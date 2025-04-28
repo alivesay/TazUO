@@ -189,7 +189,7 @@ namespace ClassicUO.Assets
                 });
         }
 
-        public Task LoadResourceAssets()
+        public Task LoadResourceAssets(GumpsLoader gumps)
         {
             return Task.Run(
                 () =>
@@ -202,10 +202,10 @@ namespace ClassicUO.Assets
                         //Check if the art already exists
                         var gumpInfo = LoadGumpTexture(i);
 
-                        if (gumpInfo.Pixels == null || gumpInfo.Pixels.IsEmpty)
+                        if (gumpInfo.Pixels.IsEmpty)
                         {
-                            gumpInfo = GumpsLoader.Instance.GetGump(i);
-                            if (gumpInfo.Pixels != null && !gumpInfo.Pixels.IsEmpty)
+                            gumpInfo = gumps.GetGump(i);
+                            if (!gumpInfo.Pixels.IsEmpty)
                             {
                                 continue;
                             }

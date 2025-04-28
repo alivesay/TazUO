@@ -577,7 +577,7 @@ namespace ClassicUO.Configuration
         public bool DisableTargetingGridContainers { get; set; }
         public bool ControllerEnabled { get; set; } = true;
 
-        public void Save(string path, bool saveGumps = true)
+        internal void Save(World world, string path, bool saveGumps = true)
         {
             Log.Trace($"Saving path:\t\t{path}");
 
@@ -593,7 +593,7 @@ namespace ClassicUO.Configuration
 
         public void SaveAsFile(string path, string filename)
         {
-            ConfigurationResolver.Save(this, Path.Combine(path, filename), ProfileJsonContext.DefaultToUse);
+            ConfigurationResolver.Save(this, Path.Combine(path, filename), ProfileJsonContext.DefaultToUse.Profile);
         }
 
         public void SaveAs(string path, string filename = "default.json")

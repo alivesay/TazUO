@@ -256,7 +256,6 @@ namespace ClassicUO.Assets
         }
 
         public unsafe void LoadMap(int i, bool useXFiles = false)
-        public unsafe void LoadMap(int i, bool useXFiles = false)
         {
             if (i < 0 || i + 1 > MAPS_COUNT || _currentMapFiles[i] == null)
             {

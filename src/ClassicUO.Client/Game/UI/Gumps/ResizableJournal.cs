@@ -48,9 +48,11 @@ namespace ClassicUO.Game.UI.Gumps
         private static int _lastX = 100, _lastY = 100;
         private static int _lastWidth = MIN_WIDTH, _lastHeight = 300;
         private readonly GumpPicTiled _backgroundTexture;
+        private World _world;
         #endregion
-        public ResizableJournal() : base(_lastWidth, _lastHeight, MIN_WIDTH, MIN_HEIGHT, 0, 0)
+        public ResizableJournal(World world) : base(world, _lastWidth, _lastHeight, MIN_WIDTH, MIN_HEIGHT, 0, 0)
         {
+            _world = world;
             AnchorType = ProfileManager.CurrentProfile.JournalAnchorEnabled ? ANCHOR_TYPE.NONE : ANCHOR_TYPE.DISABLED;
             CanMove = true;
             _prevCanMove = true;

@@ -22,6 +22,8 @@ namespace ClassicUO.Assets
 
         public int HuesCount { get; private set; }
 
+        public FloatHues[] Palette { get; private set; }
+
         public ushort[] RadarCol { get; private set; }
 
         public override unsafe void Load()
@@ -32,7 +34,7 @@ namespace ClassicUO.Assets
 
             using var file = new UOFileMul(path);
             int groupSize = Unsafe.SizeOf<HuesGroup>();
-            int entrycount = (int) file.Length / groupSize;
+            int entrycount = (int)file.Length / groupSize;
             HuesCount = entrycount * 8;
             HuesRange = new HuesGroup[entrycount];
 
@@ -45,18 +47,9 @@ namespace ClassicUO.Assets
 
             FileSystemHelper.EnsureFileExists(path);
 
-                    UOFileMul radarcol = new UOFileMul(path);
-                    RadarCol = new ushort[(int)(radarcol.Length >> 1)];
-
-                    fixed (ushort* ptr = RadarCol)
-                    {
-                        Unsafe.CopyBlockUnaligned((void*)(byte*)ptr, radarcol.PositionAddress.ToPointer(), (uint)radarcol.Length);
-                    }
-                    
-                    file.Dispose();
-                    radarcol.Dispose();
-                }
-            );
+            using var radarcol = new UOFileMul(path);
+            RadarCol = new ushort[radarcol.Length / sizeof(ushort)];
+            radarcol.Read(MemoryMarshal.AsBytes<ushort>(RadarCol.AsSpan()));
         }
 
         public float[] CreateHuesPalette()
@@ -158,6 +151,62 @@ namespace ClassicUO.Assets
         public uint ApplyHueRgba8888(ushort gray, ushort hue)
         {
             return HuesHelper.Color16To32(ApplyHueRgba5551(gray, hue));
+        }
+
+        public ushort GetColor16(ushort c, ushort color)
+        {
+            if (color != 0 && color < HuesCount)
+            {
+                color -= 1;
+                int g = color >> 3;
+                int e = color % 8;
+
+                return HuesRange[g].Entries[e].ColorTable[(c >> 10) & 0x1F];
+            }
+
+            return c;
+        }
+
+        public uint GetPolygoneColor(ushort c, ushort color)
+        {
+            if (color != 0 && color < HuesCount)
+            {
+                color -= 1;
+                int g = color >> 3;
+                int e = color % 8;
+
+                return HuesHelper.Color16To32(HuesRange[g].Entries[e].ColorTable[c]);
+            }
+
+            return 0xFF010101;
+        }
+
+        public uint GetUnicodeFontColor(ushort c, ushort color)
+        {
+            if (color != 0 && color < HuesCount)
+            {
+                color -= 1;
+                int g = color >> 3;
+                int e = color % 8;
+
+                return HuesRange[g].Entries[e].ColorTable[8];
+            }
+
+            return HuesHelper.Color16To32(c);
+        }
+
+        public uint GetColor(ushort c, ushort color)
+        {
+            if (color != 0 && color < HuesCount)
+            {
+                color -= 1;
+                int g = color >> 3;
+                int e = color % 8;
+
+                return HuesHelper.Color16To32(HuesRange[g].Entries[e].ColorTable[(c >> 10) & 0x1F]);
+            }
+
+            return color != 0 ? HuesHelper.Color16To32(color) : HuesHelper.Color16To32(c);
         }
 
         public uint GetPartialHueColor(ushort color, ushort hue)

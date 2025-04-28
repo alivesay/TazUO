@@ -152,7 +152,6 @@ namespace ClassicUO.Assets
                                     {
                                         Type = (AnimationGroupsType)i,
                                         Flags = (AnimationFlags)(0x80000000 | number)
-                                        Flags = (AnimationFlags)(0x80000000 | number)
                                     };
 
                                     break;
@@ -256,7 +255,6 @@ namespace ClassicUO.Assets
             ushort body,
             ref ushort hue,
             ref AnimationFlags flags,
-            ref AnimationFlags flags,
             out int fileIndex,
             out AnimationGroupsType animType
         )
@@ -286,7 +284,7 @@ namespace ClassicUO.Assets
                     var hashString = $"build/animationlegacyframe/{body:D6}/{action:D2}.bin";
                     var hash = UOFileUop.CreateHash(hashString);
 
-                    for (int index = 0; index < _filesUop.Count; ++index)
+                    for (int index = 0; index < _filesUop.Length; ++index)
                     {
                         if (_filesUop[index] != null && _filesUop[index].TryGetUOPData(hash, out var data))
                         {
@@ -364,7 +362,6 @@ namespace ClassicUO.Assets
         private long CalculateOffset(
             ushort graphic,
             AnimationGroupsType type,
-            AnimationFlags flags,
             AnimationFlags flags,
             out int groupCount
         )
@@ -588,7 +585,7 @@ namespace ClassicUO.Assets
                             }
                         }
 
-                        if (i >= _files.Count || _files[i] == null)
+                        if (i >= _files.Length || _files[i] == null)
                         {
                             continue;
                         }
@@ -978,26 +975,25 @@ namespace ClassicUO.Assets
                         {
                             direction = (byte)data.Direction1;
                         }
-                    {
-                        if (data.Direction1 == -1)
                         {
-                            if (direction == 7)
+                            if (data.Direction1 == -1)
                             {
-                                direction = (byte)data.Direction4;
+                                if (direction == 7)
+                                {
+                                    direction = (byte)data.Direction4;
+                                }
+                                else
+                                {
+                                    direction = (byte)data.Direction2;
+                                }
                             }
                             else
                             {
-                                direction = (byte)data.Direction2;
+                                direction = (byte)data.Direction1;
                             }
-                        }
-                        else
-                        {
-                            direction = (byte)data.Direction1;
-                        }
 
-                        break;
-                    }
-                        break;
+                            break;
+                        }
                     }
 
                 case 1:
@@ -1018,26 +1014,25 @@ namespace ClassicUO.Assets
                         {
                             direction = (byte)data.Direction2;
                         }
-                    {
-                        if (data.Direction2 == -1)
                         {
-                            if (direction == 1)
+                            if (data.Direction2 == -1)
                             {
-                                direction = (byte)data.Direction1;
+                                if (direction == 1)
+                                {
+                                    direction = (byte)data.Direction1;
+                                }
+                                else
+                                {
+                                    direction = (byte)data.Direction3;
+                                }
                             }
                             else
                             {
-                                direction = (byte)data.Direction3;
+                                direction = (byte)data.Direction2;
                             }
-                        }
-                        else
-                        {
-                            direction = (byte)data.Direction2;
-                        }
 
-                        break;
-                    }
-                        break;
+                            break;
+                        }
                     }
 
                 case 3:
@@ -1058,26 +1053,25 @@ namespace ClassicUO.Assets
                         {
                             direction = (byte)data.Direction3;
                         }
-                    {
-                        if (data.Direction3 == -1)
                         {
-                            if (direction == 3)
+                            if (data.Direction3 == -1)
                             {
-                                direction = (byte)data.Direction2;
+                                if (direction == 3)
+                                {
+                                    direction = (byte)data.Direction2;
+                                }
+                                else
+                                {
+                                    direction = (byte)data.Direction4;
+                                }
                             }
                             else
                             {
-                                direction = (byte)data.Direction4;
+                                direction = (byte)data.Direction3;
                             }
-                        }
-                        else
-                        {
-                            direction = (byte)data.Direction3;
-                        }
 
-                        break;
-                    }
-                        break;
+                            break;
+                        }
                     }
 
                 case 5:
@@ -1098,26 +1092,25 @@ namespace ClassicUO.Assets
                         {
                             direction = (byte)data.Direction4;
                         }
-                    {
-                        if (data.Direction4 == -1)
                         {
-                            if (direction == 5)
+                            if (data.Direction4 == -1)
                             {
-                                direction = (byte)data.Direction3;
+                                if (direction == 5)
+                                {
+                                    direction = (byte)data.Direction3;
+                                }
+                                else
+                                {
+                                    direction = (byte)data.Direction1;
+                                }
                             }
                             else
                             {
-                                direction = (byte)data.Direction1;
+                                direction = (byte)data.Direction4;
                             }
-                        }
-                        else
-                        {
-                            direction = (byte)data.Direction4;
-                        }
 
-                        break;
-                    }
-                        break;
+                            break;
+                        }
                     }
             }
 
@@ -1222,15 +1215,14 @@ namespace ClassicUO.Assets
                         {
                             return 8;
                         }
-                    {
-                        if (!isRunning)
                         {
-                            return 8;
-                        }
+                            if (!isRunning)
+                            {
+                                return 8;
+                            }
 
-                        goto case AnimationGroupsType.Monster;
-                    }
-                        goto case AnimationGroupsType.Monster;
+                            goto case AnimationGroupsType.Monster;
+                        }
                     }
 
                 case AnimationGroupsType.Monster:
@@ -1263,7 +1255,7 @@ namespace ClassicUO.Assets
             AnimationDirection index
         )
         {
-            if (fileIndex < 0 || fileIndex >= _filesUop.Count)
+            if (fileIndex < 0 || fileIndex >= _filesUop.Length)
             {
                 return Span<FrameInfo>.Empty;
             }
@@ -1443,7 +1435,7 @@ namespace ClassicUO.Assets
 
         public Span<FrameInfo> ReadMULAnimationFrames(int fileIndex, AnimationDirection index)
         {
-            if (fileIndex < 0 || fileIndex >= _files.Count)
+            if (fileIndex < 0 || fileIndex >= _files.Length)
             {
                 return Span<FrameInfo>.Empty;
             }

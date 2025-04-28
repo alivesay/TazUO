@@ -3091,32 +3091,40 @@ namespace ClassicUO.Assets
                         break;
 
                     case HTML_TAG_TYPE.HTT_BASEFONT:
-
-                                 if (StringHelper.UnsafeCompare(bufferCmd, "color", cmdLenght))
+                        if (MemoryExtensions.Equals(command, "color", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            ReadColorFromTextBuffer(value, ref info.Color);
+                        }
+                        else if (MemoryExtensions.Equals(command, "size", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            if (!byte.TryParse(value, out var font))
+                            {
+                                if (MemoryExtensions.Equals(value, "big", StringComparison.InvariantCultureIgnoreCase))
+                                    info.Font = 4;
+                                else if (MemoryExtensions.Equals(value, "small", StringComparison.InvariantCultureIgnoreCase))
+                                    info.Font = 0;
+                                else
+                                    info.Font = 1;
+                            }
+                            else switch (font)
                                 {
-                                    ReadColorFromTextBuffer(
-                                        bufferValue,
-                                        valueLength,
-                                        ref info.Color
-                                    );
-                                }
-                                else if (StringHelper.UnsafeCompare(bufferCmd, "size", cmdLenght))
-                                {
-                                    byte font = byte.Parse(new string(bufferValue, 0, valueLength));
-
-                                    if (font == 0 || font == 4)
-                                    {
+                                    case 0:
+                                    case 4:
                                         info.Font = 1;
-                                    }
-                                    else if (font < 4)
-                                    {
+
+                                        break;
+
+                                    case < 4:
                                         info.Font = 2;
-                                    }
-                                    else
-                                    {
+
+                                        break;
+
+                                    default:
                                         info.Font = 0;
-                                    }
+
+                                        break;
                                 }
+                        }
 
                         break;
 

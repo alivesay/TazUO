@@ -78,19 +78,12 @@ namespace ClassicUO.Game.Managers
             private set => ProfileManager.CurrentProfile.NameOverheadToggled = value;
         }
 
-        public static bool IsTemporarilyShowing { get; private set; }
-        public static bool IsShowing => IsPermaToggled || IsTemporarilyShowing || Keyboard.Ctrl && Keyboard.Shift;
-
-        private static List<NameOverheadOption> Options { get; set; } = new List<NameOverheadOption>();
-
         public static string Search { get; set; } = string.Empty;
 
         public static bool IsTemporarilyShowing { get; private set; }
         public static bool IsShowing => IsPermaToggled || IsTemporarilyShowing || Keyboard.Ctrl && Keyboard.Shift;
 
         private static List<NameOverheadOption> Options { get; set; } = new List<NameOverheadOption>();
-
-        public static string Search { get; set; } = string.Empty;
 
         public bool IsAllowed(Entity serial)
         {
@@ -150,7 +143,6 @@ namespace ClassicUO.Game.Managers
 
             if (ActiveOverheadOptions.HasFlag(NameOverheadOptions.Self) && mobile.Equals(World.Player))
                 return true;
-            }
 
             if (SerialHelper.IsItem(serial.Serial) && TypeAllowed == NameOverheadTypeAllowed.Items)
             {
@@ -168,7 +160,6 @@ namespace ClassicUO.Game.Managers
 
             if (item.IsLocked && ActiveOverheadOptions.HasFlag(NameOverheadOptions.LockedDown))
                 return true;
-            }
 
             if (ActiveOverheadOptions.HasFlag(NameOverheadOptions.Other))
                 return true;

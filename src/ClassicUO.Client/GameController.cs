@@ -104,8 +104,7 @@ namespace ClassicUO
 
             Fonts.Initialize(GraphicsDevice);
             SolidColorTextureCache.Initialize(GraphicsDevice);
-            PNGLoader.Instance.GraphicsDevice = GraphicsDevice;
-            System.Threading.Tasks.Task loadResourceAssets = PNGLoader.Instance.LoadResourceAssets();
+
             Audio = new AudioManager();
 
             var bytes = Loader.GetBackgroundImage().ToArray();
@@ -116,6 +115,10 @@ namespace ClassicUO
             SetScene(new MainScene(this));
 #else
             UO.Load(this);
+
+            PNGLoader.Instance.GraphicsDevice = GraphicsDevice;
+            System.Threading.Tasks.Task loadResourceAssets = PNGLoader.Instance.LoadResourceAssets(Client.Game.UO.Gumps);
+
             Audio.Initialize();
             // TODO: temporary fix to avoid crash when laoding plugins
             Settings.GlobalSettings.Encryption = (byte) NetClient.Socket.Load(UO.FileManager.Version, (EncryptionType) Settings.GlobalSettings.Encryption);

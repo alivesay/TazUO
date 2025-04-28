@@ -106,7 +106,7 @@ namespace ClassicUO.Game.Managers
                 case MessageType.System:
                     break;
                 case MessageType.Party:
-                    if (!currentProfile.OverheadPartyMessages)
+                    if (!currentProfile.DisplayPartyChatOverhead)
                         break;
 
                     if (parent == null) //No parent entity, need to check party members by name
@@ -139,19 +139,6 @@ namespace ClassicUO.Game.Managers
                     ));
                     break;
 
-                        TextObject msg = CreateMessage
-                        (
-                            text,
-                            hue,
-                            font,
-                            unicode,
-                            type,
-                            textType
-                        );
-
-                        parent.AddMessage(msg);
-                        break;
-                    }
                 case MessageType.Guild:
                     if (currentProfile.IgnoreGuildMessages) return;
                     break;
@@ -222,9 +209,9 @@ namespace ClassicUO.Game.Managers
                             break;
                         }
 
-                    // If person who send that message is in ignores list - but filter out Spell Text
-                    if (_world.IgnoreManager.IgnoredCharsList.Contains(parent.Name) && type != MessageType.Spell)
-                        break;
+                        // If person who send that message is in ignores list - but filter out Spell Text
+                        if (_world.IgnoreManager.IgnoredCharsList.Contains(parent.Name) && type != MessageType.Spell)
+                            break;
 
                         TextObject msg = CreateMessage
                         (
@@ -238,12 +225,12 @@ namespace ClassicUO.Game.Managers
 
                         msg.Owner = parent;
 
-                    if (parent is Item it && !it.OnGround)
-                    {
-                        msg.X = _world.DelayedObjectClickManager.X;
-                        msg.Y = _world.DelayedObjectClickManager.Y;
-                        msg.IsTextGump = true;
-                        bool found = false;
+                        if (parent is Item it && !it.OnGround)
+                        {
+                            msg.X = _world.DelayedObjectClickManager.X;
+                            msg.Y = _world.DelayedObjectClickManager.Y;
+                            msg.IsTextGump = true;
+                            bool found = false;
 
                             for (LinkedListNode<Gump> gump = UIManager.Gumps.Last; gump != null; gump = gump.Previous)
                             {
@@ -297,8 +284,7 @@ namespace ClassicUO.Game.Managers
                     textType,
                     unicode,
                     lang
-                ),
-                parent
+                )
             );
         }
 

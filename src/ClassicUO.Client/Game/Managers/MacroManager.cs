@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: BSD-2-Clause
-
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
@@ -55,10 +54,7 @@ namespace ClassicUO.Game.Managers
 
         public bool WaitingBandageTarget { get; set; }
 
-        public static MacroManager TryGetMacroManager()
-        {
-            return Client.Game.GetScene<GameScene>().Macros;
-        }
+        public static MacroManager TryGetMacroManager(World world) => world.Macros;
 
         public void Load()
         {
@@ -507,7 +503,7 @@ namespace ClassicUO.Game.Managers
 
                     if (!_world.Player.Pathfinder.AutoWalking)
                     {
-                        _world.Player.Walk((Direction) dt, false);
+                        _world.Player.Walk((Direction)dt, false);
                     }
 
                     break;
@@ -777,34 +773,11 @@ namespace ClassicUO.Game.Managers
                                     break;
 
                                 case MacroSubType.Journal:
-                                    if(ProfileManager.CurrentProfile.UseAlternateJournal)
+                                    ResizableJournal rjournal = UIManager.GetGump<ResizableJournal>();
+                                    if (macro.Code == MacroType.Close)
                                     {
-                                        ResizableJournal rjournal = UIManager.GetGump<ResizableJournal>();
-                                        if (macro.Code == MacroType.Close)
-                                        {
-                                            rjournal?.Dispose();
-                                        }
-                                        break;
+                                        rjournal?.Dispose();
                                     }
-
-                                    JournalGump journal = UIManager.GetGump<JournalGump>();
-
-                                    if (journal != null)
-                                    {
-                                        if (macro.Code == MacroType.Close)
-                                        {
-                                            journal.Dispose();
-                                        }
-                                        else if (macro.Code == MacroType.Minimize)
-                                        {
-                                            journal.IsMinimized = true;
-                                        }
-                                        else if (macro.Code == MacroType.Maximize)
-                                        {
-                                            journal.IsMinimized = false;
-                                        }
-                                    }
-
                                     break;
 
                                 case MacroSubType.Skills:
@@ -937,35 +910,34 @@ namespace ClassicUO.Game.Managers
                             break;
 
                         case MacroType.ToggleGump:
-                            Gump g;
                             switch (macro.SubCode)
                             {
                                 case MacroSubType.Configuration:
                                     if (!GameActions.CloseSettings())
-                                        GameActions.OpenSettings();
+                                        GameActions.OpenSettings(_world);
                                     break;
 
                                 case MacroSubType.Paperdoll:
-                                    if (!GameActions.ClosePaperdoll())
-                                        GameActions.OpenPaperdoll(World.Player);
+                                    if (!GameActions.ClosePaperdoll(_world))
+                                        GameActions.OpenPaperdoll(_world, _world.Player);
 
                                     break;
 
                                 case MacroSubType.Status:
                                     if (!GameActions.CloseStatusBar())
-                                        GameActions.OpenStatusBar();
+                                        GameActions.OpenStatusBar(_world);
 
                                     break;
 
                                 case MacroSubType.Journal:
                                     if (!GameActions.CloseAllJournals())
-                                        GameActions.OpenJournal();
+                                        GameActions.OpenJournal(_world);
 
                                     break;
 
                                 case MacroSubType.Skills:
                                     if (!GameActions.CloseSkills())
-                                        GameActions.OpenSkills();
+                                        GameActions.OpenSkills(_world);
 
                                     break;
 
@@ -1024,25 +996,25 @@ namespace ClassicUO.Game.Managers
 
                                 case MacroSubType.Chat:
                                     if (!GameActions.CloseChat())
-                                        GameActions.OpenChat();
+                                        GameActions.OpenChat(_world);
 
                                     break;
 
                                 case MacroSubType.Backpack:
-                                    if (!GameActions.CloseBackpack())
-                                        GameActions.OpenBackpack();
+                                    if (!GameActions.CloseBackpack(_world))
+                                        GameActions.OpenBackpack(_world);
 
                                     break;
 
                                 case MacroSubType.Overview:
                                     if (!GameActions.CloseMiniMap())
-                                        GameActions.OpenMiniMap();
+                                        GameActions.OpenMiniMap(_world);
 
                                     break;
 
                                 case MacroSubType.WorldMap:
                                     if (!GameActions.CloseWorldMap())
-                                        GameActions.OpenWorldMap();
+                                        GameActions.OpenWorldMap(_world);
 
                                     break;
 
@@ -1054,7 +1026,7 @@ namespace ClassicUO.Game.Managers
                                     {
                                         int x = Client.Game.Window.ClientBounds.Width / 2 - 272;
                                         int y = Client.Game.Window.ClientBounds.Height / 2 - 240;
-                                        UIManager.Add(new PartyGump(x, y, World.Party.CanLoot));
+                                        UIManager.Add(new PartyGump(_world, x, y, _world.Party.CanLoot));
                                     }
                                     else
                                     {
@@ -1095,7 +1067,7 @@ namespace ClassicUO.Game.Managers
                         GameActions.OpenNearbyLootGump();
 
                     break;
-                
+
                 case MacroType.ToggleLegionScripting:
                     if (!GameActions.CloseLegionScriptingGump())
                         GameActions.OpenLegionScriptingGump();
@@ -1307,7 +1279,7 @@ namespace ClassicUO.Game.Managers
                             break;
                         }
 
-                        Item item = _world.Player.FindItemByLayer(Layer.OneHanded + (byte) handIndex);
+                        Item item = _world.Player.FindItemByLayer(Layer.OneHanded + (byte)handIndex);
 
                         if (item != null)
                         {
@@ -1469,7 +1441,7 @@ namespace ClassicUO.Game.Managers
                 case MacroType.BandageSelf:
                 case MacroType.BandageTarget:
 
-                    if (Client.Game.UO.Version < ClientVersion.CV_5020 || ProfileManager.CurrentProfile.BandageSelfOld)
+                    if (Client.Game.UO.Version < Utility.ClientVersion.CV_5020 || ProfileManager.CurrentProfile.BandageSelfOld)
                     {
                         if (WaitingBandageTarget)
                         {
@@ -1509,7 +1481,7 @@ namespace ClassicUO.Game.Managers
                             if (bandage != null)
                             {
                                 WaitingBandageTarget = true;
-                                GameActions.DoubleClick(_world,bandage);
+                                GameActions.DoubleClick(_world, bandage);
                                 result = 1;
                             }
                         }
@@ -1641,13 +1613,14 @@ namespace ClassicUO.Game.Managers
                     {
                         BuffGump buff = UIManager.GetGump<BuffGump>();
 
-                    if (buff != null)
-                    {
-                        buff.Dispose();
-                    }
-                    else
-                    {
-                        UIManager.Add(new BuffGump(_world, 100, 100));
+                        if (buff != null)
+                        {
+                            buff.Dispose();
+                        }
+                        else
+                        {
+                            UIManager.Add(new BuffGump(_world, 100, 100));
+                        }
                     }
 
                     break;
@@ -1766,7 +1739,7 @@ namespace ClassicUO.Game.Managers
 
                             if (obj != null)
                             {
-                                GameActions.DoubleClick(_world,obj);
+                                GameActions.DoubleClick(_world, obj);
                             }
 
                             break;
@@ -1778,7 +1751,7 @@ namespace ClassicUO.Game.Managers
 
                             if (obj != null)
                             {
-                                GameActions.DoubleClick(_world,obj);
+                                GameActions.DoubleClick(_world, obj);
                             }
 
                             break;
@@ -1802,7 +1775,7 @@ namespace ClassicUO.Game.Managers
 
                             if (obj != null)
                             {
-                                GameActions.DoubleClick(_world,obj);
+                                GameActions.DoubleClick(_world, obj);
                             }
 
                             break;
@@ -1814,7 +1787,7 @@ namespace ClassicUO.Game.Managers
 
                             if (obj != null)
                             {
-                                GameActions.DoubleClick(_world,obj);
+                                GameActions.DoubleClick(_world, obj);
                             }
 
                             break;
@@ -2011,7 +1984,7 @@ namespace ClassicUO.Game.Managers
                     if (!string.IsNullOrEmpty(command))
                     {
                         string[] parts = command.Split(' ');
-                        CommandManager.Execute(parts[0], parts);
+                        _world.CommandManager.Execute(parts[0], parts);
                     }
                     break;
                 case MacroType.DisarmAbility:
@@ -2042,7 +2015,7 @@ namespace ClassicUO.Game.Managers
                 {
                     if (ent != null)
                     {
-                        GameActions.MessageOverhead(_world, string.Format(ResGeneral.Target0, ent.Name), Notoriety.GetHue(((Mobile) ent).NotorietyFlag), _world.Player);
+                        GameActions.MessageOverhead(_world, string.Format(ResGeneral.Target0, ent.Name), Notoriety.GetHue(((Mobile)ent).NotorietyFlag), _world.Player);
 
                         _world.TargetManager.NewTargetSystemSerial = serial;
                         _world.TargetManager.SelectedTarget = serial;
@@ -2432,7 +2405,7 @@ namespace ClassicUO.Game.Managers
                 case MacroType.CastSpell:
                     offset = (int)MacroSubType.Clumsy;
                     var countInitial = MacroSubType.Hostile - MacroSubType.Clumsy;
-                    var countFinal = MacroSubType.DeathRay - MacroSubType.Boarding;
+                    //var countFinal = MacroSubType.DeathRay - MacroSubType.Boarding;
                     count = countInitial + 33 + 43;
                     break;
 

@@ -111,14 +111,11 @@ namespace ClassicUO.Game.Managers
         private readonly World _world;
         private readonly byte[] _lastDataBuffer = new byte[19];
 
-
-        public static uint SelectedTarget;
-
         public TargetManager(World world) { _world = world; }
 
-        public uint LastAttack, SelectedTarget, NewTargetSystemSerial;
+        public uint SelectedTarget, NewTargetSystemSerial;
 
-        public static uint LastAttack
+        public uint LastAttack
         {
             get { return _lastAttack; }
             set

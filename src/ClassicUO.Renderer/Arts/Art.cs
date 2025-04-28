@@ -42,7 +42,7 @@ namespace ClassicUO.Renderer.Arts
             {
                 ArtInfo artInfo = PNGLoader.Instance.LoadArtTexture(idx);
 
-                if (artInfo.Pixels == null || artInfo.Pixels.IsEmpty)
+                if (artInfo.Pixels.IsEmpty)
                 {
                     artInfo = _artLoader.GetArt(idx);
                 }
@@ -158,7 +158,7 @@ namespace ClassicUO.Renderer.Arts
                             {
                                 c.PackedValue = *pixels_ptr;
                                 *pixels_ptr =
-                                    HuesLoader.Instance.ApplyHueRgba8888(HuesHelper.Color32To16(*pixels_ptr), customHue);
+                                    _huesLoader.ApplyHueRgba8888(HuesHelper.Color32To16(*pixels_ptr), customHue);
 
                                     // HuesHelper.Color16To32(
                                     //     _huesLoader.GetColor16(

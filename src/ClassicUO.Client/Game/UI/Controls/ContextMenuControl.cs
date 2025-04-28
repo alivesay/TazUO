@@ -1,34 +1,4 @@
-﻿#region license
-
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Gumps;
@@ -43,10 +13,12 @@ namespace ClassicUO.Game.UI.Controls
     public class ContextMenuControl
     {
         private readonly List<ContextMenuItemEntry> _items;
+        private readonly Gump _gump;
 
-        public ContextMenuControl()
+        public ContextMenuControl(Gump gump)
         {
             _items = new List<ContextMenuItemEntry>();
+            _gump = gump;
         }
 
         public void Add(string text, Action action, bool canBeSelected = false, bool defaultValue = false)
@@ -81,7 +53,7 @@ namespace ClassicUO.Game.UI.Controls
 
             UIManager.ShowContextMenu
             (
-                new ContextMenuShowMenu(_items)
+                new ContextMenuShowMenu(_gump.World, _items)
             );
         }
 
@@ -121,7 +93,7 @@ namespace ClassicUO.Game.UI.Controls
         private List<ContextMenuShowMenu> _subMenus;
 
 
-        public ContextMenuShowMenu(List<ContextMenuItemEntry> list) : base(0, 0)
+        public ContextMenuShowMenu(World world, List<ContextMenuItemEntry> list) : base(world, 0, 0)
         {
             WantUpdateSize = true;
             ModalClickOutsideAreaClosesThisControl = true;
@@ -248,10 +220,12 @@ namespace ClassicUO.Game.UI.Controls
             private readonly Label _label;
             private readonly GumpPic _selectedPic;
             private readonly ContextMenuShowMenu _subMenu;
+            private readonly ContextMenuShowMenu _gump;
 
 
             public ContextMenuItem(ContextMenuShowMenu parent, ContextMenuItemEntry entry)
             {
+                _gump = parent;
                 CanCloseWithRightClick = false;
                 _entry = entry;
 
@@ -296,10 +270,10 @@ namespace ClassicUO.Game.UI.Controls
                     Width = 100;
                 }
 
-                // it is a bit tricky, but works :D 
+                // it is a bit tricky, but works :D
                 if (_entry.Items != null && _entry.Items.Count != 0)
                 {
-                    _subMenu = new ContextMenuShowMenu(_entry.Items);
+                    _subMenu = new ContextMenuShowMenu(_gump.World, _entry.Items);
                     parent.Add(_subMenu);
 
                     if (parent._subMenus == null)

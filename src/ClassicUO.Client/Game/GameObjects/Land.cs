@@ -1,34 +1,4 @@
-﻿#region license
-
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
 using System.Runtime.CompilerServices;
@@ -42,20 +12,24 @@ namespace ClassicUO.Game.GameObjects
 {
     internal sealed partial class Land : GameObject
     {
-        private static readonly QueuedPool<Land> _pool = new QueuedPool<Land>
-        (
-            Constants.PREDICTABLE_TILE_COUNT,
-            l =>
-            {
-                l.IsDestroyed = false;
-                l.AlphaHue = 255;
-                l.NormalTop = l.NormalRight = l.NormalLeft = l.NormalBottom = Vector3.Zero;
-                l.YOffsets.Top = l.YOffsets.Right = l.YOffsets.Left = l.YOffsets.Bottom = 0;
-                l.MinZ = l.AverageZ = 0;
-            }
-        );
+        //private static readonly QueuedPool<Land> _pool = new QueuedPool<Land>
+        //(
+        //    Constants.PREDICTABLE_TILE_COUNT,
+        //    l =>
+        //    {
+        //        l.IsDestroyed = false;
+        //        l.AlphaHue = 255;
+        //        l.NormalTop = l.NormalRight = l.NormalLeft = l.NormalBottom = Vector3.Zero;
+        //        l.YOffsets.Top = l.YOffsets.Right = l.YOffsets.Left = l.YOffsets.Bottom = 0;
+        //        l.MinZ = l.AverageZ = 0;
+        //    }
+        //);
 
-        public ref LandTiles TileData => ref TileDataLoader.Instance.LandData[Graphic];
+        public ref LandTiles TileData
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => ref Client.Game.UO.FileManager.TileData.LandData[Graphic];
+        }
         public sbyte AverageZ;
         public bool IsStretched;
         public sbyte MinZ;
@@ -63,9 +37,12 @@ namespace ClassicUO.Game.GameObjects
         public ushort OriginalGraphic;
         public UltimaBatcher2D.YOffsets YOffsets;
 
-        public static Land Create(ushort graphic)
+        private Land(World world) : base(world) { }
+
+        public static Land Create(World world, ushort graphic)
         {
-            Land land = _pool.GetOne();
+            Land land = new Land(world); // _pool.GetOne();
+            land.AlphaHue = 0xFF;
             land.Graphic = graphic;
             land.OriginalGraphic = graphic;
             land.IsStretched = land.TileData.TexID == 0 && land.TileData.IsWet;
@@ -83,7 +60,7 @@ namespace ClassicUO.Game.GameObjects
             }
 
             base.Destroy();
-            _pool.ReturnOne(this);
+            //_pool.ReturnOne(this);
         }
 
         public override void UpdateGraphicBySeason()
@@ -118,7 +95,7 @@ namespace ClassicUO.Game.GameObjects
 
         public void ApplyStretch(Map.Map map, int x, int y, sbyte z)
         {
-            if (IsStretched || TexmapsLoader.Instance.GetValidRefEntry(TileData.TexID).Length <= 0)
+            if (IsStretched || Client.Game.UO.FileManager.Texmaps.File.GetValidRefEntry(TileData.TexID).Length <= 0)
             {
                 IsStretched = false;
                 AverageZ = z;
@@ -131,7 +108,7 @@ namespace ClassicUO.Game.GameObjects
              * | top | rig |
              * |_____|_____|
              * | lef | bot |
-             * |_____|_____|         
+             * |_____|_____|
              */
             sbyte zTop = z;
             sbyte zRight = map.GetTileZ(x + 1, y);
@@ -200,7 +177,7 @@ namespace ClassicUO.Game.GameObjects
             Vector3 ret = new Vector3();
 
 
-            // ========================== 
+            // ==========================
             u.X = -22;
             u.Y = -22;
             u.Z = (left - tile) * 4;
@@ -210,10 +187,10 @@ namespace ClassicUO.Game.GameObjects
             v.Z = (bottom - tile) * 4;
 
             Vector3.Cross(ref v, ref u, out ret);
-            // ========================== 
+            // ==========================
 
 
-            // ========================== 
+            // ==========================
             u.X = -22;
             u.Y = 22;
             u.Z = (bottom - tile) * 4;
@@ -224,10 +201,10 @@ namespace ClassicUO.Game.GameObjects
 
             Vector3.Cross(ref v, ref u, out normal);
             Vector3.Add(ref ret, ref normal, out ret);
-            // ========================== 
+            // ==========================
 
 
-            // ========================== 
+            // ==========================
             u.X = 22;
             u.Y = 22;
             u.Z = (right - tile) * 4;
@@ -238,10 +215,10 @@ namespace ClassicUO.Game.GameObjects
 
             Vector3.Cross(ref v, ref u, out normal);
             Vector3.Add(ref ret, ref normal, out ret);
-            // ========================== 
+            // ==========================
 
 
-            // ========================== 
+            // ==========================
             u.X = 22;
             u.Y = -22;
             u.Z = (top - tile) * 4;
@@ -252,7 +229,7 @@ namespace ClassicUO.Game.GameObjects
 
             Vector3.Cross(ref v, ref u, out normal);
             Vector3.Add(ref ret, ref normal, out ret);
-            // ========================== 
+            // ==========================
 
 
             Vector3.Normalize(ref ret, out normal);

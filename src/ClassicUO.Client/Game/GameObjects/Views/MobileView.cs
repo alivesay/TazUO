@@ -1,34 +1,4 @@
-#region license
-
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+// SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
@@ -81,9 +51,9 @@ namespace ClassicUO.Game.GameObjects
             bool hasShadow = !IsDead && !IsHidden && ProfileManager.CurrentProfile.ShadowsEnabled;
             bool inParty = World.Party.Contains(this);
 
-            if (AuraManager.IsEnabled)
+            if (World.AuraManager.IsEnabled)
             {
-                AuraManager.Draw(
+                World.AuraManager.Draw(
                     batcher,
                     drawX,
                     drawY,
@@ -97,7 +67,7 @@ namespace ClassicUO.Game.GameObjects
             bool isHuman = IsHuman;
 
             bool isGargoyle =
-                Client.Version >= ClientVersion.CV_7000
+                Client.Game.UO.Version >= ClientVersion.CV_7000
                 && (Graphic == 666 || Graphic == 667 || Graphic == 0x02B7 || Graphic == 0x02B6);
 
             Vector3 hueVec = ShaderHueTranslator.GetHueVector(0, false, AlphaHue / 255f);
@@ -171,9 +141,9 @@ namespace ClassicUO.Game.GameObjects
                 }
             }
 
-            bool isAttack = Serial == TargetManager.LastAttack;
+            bool isAttack = Serial == World.TargetManager.LastAttack;
             bool isUnderMouse =
-                TargetManager.IsTargeting && ReferenceEquals(SelectedObject.Object, this);
+                World.TargetManager.IsTargeting && ReferenceEquals(SelectedObject.Object, this);
 
             if (Serial != World.Player.Serial)
             {
@@ -190,7 +160,7 @@ namespace ClassicUO.Game.GameObjects
             ProcessSteps(out byte dir);
             byte layerDir = dir;
 
-            AnimationsLoader.Instance.GetAnimDirection(ref dir, ref IsFlipped);
+            Client.Game.UO.Animations.GetAnimDirection(ref dir, ref IsFlipped);
 
             ushort graphic = GetGraphicForAnimation();
             byte animGroup = GetGroupForAnimation(this, graphic, true);
@@ -206,10 +176,13 @@ namespace ClassicUO.Game.GameObjects
 
                 if (
                     mountGraphic != 0xFFFF
-                    && mountGraphic < Client.Game.Animations.MaxAnimationCount
+                    && mountGraphic < Client.Game.UO.Animations.MaxAnimationCount
                 )
                 {
-                    mountOffsetY = Client.Game.Animations.GetMountedHeightOffset(mountGraphic);
+                    if (Mounts.TryGet(mount.Graphic, out var mountInfo))
+                    {
+                        mountOffsetY = mountInfo.OffsetY;
+                    }
 
                     if (hasShadow)
                     {
@@ -301,7 +274,7 @@ namespace ClassicUO.Game.GameObjects
 
                     ProcessSteps(out dir);
 
-                    AnimationsLoader.Instance.FixSittingDirection(
+                    Client.Game.UO.FileManager.Animations.FixSittingDirection(
                         ref dir,
                         ref IsFlipped,
                         ref drawX,
@@ -422,7 +395,7 @@ namespace ClassicUO.Game.GameObjects
                             }
 
                             if (
-                                AnimationsLoader.Instance.EquipConversions.TryGetValue(
+                                Client.Game.UO.FileManager.Animations.EquipConversions.TryGetValue(
                                     Graphic,
                                     out Dictionary<ushort, EquipConvData> map
                                 )
@@ -535,7 +508,7 @@ namespace ClassicUO.Game.GameObjects
                 }
 
                 if (
-                    AnimationsLoader.Instance.EquipConversions.TryGetValue(
+                    Client.Game.UO.FileManager.Animations.EquipConversions.TryGetValue(
                         owner.Graphic,
                         out Dictionary<ushort, EquipConvData> map
                     )
@@ -645,7 +618,7 @@ namespace ClassicUO.Game.GameObjects
         {
             spriteInfo = default;
 
-            var frames = Client.Game.Animations.GetAnimationFrames(
+            var frames = Client.Game.UO.Animations.GetAnimationFrames(
                 graphic,
                 animGroup,
                 direction,
@@ -698,20 +671,19 @@ namespace ClassicUO.Game.GameObjects
             bool charIsSitting
         )
         {
-            if (id >= Client.Game.Animations.MaxAnimationCount || owner == null)
+            if (id >= Client.Game.UO.Animations.MaxAnimationCount || owner == null)
             {
                 return;
             }
 
-            var frames = Client.Game.Animations.GetAnimationFrames(
+            var frames = Client.Game.UO.Animations.GetAnimationFrames(
                 id,
                 animGroup,
                 dir,
                 out var hueFromFile,
                 out _,
                 isEquip,
-                false,
-                forceUOP
+                false
             );
 
             if (hueFromFile == 0)
@@ -1026,12 +998,14 @@ namespace ClassicUO.Game.GameObjects
 
             bool isHuman = IsHuman;
             bool isGargoyle =
-                Client.Version >= ClientVersion.CV_7000
+                Client.Game.UO.Version >= ClientVersion.CV_7000
                 && (Graphic == 666 || Graphic == 667 || Graphic == 0x02B7 || Graphic == 0x02B6);
+
+            var animations = Client.Game.UO.Animations;
 
             ProcessSteps(out byte dir);
             bool isFlipped = IsFlipped;
-            AnimationsLoader.Instance.GetAnimDirection(ref dir, ref isFlipped);
+            animations.GetAnimDirection(ref dir, ref isFlipped);
 
             ushort graphic = GetGraphicForAnimation();
             byte animGroup = GetGroupForAnimation(this, graphic, true);
@@ -1075,7 +1049,7 @@ namespace ClassicUO.Game.GameObjects
                             int y = position.Y - (spriteInfo.UV.Height + spriteInfo.Center.Y);
 
                             if (
-                                Client.Game.Animations.PixelCheck(
+                                animations.PixelCheck(
                                     mountGraphic,
                                     animGroupMount,
                                     dir,
@@ -1093,9 +1067,10 @@ namespace ClassicUO.Game.GameObjects
                                 return true;
                             }
 
-                            position.Y += Client.Game.Animations.GetMountedHeightOffset(
-                                mountGraphic
-                            );
+                            if (Mounts.TryGet(mount.Graphic, out var moutInfo))
+                            {
+                                position.Y += moutInfo.OffsetY;
+                            }
                         }
                     }
                 }
@@ -1109,7 +1084,7 @@ namespace ClassicUO.Game.GameObjects
                 int y = position.Y - (spriteInfo.UV.Height + spriteInfo.Center.Y);
 
                 if (
-                    Client.Game.Animations.PixelCheck(
+                    animations.PixelCheck(
                         graphic,
                         animGroup,
                         dir,
@@ -1171,7 +1146,7 @@ namespace ClassicUO.Game.GameObjects
                             int y = position.Y - (spriteInfo.UV.Height + spriteInfo.Center.Y);
 
                             if (
-                                Client.Game.Animations.PixelCheck(
+                                animations.PixelCheck(
                                     graphic,
                                     animGroup,
                                     dir,

@@ -1,34 +1,5 @@
-﻿#region license
+﻿// SPDX-License-Identifier: BSD-2-Clause
 
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
 
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
@@ -84,11 +55,14 @@ namespace ClassicUO.Game.Managers
         MobilesAndCorpses = AllMobiles | MonsterCorpses | HumanoidCorpses,
     }
 
-    public static class NameOverHeadManager
+    internal sealed class NameOverHeadManager
     {
-        private static NameOverHeadHandlerGump _gump;
+        private NameOverHeadHandlerGump _gump;
         private static SDL.SDL_Keycode _lastKeySym = SDL.SDL_Keycode.SDLK_UNKNOWN;
         private static SDL.SDL_Keymod _lastKeyMod = SDL.SDL_Keymod.KMOD_NONE;
+        private readonly World _world;
+
+        public NameOverHeadManager(World world) { _world = world; }
 
         public static string LastActiveNameOverheadOption
         {
@@ -111,7 +85,14 @@ namespace ClassicUO.Game.Managers
 
         public static string Search { get; set; } = string.Empty;
 
-        public static bool IsAllowed(Entity serial)
+        public static bool IsTemporarilyShowing { get; private set; }
+        public static bool IsShowing => IsPermaToggled || IsTemporarilyShowing || Keyboard.Ctrl && Keyboard.Shift;
+
+        private static List<NameOverheadOption> Options { get; set; } = new List<NameOverheadOption>();
+
+        public static string Search { get; set; } = string.Empty;
+
+        public bool IsAllowed(Entity serial)
         {
             if (serial == null)
                 return false;
@@ -169,18 +150,9 @@ namespace ClassicUO.Game.Managers
 
             if (ActiveOverheadOptions.HasFlag(NameOverheadOptions.Self) && mobile.Equals(World.Player))
                 return true;
+            }
 
-            return false;
-        }
-
-        private static bool HandleItemOverhead(Entity serial)
-        {
-            var item = serial as Item;
-
-            if (item == null)
-                return false;
-
-            if (item.IsCorpse)
+            if (SerialHelper.IsItem(serial.Serial) && TypeAllowed == NameOverheadTypeAllowed.Items)
             {
                 return HandleCorpseOverhead(item);
             }
@@ -196,32 +168,20 @@ namespace ClassicUO.Game.Managers
 
             if (item.IsLocked && ActiveOverheadOptions.HasFlag(NameOverheadOptions.LockedDown))
                 return true;
+            }
 
             if (ActiveOverheadOptions.HasFlag(NameOverheadOptions.Other))
-                return true;
-
-            return false;
-        }
-
-        private static bool HandleCorpseOverhead(Item item)
-        {
-            var isHumanCorpse = item.IsHumanCorpse;
-
-            if (isHumanCorpse && ActiveOverheadOptions.HasFlag(NameOverheadOptions.HumanoidCorpses))
-                return true;
-
-            if (!isHumanCorpse && ActiveOverheadOptions.HasFlag(NameOverheadOptions.MonsterCorpses))
                 return true;
 
             // TODO: Add support for IsOwnCorpse, which was coded by Dyru
             return false;
         }
 
-        public static void Open()
+        public void Open()
         {
             if (_gump == null || _gump.IsDisposed)
             {
-                _gump = new NameOverHeadHandlerGump();
+                _gump = new NameOverHeadHandlerGump(_world);
                 UIManager.Add(_gump);
             }
 
@@ -229,16 +189,20 @@ namespace ClassicUO.Game.Managers
             _gump.IsVisible = true;
         }
 
-        public static void Close()
+        public void Close()
         {
             if (_gump == null)
-                return;
+            { //Required in case nameplates are active when closing and reopening the client
+                _gump = new NameOverHeadHandlerGump(_world);
+                UIManager.Add(_gump);
+            }
+
 
             _gump.IsEnabled = false;
             _gump.IsVisible = false;
         }
 
-        public static void ToggleOverheads()
+        public void ToggleOverheads()
         {
             SetOverheadToggled(!IsPermaToggled);
         }

@@ -1,34 +1,5 @@
-﻿#region license
+﻿// SPDX-License-Identifier: BSD-2-Clause
 
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
 
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
@@ -48,7 +19,7 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private RighClickableButton XmlGumps;
 
-        private TopBarGump() : base(0, 0)
+        private TopBarGump(World world) : base(world, 0, 0)
         {
             CanMove = true;
             AcceptMouseInput = true;
@@ -69,7 +40,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             // big
             int smallWidth = 50;
-            ref readonly var gumpInfo = ref Client.Game.Gumps.GetGump(0x098B);
+            ref readonly var gumpInfo = ref Client.Game.UO.Gumps.GetGump(0x098B);
             if (gumpInfo.Texture != null)
             {
                 smallWidth = gumpInfo.UV.Width;
@@ -77,7 +48,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             int largeWidth = 100;
 
-            gumpInfo = ref Client.Game.Gumps.GetGump(0x098D);
+            gumpInfo = ref Client.Game.UO.Gumps.GetGump(0x098D);
             if (gumpInfo.Texture != null)
             {
                 largeWidth = gumpInfo.UV.Width;
@@ -93,7 +64,7 @@ namespace ClassicUO.Game.UI.Gumps
                 new[] { 1, (int) Buttons.UOStore },
             };
 
-            var cliloc = ClilocLoader.Instance;
+            var cliloc = Client.Game.UO.FileManager.Clilocs;
 
             string[] texts =
             {
@@ -105,7 +76,7 @@ namespace ClassicUO.Game.UI.Gumps
                 cliloc.GetString(1158008, ResGumps.UOStore),
             };
 
-            bool hasUOStore = Client.Version >= ClientVersion.CV_706400;
+            bool hasUOStore = Client.Game.UO.Version >= ClientVersion.CV_706400;
 
             ResizePic background;
 
@@ -340,7 +311,45 @@ namespace ClassicUO.Game.UI.Gumps
             XmlGumps.ContextMenu.Add(reload);
         }
 
-        public static void Create()
+        public void RefreshXmlGumps()
+        {
+            XmlGumps.ContextMenu?.Dispose();
+            if (XmlGumps.ContextMenu == null)
+            {
+                XmlGumps.ContextMenu = new ContextMenuControl();
+            }
+
+            string[] xmls = XmlGumpHandler.GetAllXmlGumps();
+
+            ContextMenuItemEntry ci = null;
+            foreach (var xml in xmls)
+            {
+                XmlGumps.ContextMenu.Add(ci = new ContextMenuItemEntry(xml, () =>
+                {
+                    if (Keyboard.Ctrl)
+                    {
+                        if (ProfileManager.CurrentProfile.AutoOpenXmlGumps.Contains(xml))
+                        {
+                            ProfileManager.CurrentProfile.AutoOpenXmlGumps.Remove(xml);
+                        }
+                        else
+                        {
+                            ProfileManager.CurrentProfile.AutoOpenXmlGumps.Add(xml);
+                        }
+                    }
+                    else
+                    {
+                        UIManager.Add(XmlGumpHandler.CreateGumpFromFile(System.IO.Path.Combine(XmlGumpHandler.XmlGumpPath, xml + ".xml")));
+                    }
+                    RefreshXmlGumps();
+                }, false, ProfileManager.CurrentProfile.AutoOpenXmlGumps.Contains(xml)));
+            }
+
+            ContextMenuItemEntry reload = new ContextMenuItemEntry("Reload", RefreshXmlGumps);
+            XmlGumps.ContextMenu.Add(reload);
+        }
+
+        public static void Create(World world)
         {
             TopBarGump gump = UIManager.GetGump<TopBarGump>();
 
@@ -355,7 +364,7 @@ namespace ClassicUO.Game.UI.Gumps
                 }
 
                 UIManager.Add(
-                    gump = new TopBarGump
+                    gump = new TopBarGump(world)
                     {
                         X = ProfileManager.CurrentProfile.TopbarGumpPosition.X,
                         Y = ProfileManager.CurrentProfile.TopbarGumpPosition.Y
@@ -401,27 +410,27 @@ namespace ClassicUO.Game.UI.Gumps
             switch ((Buttons)buttonID)
             {
                 case Buttons.Paperdoll:
-                    GameActions.OpenPaperdoll(World.Player);
+                    GameActions.OpenPaperdoll(World, World.Player);
 
                     break;
 
                 case Buttons.Inventory:
-                    GameActions.OpenBackpack();
+                    GameActions.OpenBackpack(World);
 
                     break;
 
                 case Buttons.Journal:
-                    GameActions.OpenJournal();
+                    GameActions.OpenJournal(World);
 
                     break;
 
                 case Buttons.Chat:
-                    GameActions.OpenChat();
+                    GameActions.OpenChat(World);
 
                     break;
 
                 case Buttons.UOStore:
-                    if (Client.Version >= ClientVersion.CV_706400)
+                    if (Client.Game.UO.Version >= ClientVersion.CV_706400)
                     {
                         NetClient.Socket.Send_OpenUOStore();
                     }
@@ -429,7 +438,7 @@ namespace ClassicUO.Game.UI.Gumps
                     break;
 
                 case Buttons.WorldMap:
-                    GameActions.OpenWorldMap();
+                    GameActions.OpenWorldMap(World);
 
                     break;
             }

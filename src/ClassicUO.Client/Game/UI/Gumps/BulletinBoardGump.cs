@@ -1,34 +1,4 @@
-﻿#region license
-
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
 using System.Collections.Generic;
@@ -47,7 +17,7 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private readonly DataBox _databox;
 
-        public BulletinBoardGump(uint serial, int x, int y, string name) : base(serial, 0)
+        public BulletinBoardGump(World world, uint serial, int x, int y, string name) : base(world, serial, 0)
         {
             X = x;
             Y = y;
@@ -85,6 +55,7 @@ namespace ClassicUO.Game.UI.Gumps
                 (
                     new BulletinBoardItem
                     (
+                        world,
                         LocalSerial,
                         0,
                         World.Player.Name,
@@ -182,6 +153,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         public BulletinBoardItem
         (
+            World world,
             uint serial,
             uint msgSerial,
             string poster,
@@ -189,7 +161,7 @@ namespace ClassicUO.Game.UI.Gumps
             string datatime,
             string data,
             byte variant
-        ) : base(serial, 0)
+        ) : base(world, serial, 0)
         {
             _msgSerial = msgSerial;
             AcceptKeyboardInput = true;
@@ -219,7 +191,7 @@ namespace ClassicUO.Game.UI.Gumps
             _databox = new DataBox(0, 0, 1, 1);
             area.Add(_databox);
 
-            bool useUnicode = Client.Version >= ClientVersion.CV_305D;
+            bool useUnicode = Client.Game.UO.Version >= ClientVersion.CV_305D;
             byte unicodeFontIndex = 1;
             int unicodeFontHeightOffset = 0;
 
@@ -384,7 +356,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             _textBox.Height = Math.Max
             (
-                FontsLoader.Instance.GetHeightUnicode
+                Client.Game.UO.FileManager.Fonts.GetHeightUnicode
                 (
                     1,
                     _textBox.Text,
@@ -423,7 +395,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             //if (!_textBox.IsDisposed && _textBox.IsChanged)
             //{
-            //    _textBox.Height = System.Math.Max(FontsLoader.Instance.GetHeightUnicode(1, _textBox.TxEntry.Text, 220, TEXT_ALIGN_TYPE.TS_LEFT, 0x0) + 20, 40);
+            //    _textBox.Height = System.Math.Max(Client.Game.UO.FileManager.Fonts.GetHeightUnicode(1, _textBox.TxEntry.Text, 220, TEXT_ALIGN_TYPE.TS_LEFT, 0x0) + 20, 40);
 
             //    foreach (Control c in _scrollArea.Children)
             //    {
@@ -458,6 +430,7 @@ namespace ClassicUO.Game.UI.Gumps
                     (
                         new BulletinBoardItem
                         (
+                            World,
                             LocalSerial,
                             _msgSerial,
                             World.Player.Name,
@@ -520,7 +493,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             Add(new GumpPic(0, 0, 0x1523, 0));
 
-            if (Client.Version >= ClientVersion.CV_305D)
+            if (Client.Game.UO.Version >= ClientVersion.CV_305D)
             {
                 Add
                 (

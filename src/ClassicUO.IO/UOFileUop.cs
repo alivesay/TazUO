@@ -1,34 +1,4 @@
-﻿#region license
-
-// Copyright (c) 2024, andreakarasho
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
 using System.Collections.Generic;
@@ -41,62 +11,74 @@ namespace ClassicUO.IO
         Zlib,
         ZlibBwt = 3
     }
-    public class UOFileUop : UOFile
+
+    public sealed class UOFileUop : UOFile
     {
         private const uint UOP_MAGIC_NUMBER = 0x50594D;
         private readonly bool _hasExtra;
-        private readonly Dictionary<ulong, UOFileIndex> _hashes = new Dictionary<ulong, UOFileIndex>();
         private readonly string _pattern;
+        private readonly Dictionary<ulong, UOFileIndex> _hashes = new Dictionary<ulong, UOFileIndex>();
 
         public UOFileUop(string path, string pattern, bool hasextra = false) : base(path)
         {
             _pattern = pattern;
             _hasExtra = hasextra;
-            Load();
         }
 
-        public int TotalEntriesCount { get; private set; }
         public string Pattern => _pattern;
-        public Dictionary<ulong, UOFileIndex> Hashes => _hashes;
 
 
-        protected override void Load()
+        public void ClearHashes()
         {
-            base.Load();
+            // _hashes.Clear();
+        }
 
-            Seek(0);
+        public override void Dispose()
+        {
+             ClearHashes();
+            base.Dispose();
+        }
 
-            if (ReadUInt() != UOP_MAGIC_NUMBER)
+        public bool TryGetUOPData(ulong hash, out UOFileIndex data)
+        {
+            return _hashes.TryGetValue(hash, out data);
+        }
+
+        public override void FillEntries()
+        {
+            Seek(0, System.IO.SeekOrigin.Begin);
+
+            if (ReadUInt32() != UOP_MAGIC_NUMBER)
             {
                 throw new ArgumentException("Bad uop file");
             }
 
-            uint version = ReadUInt();
-            uint format_timestamp = ReadUInt();
-            long nextBlock = ReadLong();
-            uint block_size = ReadUInt();
-            int count = ReadInt();
+            var version = ReadUInt32();
+            var format_timestamp = ReadUInt32();
+            var nextBlock = ReadInt64();
+            var block_size = ReadUInt32();
+            var count = ReadInt32();
 
 
-            Seek(nextBlock);
+            Seek(nextBlock, System.IO.SeekOrigin.Begin);
             int total = 0;
             int real_total = 0;
 
             do
             {
-                int filesCount = ReadInt();
-                nextBlock = ReadLong();
+                var filesCount = ReadInt32();
+                nextBlock = ReadInt64();
                 total += filesCount;
 
                 for (int i = 0; i < filesCount; i++)
                 {
-                    long offset = ReadLong();
-                    int headerLength = ReadInt();
-                    int compressedLength = ReadInt();
-                    int decompressedLength = ReadInt();
-                    ulong hash = ReadULong();
-                    uint data_hash = ReadUInt();
-                    short flag = ReadShort();
+                    long offset = ReadInt64();
+                    int headerLength = ReadInt32();
+                    int compressedLength = ReadInt32();
+                    int decompressedLength = ReadInt32();
+                    var hash = ReadUInt64();
+                    uint data_hash = ReadUInt32();
+                    short flag = ReadInt16();
                     int length = flag == 1 ? compressedLength : decompressedLength;
 
                     if (offset == 0)
@@ -110,19 +92,18 @@ namespace ClassicUO.IO
 
                     if (_hasExtra && flag != 3)
                     {
-                        long curpos = Position;
-                        Seek(offset);
+                        var pos = Position;
+                        Seek(offset, System.IO.SeekOrigin.Begin);
 
-                        var extra1 = ReadInt();
-                        var extra2 = ReadInt();
+                        var extra1 = ReadInt32();
+                        var extra2 = ReadInt32();
 
                         _hashes.Add
                         (
                             hash,
                             new UOFileIndex
                             (
-                                StartAddress,
-                                (uint)Length,
+                                null,
                                 offset + 8,
                                 compressedLength - 8,
                                 decompressedLength,
@@ -132,7 +113,7 @@ namespace ClassicUO.IO
                             )
                         );
 
-                        Seek(curpos);
+                        Seek(pos, System.IO.SeekOrigin.Begin);
                     }
                     else
                     {
@@ -141,52 +122,31 @@ namespace ClassicUO.IO
                             hash,
                             new UOFileIndex
                             (
-                                StartAddress,
-                                (uint)Length,
+                                null,
                                 offset,
                                 compressedLength,
                                 decompressedLength,
                                 (CompressionType)flag,
-                                flag == 3 ? 1 : 0,
-                                flag == 3 ? 1 : 0
+                                0,
+                                0
                             )
                         );
                     }
                 }
 
-                Seek(nextBlock);
+                Seek(nextBlock, System.IO.SeekOrigin.Begin);
             } while (nextBlock != 0);
 
-            TotalEntriesCount = real_total;
-        }
+            Entries = new UOFileIndex[Math.Max(total, ushort.MaxValue) + 0x4000];
 
-        public void ClearHashes()
-        {
-            _hashes.Clear();
-        }
-
-        public override void Dispose()
-        {
-            ClearHashes();
-            base.Dispose();
-        }
-
-
-        public bool TryGetUOPData(ulong hash, out UOFileIndex data)
-        {
-            return _hashes.TryGetValue(hash, out data);
-        }
-
-        public override void FillEntries(ref UOFileIndex[] entries)
-        {
-            for (int i = 0; i < entries.Length; i++)
+            for (int i = 0; i < Entries.Length; i++)
             {
                 string file = string.Format(_pattern, i);
                 ulong hash = CreateHash(file);
 
-                if (_hashes.TryGetValue(hash, out UOFileIndex data))
+                if (_hashes.TryGetValue(hash, out var e))
                 {
-                    entries[i] = data;
+                    Entries[i] = e;
                 }
             }
         }

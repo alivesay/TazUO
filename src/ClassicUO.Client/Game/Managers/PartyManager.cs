@@ -1,34 +1,4 @@
-#region license
-
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
 using ClassicUO.Configuration;
@@ -40,9 +10,13 @@ using ClassicUO.Resources;
 
 namespace ClassicUO.Game.Managers
 {
-    public class PartyManager
+    internal sealed class PartyManager
     {
         private const int PARTY_SIZE = 10;
+
+        private readonly World _world;
+
+        public PartyManager(World world) { _world = world; }
 
         public uint Leader { get; set; }
         public uint Inviter { get; set; }
@@ -113,7 +87,7 @@ namespace ClassicUO.Game.Managers
                         UIManager.GetGump<BaseHealthBarGump>(to_remove)?.RequestUpdateContents();
                     }
 
-                    bool remove_all = !add && to_remove == World.Player;
+                    bool remove_all = !add && to_remove == _world.Player;
                     int done = 0;
 
                     for (int i = 0; i < count; i++)
@@ -130,7 +104,7 @@ namespace ClassicUO.Game.Managers
                         {
                             if (!Contains(serial))
                             {
-                                Members[i] = new PartyMember(serial);
+                                Members[i] = new PartyMember(_world, serial);
                             }
 
                             done++;
@@ -149,7 +123,7 @@ namespace ClassicUO.Game.Managers
                         }
                         else
                         {
-                            if (serial == World.Player)
+                            if (serial == _world.Player)
                             {
                             }
                         }
@@ -186,7 +160,7 @@ namespace ClassicUO.Game.Managers
                     {
                         if (Members[i] != null && Members[i].Serial == ser)
                         {
-                            MessageManager.HandleMessage
+                            _world.MessageManager.HandleMessage
                             (
                                 null,
                                 name,
@@ -208,7 +182,7 @@ namespace ClassicUO.Game.Managers
 
                     if (ProfileManager.CurrentProfile.PartyInviteGump)
                     {
-                        UIManager.Add(new PartyInviteGump(Inviter));
+                        UIManager.Add(new PartyInviteGump(_world, Inviter));
                     }
 
                     break;
@@ -244,10 +218,12 @@ namespace ClassicUO.Game.Managers
 
     public class PartyMember : IEquatable<PartyMember>
     {
+        private readonly World _world;
         private string _name;
 
-        public PartyMember(uint serial)
+        public PartyMember(World world, uint serial)
         {
+            _world = world;
             Serial = serial;
             _name = Name;
         }
@@ -256,7 +232,7 @@ namespace ClassicUO.Game.Managers
         {
             get
             {
-                Mobile mobile = World.Mobiles.Get(Serial);
+                Mobile mobile = _world.Mobiles.Get(Serial);
 
                 if (mobile != null)
                 {

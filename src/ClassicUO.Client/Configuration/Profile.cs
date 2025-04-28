@@ -1,34 +1,4 @@
-#region license
-
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+// SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Configuration.Json;
 using ClassicUO.Game;
@@ -134,6 +104,7 @@ namespace ClassicUO.Configuration
         public bool EnabledCriminalActionQuery { get; set; } = true;
         public bool EnabledBeneficialCriminalActionQuery { get; set; } = false;
         public bool UseOldStatusGump { get; set; }
+        public bool StatusGumpBarMutuallyExclusive { get; set; } = true;
         public int BackpackStyle { get; set; }
         public bool HighlightGameObjects { get; set; }
         public bool HighlightMobilesByParalize { get; set; } = true;
@@ -310,6 +281,8 @@ namespace ClassicUO.Configuration
 
         public bool HighlightContainerWhenSelected { get; set; }
 
+        public bool UseNewTargetSystem { get; set; } = true;
+        public bool UseKrEquipUnequipPacket { get; set; }
         public bool ShowHouseContent { get; set; }
         public bool SaveHealthbars { get; set; }
         public bool TextFading { get; set; } = true;
@@ -334,6 +307,7 @@ namespace ClassicUO.Configuration
         public bool WorldMapShowCoordinates { get; set; } = true;
         public bool WorldMapShowMouseCoordinates { get; set; } = true;
         public bool WorldMapShowCorpse { get; set; } = true;
+        public bool WorldMapShowSextantCoordinates { get; set; } = false;
         public bool WorldMapShowMobiles { get; set; } = true;
         public bool WorldMapShowPlayerName { get; set; } = true;
         public bool WorldMapShowPlayerBar { get; set; } = true;
@@ -608,11 +582,11 @@ namespace ClassicUO.Configuration
             Log.Trace($"Saving path:\t\t{path}");
 
             // Save profile settings
-            ConfigurationResolver.Save(this, Path.Combine(path, "profile.json"), ProfileJsonContext.DefaultToUse);
+            ConfigurationResolver.Save(this, Path.Combine(path, "profile.json"), ProfileJsonContext.DefaultToUse.Profile);
 
             // Save opened gumps
             if (saveGumps)
-                SaveGumps(path);
+                SaveGumps(world, path);
 
             Log.Trace("Saving done!");
         }
@@ -622,7 +596,12 @@ namespace ClassicUO.Configuration
             ConfigurationResolver.Save(this, Path.Combine(path, filename), ProfileJsonContext.DefaultToUse);
         }
 
-        private void SaveGumps(string path)
+        public void SaveAs(string path, string filename = "default.json")
+        {
+            ConfigurationResolver.Save(this, Path.Combine(path, filename), ProfileJsonContext.DefaultToUse.Profile);
+        }
+
+        private void SaveGumps(World world, string path)
         {
             string gumpsXmlPath = Path.Combine(path, "gumps.xml");
 
@@ -648,6 +627,7 @@ namespace ClassicUO.Configuration
                     }
                 }
 
+
                 LinkedListNode<Gump> first = gumps.First;
 
                 while (first != null)
@@ -656,13 +636,13 @@ namespace ClassicUO.Configuration
 
                     if (gump.LocalSerial != 0)
                     {
-                        Item item = World.Items.Get(gump.LocalSerial);
+                        Item item = world.Items.Get(gump.LocalSerial);
 
                         if (item != null && !item.IsDestroyed && item.Opened)
                         {
                             while (SerialHelper.IsItem(item.Container))
                             {
-                                item = World.Items.Get(item.Container);
+                                item = world.Items.Get(item.Container);
                             }
 
                             SaveItemsGumpRecursive(item, xml, gumps);
@@ -695,7 +675,7 @@ namespace ClassicUO.Configuration
             }
 
 
-            SkillsGroupManager.Save();
+            world.SkillsGroupManager.Save();
         }
 
         private static void SaveItemsGumpRecursive(Item parent, XmlTextWriter xml, LinkedList<Gump> list)
@@ -744,12 +724,12 @@ namespace ClassicUO.Configuration
         }
 
 
-        public List<Gump> ReadGumps(string path)
+        public List<Gump> ReadGumps(World world, string path)
         {
             List<Gump> gumps = new List<Gump>();
 
             // load skillsgroup
-            SkillsGroupManager.Load();
+            world.SkillsGroupManager.Load();
 
             // load gumps
             string gumpsXmlPath = Path.Combine(path, "gumps.xml");
@@ -802,45 +782,47 @@ namespace ClassicUO.Configuration
                                     if (ProfileManager.CurrentProfile.UseImprovedBuffBar)
                                         gump = new ImprovedBuffGump();
                                     else
-                                        gump = new BuffGump(100, 100);
+                                        gump = new BuffGump(world);
 
                                     break;
 
                                 case GumpType.Container:
-                                    gump = new ContainerGump();
+                                    gump = new ContainerGump(world);
 
                                     break;
 
                                 case GumpType.CounterBar:
-                                    gump = new CounterBarGump();
+                                    gump = new CounterBarGump(world);
 
                                     break;
 
                                 case GumpType.HealthBar:
                                     if (CustomBarsToggled)
                                     {
-                                        gump = new HealthBarGumpCustom();
+                                        gump = new HealthBarGumpCustom(world);
                                     }
                                     else
                                     {
-                                        gump = new HealthBarGump();
+                                        gump = new HealthBarGump(world);
                                     }
 
                                     break;
 
                                 case GumpType.InfoBar:
-                                    gump = new InfoBarGump();
+                                    gump = new InfoBarGump(world);
 
                                     break;
 
                                 case GumpType.Journal:
-                                    gump = new ResizableJournal();
-                                    //x = ProfileManager.CurrentProfile.JournalPosition.X;
-                                    //y = ProfileManager.CurrentProfile.JournalPosition.Y;
+                                    if(ProfileManager.CurrentProfile.UseAlternateJournal)
+                                        gump = new ResizableJournal(world);
+                                    else
+                                        gump = new JournalGump(world);
+
                                     break;
 
                                 case GumpType.MacroButton:
-                                    gump = new MacroButtonGump();
+                                    gump = new MacroButtonGump(world);
 
                                     break;
                                 case GumpType.MacroButtonEditor:
@@ -849,7 +831,7 @@ namespace ClassicUO.Configuration
                                     break;
 
                                 case GumpType.MiniMap:
-                                    gump = new MiniMapGump();
+                                    gump = new MiniMapGump(world);
 
                                     break;
 
@@ -878,17 +860,17 @@ namespace ClassicUO.Configuration
                                 case GumpType.SkillMenu:
                                     if (StandardSkillsGump)
                                     {
-                                        gump = new StandardSkillsGump();
+                                        gump = new StandardSkillsGump(world);
                                     }
                                     else
                                     {
-                                        gump = new SkillGumpAdvanced();
+                                        gump = new SkillGumpAdvanced(world);
                                     }
 
                                     break;
 
                                 case GumpType.SpellBook:
-                                    gump = new SpellbookGump();
+                                    gump = new SpellbookGump(world);
 
                                     break;
 
@@ -902,37 +884,37 @@ namespace ClassicUO.Configuration
                                 //    gump = new TipNoticeGump();
                                 //    break;
                                 case GumpType.AbilityButton:
-                                    gump = new UseAbilityButtonGump();
+                                    gump = new UseAbilityButtonGump(world);
 
                                     break;
 
                                 case GumpType.SpellButton:
-                                    gump = new UseSpellButtonGump();
+                                    gump = new UseSpellButtonGump(world);
 
                                     break;
 
                                 case GumpType.SkillButton:
-                                    gump = new SkillButtonGump();
+                                    gump = new SkillButtonGump(world);
 
                                     break;
 
                                 case GumpType.RacialButton:
-                                    gump = new RacialAbilityButton();
+                                    gump = new RacialAbilityButton(world);
 
                                     break;
 
                                 case GumpType.WorldMap:
-                                    gump = new WorldMapGump();
+                                    gump = new WorldMapGump(world);
 
                                     break;
 
                                 case GumpType.Debug:
-                                    gump = new DebugGump(100, 100);
+                                    gump = new DebugGump(world, 100, 100);
 
                                     break;
 
                                 case GumpType.NetStats:
-                                    gump = new NetworkStatsGump(100, 100);
+                                    gump = new NetworkStatsGump(world, 100, 100);
 
                                     break;
 
@@ -1008,34 +990,34 @@ namespace ClassicUO.Configuration
                                 switch (type)
                                 {
                                     case GumpType.SpellButton:
-                                        gump = new UseSpellButtonGump();
+                                        gump = new UseSpellButtonGump(world);
 
                                         break;
 
                                     case GumpType.SkillButton:
-                                        gump = new SkillButtonGump();
+                                        gump = new SkillButtonGump(world);
 
                                         break;
 
                                     case GumpType.HealthBar:
                                         if (CustomBarsToggled)
                                         {
-                                            gump = new HealthBarGumpCustom();
+                                            gump = new HealthBarGumpCustom(world);
                                         }
                                         else
                                         {
-                                            gump = new HealthBarGump();
+                                            gump = new HealthBarGump(world);
                                         }
 
                                         break;
 
                                     case GumpType.AbilityButton:
-                                        gump = new UseAbilityButtonGump();
+                                        gump = new UseAbilityButtonGump(world);
 
                                         break;
 
                                     case GumpType.MacroButton:
-                                        gump = new MacroButtonGump();
+                                        gump = new MacroButtonGump(world);
 
                                         break;
                                     case GumpType.GridContainer:

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -68,9 +68,7 @@ namespace ClassicUO.Utility
                 }
             }
 
-            ushort[] array = table.ToArray();
-            Array.Sort(array);
-            array.AsSpan().CopyTo(table);
+            table.Sort();
         }
 
         static byte[] InternalDecompress(Span<byte> input, uint len)

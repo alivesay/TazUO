@@ -1,34 +1,4 @@
-﻿#region license
-
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
 using System.Collections.Generic;
@@ -42,6 +12,8 @@ using ClassicUO.Input;
 using ClassicUO.Assets;
 using ClassicUO.Renderer;
 using ClassicUO.Utility;
+using ClassicUO.Renderer.Gumps;
+using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.UI.Gumps.CharCreation
 {
@@ -73,7 +45,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
             }
         };
 
-        public CreateCharAppearanceGump() : base(0, 0)
+        public CreateCharAppearanceGump(World world) : base(world, 0, 0)
         {
             Add
             (
@@ -204,7 +176,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
                 1
             );
 
-            if (Client.Version >= ClientVersion.CV_60144)
+            if (Client.Game.UO.Version >= ClientVersion.CV_60144)
             {
                 Add
                 (
@@ -257,7 +229,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
         {
             if (_character == null)
             {
-                _character = new PlayerMobile(1);
+                _character = new PlayerMobile(World, 1);
                 World.Mobiles.Add(_character);
             }
 
@@ -459,7 +431,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
 
             Add
             (
-                _hairLabel = new Label(ClilocLoader.Instance.GetString(race == RaceType.GARGOYLE ? 1112309 : 3000121), unicode, hue, font: font)
+                _hairLabel = new Label(Client.Game.UO.FileManager.Clilocs.GetString(race == RaceType.GARGOYLE ? 1112309 : 3000121), unicode, hue, font: font)
                 {
                     X = 98, Y = 140
                 },
@@ -488,7 +460,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
 
                 Add
                 (
-                    _facialLabel = new Label(ClilocLoader.Instance.GetString(race == RaceType.GARGOYLE ? 1112511 : 3000122), unicode, hue, font: font)
+                    _facialLabel = new Label(Client.Game.UO.FileManager.Clilocs.GetString(race == RaceType.GARGOYLE ? 1112511 : 3000122), unicode, hue, font: font)
                     {
                         X = 98, Y = 184
                     },
@@ -594,7 +566,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
 
             Add
             (
-                _paperDoll = new PaperDollInteractable(262, 135, _character, null)
+                _paperDoll = new PaperDollInteractable(262, 135, _character, new PaperDollGump(World))
                 {
                     AcceptMouseInput = false
                 },
@@ -621,6 +593,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
             (
                 colorPicker = new CustomColorPicker
                 (
+                    this,
                     layer,
                     clilocLabel,
                     pallet,
@@ -799,17 +772,19 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
             int invalid = Validate(character.Name);
             if (invalid > 0)
             {
-                UIManager.GetGump<CharCreationGump>()?.ShowMessage(ClilocLoader.Instance.GetString(invalid));
+                UIManager.GetGump<CharCreationGump>()?.ShowMessage(Client.Game.UO.FileManager.Clilocs.GetString(invalid));
 
                 return false;
             }
+            
+            Log.Trace($"Creating character '{character.Name}'");
 
             return true;
         }
 
         public static int Validate(string name)
         {
-            return Validate(name, 2, 16, true, false, true, 1, _SpaceDashPeriodQuote, Client.Version >= ClientVersion.CV_5020 ? _Disallowed : new string[] { }, _StartDisallowed);
+            return Validate(name, 2, 16, true, false, true, 1, _SpaceDashPeriodQuote, Client.Game.UO.Version >= ClientVersion.CV_5020 ? _Disallowed : new string[] { }, _StartDisallowed);
         }
 
         public static int Validate(string name, int minLength, int maxLength, bool allowLetters, bool allowDigits, bool noExceptionsAtStart, int maxExceptions, char[] exceptions, string[] disallowed, string[] startDisallowed)
@@ -1054,9 +1029,11 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
             private int _lastSelectedIndex;
             private readonly Layer _layer;
             private readonly ushort[] _pallet;
+            private readonly Gump _gump;
 
-            public CustomColorPicker(Layer layer, int label, ushort[] pallet, int rows, int columns)
+            public CustomColorPicker(Gump gump, Layer layer, int label, ushort[] pallet, int rows, int columns)
             {
+                _gump = gump;
                 Width = 121;
                 Height = 25;
                 _cellW = 125 / columns;
@@ -1076,7 +1053,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
 
                 Add
                 (
-                    new Label(ClilocLoader.Instance.GetString(label), unicode, hue, font: font)
+                    new Label(Client.Game.UO.FileManager.Clilocs.GetString(label), unicode, hue, font: font)
                     {
                         X = 0,
                         Y = 0
@@ -1141,6 +1118,7 @@ namespace ClassicUO.Game.UI.Gumps.CharCreation
                     {
                         _colorPickerBox = new ColorPickerBox
                         (
+                            _gump.World,
                             489,
                             141,
                             _rows,

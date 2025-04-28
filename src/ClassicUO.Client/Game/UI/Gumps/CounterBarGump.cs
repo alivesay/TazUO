@@ -1,34 +1,4 @@
-#region license
-
-// Copyright (c) 2021, andreakarasho
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. All advertising materials mentioning features or use of this software
-//    must display the following acknowledgement:
-//    This product includes software developed by andreakarasho - https://github.com/andreakarasho
-// 4. Neither the name of the copyright holder nor the
-//    names of its contributors may be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System.Collections.Generic;
 using System.Xml;
@@ -59,18 +29,19 @@ namespace ClassicUO.Game.UI.Gumps
 
         //private bool _isVertical;
 
-        public CounterBarGump() : base(0, 0)
+        public CounterBarGump(World world) : base(world, 0, 0)
         {
             CurrentCounterBarGump = this;
         }
 
         public CounterBarGump(
+            World world,
             int x,
             int y,
             int rectSize = 30,
             int rows = 1,
             int columns = 1 /*, bool vertical = false*/
-        ) : base(0, 0)
+        ) : base(world, 0, 0)
         {
             X = x;
             Y = y;
@@ -127,6 +98,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Add(
                         new CounterItem(
+                            this,
                             col * _rectSize + 2,
                             row * _rectSize + 2,
                             _rectSize - 4,
@@ -239,6 +211,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         Add(
                             new CounterItem(
+                                this,
                                 col * _rectSize + 2,
                                 row * _rectSize + 2,
                                 _rectSize - 4,
@@ -363,15 +336,16 @@ namespace ClassicUO.Game.UI.Gumps
         public class CounterItem : Control
         {
             private int _amount;
-
             private readonly ImageWithText _image;
             private uint _time;
             private const uint HIGHLIGHT_DURATION = 1000;
             private uint _endHighlight;
             private bool _highlight;
+            private readonly CounterBarGump _gump;
 
-            public CounterItem(int x, int y, int w, int h)
+            public CounterItem(CounterBarGump gump, int x, int y, int w, int h)
             {
+                _gump = gump;
                 AcceptMouseInput = true;
                 WantUpdateSize = false;
                 CanMove = true;
@@ -385,7 +359,7 @@ namespace ClassicUO.Game.UI.Gumps
                 _image = new ImageWithText();
                 Add(_image);
 
-                ContextMenu = new ContextMenuControl();
+                ContextMenu = new ContextMenuControl(_gump);
                 ContextMenu.Add(ResGumps.UseObject, Use);
                 ContextMenu.Add(ResGumps.Remove, RemoveItem);
                 ContextMenu.Add("Set spell", GenSpellList());
@@ -431,7 +405,13 @@ namespace ClassicUO.Game.UI.Gumps
                     return;
                 }
 
-                Item backpack = World.Player.FindItemByLayer(Layer.Backpack);
+                if (SpellID != default)
+                {
+                    GameActions.CastSpell(SpellID);
+                    return;
+                }
+
+                Item backpack = _gump.World.Player.FindItemByLayer(Layer.Backpack);
 
                 if (backpack == null)
                 {
@@ -442,8 +422,107 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (item != null)
                 {
-                    GameActions.DoubleClick(item);
+                    GameActions.DoubleClick(_gump.World, item);
                 }
+            }
+
+            // protected override void OnMouseOver(int x, int y)
+            // {
+            //     base.OnMouseOver(x, y);
+
+            //     if (_gump.World.Player.FindItemByLayer(Layer.Backpack)?.FindItem(Graphic, Hue) is {} item)
+            //         SetTooltip(item);
+            // }
+
+            // protected override void OnMouseExit(int x, int y)
+            // {
+            //     base.OnMouseExit(x, y);
+            //     ClearTooltip();
+            // }
+
+            public List<ContextMenuItemEntry> GenSpellList()
+            {
+                List<ContextMenuItemEntry> list = new List<ContextMenuItemEntry>();
+
+                ContextMenuItemEntry entry = new ContextMenuItemEntry("Magery");
+                foreach (var spell in SpellsMagery.GetAllSpells.Values)
+                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
+                    {
+                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
+                        SpellID = spell.ID;
+                    }));
+                list.Add(entry);
+
+
+                entry = new ContextMenuItemEntry("Necromancy");
+                foreach (var spell in SpellsNecromancy.GetAllSpells.Values)
+                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
+                    {
+                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
+                        SpellID = spell.ID;
+                    }));
+                list.Add(entry);
+
+
+                entry = new ContextMenuItemEntry("Chivalry");
+                foreach (var spell in SpellsChivalry.GetAllSpells.Values)
+                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
+                    {
+                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
+                        SpellID = spell.ID;
+                    }));
+                list.Add(entry);
+
+
+                entry = new ContextMenuItemEntry("Bushido");
+                foreach (var spell in SpellsBushido.GetAllSpells.Values)
+                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
+                    {
+                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
+                        SpellID = spell.ID;
+                    }));
+                list.Add(entry);
+
+
+                entry = new ContextMenuItemEntry("Ninjitsu");
+                foreach (var spell in SpellsNinjitsu.GetAllSpells.Values)
+                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
+                    {
+                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
+                        SpellID = spell.ID;
+                    }));
+                list.Add(entry);
+
+
+                entry = new ContextMenuItemEntry("Spellweaving");
+                foreach (var spell in SpellsSpellweaving.GetAllSpells.Values)
+                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
+                    {
+                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
+                        SpellID = spell.ID;
+                    }));
+                list.Add(entry);
+
+
+                entry = new ContextMenuItemEntry("Mysticism");
+                foreach (var spell in SpellsMysticism.GetAllSpells.Values)
+                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
+                    {
+                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
+                        SpellID = spell.ID;
+                    }));
+                list.Add(entry);
+
+
+                entry = new ContextMenuItemEntry("Mastery");
+                foreach (var spell in SpellsMastery.GetAllSpells.Values)
+                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
+                    {
+                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
+                        SpellID = spell.ID;
+                    }));
+                list.Add(entry);
+                return list;
             }
 
             public List<ContextMenuItemEntry> GenSpellList()
@@ -535,19 +614,19 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (button == MouseButtonType.Left)
                 {
-                    if (Client.Game.GameCursor.ItemHold.Enabled)
+                    if (Client.Game.UO.GameCursor.ItemHold.Enabled)
                     {
                         SetGraphic(
-                            Client.Game.GameCursor.ItemHold.Graphic,
-                            Client.Game.GameCursor.ItemHold.Hue
+                            Client.Game.UO.GameCursor.ItemHold.Graphic,
+                            Client.Game.UO.GameCursor.ItemHold.Hue
                         );
 
                         GameActions.DropItem(
-                            Client.Game.GameCursor.ItemHold.Serial,
-                            Client.Game.GameCursor.ItemHold.X,
-                            Client.Game.GameCursor.ItemHold.Y,
+                            Client.Game.UO.GameCursor.ItemHold.Serial,
+                            Client.Game.UO.GameCursor.ItemHold.X,
+                            Client.Game.UO.GameCursor.ItemHold.Y,
                             0,
-                            Client.Game.GameCursor.ItemHold.Container
+                            Client.Game.UO.GameCursor.ItemHold.Container
                         );
                     }
                     else if (ProfileManager.CurrentProfile.CastSpellsByOneClick)
@@ -601,7 +680,7 @@ namespace ClassicUO.Game.UI.Gumps
                         _amount = 0;
 
                         for (
-                            Item item = (Item)World.Player.Items;
+                            Item item = (Item)_gump.World.Player.Items;
                             item != null;
                             item = (Item)item.Next
                         )
@@ -730,7 +809,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         _graphic = graphic;
                         _hue = hue;
-                        _partial = isGumpGraphic ? false : TileDataLoader.Instance.StaticData[graphic].IsPartialHue;
+                        _partial = isGumpGraphic ? false : Client.Game.UO.FileManager.TileData.StaticData[graphic].IsPartialHue;
                         _label.Y = Parent.Height - 15;
                     }
                     else
@@ -756,11 +835,11 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (_graphic != 0)
                     {
-                        ref readonly var artInfo = ref Client.Game.Arts.GetArt(_graphic);
+                        ref readonly var artInfo = ref Client.Game.UO.Arts.GetArt(_graphic);
                         if (_isGumpGraphic)
                             artInfo = ref Client.Game.Gumps.GetGump(_graphic);
 
-                        var rect = _isGumpGraphic ? artInfo.UV : Client.Game.Arts.GetRealArtBounds(_graphic);
+                        var rect = _isGumpGraphic ? artInfo.UV : Client.Game.UO.Arts.GetRealArtBounds(_graphic);
 
                         Vector3 hueVector = ShaderHueTranslator.GetHueVector(_hue, _partial, 1f, _isGumpGraphic);
 

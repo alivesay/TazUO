@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace ClassicUO.Game.GameObjects
 {
-    public abstract class BaseGameObject : LinkedObject
+    internal abstract class BaseGameObject : LinkedObject
     {
         protected BaseGameObject(World world) => World = world;
 
@@ -21,7 +21,7 @@ namespace ClassicUO.Game.GameObjects
         public World World { get; }
     }
 
-    public abstract partial class GameObject : BaseGameObject
+    internal abstract partial class GameObject : BaseGameObject
     {
         protected GameObject(World world) : base(world) { }
 

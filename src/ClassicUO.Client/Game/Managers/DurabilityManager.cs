@@ -41,7 +41,7 @@ using System;
 
 namespace ClassicUO.Game.Managers
 {
-    public class DurabilityManager : IDisposable
+    internal class DurabilityManager : IDisposable
     {
         private readonly ConcurrentDictionary<uint, DurabiltyProp> _itemLayerSlots = new ConcurrentDictionary<uint, DurabiltyProp>();
         
@@ -52,10 +52,13 @@ namespace ClassicUO.Game.Managers
             Layer.Beard, Layer.Earrings, Layer.Helmet, Layer.OneHanded, Layer.TwoHanded, Layer.Talisman
         };
 
+        private World World;
+
         public List<DurabiltyProp> Durabilities => _itemLayerSlots.Values.ToList();
 
-        public DurabilityManager()
+        public DurabilityManager(World world)
         {
+            this.World = world;
             EventSink.OPLOnReceive += OnOPLReceive;
         }
 

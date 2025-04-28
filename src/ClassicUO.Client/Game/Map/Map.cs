@@ -8,9 +8,8 @@ using ClassicUO.Assets;
 
 namespace ClassicUO.Game.Map
 {
-    public sealed class Map
+    internal sealed class Map
     {
-        private static Chunk[] _terrainChunks;
         private static Chunk[] _terrainChunks;
         private static readonly bool[] _blockAccessList = new bool[0x1000];
         private readonly LinkedList<int> _usedIndices = new LinkedList<int>();

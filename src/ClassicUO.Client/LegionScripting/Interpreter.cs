@@ -121,7 +121,7 @@ namespace LScript
         }
     }
 
-    public class Argument
+    internal class Argument
     {
         private ASTNode _node;
         private Script _script;
@@ -258,9 +258,14 @@ namespace LScript
 
             return (other._node.Lexeme == _node.Lexeme);
         }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    public class Script
+    internal class Script
     {
         public bool IsPlaying = false;
 
@@ -270,6 +275,8 @@ namespace LScript
 
         private Dictionary<int, ASTNode> lineNodes = new Dictionary<int, ASTNode>();
         private Deque<ASTNode> returnPoints = new Deque<ASTNode>();
+
+        private World _world;
 
         public ExecutionState ExecutionState = ExecutionState.RUNNING;
 
@@ -389,8 +396,9 @@ namespace LScript
         // scripts to a bytecode. That would allow more errors
         // to be caught with better error messages, as well as
         // make the scripts execute more quickly.
-        public Script(ASTNode root)
+        public Script(ASTNode root, World world)
         {
+            _world = world;
             // Set current to the first statement
             _statement = root.FirstChild();
 
@@ -447,7 +455,7 @@ namespace LScript
             int depth = 0;
 
             if(CUOEnviroment.Debug)
-                ClassicUO.Game.GameActions.Print($"Executing: [{CurrentLine}]{node.Lexeme}");
+                ClassicUO.Game.GameActions.Print(_world, $"Executing: [{CurrentLine}]{node.Lexeme}");
 
             switch (node.Type)
             {
@@ -1192,7 +1200,7 @@ namespace LScript
         TIMING_OUT
     };
 
-    public static class Interpreter
+    internal static class Interpreter
     {
         // Aliases only hold serial numbers
         private static Dictionary<string, uint> _aliases = new Dictionary<string, uint>();

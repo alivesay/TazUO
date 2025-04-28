@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using System.Collections.Generic;
+using ClassicUO.Assets;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
@@ -10,7 +11,6 @@ using ClassicUO.Input;
 using ClassicUO.Utility;
 using ClassicUO.Utility.Logging;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Controls
 {
@@ -272,7 +272,7 @@ namespace ClassicUO.Game.UI.Controls
                                 && !_paperDollGump.World.Player.IsDead
                                 && layer != Layer.Beard
                                 && layer != Layer.Hair
-                                && ((_paperDollGump != null && _paperDollGump.CanLift) || (_paperDollGump != null && LocalSerial == World.Player)),
+                                && ((_paperDollGump != null && _paperDollGump.CanLift) || (_paperDollGump != null && LocalSerial == _paperDollGump.World.Player)),
                         }.ScaleWidthAndHeight(Scale).SetInternalScale(InternalScale)
                     );
                 }

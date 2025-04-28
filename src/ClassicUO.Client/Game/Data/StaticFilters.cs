@@ -213,7 +213,7 @@ namespace ClassicUO.Game.Data
             Log.Trace("Applying statics border...");
             foreach (ushort graphic in CaveTiles)
             {
-                ref readonly var artInfo = ref Client.Game.Arts.GetArt(graphic);
+                ref readonly var artInfo = ref Client.Game.UO.Arts.GetArt(graphic);
 
                 if (artInfo.Texture != null)
                 {
@@ -334,9 +334,9 @@ namespace ClassicUO.Game.Data
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsOutStamina()
+        public static bool IsOutStamina(World world)
         {
-            return World.Player.Stamina != World.Player.StaminaMax;
+            return world.Player.Stamina != world.Player.StaminaMax;
         }
         // ## BEGIN - END ## // MISC2
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -47,7 +47,7 @@ namespace ClassicUO.Configuration
 
 
 
-    public sealed class Profile
+    internal sealed class Profile
     {
         [JsonIgnore] public string Username { get; set; }
         [JsonIgnore] public string ServerName { get; set; }
@@ -814,10 +814,7 @@ namespace ClassicUO.Configuration
                                     break;
 
                                 case GumpType.Journal:
-                                    if(ProfileManager.CurrentProfile.UseAlternateJournal)
-                                        gump = new ResizableJournal(world);
-                                    else
-                                        gump = new JournalGump(world);
+                                    gump = new ResizableJournal(world);
 
                                     break;
 
@@ -841,7 +838,7 @@ namespace ClassicUO.Configuration
                                         break;
                                     }
 
-                                    if (ProfileManager.CurrentProfile.UseModernPaperdoll && serial == World.Player.Serial)
+                                    if (ProfileManager.CurrentProfile.UseModernPaperdoll && serial == world.Player.Serial)
                                     {
                                         gump = new ModernPaperdoll(serial);
                                         x = ProfileManager.CurrentProfile.ModernPaperdollPosition.X;
@@ -849,7 +846,7 @@ namespace ClassicUO.Configuration
                                     }
                                     else
                                     {
-                                        gump = new PaperDollGump(serial, serial == World.Player.Serial);
+                                        gump = new PaperDollGump(world, serial, serial == world.Player.Serial);
                                         x = ProfileManager.CurrentProfile.PaperdollPosition.X;
                                         y = ProfileManager.CurrentProfile.PaperdollPosition.Y;
                                     }
@@ -875,7 +872,7 @@ namespace ClassicUO.Configuration
                                     break;
 
                                 case GumpType.StatusGump:
-                                    gump = StatusGumpBase.AddStatusGump(0, 0);
+                                    gump = StatusGumpBase.AddStatusGump(world, 0, 0);
                                     x = ProfileManager.CurrentProfile.StatusGumpPosition.X;
                                     y = ProfileManager.CurrentProfile.StatusGumpPosition.Y;
                                     break;
@@ -924,7 +921,7 @@ namespace ClassicUO.Configuration
                                     break;
                                 case GumpType.GridContainer:
                                     ushort ogContainer = ushort.Parse(xml.GetAttribute("ogContainer"));
-                                    gump = new GridContainer(serial, ogContainer);
+                                    gump = new GridContainer(world, serial, ogContainer);
                                     if (((GridContainer)gump).IsPlayerBackpack)
                                     {
                                         x = ProfileManager.CurrentProfile.BackpackGridPosition.X;
@@ -1022,19 +1019,19 @@ namespace ClassicUO.Configuration
                                         break;
                                     case GumpType.GridContainer:
                                         ushort ogContainer = ushort.Parse(xml.GetAttribute("ogContainer"));
-                                        gump = new GridContainer(serial, ogContainer);
+                                        gump = new GridContainer(world, serial, ogContainer);
                                         break;
                                     case GumpType.Journal:
-                                        gump = new ResizableJournal();
+                                        gump = new ResizableJournal(world);
                                         break;
                                     case GumpType.WorldMap:
-                                        gump = new WorldMapGump();
+                                        gump = new WorldMapGump(world);
                                         break;
                                     case GumpType.InfoBar:
-                                        gump = new InfoBarGump();
+                                        gump = new InfoBarGump(world);
                                         break;
                                     case GumpType.PaperDoll:
-                                        gump = new ModernPaperdoll(World.Player.Serial);
+                                        gump = new ModernPaperdoll(world.Player.Serial);
                                         break;
                                 }
 

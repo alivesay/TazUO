@@ -13,6 +13,11 @@ using System.Threading;
 namespace ClassicUO.Game.Managers
 {
     [JsonSerializable(typeof(ToolTipOverrideData))]
+    [JsonSerializable(typeof(ToolTipOverrideData[]))]
+    internal partial class ToolTipOverrideContext : JsonSerializerContext
+    {
+    }
+
     internal class ToolTipOverrideData
     {
         public ToolTipOverrideData() { }
@@ -145,88 +150,44 @@ namespace ClassicUO.Game.Managers
             return result;
         }
 
-        public static void ExportOverrideSettings()
+        public static void ExportOverrideSettings(World world)
         {
             ToolTipOverrideData[] allData = GetAllToolTipOverrides();
 
-            if (!CUOEnviroment.IsUnix)
+            string result = JsonSerializer.Serialize(allData, ToolTipOverrideContext.Default.ToolTipOverrideDataArray);
+
+            string path = Path.Combine(CUOEnviroment.ExecutablePath, "tooltip_overrides.json");
+            if (CUOEnviroment.IsUnix)
             {
-                Thread t = new Thread(() =>
-                {
-                    System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-                    saveFileDialog1.Filter = "Json|*.json";
-                    saveFileDialog1.Title = "Save tooltip override settings";
-                    saveFileDialog1.ShowDialog();
-
-                    string result = JsonSerializer.Serialize(allData);
-
-                    // If the file name is not an empty string open it for saving.
-                    if (saveFileDialog1.FileName != "")
-                    {
-                        System.IO.FileStream fs =
-                            (System.IO.FileStream)saveFileDialog1.OpenFile();
-                        // NOTE that the FilterIndex property is one-based.
-                        switch (saveFileDialog1.FilterIndex)
-                        {
-                            default:
-                                byte[] data = Encoding.UTF8.GetBytes(result);
-                                fs.Write(data, 0, data.Length);
-                                break;
-                        }
-
-                        fs.Close();
-                    }
-                });
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();
+                File.WriteAllText(path, result);
+                GameActions.Print(world, $"Tooltip overrides exported to [{path}]");
+                return;
             }
         }
 
-        public static void ImportOverrideSettings()
+        public static void ImportOverrideSettings(World world)
         {
-            if (!CUOEnviroment.IsUnix)
+            var input = new InputRequest("Enter the path to the tooltip overrides json file", "Import", "Cancel", (r, path) =>
             {
-                Thread t = new Thread(() =>
+                if (r == InputRequest.Result.BUTTON2) return;
+
+                if (File.Exists(path))
                 {
-                    System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
-                    openFileDialog.Filter = "Json|*.json";
-                    openFileDialog.Title = "Import tooltip override settings";
-                    openFileDialog.ShowDialog();
-
-                    // If the file name is not an empty string open it for saving.
-                    if (openFileDialog.FileName != "")
+                    try
                     {
-                        // NOTE that the FilterIndex property is one-based.
-                        switch (openFileDialog.FilterIndex)
-                        {
-                            default:
-                                try
-                                {
-                                    string result = File.ReadAllText(openFileDialog.FileName);
+                        string result = File.ReadAllText(path);
+                        ToolTipOverrideData[] imported = JsonSerializer.Deserialize(result, ToolTipOverrideContext.Default.ToolTipOverrideDataArray);
+                        foreach (ToolTipOverrideData importedData in imported)
+                            new ToolTipOverrideData(ProfileManager.CurrentProfile.ToolTipOverride_SearchText.Count, importedData.SearchText, importedData.FormattedText, importedData.Min1, importedData.Max1, importedData.Min2, importedData.Max2, (byte)importedData.ItemLayer).Save();
 
-                                    ToolTipOverrideData[] imported = JsonSerializer.Deserialize<ToolTipOverrideData[]>(result);
-
-                                    foreach (ToolTipOverrideData importedData in imported)
-                                        //GameActions.Print(importedData.searchText);
-                                        new ToolTipOverrideData(ProfileManager.CurrentProfile.ToolTipOverride_SearchText.Count, importedData.SearchText, importedData.FormattedText, importedData.Min1, importedData.Max1, importedData.Min2, importedData.Max2, (byte)importedData.ItemLayer).Save();
-
-                                }
-                                catch (System.Exception e)
-                                {
-                                    GameActions.Print(e.Message);
-                                    GameActions.Print("It looks like there was an error trying to import your override settings.", 32);
-                                }
-                                break;
-                        }
                     }
-                });
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();
-            }
-            else
-            {
-                GameActions.Print("This feature is not currently supported on Unix.", 32);
-            }
+                    catch (Exception e)
+                    {
+                        GameActions.Print(world, e.Message);
+                        GameActions.Print(world, "It looks like there was an error trying to import your override settings.", 32);
+                    }
+                }
+            });
         }
 
         private static string DecodeUnicodeEscapes(string input)
@@ -244,18 +205,18 @@ namespace ClassicUO.Game.Managers
             return input;
         }
 
-        public static string ProcessTooltipText(uint serial, uint compareTo = uint.MinValue)
+        public static string ProcessTooltipText(World world, uint serial, uint compareTo = uint.MinValue)
         {
             string tooltip = "";
             ItemPropertiesData itemPropertiesData;
 
             if (compareTo != uint.MinValue)
             {
-                itemPropertiesData = new ItemPropertiesData(World.Items.Get(serial), World.Items.Get(compareTo));
+                itemPropertiesData = new ItemPropertiesData(world, world.Items.Get(serial), world.Items.Get(compareTo));
             }
             else
             {
-                itemPropertiesData = new ItemPropertiesData(World.Items.Get(serial));
+                itemPropertiesData = new ItemPropertiesData(world, world.Items.Get(serial));
             }
 
             ToolTipOverrideData[] result = GetAllToolTipOverrides();
@@ -282,7 +243,7 @@ namespace ClassicUO.Game.Managers
                         if (!CheckLayers(overrideData.ItemLayer, itemPropertiesData.item.ItemData.Layer))
                             continue;
 
-                        if (!MatchPropertyName(property.OriginalString, overrideData.SearchText))
+                        if (!MatchPropertyName(world, property.OriginalString, overrideData.SearchText))
                             continue;
 
                         if (property.FirstValue == double.MinValue || (property.FirstValue >= overrideData.Min1 && property.FirstValue <= overrideData.Max1))
@@ -408,7 +369,7 @@ namespace ClassicUO.Game.Managers
         /// <param name="property"></param>
         /// <param name="match">If prepended with $, regex will be applied</param>
         /// <returns></returns>
-        private static bool MatchPropertyName(string property, string match)
+        private static bool MatchPropertyName(World world, string property, string match)
         {
             if (string.IsNullOrEmpty(match))
                 return false;
@@ -421,7 +382,7 @@ namespace ClassicUO.Game.Managers
                 }
                 catch
                 {
-                    GameActions.Print($"Invalid regex pattern: {match.Substring(1)}");
+                    GameActions.Print(world, $"Invalid regex pattern: {match[1..]}");
                     return false;
                 }
             }

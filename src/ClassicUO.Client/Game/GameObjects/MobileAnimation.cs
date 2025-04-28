@@ -1,18 +1,15 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
-using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using ClassicUO.Game.Data;
 using ClassicUO.Assets;
 using ClassicUO.Utility;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using ClassicUO.Renderer.Animations;
 
 namespace ClassicUO.Game.GameObjects
 {
-    public partial class Mobile
+    internal partial class Mobile
     {
         private static readonly ushort[] HANDS_BASE_ANIMID =
         {

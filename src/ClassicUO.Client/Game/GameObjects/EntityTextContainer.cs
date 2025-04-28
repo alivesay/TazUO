@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.GameObjects
 {
-    public class TextContainer : LinkedObject
+    internal class TextContainer : LinkedObject
     {
         public int Size,
             MaxSize = 5;
@@ -81,11 +81,11 @@ namespace ClassicUO.Game.GameObjects
         {
             Parent.AddDamage(damage);
 
-            TextObject text_obj = TextObject.Create();
+            TextObject text_obj = TextObject.Create(_world);
 
             ushort hue = ProfileManager.CurrentProfile == null ? (ushort)0x0021 : ProfileManager.CurrentProfile.DamageHueOther;
             string name = string.Empty;
-            if (ReferenceEquals(Parent, World.Player))
+            if (ReferenceEquals(Parent, _world.Player))
                 hue = ProfileManager.CurrentProfile == null ? (ushort)0x0034 : ProfileManager.CurrentProfile.DamageHueSelf;
             else if (Parent is Mobile)
             {
@@ -96,7 +96,7 @@ namespace ClassicUO.Game.GameObjects
                 else if (_parent.NotorietyFlag == NotorietyFlag.Ally)
                     hue = ProfileManager.CurrentProfile == null ? (ushort)0x0030 : ProfileManager.CurrentProfile.DamageHueAlly;
 
-                if (_parent.Serial == TargetManager.LastAttack)
+                if (_parent.Serial == _world.TargetManager.LastAttack)
                     hue = ProfileManager.CurrentProfile == null ? (ushort)0x1F : ProfileManager.CurrentProfile.DamageHueLastAttck;
             }
             string dps = ProfileManager.CurrentProfile.ShowDPS ? $" (DPS: {Parent.GetCurrentDPS()})" : string.Empty;
@@ -104,7 +104,7 @@ namespace ClassicUO.Game.GameObjects
             
             text_obj.TextBox = TextBox.GetOne(damage.ToString() + dps, ProfileManager.CurrentProfile.OverheadChatFont, ProfileManager.CurrentProfile.OverheadChatFontSize, hue, TextBox.RTLOptions.DefaultCenterStroked(ProfileManager.CurrentProfile.OverheadChatWidth).MouseInput(!ProfileManager.CurrentProfile.DisableMouseInteractionOverheadText));
 
-            World.Journal.Add(damage.ToString() + dps, hue, name, TextType.CLIENT, messageType: MessageType.Damage);
+            _world.Journal.Add(damage.ToString() + dps, hue, name, TextType.CLIENT, messageType: MessageType.Damage);
 
             text_obj.Time = Time.Ticks + 1500;
 

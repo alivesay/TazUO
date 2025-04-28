@@ -13,9 +13,8 @@ using ClassicUO.Resources;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using SDL2;
-using System;
-using System.Linq;
 using MathHelper = ClassicUO.Utility.MathHelper;
+using ClassicUO.Assets;
 
 namespace ClassicUO.Game.Scenes
 {
@@ -94,50 +93,50 @@ namespace ClassicUO.Game.Scenes
 
             Microsoft.Xna.Framework.Input.GamePadState gamePadState = Microsoft.Xna.Framework.Input.GamePad.GetState(PlayerIndex.One);
 
-            if (gamePadState.IsConnected && gamePadState.ThumbSticks.Left != Vector2.Zero && World.InGame)
+            if (gamePadState.IsConnected && gamePadState.ThumbSticks.Left != Vector2.Zero && _world.InGame)
             {
                 var dir = gamePadState.ThumbSticks.Left;
                 bool run = dir.X > 0.5 || dir.Y > 0.5 || dir.X < -0.5 || dir.Y < -0.5;
 
                 if (dir.X > THRESHOLD && dir.Y > THRESHOLD) // North
                 {
-                    World.Player.Walk(Direction.North, run);
+                    _world.Player.Walk(Direction.North, run);
                     return true;
                 }
                 if (dir.X < -THRESHOLD && dir.Y < -THRESHOLD) // South
                 {
-                    World.Player.Walk(Direction.South, run);
+                    _world.Player.Walk(Direction.South, run);
                     return true;
                 }
                 if (dir.X < -THRESHOLD && dir.Y > THRESHOLD) // Left
                 {
-                    World.Player.Walk(Direction.West, run);
+                    _world.Player.Walk(Direction.West, run);
                     return true;
                 }
                 if (dir.X > THRESHOLD && dir.Y < -THRESHOLD) // Left
                 {
-                    World.Player.Walk(Direction.East, run);
+                    _world.Player.Walk(Direction.East, run);
                     return true;
                 }
 
                 if (dir.X < THRESHOLD && dir.Y > THRESHOLD) //Up
                 {
-                    World.Player.Walk(Direction.Up, run);
+                    _world.Player.Walk(Direction.Up, run);
                     return true;
                 }
                 if (dir.X < THRESHOLD && dir.Y < -THRESHOLD) //Down
                 {
-                    World.Player.Walk(Direction.Down, run);
+                    _world.Player.Walk(Direction.Down, run);
                     return true;
                 }
                 if (dir.X > THRESHOLD && dir.Y < THRESHOLD) // Right
                 {
-                    World.Player.Walk(Direction.Right, run);
+                    _world.Player.Walk(Direction.Right, run);
                     return true;
                 }
                 if (dir.X < -THRESHOLD && dir.Y < THRESHOLD) // Left
                 {
-                    World.Player.Walk(Direction.Left, run);
+                    _world.Player.Walk(Direction.Left, run);
                     return true;
                 }
             }
@@ -539,10 +538,10 @@ namespace ClassicUO.Game.Scenes
                 if (Keyboard.Ctrl)
                 {
                     GameActions.DropItem(
-                            Client.Game.GameCursor.ItemHold.Serial,
-                            World.Player.X + 1,
-                            World.Player.Y,
-                            World.Player.Z + 1,
+                            Client.Game.UO.GameCursor.ItemHold.Serial,
+                            _world.Player.X + 1,
+                            _world.Player.Y,
+                            _world.Player.Z + 1,
                             0
                         );
                     return true;
@@ -756,12 +755,12 @@ namespace ClassicUO.Game.Scenes
                             switch (obj)
                             {
                                 case Land land:
-                                    TargetManager.Reset();
+                                    _world.TargetManager.Reset();
                                     MultiItemMoveGump.OnContainerTarget(land.X, land.Y, land.Z);
                                     break;
 
                                 case Entity o:
-                                    TargetManager.Reset();
+                                    _world.TargetManager.Reset();
                                     MultiItemMoveGump.OnContainerTarget(o.Serial);
                                     break;
                             }
@@ -989,11 +988,11 @@ namespace ClassicUO.Game.Scenes
                 {
                     if (obj is Static || obj is Multi || obj is Item)
                     {
-                        ref StaticTiles itemdata = ref TileDataLoader.Instance.StaticData[obj.Graphic];
+                        ref StaticTiles itemdata = ref Client.Game.UO.FileManager.TileData.StaticData[obj.Graphic];
 
-                        if (itemdata.IsSurface && Pathfinder.WalkTo(obj.X, obj.Y, obj.Z, 0))
+                        if (itemdata.IsSurface && _world.Player.Pathfinder.WalkTo(obj.X, obj.Y, obj.Z, 0))
                         {
-                            World.Player.AddMessage
+                            _world.Player.AddMessage
                             (
                                 MessageType.Label,
                                 ResGeneral.Pathfinding,
@@ -1006,54 +1005,9 @@ namespace ClassicUO.Game.Scenes
                             return true;
                         }
                     }
-                    else if (obj is Land && Pathfinder.WalkTo(obj.X, obj.Y, obj.Z, 0))
+                    else if (obj is Land && _world.Player.Pathfinder.WalkTo(obj.X, obj.Y, obj.Z, 0))
                     {
-                        World.Player.AddMessage
-                        (
-                            MessageType.Label,
-                            ResGeneral.Pathfinding,
-                            3,
-                            0,
-                            false,
-                            TextType.CLIENT
-                        );
-
-                        return true;
-                    }
-                }
-            }
-
-            if (ProfileManager.CurrentProfile.EnablePathfind && ProfileManager.CurrentProfile.PathfindSingleClick)
-            {
-                if (ProfileManager.CurrentProfile.UseShiftToPathfind && !Keyboard.Shift)
-                {
-                    return false;
-                }
-
-                if (SelectedObject.Object is GameObject obj)
-                {
-                    if (obj is Static || obj is Multi || obj is Item)
-                    {
-                        ref StaticTiles itemdata = ref TileDataLoader.Instance.StaticData[obj.Graphic];
-
-                        if (itemdata.IsSurface && Pathfinder.WalkTo(obj.X, obj.Y, obj.Z, 0))
-                        {
-                            World.Player.AddMessage
-                            (
-                                MessageType.Label,
-                                ResGeneral.Pathfinding,
-                                3,
-                                0,
-                                false,
-                                TextType.CLIENT
-                            );
-
-                            return true;
-                        }
-                    }
-                    else if (obj is Land && Pathfinder.WalkTo(obj.X, obj.Y, obj.Z, 0))
-                    {
-                        World.Player.AddMessage
+                        _world.Player.AddMessage
                         (
                             MessageType.Label,
                             ResGeneral.Pathfinding,
@@ -1721,25 +1675,9 @@ namespace ClassicUO.Game.Scenes
         {
             base.OnControllerButtonDown(e);
 
-            if (World.InGame && (UIManager.KeyboardFocusControl == UIManager.SystemChat.TextBoxControl || UIManager.KeyboardFocusControl == null))
+            if (_world.InGame && (UIManager.KeyboardFocusControl == UIManager.SystemChat.TextBoxControl || UIManager.KeyboardFocusControl == null))
             {
-                Macro macro = Macros.FindMacro((SDL.SDL_GameControllerButton)e.button);
-                if (macro != null && macro.Items is MacroObject mac)
-                {
-                    ExecuteMacro(mac);
-                }
-            }
-
-            NameOverHeadManager.RegisterKeyUp(e.keysym);
-        }
-
-        internal override void OnControllerButtonDown(SDL.SDL_ControllerButtonEvent e)
-        {
-            base.OnControllerButtonDown(e);
-
-            if (World.InGame && (UIManager.KeyboardFocusControl == UIManager.SystemChat.TextBoxControl || UIManager.KeyboardFocusControl == null))
-            {
-                Macro macro = Macros.FindMacro((SDL.SDL_GameControllerButton)e.button);
+                Macro macro = _world.Macros.FindMacro((SDL.SDL_GameControllerButton)e.button);
                 if (macro != null && macro.Items is MacroObject mac)
                 {
                     ExecuteMacro(mac);

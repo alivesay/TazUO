@@ -51,7 +51,7 @@ using static ClassicUO.Game.UI.Gumps.GridHightlightMenu;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    public class GridContainer : ResizableGump
+    internal class GridContainer : ResizableGump
     {
         #region CONSTANTS
         private const int X_SPACING = 1, Y_SPACING = 1;
@@ -88,6 +88,8 @@ namespace ClassicUO.Game.UI.Gumps
 
         private GridScrollArea scrollArea;
         private GridSlotManager gridSlotManager;
+
+        private World world;
         #endregion
 
         #region private tooltip vars
@@ -118,13 +120,15 @@ namespace ClassicUO.Game.UI.Gumps
         public bool StackNonStackableItems = false;
         #endregion
 
-        public GridContainer(uint local, ushort originalContainerGraphic, bool? useGridStyle = null) : base(GetWidth(), GetHeight(), GetWidth(2), GetHeight(1), local, 0)
+        public GridContainer(World world, uint local, ushort originalContainerGraphic, bool? useGridStyle = null) : base(world, GetWidth(), GetHeight(), GetWidth(2), GetHeight(1), local, 0)
         {
             if (container == null)
             {
                 Dispose();
                 return;
             }
+
+            this.world = world;
 
             #region SET VARS
             isCorpse = container.IsCorpse || container.Graphic == 0x0009;
@@ -195,7 +199,7 @@ namespace ClassicUO.Game.UI.Gumps
             };
             searchBox.TextChanged += (sender, e) => { UpdateItems(); };
 
-            var regularGumpIcon = Client.Game.Gumps.GetGump(5839).Texture;
+            var regularGumpIcon = Client.Game.UO.Gumps.GetGump(5839).Texture;
             openRegularGump = new GumpPic(background.Width - 25 - borderWidth, borderWidth, regularGumpIcon == null ? (ushort)1209 : (ushort)5839, 0);
             openRegularGump.ContextMenu = GenContextMenu();
 
@@ -224,9 +228,9 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (e.Button == MouseButtonType.Left && quickDropBackpack.MouseIsOver)
                 {
-                    if (Client.Game.GameCursor.ItemHold.Enabled)
+                    if (Client.Game.UO.GameCursor.ItemHold.Enabled)
                     {
-                        GameActions.DropItem(Client.Game.GameCursor.ItemHold.Serial, 0xFFFF, 0xFFFF, 0, World.Player.FindItemByLayer(Layer.Backpack));
+                        GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, 0xFFFF, 0xFFFF, 0, World.Player.FindItemByLayer(Layer.Backpack));
                     }
                     else if (isCorpse)
                     {
@@ -276,8 +280,8 @@ namespace ClassicUO.Game.UI.Gumps
             setLootBag.SetTooltip("For double click looting only");
             setLootBag.MouseUp += (s, e) =>
             {
-                GameActions.Print(Resources.ResGumps.TargetContainerToGrabItemsInto);
-                TargetManager.SetTargeting(CursorTarget.SetGrabBag, 0, TargetType.Neutral);
+                GameActions.Print(world, Resources.ResGumps.TargetContainerToGrabItemsInto);
+                world.TargetManager.SetTargeting(CursorTarget.SetGrabBag, 0, TargetType.Neutral);
             };
             #endregion
 
@@ -299,7 +303,7 @@ namespace ClassicUO.Game.UI.Gumps
             Add(setLootBag);
             #endregion
 
-            gridSlotManager = new GridSlotManager(LocalSerial, this, scrollArea); //Must come after scroll area
+            gridSlotManager = new GridSlotManager(world, LocalSerial, this, scrollArea); //Must come after scroll area
 
             if (GridSaveSystem.Instance.UseOriginalContainerGump(LocalSerial) && (UseOldContainerStyle == null || UseOldContainerStyle == true))
             {
@@ -318,7 +322,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         private ContextMenuControl GenContextMenu()
         {
-            var control = new ContextMenuControl();
+            var control = new ContextMenuControl(this);
             control.Add(new ContextMenuItemEntry("Open Original Container", () =>
             {
                 UseOldContainerStyle = true;
@@ -391,10 +395,10 @@ namespace ClassicUO.Game.UI.Gumps
         {
             if (e.Button == MouseButtonType.Left && scrollArea.MouseIsOver)
             {
-                if (Client.Game.GameCursor.ItemHold.Enabled)
-                    GameActions.DropItem(Client.Game.GameCursor.ItemHold.Serial, 0xFFFF, 0xFFFF, 0, LocalSerial);
-                else if (TargetManager.IsTargeting && !ProfileManager.CurrentProfile.DisableTargetingGridContainers)
-                    TargetManager.Target(LocalSerial);
+                if (Client.Game.UO.GameCursor.ItemHold.Enabled)
+                    GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, 0xFFFF, 0xFFFF, 0, LocalSerial);
+                else if (world.TargetManager.IsTargeting && !ProfileManager.CurrentProfile.DisableTargetingGridContainers)
+                    world.TargetManager.Target(LocalSerial);
             }
             else if (e.Button == MouseButtonType.Right)
             {
@@ -408,47 +412,47 @@ namespace ClassicUO.Game.UI.Gumps
 
             ushort graphic = originalContainerItemGraphic;
 
-            if (Client.Version >= Utility.ClientVersion.CV_706000 &&
+            if (Client.Game.UO.Version >= Utility.ClientVersion.CV_706000 &&
                 ProfileManager.CurrentProfile?.UseLargeContainerGumps == true)
             {
                 switch (graphic)
                 {
-                    case 0x0048 when Client.Game.Gumps.GetGump(0x06E8).Texture != null:
+                    case 0x0048 when Client.Game.UO.Gumps.GetGump(0x06E8).Texture != null:
                         graphic = 0x06E8;
                         break;
-                    case 0x0049 when Client.Game.Gumps.GetGump(0x9CDF).Texture != null:
+                    case 0x0049 when Client.Game.UO.Gumps.GetGump(0x9CDF).Texture != null:
                         graphic = 0x9CDF;
                         break;
-                    case 0x0051 when Client.Game.Gumps.GetGump(0x06E7).Texture != null:
+                    case 0x0051 when Client.Game.UO.Gumps.GetGump(0x06E7).Texture != null:
                         graphic = 0x06E7;
                         break;
-                    case 0x003E when Client.Game.Gumps.GetGump(0x06E9).Texture != null:
+                    case 0x003E when Client.Game.UO.Gumps.GetGump(0x06E9).Texture != null:
                         graphic = 0x06E9;
                         break;
-                    case 0x004D when Client.Game.Gumps.GetGump(0x06EA).Texture != null:
+                    case 0x004D when Client.Game.UO.Gumps.GetGump(0x06EA).Texture != null:
                         graphic = 0x06EA;
                         break;
-                    case 0x004E when Client.Game.Gumps.GetGump(0x06E6).Texture != null:
+                    case 0x004E when Client.Game.UO.Gumps.GetGump(0x06E6).Texture != null:
                         graphic = 0x06E6;
                         break;
-                    case 0x004F when Client.Game.Gumps.GetGump(0x06E5).Texture != null:
+                    case 0x004F when Client.Game.UO.Gumps.GetGump(0x06E5).Texture != null:
                         graphic = 0x06E5;
                         break;
-                    case 0x004A when Client.Game.Gumps.GetGump(0x9CDD).Texture != null:
+                    case 0x004A when Client.Game.UO.Gumps.GetGump(0x9CDD).Texture != null:
                         graphic = 0x9CDD;
                         break;
-                    case 0x0044 when Client.Game.Gumps.GetGump(0x9CE3).Texture != null:
+                    case 0x0044 when Client.Game.UO.Gumps.GetGump(0x9CE3).Texture != null:
                         graphic = 0x9CE3;
                         break;
                 }
             }
 
-            ContainerManager.CalculateContainerPosition(serial, graphic);
+            world.ContainerManager.CalculateContainerPosition(serial, graphic);
 
             var container = new ContainerGump(this.container.Serial, graphic, true, true)
             {
-                X = ContainerManager.X,
-                Y = ContainerManager.Y,
+                X = world.ContainerManager.X,
+                Y = world.ContainerManager.Y,
                 InvalidateContents = true
             };
 
@@ -665,7 +669,7 @@ namespace ClassicUO.Game.UI.Gumps
                     graphic = 9260; borderSize = 17;
                     break;
                 case BorderStyle.Style8:
-                    if (Client.Game.Gumps.GetGump(40303).Texture != null)
+                    if (Client.Game.UO.Gumps.GetGump(40303).Texture != null)
                         graphic = 40303;
                     else
                         graphic = 83;
@@ -760,6 +764,7 @@ namespace ClassicUO.Game.UI.Gumps
             private AlphaBlendControl background;
             private CustomToolTip toolTipThis, toolTipitem1, toolTipitem2;
             private readonly List<SimpleTimedTextGump> timedTexts = new();
+            private World world;
 
             private bool borderHighlight;
             private ushort borderHighlightHue;
@@ -778,21 +783,22 @@ namespace ClassicUO.Game.UI.Gumps
 
             private readonly int[] spellbooks = [0x0EFA, 0x2253, 0x2252, 0x238C, 0x23A0, 0x2D50, 0x2D9D, 0x225A];
 
-            public GridItem(uint serial, int size, Item container, GridContainer gridContainer, int count)
+            public GridItem(World world, uint serial, int size, Item container, GridContainer gridContainer, int count)
             {
+                this.world = world;
                 slot = count;
                 this.container = container;
                 this.gridContainer = gridContainer;
                 LocalSerial = serial;
-                _item = World.Items.Get(serial);
+                _item = world.Items.Get(serial);
                 CanMove = true;
 
                 if (_item != null)
                 {
-                    ref readonly var text = ref Client.Game.Arts.GetArt((uint)_item.DisplayedGraphic);
+                    ref readonly var text = ref Client.Game.UO.Arts.GetArt((uint)_item.DisplayedGraphic);
                     texture = text.Texture;
                     bounds = text.UV;
-                    rect = Client.Game.Arts.GetRealArtBounds((uint)_item.DisplayedGraphic);
+                    rect = Client.Game.UO.Arts.GetRealArtBounds((uint)_item.DisplayedGraphic);
                 }
 
                 background = new AlphaBlendControl(0.25f)
@@ -848,7 +854,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         SetHighlightBorderHue(highlightConfig.Hue);
                         if (CUOEnviroment.Debug)
-                            GameActions.Print($"Item {_item.Name} matched grid highlight: {highlightConfig.Name}");
+                            GameActions.Print(world, $"Item {_item.Name} matched grid highlight: {highlightConfig.Name}");
                     }
             }
             public void SetHighlightBorderHue(ushort hue)
@@ -886,10 +892,10 @@ namespace ClassicUO.Game.UI.Gumps
                 }
 
                 _item = item;
-                ref readonly var text = ref Client.Game.Arts.GetArt((uint)_item.DisplayedGraphic);
+                ref readonly var text = ref Client.Game.UO.Arts.GetArt((uint)_item.DisplayedGraphic);
                 texture = text.Texture;
                 bounds = text.UV;
-                rect = Client.Game.Arts.GetRealArtBounds(_item.DisplayedGraphic);
+                rect = Client.Game.UO.Arts.GetRealArtBounds(_item.DisplayedGraphic);
 
                 LocalSerial = item.Serial;
                 int itemAmt = _item.ItemData.IsStackable ? _item.Amount : 1;
@@ -912,7 +918,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             private void _hit_MouseDoubleClick(object sender, MouseDoubleClickEventArgs e)
             {
-                if (e.Button != MouseButtonType.Left || TargetManager.IsTargeting || _item == null)
+                if (e.Button != MouseButtonType.Left || world.TargetManager.IsTargeting || _item == null)
                     return;
 
                 if (!Keyboard.Ctrl &&
@@ -920,12 +926,12 @@ namespace ClassicUO.Game.UI.Gumps
                     gridContainer.isCorpse &&
                     !_item.IsDestroyed &&
                     !_item.ItemData.IsContainer &&
-                    container != World.Player.FindItemByLayer(Layer.Backpack) &&
+                    container != world.Player.FindItemByLayer(Layer.Backpack) &&
                     !_item.IsLocked &&
                     _item.IsLootable)
-                    GameActions.GrabItem(_item, _item.Amount);
+                    GameActions.GrabItem(world, _item, _item.Amount);
                 else
-                    GameActions.DoubleClick(LocalSerial);
+                    GameActions.DoubleClick(world, LocalSerial);
 
                 e.Result = true;
             }
@@ -934,39 +940,39 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (e.Button == MouseButtonType.Left)
                 {
-                    if (Client.Game.GameCursor.ItemHold.Enabled)
+                    if (Client.Game.UO.GameCursor.ItemHold.Enabled)
                     {
                         if (_item != null && _item.ItemData.IsContainer)
                         {
-                            GameActions.DropItem(Client.Game.GameCursor.ItemHold.Serial, 0xFFFF, 0xFFFF, 0, _item.Serial);
+                            GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, 0xFFFF, 0xFFFF, 0, _item.Serial);
                             Mouse.CancelDoubleClick = true;
                         }
-                        else if (_item != null && _item.ItemData.IsStackable && _item.Graphic == Client.Game.GameCursor.ItemHold.Graphic)
+                        else if (_item != null && _item.ItemData.IsStackable && _item.Graphic == Client.Game.UO.GameCursor.ItemHold.Graphic)
                         {
-                            GameActions.DropItem(Client.Game.GameCursor.ItemHold.Serial, _item.X, _item.Y, 0, _item.Serial);
+                            GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, _item.X, _item.Y, 0, _item.Serial);
                             Mouse.CancelDoubleClick = true;
                         }
                         else
                         {
-                            Rectangle containerBounds = ContainerManager.Get(container.Graphic).Bounds;
-                            gridContainer.gridSlotManager.AddLockedItemSlot(Client.Game.GameCursor.ItemHold.Serial, slot);
-                            var pos = GetBoxPosition(slot, Client.Game.GameCursor.ItemHold.Graphic, containerBounds.Width, containerBounds.Height);
-                            GameActions.DropItem(Client.Game.GameCursor.ItemHold.Serial, pos.X, pos.Y, 0, container.Serial);
+                            Rectangle containerBounds = world.ContainerManager.Get(container.Graphic).Bounds;
+                            gridContainer.gridSlotManager.AddLockedItemSlot(Client.Game.UO.GameCursor.ItemHold.Serial, slot);
+                            var pos = GetBoxPosition(slot, Client.Game.UO.GameCursor.ItemHold.Graphic, containerBounds.Width, containerBounds.Height);
+                            GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, pos.X, pos.Y, 0, container.Serial);
                             Mouse.CancelDoubleClick = true;
                         }
                     }
-                    else if (TargetManager.IsTargeting)
+                    else if (world.TargetManager.IsTargeting)
                     {
                         if (_item != null)
                         {
-                            TargetManager.Target(_item);
-                            if (TargetManager.TargetingState == CursorTarget.SetTargetClientSide)
+                            world.TargetManager.Target(_item);
+                            if (world.TargetManager.TargetingState == CursorTarget.SetTargetClientSide)
                             {
-                                UIManager.Add(new InspectorGump(_item));
+                                UIManager.Add(new InspectorGump(world, _item));
                             }
                         }
                         else if (!ProfileManager.CurrentProfile.DisableTargetingGridContainers)
-                            TargetManager.Target(container);
+                            world.TargetManager.Target(container);
                         Mouse.CancelDoubleClick = true;
                     }
                     else if (Keyboard.Ctrl)
@@ -985,7 +991,7 @@ namespace ClassicUO.Game.UI.Gumps
                     else if (Keyboard.Shift && _item != null && ProfileManager.CurrentProfile.EnableAutoLoot && !ProfileManager.CurrentProfile.HoldShiftForContext && !ProfileManager.CurrentProfile.HoldShiftToSplitStack)
                     {
                         AutoLootManager.Instance.AddAutoLootEntry(_item.Graphic, _item.Hue, _item.Name);
-                        GameActions.Print($"Added this item to auto loot.");
+                        GameActions.Print(world, $"Added this item to auto loot.");
                     }
                     else if (_item != null)
                     {
@@ -994,16 +1000,16 @@ namespace ClassicUO.Game.UI.Gumps
                         {
                             if ((gridContainer.isCorpse && ProfileManager.CurrentProfile.CorpseSingleClickLoot) || gridContainer.quickLootThisContainer)
                             {
-                                GameActions.GrabItem(_item.Serial, _item.Amount);
+                                GameActions.GrabItem(world, _item.Serial, _item.Amount);
                                 Mouse.CancelDoubleClick = true;
                             }
                             else
                             {
-                                if (World.ClientFeatures.TooltipsEnabled)
-                                    DelayedObjectClickManager.Set(_item.Serial, gridContainer.X, gridContainer.Y - 80, Time.Ticks + Mouse.MOUSE_DELAY_DOUBLE_CLICK);
+                                if (world.ClientFeatures.TooltipsEnabled)
+                                    world.DelayedObjectClickManager.Set(_item.Serial, gridContainer.X, gridContainer.Y - 80, Time.Ticks + Mouse.MOUSE_DELAY_DOUBLE_CLICK);
                                 else
                                 {
-                                    GameActions.SingleClick(_item.Serial);
+                                    GameActions.SingleClick(world, _item.Serial);
                                 }
                             }
                         }
@@ -1046,7 +1052,7 @@ namespace ClassicUO.Game.UI.Gumps
                         if (_item != null)
                         {
                             if (!Keyboard.Alt)
-                                GameActions.PickUp(_item, e.X, e.Y);
+                                GameActions.PickUp(world, _item, e.X, e.Y);
                         }
                         else
                         {
@@ -1079,7 +1085,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             private void _hit_MouseEnter(object sender, MouseEventArgs e)
             {
-                SelectedObject.Object = World.Get(LocalSerial);
+                SelectedObject.Object = world.Get(LocalSerial);
                 if (Mouse.LButtonPressed)
                     mousePressedWhenEntered = true;
                 else
@@ -1088,7 +1094,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (_item.ItemData.IsContainer && _item.Items != null && ProfileManager.CurrentProfile.GridEnableContPreview && !spellbooks.Contains(_item.Graphic))
                     {
-                        preview = new GridContainerPreview(_item, Mouse.Position.X, Mouse.Position.Y);
+                        preview = new GridContainerPreview(world, _item, Mouse.Position.X, Mouse.Position.Y);
                         UIManager.Add(preview);
                     }
 
@@ -1113,7 +1119,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (_item != null && _item.ItemData.Layer > 0 && hit.MouseIsOver && Keyboard.Ctrl && (toolTipThis == null || toolTipThis.IsDisposed) && (toolTipitem1 == null || toolTipitem1.IsDisposed) && (toolTipitem2 == null || toolTipitem2.IsDisposed))
                 {
-                    Item compItem = World.Player.FindItemByLayer((Layer)_item.ItemData.Layer);
+                    Item compItem = world.Player.FindItemByLayer((Layer)_item.ItemData.Layer);
                     if (compItem != null && (Layer)_item.ItemData.Layer != Layer.Backpack)
                     {
                         hit.ClearTooltip();
@@ -1129,12 +1135,12 @@ namespace ClassicUO.Game.UI.Gumps
                             ItemPropertiesData i2 = new ItemPropertiesData(compItem);
 
                             if (i1.GenerateComparisonTooltip(i2, out string compileToolTip))
-                                GameActions.Print(compileToolTip);
+                                GameActions.Print(world,compileToolTip);
                         }
 
                         if ((Layer)_item.ItemData.Layer == Layer.OneHanded)
                         {
-                            Item compItem2 = World.Player.FindItemByLayer(Layer.TwoHanded);
+                            Item compItem2 = world.Player.FindItemByLayer(Layer.TwoHanded);
                             if (compItem2 != null)
                             {
                                 toolTipitem2 = new CustomToolTip(compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
@@ -1144,7 +1150,7 @@ namespace ClassicUO.Game.UI.Gumps
                         }
                         else if ((Layer)_item.ItemData.Layer == Layer.TwoHanded)
                         {
-                            Item compItem2 = World.Player.FindItemByLayer(Layer.OneHanded);
+                            Item compItem2 = world.Player.FindItemByLayer(Layer.OneHanded);
                             if (compItem2 != null)
                             {
                                 toolTipitem2 = new CustomToolTip(compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
@@ -1317,15 +1323,17 @@ namespace ClassicUO.Game.UI.Gumps
             private Control area;
             private Dictionary<int, uint> itemPositions = new Dictionary<int, uint>();
             private List<uint> itemLocks = new List<uint>();
+            private World world;
 
             public Dictionary<int, GridItem> GridSlots { get { return gridSlots; } }
             public List<Item> ContainerContents { get { return containerContents; } }
             public Dictionary<int, uint> ItemPositions { get { return itemPositions; } }
 
 
-            public GridSlotManager(uint thisContainer, GridContainer gridContainer, Control controlArea)
+            public GridSlotManager(World world, uint thisContainer, GridContainer gridContainer, Control controlArea)
             {
                 #region VARS
+                this.world = world;
                 area = controlArea;
                 foreach (GridSaveSystem.GridItemSlotSaveData item in GridSaveSystem.Instance.GetItemSlots(thisContainer))
                 {
@@ -1334,7 +1342,7 @@ namespace ClassicUO.Game.UI.Gumps
                         itemLocks.Add(item.Serial);
 
                 }
-                container = World.Items.Get(thisContainer);
+                container = world.Items.Get(thisContainer);
                 UpdateItems();
                 if (containerContents.Count > 125)
                     amount = containerContents.Count;
@@ -1342,7 +1350,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 for (int i = 0; i < amount; i++)
                 {
-                    GridItem GI = new GridItem(0, gridItemSize, container, gridContainer, i);
+                    GridItem GI = new GridItem(world, 0, gridItemSize, container, gridContainer, i);
                     gridSlots.Add(i, GI);
                     area.Add(GI);
                 }
@@ -1378,7 +1386,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 foreach (var spot in itemPositions)
                 {
-                    Item i = World.Items.Get(spot.Value);
+                    Item i = world.Items.Get(spot.Value);
                     if (i != null)
                         if (filteredItems.Contains(i) && (!overrideSort || itemLocks.Contains(spot.Value)))
                         {
@@ -1486,7 +1494,7 @@ namespace ClassicUO.Game.UI.Gumps
                 if (item == null)
                     return false;
 
-                if (World.OPL.TryGetNameAndData(item.Serial, out string name, out string data))
+                if (world.OPL.TryGetNameAndData(item.Serial, out string name, out string data))
                 {
                     if (name != null && name.ToLower().Contains(search.ToLower()))
                         return true;
@@ -1739,7 +1747,7 @@ namespace ClassicUO.Game.UI.Gumps
             private const int HEIGHT = 150;
             private const int GRIDSIZE = 50;
 
-            public GridContainerPreview(uint serial, int x, int y) : base(serial, 0)
+            public GridContainerPreview(World world, uint serial, int x, int y) : base(world, serial, 0)
             {
                 _container = World.Items.Get(serial);
                 if (_container == null)

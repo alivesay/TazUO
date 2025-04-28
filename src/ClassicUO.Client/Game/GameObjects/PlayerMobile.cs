@@ -5,18 +5,15 @@ using System.Linq;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.Managers;
-using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Network;
 using ClassicUO.Utility;
 using ClassicUO.Utility.Logging;
-using System.Collections.Generic;
-using System.Linq;
-using ClassicUO.Game.Scenes;
+using ClassicUO.Assets;
 
 namespace ClassicUO.Game.GameObjects
 {
-    public class PlayerMobile : Mobile
+    internal class PlayerMobile : Mobile
     {
         private readonly Dictionary<BuffIconType, BuffIcon> _buffIcons = new Dictionary<BuffIconType, BuffIcon>();
 
@@ -566,7 +563,7 @@ namespace ClassicUO.Game.GameObjects
             }
             else
             {
-                if (Walker.WalkingFailed || Walker.LastStepRequestTime > Time.Ticks || Walker.StepsCount >= Constants.MAX_STEP_COUNT || Client.Version >= ClientVersion.CV_60142 && IsParalyzed)
+                if (Walker.WalkingFailed || Walker.LastStepRequestTime > Time.Ticks || Walker.StepsCount >= Constants.MAX_STEP_COUNT || Client.Game.UO.Version >= ClientVersion.CV_60142 && IsParalyzed)
                 {
                     return false;
                 }

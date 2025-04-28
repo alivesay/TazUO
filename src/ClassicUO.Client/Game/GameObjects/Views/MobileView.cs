@@ -3,7 +3,6 @@
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
-using ClassicUO.Game.Managers;
 using ClassicUO.Game.Scenes;
 using ClassicUO.Renderer;
 using ClassicUO.Utility;
@@ -14,7 +13,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.GameObjects
 {
-    public partial class Mobile
+    internal partial class Mobile
     {
         private const int SIT_OFFSET_Y = 4;
         private static EquipConvData? _equipConvData;

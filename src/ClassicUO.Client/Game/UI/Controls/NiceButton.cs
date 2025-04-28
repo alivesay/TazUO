@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class NiceButton : HitBox
+    internal class NiceButton : HitBox
     {
         private readonly ButtonAction _action;
         private readonly int _groupnumber;

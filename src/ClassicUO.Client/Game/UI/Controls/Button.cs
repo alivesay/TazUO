@@ -7,7 +7,6 @@ using ClassicUO.Renderer;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Controls
 {
@@ -18,7 +17,7 @@ namespace ClassicUO.Game.UI.Controls
         Activate = 1
     }
 
-    public class Button : Control
+    internal class Button : Control
     {
         private readonly string _caption;
         private bool _entered;

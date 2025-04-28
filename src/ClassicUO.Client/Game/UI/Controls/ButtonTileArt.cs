@@ -1,15 +1,13 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using System.Collections.Generic;
-using ClassicUO.Assets;
 using ClassicUO.Renderer;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class ButtonTileArt : Button
+    internal class ButtonTileArt : Button
     {
         private readonly ushort _hue;
         private readonly bool _isPartial;

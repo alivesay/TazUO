@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class ColorBox : Control
+    internal class ColorBox : Control
     {
         private ushort hue;
         protected Vector3 hueVector;

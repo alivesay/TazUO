@@ -45,6 +45,7 @@ namespace ClassicUO.Game.UI.Controls
         private readonly HotkeyBox _hotkeyBox;
         private readonly Dictionary<NameOverheadOptions, Checkbox> checkboxDict = new();
         private readonly ScrollArea checkBoxScroll;
+        private World _world;
 
         private enum ButtonType
         {
@@ -52,8 +53,10 @@ namespace ClassicUO.Game.UI.Controls
             UncheckAll,
         }
 
-        public NameOverheadAssignControl(NameOverheadOption option)
+        public NameOverheadAssignControl(World world, NameOverheadOption option)
         {
+            _world = world;
+
             Option = option;
 
             CanMove = true;
@@ -252,7 +255,7 @@ namespace ClassicUO.Game.UI.Controls
                 return;
 
             UpdateValueInHotkeyBox();
-            UIManager.Add(new MessageBoxGump(250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, option.Name), null));
+            UIManager.Add(new MessageBoxGump(_world, 250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, option.Name), null));
         }
 
         private void BoxOnHotkeyCancelled(object sender, EventArgs e)

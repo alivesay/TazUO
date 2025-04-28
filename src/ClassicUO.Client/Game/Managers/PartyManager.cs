@@ -216,7 +216,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    public class PartyMember : IEquatable<PartyMember>
+    internal class PartyMember : IEquatable<PartyMember>
     {
         private readonly World _world;
         private string _name;

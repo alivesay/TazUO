@@ -9,11 +9,11 @@ using ClassicUO.Resources;
 using ClassicUO.Utility;
 using ClassicUO.Utility.Collections;
 using Microsoft.Xna.Framework;
-using ClassicUO.Game.Scenes;
+using ClassicUO.Assets;
 
 namespace ClassicUO.Game.GameObjects
 {
-    public partial class Mobile : Entity
+    internal partial class Mobile : Entity
     {
         //private static readonly QueuedPool<Mobile> _pool = new QueuedPool<Mobile>(
         //    Constants.PREDICTABLE_CHUNKS,

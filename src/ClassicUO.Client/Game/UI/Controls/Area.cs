@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class Area : Control
+    internal class Area : Control
     {
         private bool drawBorder;
         private int hue;

@@ -524,92 +524,6 @@ namespace ClassicUO.Game.UI.Gumps
                 list.Add(entry);
                 return list;
             }
-
-            public List<ContextMenuItemEntry> GenSpellList()
-            {
-                List<ContextMenuItemEntry> list = new List<ContextMenuItemEntry>();
-
-                ContextMenuItemEntry entry = new ContextMenuItemEntry("Magery");
-                foreach (var spell in SpellsMagery.GetAllSpells.Values)
-                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
-                    {
-                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
-                        SpellID = spell.ID;
-                    }));
-                list.Add(entry);
-
-
-                entry = new ContextMenuItemEntry("Necromancy");
-                foreach (var spell in SpellsNecromancy.GetAllSpells.Values)
-                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
-                    {
-                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
-                        SpellID = spell.ID;
-                    }));
-                list.Add(entry);
-
-
-                entry = new ContextMenuItemEntry("Chivalry");
-                foreach (var spell in SpellsChivalry.GetAllSpells.Values)
-                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
-                    {
-                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
-                        SpellID = spell.ID;
-                    }));
-                list.Add(entry);
-
-
-                entry = new ContextMenuItemEntry("Bushido");
-                foreach (var spell in SpellsBushido.GetAllSpells.Values)
-                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
-                    {
-                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
-                        SpellID = spell.ID;
-                    }));
-                list.Add(entry);
-
-
-                entry = new ContextMenuItemEntry("Ninjitsu");
-                foreach (var spell in SpellsNinjitsu.GetAllSpells.Values)
-                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
-                    {
-                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
-                        SpellID = spell.ID;
-                    }));
-                list.Add(entry);
-
-
-                entry = new ContextMenuItemEntry("Spellweaving");
-                foreach (var spell in SpellsSpellweaving.GetAllSpells.Values)
-                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
-                    {
-                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
-                        SpellID = spell.ID;
-                    }));
-                list.Add(entry);
-
-
-                entry = new ContextMenuItemEntry("Mysticism");
-                foreach (var spell in SpellsMysticism.GetAllSpells.Values)
-                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
-                    {
-                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
-                        SpellID = spell.ID;
-                    }));
-                list.Add(entry);
-
-
-                entry = new ContextMenuItemEntry("Mastery");
-                foreach (var spell in SpellsMastery.GetAllSpells.Values)
-                    entry.Add(new ContextMenuItemEntry(spell.Name, () =>
-                    {
-                        SetGraphic((ushort)(spell.GumpIconSmallID), 0, true);
-                        SpellID = spell.ID;
-                    }));
-                list.Add(entry);
-                return list;
-            }
-
             protected override void OnMouseUp(int x, int y, MouseButtonType button)
             {
                 if (button == MouseButtonType.Left)
@@ -837,7 +751,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         ref readonly var artInfo = ref Client.Game.UO.Arts.GetArt(_graphic);
                         if (_isGumpGraphic)
-                            artInfo = ref Client.Game.Gumps.GetGump(_graphic);
+                            artInfo = ref Client.Game.UO.Gumps.GetGump(_graphic);
 
                         var rect = _isGumpGraphic ? artInfo.UV : Client.Game.UO.Arts.GetRealArtBounds(_graphic);
 

@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace ClassicUO.Game.Managers
 {
-    public static class UIManager
+    internal static class UIManager
     {
         private static readonly Dictionary<uint, Point> _gumpPositionCache = new Dictionary<uint, Point>();
         private static readonly Control[] _mouseDownControls = new Control[0xFF];
@@ -25,6 +25,8 @@ namespace ClassicUO.Game.Managers
         private static bool _isDraggingControl;
         private static Control _keyboardFocusControl, _lastFocus;
         private static bool _needSort;
+
+        public static World World { get; set; }
 
         public static float ContainerScale { get; set; } = 1f;
 
@@ -434,7 +436,7 @@ namespace ClassicUO.Game.Managers
         public static void Draw(UltimaBatcher2D batcher)
         {
             SortControlsByInfo();
-            if (World.InGame && ProfileManager.CurrentProfile.GlobalScaling)
+            if (World != null && World.InGame && ProfileManager.CurrentProfile.GlobalScaling)
                 batcher.Begin(null, Matrix.CreateScale(ProfileManager.CurrentProfile.GlobalScale));
             else
                 batcher.Begin();

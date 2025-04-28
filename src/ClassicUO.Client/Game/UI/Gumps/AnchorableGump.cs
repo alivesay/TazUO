@@ -3,7 +3,6 @@
 using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
 using ClassicUO.Input;
-using ClassicUO.Assets;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,7 +17,7 @@ namespace ClassicUO.Game.UI.Gumps
         DISABLED
     }
 
-    public abstract class AnchorableGump : Gump
+    internal abstract class AnchorableGump : Gump
     {
         private AnchorableGump _anchorCandidate;
 

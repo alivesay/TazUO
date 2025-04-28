@@ -135,9 +135,9 @@ namespace ClassicUO.Game.Managers
                         else
                         {
                             if (ProfileManager.CurrentProfile.CustomBarsToggled)
-                                UIManager.Add(BaseHealthBarGump.LastAttackBar = new HealthBarGumpCustom(value) { Location = ProfileManager.CurrentProfile.LastTargetHealthBarPos, IsLastTarget = true });
+                                UIManager.Add(BaseHealthBarGump.LastAttackBar = new HealthBarGumpCustom(_world, value) { Location = ProfileManager.CurrentProfile.LastTargetHealthBarPos, IsLastTarget = true });
                             else
-                                UIManager.Add(BaseHealthBarGump.LastAttackBar = new HealthBarGump(value) { Location = ProfileManager.CurrentProfile.LastTargetHealthBarPos, IsLastTarget = true });
+                                UIManager.Add(BaseHealthBarGump.LastAttackBar = new HealthBarGump(_world, value) { Location = ProfileManager.CurrentProfile.LastTargetHealthBarPos, IsLastTarget = true });
                         }
                     }
                     else
@@ -145,9 +145,9 @@ namespace ClassicUO.Game.Managers
                         if (UIManager.GetGump<BaseHealthBarGump>(value) == null)
                         {
                             if (ProfileManager.CurrentProfile.CustomBarsToggled)
-                                UIManager.Add(new HealthBarGumpCustom(value) { Location = ProfileManager.CurrentProfile.LastTargetHealthBarPos, IsLastTarget = true });
+                                UIManager.Add(new HealthBarGumpCustom(_world, value) { Location = ProfileManager.CurrentProfile.LastTargetHealthBarPos, IsLastTarget = true });
                             else
-                                UIManager.Add(new HealthBarGump(value) { Location = ProfileManager.CurrentProfile.LastTargetHealthBarPos, IsLastTarget = true });
+                                UIManager.Add(new HealthBarGump(_world, value) { Location = ProfileManager.CurrentProfile.LastTargetHealthBarPos, IsLastTarget = true });
                         }
                     }
                 }
@@ -549,7 +549,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    public static class TargetHelper
+    internal static class TargetHelper
     {
         private static CancellationTokenSource _executingSource = new CancellationTokenSource();
 
@@ -557,15 +557,15 @@ namespace ClassicUO.Game.Managers
         /// Request the player to target a gump
         /// </summary>
         /// <param name="onTarget"></param>
-        public static async void TargetGump(Action<Gump> onTarget)
+        public static async void TargetGump(World world, Action<Gump> onTarget)
         {
-            var serial = await TargetAsync();
+            var serial = await TargetAsync(world);
             if (serial == 0) return;
 
             var g = UIManager.GetGump(serial);
             if (g == null)
             {
-                GameActions.Print($"Failed to find the targeted gump (0x{serial:X}).");
+                GameActions.Print(world, $"Failed to find the targeted gump (0x{serial:X}).");
                 return;
             }
 
@@ -577,28 +577,28 @@ namespace ClassicUO.Game.Managers
         /// </summary>
         /// <param name="onTargeted"></param>
         /// <returns></returns>
-        public static async Task TargetObject(Action<Entity> onTargeted)
+        public static async Task TargetObject(World world, Action<Entity> onTargeted)
         {
-            var serial = await TargetAsync();
+            var serial = await TargetAsync(world);
             if (serial == 0) return;
 
-            var untyped = World.Get(serial);
+            var untyped = world.Get(serial);
             if (untyped == null)
             {
-                GameActions.Print($"Failed to find the targeted entity (0x{serial:X}).");
+                GameActions.Print(world, $"Failed to find the targeted entity (0x{serial:X}).");
                 return;
             }
 
             onTargeted(untyped);
         }
 
-        public static async Task<uint> TargetAsync()
+        public static async Task<uint> TargetAsync(World world)
         {
-            if (TargetManager.IsTargeting) TargetManager.CancelTarget();
+            if (world.TargetManager.IsTargeting) world.TargetManager.CancelTarget();
 
             if (CUOEnviroment.Debug)
             {
-                GameActions.Print($"Waiting for Target.");
+                GameActions.Print(world, $"Waiting for Target.");
             }
 
             // Abort any previous running task
@@ -606,10 +606,10 @@ namespace ClassicUO.Game.Managers
             Interlocked.Exchange(ref _executingSource, newSource).Cancel();
 
             // Set target
-            TargetManager.SetTargeting(CursorTarget.Internal, CursorType.Target, TargetType.Neutral);
+            world.TargetManager.SetTargeting(CursorTarget.Internal, CursorType.Target, TargetType.Neutral);
 
             // Wait for target
-            while (!newSource.IsCancellationRequested && TargetManager.IsTargeting)
+            while (!newSource.IsCancellationRequested && world.TargetManager.IsTargeting)
             {
                 try
                 {
@@ -623,11 +623,11 @@ namespace ClassicUO.Game.Managers
 
             if (newSource.IsCancellationRequested)
             {
-                GameActions.Print($"Target request was cancelled.");
+                GameActions.Print(world, $"Target request was cancelled.");
                 return 0;
             }
 
-            return TargetManager.LastTargetInfo.Serial;
+            return world.TargetManager.LastTargetInfo.Serial;
         }
     }
 }

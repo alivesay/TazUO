@@ -48,8 +48,11 @@ namespace ClassicUO.Game.Managers
             1072060,    // You cannot cast a spell while calmed.
         };
 
+        private World World;
+
         private SpellVisualRangeManager()
         {
+            this.World = Client.Game.UO.World;
             Load();
         }
 
@@ -122,7 +125,7 @@ namespace ClassicUO.Game.Managers
                 return false;
             }
 
-            if (TargetManager.IsTargeting || (currentSpell.ShowCastRangeDuringCasting && IsCastingWithoutTarget()))
+            if (World.TargetManager.IsTargeting || (currentSpell.ShowCastRangeDuringCasting && IsCastingWithoutTarget()))
             {
                 if (LastSpellTime + TimeSpan.FromSeconds(currentSpell.MaxDuration) > DateTime.Now)
                 {
@@ -135,7 +138,7 @@ namespace ClassicUO.Game.Managers
 
         public bool IsCastingWithoutTarget()
         {
-            if (!loaded || currentSpell == null || !isCasting || currentSpell.CastTime <= 0 || TargetManager.IsTargeting || ProfileManager.CurrentProfile == null || !ProfileManager.CurrentProfile.EnableSpellIndicators)
+            if (!loaded || currentSpell == null || !isCasting || currentSpell.CastTime <= 0 || World.TargetManager.IsTargeting || ProfileManager.CurrentProfile == null || !ProfileManager.CurrentProfile.EnableSpellIndicators)
             {
                 return false;
             }
@@ -454,18 +457,18 @@ namespace ClassicUO.Game.Managers
             private Vector3 hue = ShaderHueTranslator.GetHueVector(0);
 
 
-            public CastTimerProgressBar() : base(0, 0)
+            public CastTimerProgressBar(World world) : base(world, 0, 0)
             {
                 CanMove = false;
                 AcceptMouseInput = false;
                 CanCloseWithEsc = false;
                 CanCloseWithRightClick = false;
 
-                ref readonly var gi = ref Client.Game.Gumps.GetGump(0x0805);
+                ref readonly var gi = ref Client.Game.UO.Gumps.GetGump(0x0805);
                 background = gi.Texture;
                 barBounds = gi.UV;
 
-                gi = ref Client.Game.Gumps.GetGump(0x0806);
+                gi = ref Client.Game.UO.Gumps.GetGump(0x0806);
                 foreground = gi.Texture;
                 barBoundsF = gi.UV;
             }
@@ -482,7 +485,7 @@ namespace ClassicUO.Game.Managers
                             if (background != null && foreground != null)
                             {
                                 Mobile m = World.Player;
-                                Client.Game.Animations.GetAnimationDimensions(
+                                Client.Game.UO.Animations.GetAnimationDimensions(
                                     m.AnimIndex,
                                     m.GetGraphicForAnimation(),
                                     0,

@@ -11,7 +11,7 @@ internal class ArtBrowserGump : Gump
     private DataBox dataBox = new DataBox(0, 0, 500, 700);
     private ResizableStaticPic[] resizableStaticPics;
     private StbTextBox pageInput;
-    public ArtBrowserGump() : base(0, 0)
+    public ArtBrowserGump(World world) : base(world, 0, 0)
     {
         CanMove = true;
         AcceptMouseInput = true;
@@ -95,7 +95,7 @@ internal class ArtBrowserGump : Gump
         if (sender is ResizableStaticPic rsp)
         {
             SDL.SDL_SetClipboardText(rsp.Graphic.ToString());
-            GameActions.Print($"Copied {rsp.Graphic} to clipboard.");
+            GameActions.Print(World, $"Copied {rsp.Graphic} to clipboard.");
         }
     }
 
@@ -111,7 +111,7 @@ internal class ArtBrowserGump : Gump
         uint index = (uint)(Page * maxEntries);
         while (count < maxEntries)
         {
-            ref readonly var art = ref Client.Game.Arts.GetArt(index);
+            ref readonly var art = ref Client.Game.UO.Arts.GetArt(index);
             //if (art.Texture != null)
             {
                 var c = resizableStaticPics[count];

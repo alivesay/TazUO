@@ -5,14 +5,13 @@ using System.Runtime.CompilerServices;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.Managers;
 using ClassicUO.Assets;
-using ClassicUO.Utility;
 using System;
 using System.Runtime.InteropServices;
 using System.Buffers;
 
 namespace ClassicUO.Game.Map
 {
-    public sealed class Chunk
+    internal sealed class Chunk
     {
         //private static readonly QueuedPool<Chunk> _pool = new QueuedPool<Chunk>
         //(

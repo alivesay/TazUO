@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class ResizableStaticPic : Control
+    internal class ResizableStaticPic : Control
     {
         private uint graphic;
         private ushort hue = 0;
@@ -37,9 +37,9 @@ namespace ClassicUO.Game.UI.Controls
                 return false;
             }
 
-            ref readonly var texture = ref Client.Game.Arts.GetArt(graphic);
+            ref readonly var texture = ref Client.Game.UO.Arts.GetArt(graphic);
 
-            Rectangle _rect = Client.Game.Arts.GetRealArtBounds(graphic);
+            Rectangle _rect = Client.Game.UO.Arts.GetRealArtBounds(graphic);
 
             Point _originalSize = new Point(Width, Height);
             Point _point = new Point((Width >> 1) - (_originalSize.X >> 1), (Height >> 1) - (_originalSize.Y >> 1));

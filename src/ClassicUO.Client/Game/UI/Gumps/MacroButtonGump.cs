@@ -4,13 +4,10 @@ using System;
 using System.Xml;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
-using ClassicUO.Game.Scenes;
 using ClassicUO.Input;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Xml;
 
 namespace ClassicUO.Game.UI.Gumps
 {

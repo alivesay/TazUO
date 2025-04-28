@@ -176,7 +176,7 @@ namespace ClassicUO.Game.UI.Gumps
                 },
                 1
             );
-            moreMenu.ContextMenu = new ContextMenuControl();
+            moreMenu.ContextMenu = new ContextMenuControl(this);
             moreMenu.MouseUp += (s, e) => { moreMenu.ContextMenu?.Show(); };
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry(Language.Instance.TopBarGump.CommandsEntry, () =>
             {
@@ -184,12 +184,12 @@ namespace ClassicUO.Game.UI.Gumps
             }));
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry(cliloc.GetString(1079449, ResGumps.Info), () =>
             {
-                if (TargetManager.IsTargeting)
+                if (World.TargetManager.IsTargeting)
                 {
-                    TargetManager.CancelTarget();
+                    World.TargetManager.CancelTarget();
                 }
 
-                TargetManager.SetTargeting(CursorTarget.SetTargetClientSide, CursorType.Target, TargetType.Neutral);
+                World.TargetManager.SetTargeting(CursorTarget.SetTargetClientSide, CursorType.Target, TargetType.Neutral);
             }));
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry(cliloc.GetString(1042237, ResGumps.Debug), () =>
             {
@@ -197,7 +197,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (debugGump == null)
                 {
-                    debugGump = new DebugGump(100, 100);
+                    debugGump = new DebugGump(World, 100, 100);
                     UIManager.Add(debugGump);
                 }
                 else
@@ -212,7 +212,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (netstatsgump == null)
                 {
-                    netstatsgump = new NetworkStatsGump(100, 100);
+                    netstatsgump = new NetworkStatsGump(World, 100, 100);
                     UIManager.Add(netstatsgump);
                 }
                 else
@@ -224,7 +224,7 @@ namespace ClassicUO.Game.UI.Gumps
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry(cliloc.GetString(3000134, ResGumps.Help), () => { GameActions.RequestHelp(); }));
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Open boat control", () => { UIManager.Add(new BoatControl() { X = 200, Y = 200 }); }));
 
-            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Toggle nameplates", () => { NameOverHeadManager.ToggleOverheads(); }));
+            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Toggle nameplates", World.NameOverHeadManager.ToggleOverheads));
             
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Legion Scripting", () => { UIManager.Add(new LegionScripting.ScriptManagerGump()); }));
 
@@ -278,45 +278,7 @@ namespace ClassicUO.Game.UI.Gumps
             XmlGumps.ContextMenu?.Dispose();
             if (XmlGumps.ContextMenu == null)
             {
-                XmlGumps.ContextMenu = new ContextMenuControl();
-            }
-
-            string[] xmls = XmlGumpHandler.GetAllXmlGumps();
-
-            ContextMenuItemEntry ci = null;
-            foreach (var xml in xmls)
-            {
-                XmlGumps.ContextMenu.Add(ci = new ContextMenuItemEntry(xml, () =>
-                {
-                    if (Keyboard.Ctrl)
-                    {
-                        if (ProfileManager.CurrentProfile.AutoOpenXmlGumps.Contains(xml))
-                        {
-                            ProfileManager.CurrentProfile.AutoOpenXmlGumps.Remove(xml);
-                        }
-                        else
-                        {
-                            ProfileManager.CurrentProfile.AutoOpenXmlGumps.Add(xml);
-                        }
-                    }
-                    else
-                    {
-                        UIManager.Add(XmlGumpHandler.CreateGumpFromFile(System.IO.Path.Combine(XmlGumpHandler.XmlGumpPath, xml + ".xml")));
-                    }
-                    RefreshXmlGumps();
-                }, false, ProfileManager.CurrentProfile.AutoOpenXmlGumps.Contains(xml)));
-            }
-
-            ContextMenuItemEntry reload = new ContextMenuItemEntry("Reload", RefreshXmlGumps);
-            XmlGumps.ContextMenu.Add(reload);
-        }
-
-        public void RefreshXmlGumps()
-        {
-            XmlGumps.ContextMenu?.Dispose();
-            if (XmlGumps.ContextMenu == null)
-            {
-                XmlGumps.ContextMenu = new ContextMenuControl();
+                XmlGumps.ContextMenu = new ContextMenuControl(this);
             }
 
             string[] xmls = XmlGumpHandler.GetAllXmlGumps();

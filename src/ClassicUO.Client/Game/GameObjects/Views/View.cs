@@ -19,7 +19,7 @@ namespace ClassicUO.Game.GameObjects
         DISPLAYING
     }
 
-    public abstract partial class GameObject
+    internal abstract partial class GameObject
     {
         public byte AlphaHue;
         public bool AllowedToDraw = true;

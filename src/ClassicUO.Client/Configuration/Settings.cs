@@ -1,9 +1,10 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
-using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ClassicUO.Configuration.Json;
+using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Configuration
 {

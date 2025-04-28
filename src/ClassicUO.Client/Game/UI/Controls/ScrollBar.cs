@@ -4,7 +4,6 @@ using System;
 using ClassicUO.Input;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
-using System;
 
 namespace ClassicUO.Game.UI.Controls
 {

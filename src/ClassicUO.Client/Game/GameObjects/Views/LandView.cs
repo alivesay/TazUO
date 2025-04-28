@@ -112,8 +112,8 @@ namespace ClassicUO.Game.GameObjects
             {
                 ref readonly var artInfo = ref Client.Game.UO.Arts.GetLand(Graphic);
 
-                ref readonly var texmapInfo = ref Client.Game.Texmaps.GetTexmap(
-                    TileDataLoader.Instance.LandData[Graphic].TexID
+                ref readonly var texmapInfo = ref Client.Game.UO.Texmaps.GetTexmap(
+                    Client.Game.UO.FileManager.TileData.LandData[Graphic].TexID
                 );
 
                 if (artInfo.Texture != null)

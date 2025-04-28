@@ -73,7 +73,7 @@ namespace ClassicUO
         public GraphicsDeviceManager GraphicManager { get; }
         public readonly uint[] FrameDelay = new uint[2];
 
-        private readonly List<(uint, Action)> _queuedActions = new ();
+        private readonly List<(uint, Action)> _queuedActions = new();
 
         public void EnqueueAction(uint time, Action action)
         {
@@ -117,11 +117,11 @@ namespace ClassicUO
             UO.Load(this);
 
             PNGLoader.Instance.GraphicsDevice = GraphicsDevice;
-            System.Threading.Tasks.Task loadResourceAssets = PNGLoader.Instance.LoadResourceAssets(Client.Game.UO.Gumps);
+            System.Threading.Tasks.Task loadResourceAssets = PNGLoader.Instance.LoadResourceAssets(Client.Game.UO.Gumps.GetGumpsLoader);
 
             Audio.Initialize();
             // TODO: temporary fix to avoid crash when laoding plugins
-            Settings.GlobalSettings.Encryption = (byte) NetClient.Socket.Load(UO.FileManager.Version, (EncryptionType) Settings.GlobalSettings.Encryption);
+            Settings.GlobalSettings.Encryption = (byte)NetClient.Socket.Load(UO.FileManager.Version, (EncryptionType)Settings.GlobalSettings.Encryption);
 
             Log.Trace("Loading plugins...");
             PluginHost?.Initialize();
@@ -133,7 +133,10 @@ namespace ClassicUO
             _pluginsInitialized = true;
 
             Log.Trace("Done!");
-loadResourceAssets.Wait(10000);
+            loadResourceAssets.Wait(10000);
+
+            UIManager.World = UO.World;
+
             SetScene(new LoginScene(UO.World));
 #endif
             SetWindowPositionBySettings();
@@ -429,7 +432,7 @@ loadResourceAssets.Wait(10000);
                 }
             }
 
-             base.Update(gameTime);
+            base.Update(gameTime);
         }
 
         public static void UpdateBackgroundHueShader()
@@ -884,7 +887,7 @@ loadResourceAssets.Wait(10000);
                         e.button.button = (byte)MouseButtonType.Right;
                         SDL2.SDL.SDL_PushEvent(ref e);
                     }
-                    else if (sdlEvent->cbutton.button == (byte)SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_START && World.InGame)
+                    else if (sdlEvent->cbutton.button == (byte)SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_START && UO.World.InGame)
                     {
                         Gump g = UIManager.GetGump<ModernOptionsGump>();
                         if (g == null)
@@ -1030,110 +1033,29 @@ loadResourceAssets.Wait(10000);
             {
                 texture.SetData(colors);
 
-                if (CUOEnviroment.IsUnix)
+                string screenshotsFolder = FileSystemHelper.CreateFolderIfNotExists(
+                    CUOEnviroment.ExecutablePath,
+                    "Data",
+                    "Client",
+                    "Screenshots"
+                );
+
+                string path = Path.Combine(
+                    screenshotsFolder,
+                    $"screenshot_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.png"
+                );
+
+                using FileStream fileStream = File.Create(path);
+                texture.SaveAsPng(fileStream, texture.Width, texture.Height);
+                string message = string.Format(ResGeneral.ScreenshotStoredIn0, path);
+
+                if (ProfileManager.CurrentProfile == null || ProfileManager.CurrentProfile.HideScreenshotStoredInMessage)
                 {
-                    string screenshotsFolder = FileSystemHelper.CreateFolderIfNotExists(
-                        CUOEnviroment.ExecutablePath,
-                        "Data",
-                        "Client",
-                        "Screenshots"
-                    );
-
-                    string path = Path.Combine(
-                        screenshotsFolder,
-                        $"screenshot_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.png"
-                    );
-
-                    using FileStream fileStream = File.Create(path);
-                    texture.SaveAsPng(fileStream, texture.Width, texture.Height);
-                    string message = string.Format(ResGeneral.ScreenshotStoredIn0, path);
-
-                    if (ProfileManager.CurrentProfile == null || ProfileManager.CurrentProfile.HideScreenshotStoredInMessage)
-                    {
-                        Log.Info(message);
-                    }
-                    else
-                    {
-                        GameActions.Print(message, 0x44, MessageType.System);
-                    }
+                    Log.Info(message);
                 }
                 else
                 {
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        texture.SaveAsPng(stream, texture.Width, texture.Height);
-
-                        try
-                        {
-                            System.Windows.Forms.Clipboard.SetImage(System.Drawing.Image.FromStream(stream));
-                            GameActions.Print("Copied screenshot to your clipboard");
-                        }
-                        catch { }
-                    }
-
-                }
-            }
-        }
-
-        public void ClipboardScreenshot(Rectangle position, GraphicsDevice graphicDevice)
-        {
-            Color[] colors = new Color[position.Width * position.Height];
-
-            graphicDevice.GetBackBufferData(position, colors, 0, colors.Length);
-
-            using (
-                Texture2D texture = new Texture2D(
-                    GraphicsDevice,
-                    position.Width,
-                    position.Height,
-                    false,
-                    SurfaceFormat.Color
-                )
-            )
-            {
-                texture.SetData(colors);
-
-                if (CUOEnviroment.IsUnix)
-                {
-                    string screenshotsFolder = FileSystemHelper.CreateFolderIfNotExists(
-                        CUOEnviroment.ExecutablePath,
-                        "Data",
-                        "Client",
-                        "Screenshots"
-                    );
-
-                    string path = Path.Combine(
-                        screenshotsFolder,
-                        $"screenshot_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.png"
-                    );
-
-                    using FileStream fileStream = File.Create(path);
-                    texture.SaveAsPng(fileStream, texture.Width, texture.Height);
-                    string message = string.Format(ResGeneral.ScreenshotStoredIn0, path);
-
-                    if (ProfileManager.CurrentProfile == null || ProfileManager.CurrentProfile.HideScreenshotStoredInMessage)
-                    {
-                        Log.Info(message);
-                    }
-                    else
-                    {
-                        GameActions.Print(message, 0x44, MessageType.System);
-                    }
-                }
-                else
-                {
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        texture.SaveAsPng(stream, texture.Width, texture.Height);
-
-                        try
-                        {
-                            System.Windows.Forms.Clipboard.SetImage(System.Drawing.Image.FromStream(stream));
-                            GameActions.Print("Copied screenshot to your clipboard");
-                        }
-                        catch { }
-                    }
-
+                    GameActions.Print(UO.World, message, 0x44, MessageType.System);
                 }
             }
         }

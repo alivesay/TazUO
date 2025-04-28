@@ -11,13 +11,12 @@ using ClassicUO.IO;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using MathHelper = ClassicUO.Utility.MathHelper;
+using ClassicUO.Assets;
 
 namespace ClassicUO.Game.GameObjects
 {
-    public partial class Item
+    internal partial class Item
     {
         private static EquipConvData? _equipConvData;
 
@@ -64,12 +63,11 @@ namespace ClassicUO.Game.GameObjects
                 {
                     if (StaticFilters.IsOutStamina())
                     {
-                        TileDataLoader.Instance.StaticData[Graphic].SetImpassable(true);
-
+                        Client.Game.UO.FileManager.TileData.StaticData[Graphic].SetImpassable(true);
                     }
                     else
                     {
-                        TileDataLoader.Instance.StaticData[Graphic].SetImpassable(false);
+                        Client.Game.UO.FileManager.TileData.StaticData[Graphic].SetImpassable(false);
                     }
                         
                 }

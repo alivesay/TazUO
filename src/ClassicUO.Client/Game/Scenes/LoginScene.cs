@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
@@ -16,17 +15,10 @@ using ClassicUO.Game.UI.Gumps.CharCreation;
 using ClassicUO.Game.UI.Gumps.Login;
 using ClassicUO.IO;
 using ClassicUO.Network;
-using ClassicUO.Network.Encryption;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
 using ClassicUO.Utility.Logging;
 using Microsoft.Xna.Framework;
-using System;
-using System.IO;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Text;
 
 namespace ClassicUO.Game.Scenes
 {
@@ -78,7 +70,7 @@ namespace ClassicUO.Game.Scenes
 
             _autoLogin = Settings.GlobalSettings.AutoLogin;
 
-            UIManager.Add(new LoginBackground());
+            UIManager.Add(new LoginBackground(_world));
 
             if (string.IsNullOrEmpty(Settings.GlobalSettings.IP))
             {
@@ -97,26 +89,26 @@ namespace ClassicUO.Game.Scenes
                                         Settings.GlobalSettings.Port = p;
                                     }
                                 }
-                                UIManager.Add(_currentGump = new LoginGump(this));
+                                UIManager.Add(_currentGump = new LoginGump(_world, this));
                             })
                             { X = 130, Y = 150 });
                         }
                         else //Port is > 0, possibly valid
                         {
-                            UIManager.Add(_currentGump = new LoginGump(this));
+                            UIManager.Add(_currentGump = new LoginGump(_world, this));
                         }
                         Settings.GlobalSettings.IP = input;
                     }
                     else //Cancel ip entry
                     {
-                        UIManager.Add(_currentGump = new LoginGump(this));
+                        UIManager.Add(_currentGump = new LoginGump(_world, this));
                     }
                 })
                 { X = 130, Y = 150 });
             }
             else
             {
-                UIManager.Add(_currentGump = new LoginGump(this));
+                UIManager.Add(_currentGump = new LoginGump(_world, this));
             }
 
             Client.Game.Audio.PlayMusic(Client.Game.Audio.LoginMusicIndex, false, true);

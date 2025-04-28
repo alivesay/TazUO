@@ -43,7 +43,7 @@ using System.Text.RegularExpressions;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class TextBox : Control
+    internal class TextBox : Control
     {
         private static Queue<TextBox> _pool = new();
         private RichTextLayout _rtl;
@@ -150,7 +150,7 @@ namespace ClassicUO.Game.UI.Controls
             if (hue == 0)
                 hue = 946; //Change black text to standard gray
 
-            return new Color() { PackedValue = HuesLoader.Instance.GetHueColorRgba8888(31, (ushort)hue) };
+            return new Color() { PackedValue = Client.Game.UO.FileManager.Hues.GetHueColorRgba8888(31, (ushort)hue) };
         }
         public bool PixelCheck(int x, int y)
         {
@@ -244,7 +244,7 @@ namespace ClassicUO.Game.UI.Controls
             get => (int)_color.PackedValue;
             set
             {
-                var newVal = HuesLoader.Instance.GetHueColorRgba8888(31, (ushort)value);
+                var newVal = Client.Game.UO.FileManager.Hues.GetHueColorRgba8888(31, (ushort)value);
                 if (_color.PackedValue != newVal)
                 {
                     _color.PackedValue = newVal;

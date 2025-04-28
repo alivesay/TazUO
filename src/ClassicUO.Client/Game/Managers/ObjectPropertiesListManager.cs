@@ -11,7 +11,7 @@ using ClassicUO.Network;
 
 namespace ClassicUO.Game.Managers
 {
-    public sealed class ObjectPropertiesListManager
+    internal sealed class ObjectPropertiesListManager
     {
         private readonly Dictionary<uint, ItemProperty> _itemsProperties = new Dictionary<uint, ItemProperty>();
 
@@ -42,14 +42,13 @@ namespace ClassicUO.Game.Managers
                 return true; //p.Revision != 0;  <-- revision == 0 can contain the name.
             }
 
-            if(ProfileManager.CurrentProfile.ForceTooltipsOnOldClients) 
+            if (ProfileManager.CurrentProfile.ForceTooltipsOnOldClients)
                 ForcedTooltipManager.RequestName(serial);
 
             // if we don't have the OPL of this item, let's request it to the server.
             // Original client seems asking for OPL when character is not running.
             // We'll ask OPL when mouse is over an object.
-            if(World.ClientFeatures.TooltipsEnabled)
-                PacketHandlers.AddMegaClilocRequest(serial);
+            PacketHandlers.AddMegaClilocRequest(serial);
 
             return false;
         }
@@ -104,11 +103,11 @@ namespace ClassicUO.Game.Managers
             return 0;
         }
 
-        public ItemPropertiesData TryGetItemPropertiesData(uint serial)
+        public ItemPropertiesData TryGetItemPropertiesData(World world, uint serial)
         {
             if (Contains(serial))
-                if (World.Items.TryGetValue(serial, out Item item))
-                    return new ItemPropertiesData(item);
+                if (world.Items.TryGetValue(serial, out Item item))
+                    return new ItemPropertiesData(world, item);
             return null;
         }
 
@@ -138,7 +137,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    public class ItemPropertiesData
+    internal class ItemPropertiesData
     {
         public readonly bool HasData = false;
         public string Name = "";
@@ -148,15 +147,18 @@ namespace ClassicUO.Game.Managers
         public readonly Item item, itemComparedTo;
         public List<SinglePropertyData> singlePropertyData = new List<SinglePropertyData>();
 
-        public ItemPropertiesData(Item item, Item compareTo = null)
+        private World world;
+
+        public ItemPropertiesData(World world, Item item, Item compareTo = null)
         {
             if (item == null)
                 return;
+            this.world = world;
             this.item = item;
             itemComparedTo = compareTo;
 
             serial = item.Serial;
-            if (World.OPL.TryGetNameAndData(item.Serial, out Name, out RawData))
+            if (world.OPL.TryGetNameAndData(item.Serial, out Name, out RawData))
             {
                 Name = Name.Trim();
                 HasData = true;
@@ -192,7 +194,7 @@ namespace ClassicUO.Game.Managers
                 singlePropertyData.Add(new SinglePropertyData(line));
             }
 
-            if(itemComparedTo != null)
+            if (itemComparedTo != null)
             {
                 GenComparisonData();
             }
@@ -200,9 +202,9 @@ namespace ClassicUO.Game.Managers
 
         private void GenComparisonData()
         {
-            if(itemComparedTo == null) return;
+            if (itemComparedTo == null) return;
 
-            ItemPropertiesData itemPropertiesData = new ItemPropertiesData(itemComparedTo);
+            ItemPropertiesData itemPropertiesData = new ItemPropertiesData(world, itemComparedTo);
             if (itemPropertiesData.HasData)
             {
                 foreach (SinglePropertyData thisItem in singlePropertyData)

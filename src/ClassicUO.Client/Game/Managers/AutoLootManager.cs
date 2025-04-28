@@ -8,10 +8,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ClassicUO.Game.Managers
 {
+    [JsonSerializable(typeof(AutoLootManager.AutoLootConfigEntry))]
+    [JsonSerializable(typeof(AutoLootManager.AutoLootConfigEntry[]))]
+    internal partial class AutoLootJsonContext : JsonSerializerContext
+    {
+    }
+
     internal class AutoLootManager
     {
         public static AutoLootManager Instance { get; private set; } = new AutoLootManager();
@@ -28,7 +35,12 @@ namespace ClassicUO.Game.Managers
         private int currentLootTotalCount = 0;
         private bool IsEnabled { get { return ProfileManager.CurrentProfile.EnableAutoLoot; } }
 
-        private AutoLootManager() { }
+        private World World;
+
+        private AutoLootManager()
+        {
+            World = Client.Game.UO.World;
+        }
 
 
         public bool IsBeingLooted(uint serial)
@@ -234,7 +246,7 @@ namespace ClassicUO.Game.Managers
                         if (rc != null && rc.Distance > ProfileManager.CurrentProfile.AutoOpenCorpseRange)
                             return;
                     }
-                    GameActions.GrabItem(m, m.Amount);
+                    GameActions.GrabItem(World, m, m.Amount);
                     nextLootTime = Time.Ticks + ProfileManager.CurrentProfile.MoveMultiObjectDelay;
                 }
             }
@@ -270,13 +282,13 @@ namespace ClassicUO.Game.Managers
                     try
                     {
                         string data = File.ReadAllText(savePath);
-                        AutoLootConfigEntry[] tItem = JsonSerializer.Deserialize<AutoLootConfigEntry[]>(data);
+                        AutoLootConfigEntry[] tItem = JsonSerializer.Deserialize(data, AutoLootJsonContext.Default.AutoLootConfigEntryArray);
                         autoLootItems = tItem.ToList<AutoLootConfigEntry>();
                         loaded = true;
                     }
                     catch
                     {
-                        GameActions.Print("There was an error loading your auto loot config file, please check it with a json validator.", 32);
+                        GameActions.Print(World, "There was an error loading your auto loot config file, please check it with a json validator.", 32);
                         loaded = false;
                     }
 
@@ -290,8 +302,7 @@ namespace ClassicUO.Game.Managers
             {
                 try
                 {
-                    var options = new JsonSerializerOptions() { WriteIndented = true };
-                    string fileData = JsonSerializer.Serialize(autoLootItems, options);
+                    string fileData = JsonSerializer.Serialize(autoLootItems, AutoLootJsonContext.Default.AutoLootConfigEntryArray);
 
                     File.WriteAllText(savePath, fileData);
                 }
@@ -317,7 +328,7 @@ namespace ClassicUO.Game.Managers
 
                 if (!HueCheck(compareTo.Hue)) return false;
 
-                if (RegexMatch && !RegexCheck(compareTo)) return false;
+                if (RegexMatch && !RegexCheck(compareTo.World, compareTo)) return false;
 
                 return true;
             }
@@ -338,10 +349,10 @@ namespace ClassicUO.Game.Managers
                 }
             }
 
-            private bool RegexCheck(Item compareTo)
+            private bool RegexCheck(World world, Item compareTo)
             {
                 string search = "";
-                if (World.OPL.TryGetNameAndData(compareTo, out string name, out string data))
+                if (world.OPL.TryGetNameAndData(compareTo, out string name, out string data))
                     search += name + data;
                 else
                     search = StringHelper.GetPluralAdjustedString(compareTo.ItemData.Name);

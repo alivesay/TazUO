@@ -10,14 +10,11 @@ using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SDL2;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Keyboard = ClassicUO.Input.Keyboard;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public abstract class Control
+    internal abstract class Control
     {
         internal static int _StepsDone = 1;
         internal static int _StepChanger = 1;

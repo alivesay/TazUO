@@ -4,20 +4,21 @@
 using System;
 using System.Collections.Generic;
 using ClassicUO.Game.GameObjects;
-using ClassicUO.Game.Scenes;
 using ClassicUO.Input;
 using ClassicUO.Resources;
 using ClassicUO.Utility.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
+using ClassicUO.Game.Data;
+using ClassicUO.Game.UI.Gumps;
+using ClassicUO.Configuration;
 
 namespace ClassicUO.Game.Managers
 {
     internal sealed class CommandManager
     {
         private readonly Dictionary<string, Action<string[]>> _commands = new Dictionary<string, Action<string[]>>();
+        public Dictionary<string, Action<string[]>> Commands => _commands;
+
         private readonly World _world;
 
         public CommandManager(World world)
@@ -101,7 +102,7 @@ namespace ClassicUO.Game.Managers
                     GameActions.CastSpell(spellDef.ID);
             });
 
-            List<Skill> sortSkills = new List<Skill>(World.Player.Skills);
+            List<Skill> sortSkills = new List<Skill>(_world.Player.Skills);
 
             Register("skill", s =>
             {
@@ -114,11 +115,11 @@ namespace ClassicUO.Game.Managers
 
                 if (skill.Length > 0)
                 {
-                    for (int i = 0; i < World.Player.Skills.Length; i++)
+                    for (int i = 0; i < _world.Player.Skills.Length; i++)
                     {
-                        if (World.Player.Skills[i].Name.ToLower().Contains(skill))
+                        if (_world.Player.Skills[i].Name.ToLower().Contains(skill))
                         {
-                            GameActions.UseSkill(World.Player.Skills[i].Index);
+                            GameActions.UseSkill(_world.Player.Skills[i].Index);
                             break;
                         }
                     }
@@ -126,7 +127,7 @@ namespace ClassicUO.Game.Managers
             });
 
             Register("version", s => { UIManager.Add(new VersionHistory()); });
-            Register("rain", s => { Client.Game.GetScene<ClassicUO.Game.Scenes.GameScene>()?.Weather.Generate(WeatherType.WT_RAIN, 30, 75); });
+            Register("rain", s => { _world.Weather.Generate(WeatherType.WT_RAIN, 30, 75); });
 
             Register("marktile", s =>
             {
@@ -134,13 +135,13 @@ namespace ClassicUO.Game.Managers
                 {
                     if (s.Length == 2)
                     {
-                        TileMarkerManager.Instance.RemoveTile(World.Player.X, World.Player.Y, World.Map.Index);
+                        TileMarkerManager.Instance.RemoveTile(_world.Player.X, _world.Player.Y, _world.Map.Index);
                     }
                     else if (s.Length == 4)
                     {
                         if (int.TryParse(s[2], out var x))
                             if (int.TryParse(s[3], out var y))
-                                TileMarkerManager.Instance.RemoveTile(x, y, World.Map.Index);
+                                TileMarkerManager.Instance.RemoveTile(x, y, _world.Map.Index);
                     }
                     else if (s.Length == 5)
                     {
@@ -154,19 +155,19 @@ namespace ClassicUO.Game.Managers
                 {
                     if (s.Length == 1)
                     {
-                        TileMarkerManager.Instance.AddTile(World.Player.X, World.Player.Y, World.Map.Index, 32);
+                        TileMarkerManager.Instance.AddTile(_world.Player.X, _world.Player.Y, _world.Map.Index, 32);
                     }
                     else if (s.Length == 2)
                     {
                         if (ushort.TryParse(s[1], out ushort h))
-                            TileMarkerManager.Instance.AddTile(World.Player.X, World.Player.Y, World.Map.Index, h);
+                            TileMarkerManager.Instance.AddTile(_world.Player.X, _world.Player.Y, _world.Map.Index, h);
                     }
                     else if (s.Length == 4)
                     {
                         if (int.TryParse(s[1], out var x))
                             if (int.TryParse(s[2], out var y))
                                 if (ushort.TryParse(s[3], out var h))
-                                    TileMarkerManager.Instance.AddTile(x, y, World.Map.Index, h);
+                                    TileMarkerManager.Instance.AddTile(x, y, _world.Map.Index, h);
                     }
                     else if (s.Length == 5)
                     {
@@ -197,18 +198,18 @@ namespace ClassicUO.Game.Managers
 
             Register("options", (s) =>
             {
-                UIManager.Add(new OptionsGump());
+                UIManager.Add(new OptionsGump(_world));
             });
 
             Register("paperdoll", (s) =>
             {
                 if (ProfileManager.CurrentProfile.UseModernPaperdoll)
                 {
-                    UIManager.Add(new PaperDollGump(World.Player, true));
+                    UIManager.Add(new PaperDollGump(_world, _world.Player, true));
                 }
                 else
                 {
-                    UIManager.Add(new ModernPaperdoll(World.Player));
+                    UIManager.Add(new ModernPaperdoll(_world.Player));
                 }
 
             });
@@ -232,7 +233,7 @@ namespace ClassicUO.Game.Managers
                 {
                     if (g != null)
                     {
-                        GameActions.Print(g.GetPageString());
+                        GameActions.Print(_world, g.GetPageString());
                     }
                 }
             });
@@ -261,12 +262,12 @@ namespace ClassicUO.Game.Managers
             });
 
             Register("artbrowser", (s) => { UIManager.Add(new ArtBrowserGump()); });
-            
+
             Register("animbrowser", (s) => { UIManager.Add(new AnimBrowser()); });
         }
 
 
-        public static void Register(string name, Action<string[]> callback)
+        public void Register(string name, Action<string[]> callback)
         {
             name = name.ToLower();
 
@@ -305,7 +306,7 @@ namespace ClassicUO.Game.Managers
             }
             else
             {
-                GameActions.Print(string.Format(Language.Instance.ErrorsLanguage.CommandNotFound, name));
+                GameActions.Print(_world, string.Format(Language.Instance.ErrorsLanguage.CommandNotFound, name));
                 Log.Warn($"Command: '{name}' not exists");
             }
         }

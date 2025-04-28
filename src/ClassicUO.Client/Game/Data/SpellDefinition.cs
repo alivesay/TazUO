@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace ClassicUO.Game.Data
 {
-    public class SpellDefinition : IEquatable<SpellDefinition>
+    internal class SpellDefinition : IEquatable<SpellDefinition>
     {
         public static SpellDefinition EmptySpell = new SpellDefinition
         (
@@ -119,22 +119,22 @@ namespace ClassicUO.Game.Data
         public readonly TargetType TargetType;
         public readonly int TithingCost;
 
-        public static void LoadCustomSpells()
+        public static void LoadCustomSpells(World world)
         {
             string path = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "spelldef.json");
             if (File.Exists(path))
             {
-                LoadSpellsFromFile(path);
+                LoadSpellsFromFile(world, path);
             }
 
             path = Path.Combine(Settings.GlobalSettings.UltimaOnlineDirectory, "spelldef.json");
             if (File.Exists(path))
             {
-                LoadSpellsFromFile(path);
+                LoadSpellsFromFile(world, path);
             }
         }
 
-        private static void LoadSpellsFromFile(string path)
+        private static void LoadSpellsFromFile(World world, string path)
         {
             try
             {
@@ -172,7 +172,7 @@ namespace ClassicUO.Game.Data
                                 SpellsSpellweaving.SetSpell(spell.SpellID, spellDef);
                                 break;
                             default:
-                                GameActions.Print($"Failed to load a spell, matching school not found for: [{spell.School}]. Spell was {spell.SpellName}({spell.SpellID})");
+                                GameActions.Print(world, $"Failed to load a spell, matching school not found for: [{spell.School}]. Spell was {spell.SpellName}({spell.SpellID})");
                                 continue;
                         }
                     }
@@ -495,7 +495,7 @@ namespace ClassicUO.Game.Data
             ];
         }
 
-        public static void SaveAllSpellsToJson()
+        public static void SaveAllSpellsToJson(World world)
         {
             List<SpellJson> list = new List<SpellJson>();
 
@@ -574,11 +574,11 @@ namespace ClassicUO.Game.Data
 
             if (!JsonHelper.SaveJsonFile(list, Path.Combine(CUOEnviroment.ExecutablePath, "Data", "spelldef.json")))
             {
-                GameActions.Print("Failed to save all spells as a json file!", 32);
+                GameActions.Print(world, "Failed to save all spells as a json file!", 32);
             }
             else
             {
-                GameActions.Print($"Saved all spells as a json file at {Path.Combine(CUOEnviroment.ExecutablePath, "Data", "spelldef.json")}");
+                GameActions.Print(world, $"Saved all spells as a json file at {Path.Combine(CUOEnviroment.ExecutablePath, "Data", "spelldef.json")}");
             }
         }
 

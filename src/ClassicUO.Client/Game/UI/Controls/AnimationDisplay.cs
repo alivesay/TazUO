@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls;
 
-public class AnimationDisplay : Control
+internal class AnimationDisplay : Control
 {
     private ushort _graphic;
     public ushort Graphic => _graphic;
@@ -36,21 +36,21 @@ public class AnimationDisplay : Control
 
     public void UpdateGraphic(ushort graphic)
     {
-        if (graphic >= Client.Game.Animations.MaxAnimationCount)
+        if (graphic >= Client.Game.UO.Animations.MaxAnimationCount)
             graphic = 0;
 
         _graphic = graphic;
         _animGroup = GetAnimGroup(graphic);
 
-        var frames = Client.Game.Animations.GetAnimationFrames(graphic, _animGroup, 1, out var hue2, out _, true);
-        _hueVector = ShaderHueTranslator.GetHueVector(hue2, TileDataLoader.Instance.StaticData[_graphic].IsPartialHue, 1f);
+        Client.Game.UO.Animations.GetAnimationFrames(graphic, _animGroup, 1, out var hue2, out _, true);
+        _hueVector = ShaderHueTranslator.GetHueVector(hue2, Client.Game.UO.FileManager.TileData.StaticData[_graphic].IsPartialHue, 1f);
     }
 
     private static byte GetAnimGroup(ushort graphic)
     {
-        var groupType = Client.Game.Animations.GetAnimType(graphic);
+        var groupType = Client.Game.UO.Animations.GetAnimType(graphic);
 
-        switch (AnimationsLoader.Instance.GetGroupIndex(graphic, groupType))
+        switch (Client.Game.UO.FileManager.Animations.GetGroupIndex(graphic, groupType))
         {
             case AnimationGroups.Low: return (byte)LowAnimationGroup.Stand;
 
@@ -78,7 +78,7 @@ public class AnimationDisplay : Control
     {
         base.Draw(batcher, x, y);
 
-        var frames = Client.Game.Animations.GetAnimationFrames(_graphic, _animGroup, 1, out var hue2, out _, true);
+        var frames = Client.Game.UO.Animations.GetAnimationFrames(_graphic, _animGroup, 1, out var hue2, out _, true);
 
         if (frames.Length == 0)
             return true;

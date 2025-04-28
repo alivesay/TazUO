@@ -157,6 +157,16 @@ namespace ClassicUO.Game.Managers
 
     internal sealed class SkillsGroupManager
     {
+        private bool _isActive;
+        public bool IsActive
+        {
+            get { return _isActive; }
+            set
+            {
+                _isActive = value;
+            }
+        }
+
         private readonly World _world;
 
         public SkillsGroupManager(World world) => _world = world;

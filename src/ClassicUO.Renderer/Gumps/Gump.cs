@@ -10,6 +10,8 @@ namespace ClassicUO.Renderer.Gumps
         private readonly PixelPicker _picker = new PixelPicker();
         private readonly GumpsLoader _gumpsLoader;
 
+        public GumpsLoader GetGumpsLoader => _gumpsLoader;
+
         public Gump(GumpsLoader gumpsLoader, GraphicsDevice device)
         {
             _gumpsLoader = gumpsLoader;
@@ -28,7 +30,7 @@ namespace ClassicUO.Renderer.Gumps
             {
                 var gumpInfo = PNGLoader.Instance.LoadGumpTexture(idx);
 
-                if (gumpInfo.Pixels == null || gumpInfo.Pixels.IsEmpty)
+                if (gumpInfo.Pixels.IsEmpty)
                 {
                     gumpInfo = _gumpsLoader.GetGump(idx);
                 }

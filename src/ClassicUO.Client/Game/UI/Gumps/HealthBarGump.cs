@@ -15,6 +15,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDL2;
 using ClassicUO.Game.Scenes;
+using ClassicUO.Assets;
+using System.Text.Json.Serialization;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -25,10 +27,7 @@ namespace ClassicUO.Game.UI.Gumps
         public bool IsLastAttackBar { get; set; } = false;
         public static BaseHealthBarGump LastAttackBar { get; set; }
         protected bool HasBeenBuilt { get; set; } = false;
-
-        public bool IsLastAttackBar { get; set; } = false;
-        public static BaseHealthBarGump LastAttackBar { get; set; }
-        protected bool HasBeenBuilt { get; set; } = false;
+        protected World _world;
 
         protected BaseHealthBarGump(World world, Entity entity) : this(world, 0, 0)
         {
@@ -38,6 +37,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 return;
             }
+            _world = world;
 
             GameActions.RequestMobileStatus(world, entity.Serial, true);
             LocalSerial = entity.Serial;
@@ -69,6 +69,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         protected BaseHealthBarGump(World world, uint local, uint server) : base(world, local, server)
         {
+            _world = world;
             CanMove = true;
             AnchorType = ANCHOR_TYPE.HEALTHBAR;
         }
@@ -255,7 +256,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (UIManager.MouseOverControl != null && (UIManager.MouseOverControl == this || UIManager.MouseOverControl.RootParent == this))
                 {
-                    ref readonly var texture = ref Client.Game.Gumps.GetGump(0x82C);
+                    ref readonly var texture = ref Client.Game.UO.Gumps.GetGump(0x82C);
                     if (texture.Texture != null)
                     {
                         if (x >= 0 && x < texture.UV.Width && y >= 0 && y <= texture.UV.Height)
@@ -268,7 +269,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (!ProfileManager.CurrentProfile.DisableAutoFollowAlt)
                 {
-                    MessageManager.HandleMessage
+                    _world.MessageManager.HandleMessage
                     (
                         World.Player,
                         ResGeneral.NowFollowing,
@@ -347,7 +348,7 @@ namespace ClassicUO.Game.UI.Gumps
                 else
                 {
                     if (StatusGumpBase.GetStatusGump() == null)
-                        UIManager.Add(StatusGumpBase.AddStatusGump(ProfileManager.CurrentProfile.StatusGumpPosition.X, ProfileManager.CurrentProfile.StatusGumpPosition.Y));
+                        UIManager.Add(StatusGumpBase.AddStatusGump(_world, ProfileManager.CurrentProfile.StatusGumpPosition.X, ProfileManager.CurrentProfile.StatusGumpPosition.Y));
                 }
             }
 
@@ -398,7 +399,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 Vector3 hueVector = ShaderHueTranslator.GetHueVector(0);
 
-                ref readonly var texture = ref Client.Game.Gumps.GetGump(0x82C);
+                ref readonly var texture = ref Client.Game.UO.Gumps.GetGump(0x82C);
 
                 if (texture.Texture != null)
                 {
@@ -711,10 +712,10 @@ namespace ClassicUO.Game.UI.Gumps
                 }
 
                 if (mobile != null && mobile != World.Player)
-                    if (TargetManager.LastTargetInfo.Serial != World.Player && !_outOfRange)
+                    if (_world.TargetManager.LastTargetInfo.Serial != World.Player && !_outOfRange)
                     {
                         int tDistance = mobile.Distance;
-                        if (mobile == TargetManager.LastTargetInfo.Serial)
+                        if (mobile == _world.TargetManager.LastTargetInfo.Serial)
                         {
                             _border[0].LineColor = HPB_COLOR_RED;
                             _border[0].Hue = 0;
@@ -737,7 +738,7 @@ namespace ClassicUO.Game.UI.Gumps
                                 _border[1].LineColor = _border[2].LineColor = _border[3].LineColor = HPB_COLOR_RED;
                             }
                         }
-                        else if (mobile != TargetManager.LastTargetInfo.Serial)
+                        else if (mobile != _world.TargetManager.LastTargetInfo.Serial)
                         {
                             _border[0].LineColor = HPB_COLOR_BLACK;
                             _border[0].Hue = 0;

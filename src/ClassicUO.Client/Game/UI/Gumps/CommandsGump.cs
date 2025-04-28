@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    public class CommandsGump : Gump
+    internal class CommandsGump : Gump
     {
-        public CommandsGump() : base(0, 0)
+        public CommandsGump(World world) : base(world, 0, 0)
         {
             X = 300;
             Y = 200;
@@ -50,7 +50,7 @@ namespace ClassicUO.Game.UI.Gumps
         private void GenerateEntries(ScrollArea scroll)
         {
             int y = 0;
-            foreach (var command in CommandManager.Commands)
+            foreach (var command in World.CommandManager.Commands)
             {
                 TextBox t = TextBox.GetOne(command.Key, TrueTypeLoader.EMBEDDED_FONT, 18, Color.White, TextBox.RTLOptions.Default(scroll.Width));
                 t.Y = y;

@@ -5,8 +5,6 @@ using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
-using ClassicUO.Game.Scenes;
-using ClassicUO.Renderer.Animations;
 
 namespace ClassicUO.Game.Managers
 {
@@ -31,38 +29,38 @@ namespace ClassicUO.Game.Managers
         {
             var camera = Client.Game.Scene.Camera;
 
-            if (SerialHelper.IsMobile(TargetManager.LastTargetInfo.Serial))
-            {
-                DrawHealthLineWithMath(
-                    batcher,
-                    TargetManager.LastTargetInfo.Serial,
-                    camera.Bounds.Width,
-                    camera.Bounds.Height
-                );
-                DrawTargetIndicator(batcher, TargetManager.LastTargetInfo.Serial);
-            }
+            // if (SerialHelper.IsMobile(_world.TargetManager.LastTargetInfo.Serial))
+            // {
+            //     DrawHealthLineWithMath(
+            //         batcher,
+            //         _world.TargetManager.LastTargetInfo.Serial,
+            //         camera.Bounds.Width,
+            //         camera.Bounds.Height
+            //     );
+            //     DrawTargetIndicator(batcher, _world.TargetManager.LastTargetInfo.Serial);
+            // }
 
-            if (SerialHelper.IsMobile(TargetManager.SelectedTarget))
-            {
-                DrawHealthLineWithMath(
-                    batcher,
-                    TargetManager.SelectedTarget,
-                    camera.Bounds.Width,
-                    camera.Bounds.Height
-                );
-                DrawTargetIndicator(batcher, TargetManager.SelectedTarget);
-            }
+            // if (SerialHelper.IsMobile(_world.TargetManager.SelectedTarget))
+            // {
+            //     DrawHealthLineWithMath(
+            //         batcher,
+            //         _world.TargetManager.SelectedTarget,
+            //         camera.Bounds.Width,
+            //         camera.Bounds.Height
+            //     );
+            //     DrawTargetIndicator(batcher, _world.TargetManager.SelectedTarget);
+            // }
 
-            if (SerialHelper.IsMobile(TargetManager.LastAttack))
-            {
-                DrawHealthLineWithMath(
-                    batcher,
-                    TargetManager.LastAttack,
-                    camera.Bounds.Width,
-                    camera.Bounds.Height
-                );
-                DrawTargetIndicator(batcher, TargetManager.LastAttack);
-            }
+            // if (SerialHelper.IsMobile(_world.TargetManager.LastAttack))
+            // {
+            //     DrawHealthLineWithMath(
+            //         batcher,
+            //         _world.TargetManager.LastAttack,
+            //         camera.Bounds.Width,
+            //         camera.Bounds.Height
+            //     );
+            //     DrawTargetIndicator(batcher, _world.TargetManager.LastAttack);
+            // }
 
             if (!IsEnabled)
             {
@@ -207,14 +205,14 @@ namespace ClassicUO.Game.Managers
 
                 if ((isEnabled && mode >= 1) || newTargSystem || forceDraw)
                 {
-                    DrawHealthLine(batcher, mobile, p.X, p.Y, mobile.Serial != World.Player.Serial);
+                    DrawHealthLine(batcher, mobile, p.X, p.Y, offsetY, passive, newTargSystem);
                 }
             }
         }
 
         private void DrawTargetIndicator(UltimaBatcher2D batcher, uint serial)
         {
-            Entity entity = World.Get(serial);
+            Entity entity = _world.Get(serial);
 
             if (entity == null)
             {
@@ -224,7 +222,7 @@ namespace ClassicUO.Game.Managers
             {
                 return;
             }
-            ref readonly var indicatorInfo = ref Client.Game.Gumps.GetGump(0x756F);
+            ref readonly var indicatorInfo = ref Client.Game.UO.Gumps.GetGump(0x756F);
             if (indicatorInfo.Texture != null)
             {
                 Point p = entity.RealScreenPosition;
@@ -245,40 +243,40 @@ namespace ClassicUO.Game.Managers
                 ProfileManager.CurrentProfile.ShowTargetIndicator = false; //This sprite doesn't exist for this client, lets avoid checking for it every frame.
             }
         }
-        private void DrawHealthLineWithMath(
-            UltimaBatcher2D batcher,
-            uint serial,
-            int screenW,
-            int screenH
-        )
-        {
-            Entity entity = World.Get(serial);
+        // private void DrawHealthLineWithMath(
+        //     UltimaBatcher2D batcher,
+        //     uint serial,
+        //     int screenW,
+        //     int screenH
+        // )
+        // {
+        //     Entity entity = _world.Get(serial);
 
-            if (entity == null)
-            {
-                return;
-            }
+        //     if (entity == null)
+        //     {
+        //         return;
+        //     }
 
-            Point p = entity.RealScreenPosition;
-            p.X += (int)entity.Offset.X + 22;
-            p.Y += (int)(entity.Offset.Y - entity.Offset.Z) + 22 + 5;
+        //     Point p = entity.RealScreenPosition;
+        //     p.X += (int)entity.Offset.X + 22;
+        //     p.Y += (int)(entity.Offset.Y - entity.Offset.Z) + 22 + 5;
 
-            p = Client.Game.Scene.Camera.WorldToScreen(p);
-            p.X -= BAR_WIDTH_HALF;
-            p.Y -= BAR_HEIGHT_HALF;
+        //     p = Client.Game.Scene.Camera.WorldToScreen(p);
+        //     p.X -= BAR_WIDTH_HALF;
+        //     p.Y -= BAR_HEIGHT_HALF;
 
-            if (p.X < 0 || p.X > screenW - BAR_WIDTH)
-            {
-                return;
-            }
+        //     if (p.X < 0 || p.X > screenW - BAR_WIDTH)
+        //     {
+        //         return;
+        //     }
 
-            if (p.Y < 0 || p.Y > screenH - BAR_HEIGHT)
-            {
-                return;
-            }
+        //     if (p.Y < 0 || p.Y > screenH - BAR_HEIGHT)
+        //     {
+        //         return;
+        //     }
 
-            DrawHealthLine(batcher, entity, p.X, p.Y, false);
-        }
+        //     DrawHealthLine(batcher, entity, p.X, p.Y, false);
+        // }
 
         private void DrawHealthLine(
             UltimaBatcher2D batcher,

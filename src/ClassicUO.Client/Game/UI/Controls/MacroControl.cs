@@ -3,7 +3,6 @@
 using System;
 using System.Linq;
 using ClassicUO.Game.Managers;
-using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Input;
 using ClassicUO.Assets;
@@ -407,7 +406,7 @@ namespace ClassicUO.Game.UI.Controls
             {
                 var posX = (Client.Game.Window.ClientBounds.Width >> 1) - 300;
                 var posY = (Client.Game.Window.ClientBounds.Height >> 1) - 250;
-                Gump opt = UIManager.GetGump<OptionsGump>();
+                Gumps.Gump opt = UIManager.GetGump<OptionsGump>();
                 if (opt != null)
                 {
                     posX = opt.X + opt.Width + 5;
@@ -424,33 +423,6 @@ namespace ClassicUO.Game.UI.Controls
             btnEditorGump.SetInScreen();
             btnEditorGump.BringOnTop();
         }
-
-        private void OpenMacroButtonEditor(Macro macro, Vector2? position = null)
-        {
-            MacroButtonEditorGump btnEditorGump = UIManager.GetGump<MacroButtonEditorGump>();
-
-            if (btnEditorGump == null)
-            {
-                var posX = (Client.Game.Window.ClientBounds.Width >> 1) - 300;
-                var posY = (Client.Game.Window.ClientBounds.Height >> 1) - 250;
-                Gump opt = UIManager.GetGump<OptionsGump>();
-                if (opt != null)
-                {
-                    posX = opt.X + opt.Width + 5;
-                    posY = opt.Y;
-                }
-                if (position.HasValue)
-                {
-                    posX = (int)position.Value.X;
-                    posY = (int)position.Value.Y;
-                }
-                btnEditorGump = new MacroButtonEditorGump(macro, posX, posY);
-                UIManager.Add(btnEditorGump);
-            }
-            btnEditorGump.SetInScreen();
-            btnEditorGump.BringOnTop();
-        }
-
 
         private class MacroEntry : Control
         {

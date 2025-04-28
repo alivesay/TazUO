@@ -14,7 +14,7 @@ using ClassicUO.Game.Scenes;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    public sealed class TradingGump : TextContainerGump
+    internal sealed class TradingGump : TextContainerGump
     {
         private uint _gold,
             _platinum,
@@ -327,12 +327,12 @@ namespace ClassicUO.Game.UI.Gumps
                         );
                     }
                 }
-                else if(TargetManager.IsTargeting)
+                else if(World.TargetManager.IsTargeting)
                 {
-                    if(TargetManager.TargetingType == TargetType.Neutral && TargetManager.TargetingState == CursorTarget.MoveItemContainer)
+                    if(World.TargetManager.TargetingType == TargetType.Neutral && World.TargetManager.TargetingState == CursorTarget.MoveItemContainer)
                     {
                         MultiItemMoveGump.OnTradeWindowTarget(ID1);
-                        TargetManager.CancelTarget();
+                        World.TargetManager.CancelTarget();
                     }
                 }
             }

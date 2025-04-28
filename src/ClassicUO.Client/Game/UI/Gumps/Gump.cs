@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    public class Gump : Control
+    internal class Gump : Control
     {
         private bool isLocked = false;
 
@@ -300,6 +300,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 GameActions.ReplyGump
                 (
+                    World,
                     LocalSerial,
                     // Seems like MasterGump serial does not work as expected.
                     /*MasterGumpSerial != 0 ? MasterGumpSerial :*/ ServerSerial,

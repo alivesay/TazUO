@@ -99,14 +99,14 @@ namespace ClassicUO.Game.Managers
             return false;
         }
 
-        private static bool HandleMobileOverhead(Entity serial)
+        private bool HandleMobileOverhead(Entity serial)
         {
             var mobile = serial as Mobile;
 
             if (mobile == null)
                 return false;
 
-            if (mobile.Equals(World.Player) && ActiveOverheadOptions.HasFlag(NameOverheadOptions.ExcludeSelf))
+            if (mobile.Equals(_world.Player) && ActiveOverheadOptions.HasFlag(NameOverheadOptions.ExcludeSelf))
                 return false;
 
             // Mobile types
@@ -141,10 +141,20 @@ namespace ClassicUO.Game.Managers
             if (ActiveOverheadOptions.HasFlag(NameOverheadOptions.Invulnerable) && mobile.NotorietyFlag == NotorietyFlag.Invulnerable)
                 return true;
 
-            if (ActiveOverheadOptions.HasFlag(NameOverheadOptions.Self) && mobile.Equals(World.Player))
+            if (ActiveOverheadOptions.HasFlag(NameOverheadOptions.Self) && mobile.Equals(_world.Player))
                 return true;
 
-            if (SerialHelper.IsItem(serial.Serial) && TypeAllowed == NameOverheadTypeAllowed.Items)
+            return false;
+        }
+
+        private static bool HandleItemOverhead(Entity serial)
+        {
+            var item = serial as Item;
+
+            if (item == null)
+                return false;
+
+            if (item.IsCorpse)
             {
                 return HandleCorpseOverhead(item);
             }
@@ -162,6 +172,19 @@ namespace ClassicUO.Game.Managers
                 return true;
 
             if (ActiveOverheadOptions.HasFlag(NameOverheadOptions.Other))
+                return true;
+
+            return false;
+        }
+
+        private static bool HandleCorpseOverhead(Item item)
+        {
+            var isHumanCorpse = item.IsHumanCorpse;
+
+            if (isHumanCorpse && ActiveOverheadOptions.HasFlag(NameOverheadOptions.HumanoidCorpses))
+                return true;
+
+            if (!isHumanCorpse && ActiveOverheadOptions.HasFlag(NameOverheadOptions.MonsterCorpses))
                 return true;
 
             // TODO: Add support for IsOwnCorpse, which was coded by Dyru
@@ -198,7 +221,7 @@ namespace ClassicUO.Game.Managers
             SetOverheadToggled(!IsPermaToggled);
         }
 
-        public static void SetOverheadToggled(bool toggled)
+        public void SetOverheadToggled(bool toggled)
         {
             if (IsPermaToggled == toggled)
                 return;
@@ -295,13 +318,13 @@ namespace ClassicUO.Game.Managers
             return Options.Find(o => o.Name == name);
         }
 
-        public static void AddOption(NameOverheadOption option)
+        public void AddOption(NameOverheadOption option)
         {
             Options.Add(option);
             _gump?.RedrawOverheadOptions();
         }
 
-        public static void RemoveOption(NameOverheadOption option)
+        public void RemoveOption(NameOverheadOption option)
         {
             Options.Remove(option);
             _gump?.RedrawOverheadOptions();
@@ -314,7 +337,7 @@ namespace ClassicUO.Game.Managers
 
         public static List<NameOverheadOption> GetAllOptions() => Options;
 
-        public static void RegisterKeyDown(SDL.SDL_Keysym key)
+        public void RegisterKeyDown(SDL.SDL_Keysym key)
         {
             if (_lastKeySym == key.sym && _lastKeyMod == key.mod)
                 return;
@@ -346,7 +369,7 @@ namespace ClassicUO.Game.Managers
             IsTemporarilyShowing = false;
         }
 
-        public static void SetActiveOption(NameOverheadOption option)
+        public void SetActiveOption(NameOverheadOption option)
         {
             if (option == null)
             {

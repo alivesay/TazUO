@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 using ClassicUO.Assets;
 using ClassicUO.Game.Managers;
 using ClassicUO.Input;
@@ -11,7 +10,7 @@ using StbTextEditSharp;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class TTFTextInputField : Control
+    internal class TTFTextInputField : Control
     {
         public readonly StbTextBox TextBox;
         private AlphaBlendControl _background;

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class HitBox : Control
+    internal class HitBox : Control
     {
         public HitBox
         (

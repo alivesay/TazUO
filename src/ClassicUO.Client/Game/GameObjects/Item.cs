@@ -1,25 +1,17 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
-using System.Collections.Generic;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Gumps;
-using ClassicUO.IO;
 using ClassicUO.Assets;
-using ClassicUO.Renderer;
-using ClassicUO.Utility;
-using ClassicUO.Utility.Logging;
-using ClassicUO.Utility.Platforms;
 using Microsoft.Xna.Framework;
 using MathHelper = ClassicUO.Utility.MathHelper;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 
 namespace ClassicUO.Game.GameObjects
 {
-    public partial class Item : Entity
+    internal partial class Item : Entity
     {
         //private static readonly QueuedPool<Item> _pool = new QueuedPool<Item>(
         //    Constants.PREDICTABLE_CHUNKS * 3,

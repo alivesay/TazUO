@@ -61,12 +61,10 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Point n = ResizeGameWindow(_lastSize);
 
-                    UIManager.GetGump<OptionsGump>()?.UpdateVideo();
-
-                    if (Client.Game.UO.Version >= Utility.ClientVersion.CV_200)
-                    {
-                        NetClient.Socket.Send_GameWindowSize((uint)n.X, (uint)n.Y);
-                    }
+                    // if (Client.Game.UO.Version >= Utility.ClientVersion.CV_200)
+                    // {
+                    //     NetClient.Socket.Send_GameWindowSize((uint)n.X, (uint)n.Y);
+                    // }
 
                     _clicked = false;
                 }
@@ -77,11 +75,6 @@ namespace ClassicUO.Game.UI.Gumps
             Height = scene.Camera.Bounds.Height + BORDER_WIDTH * 2;
 
             _borderControl = new BorderControl(0, 0, Width, Height, 4);
-
-            _borderControl.DragEnd += (sender, e) =>
-            {
-                UIManager.GetGump<OptionsGump>()?.UpdateVideo();
-            };
 
             UIManager.SystemChat = _systemChatControl = new SystemChatControl(
                 this,
@@ -98,7 +91,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             if (ProfileManager.CurrentProfile.LastVersionHistoryShown != CUOEnviroment.Version.ToString())
             {
-                UIManager.Add(new VersionHistory());
+                UIManager.Add(new VersionHistory(world));
                 ProfileManager.CurrentProfile.LastVersionHistoryShown = CUOEnviroment.Version.ToString();
             }
         }
@@ -192,7 +185,6 @@ namespace ClassicUO.Game.UI.Gumps
             _scene.Camera.Bounds.X = position.X + BORDER_WIDTH;
             _scene.Camera.Bounds.Y = position.Y + BORDER_WIDTH;
 
-            UIManager.GetGump<OptionsGump>()?.UpdateVideo();
             UpdateGameWindowPos();
         }
 

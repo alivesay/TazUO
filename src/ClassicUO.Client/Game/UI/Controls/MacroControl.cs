@@ -417,7 +417,7 @@ namespace ClassicUO.Game.UI.Controls
                     posX = (int)position.Value.X;
                     posY = (int)position.Value.Y;
                 }
-                btnEditorGump = new MacroButtonEditorGump(macro, posX, posY);
+                btnEditorGump = new MacroButtonEditorGump(_gump.World, macro, posX, posY);
                 UIManager.Add(btnEditorGump);
             }
             btnEditorGump.SetInScreen();

@@ -14,7 +14,15 @@ using ClassicUO.Input;
 
 namespace ClassicUO.LegionScripting
 {
-    internal class ScriptBrowser : Gump
+    using System.Text.Json.Serialization;
+
+    [JsonSerializable(typeof(List<ScriptBrowser.GHFileObject>))]
+    [JsonSerializable(typeof(ScriptBrowser.GHFileObject))]
+    [JsonSerializable(typeof(ScriptBrowser._Links))]
+    internal partial class ScriptBrowserJsonContext : JsonSerializerContext
+    {
+    }
+        internal class ScriptBrowser : Gump
     {
         private const int WIDTH = 400;
         private const int HEIGHT = 600;
@@ -23,7 +31,7 @@ namespace ClassicUO.LegionScripting
         public static readonly HttpClient client = new HttpClient();
         private ScrollArea scrollArea;
         private string lastPath = "";
-        public ScriptBrowser() : base(0, 0)
+        public ScriptBrowser(World world) : base(world, 0, 0)
         {
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
 
@@ -54,7 +62,7 @@ namespace ClassicUO.LegionScripting
             if (lastPath.Length > 0)
             {
                 lastP = Path.GetDirectoryName(lastPath);
-                scrollArea.Add(new ItemControl(new GHFileObject() { type = "dir", name = $"<- Back{(string.IsNullOrEmpty(lastP) ? "" : $" ({lastP})")}", path = lastP }, this));
+                scrollArea.Add(new ItemControl(World, new GHFileObject() { type = "dir", name = $"<- Back{(string.IsNullOrEmpty(lastP) ? "" : $" ({lastP})")}", path = lastP }, this));
 
             }
 
@@ -63,7 +71,7 @@ namespace ClassicUO.LegionScripting
                 if (file.type == "file" && !file.name.EndsWith(".lscript"))
                     continue;
 
-                scrollArea.Add(new ItemControl(file, this));
+                scrollArea.Add(new ItemControl(World, file, this));
             }
 
             int y = 0;
@@ -87,12 +95,12 @@ namespace ClassicUO.LegionScripting
                 var url = $"https://api.github.com/repos/{REPO}/contents{path}";
                 var response = await client.GetStringAsync(url);
 
-                return JsonSerializer.Deserialize<List<GHFileObject>>(response);
+                return JsonSerializer.Deserialize(response, ScriptBrowserJsonContext.Default.ListGHFileObject);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
-                GameActions.Print("There was an error trying to load public scripts. You can browse them manually at: https://github.com/bittiez/PublicLegionScripts");
+                GameActions.Print(World, "There was an error trying to load public scripts. You can browse them manually at: https://github.com/bittiez/PublicLegionScripts");
             }
 
             return new List<GHFileObject>();
@@ -123,8 +131,10 @@ namespace ClassicUO.LegionScripting
 
         internal class ItemControl : Control
         {
-            public ItemControl(GHFileObject gHFileObject, ScriptBrowser scriptBrowser)
+            private World World;
+            public ItemControl(World world, GHFileObject gHFileObject, ScriptBrowser scriptBrowser)
             {
+                World = world;
                 Width = WIDTH - 18;
                 Height = 50;
 
@@ -154,8 +164,8 @@ namespace ClassicUO.LegionScripting
                 var t = ScriptBrowser.client.GetStringAsync(GHFileObject.download_url);
                 t.Wait();
 
-                ScriptFile f = new ScriptFile(LegionScripting.ScriptPath, t.Result, GHFileObject.name);
-                UIManager.Add(new ScriptEditor(f));
+                ScriptFile f = new ScriptFile(World, LegionScripting.ScriptPath, t.Result, GHFileObject.name);
+                UIManager.Add(new ScriptEditor(World, f));
             }
 
             private void DirectoryMouseDown(object sender, MouseEventArgs e)

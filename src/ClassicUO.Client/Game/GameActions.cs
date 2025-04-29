@@ -62,14 +62,14 @@ internal static class GameActions
         return false;
     }
 
-    internal static void OpenDurabilityGump()
+    internal static void OpenDurabilityGump(World world)
     {
-        UIManager.Add(new DurabilitysGump());
+        UIManager.Add(new DurabilitysGump(world));
     }
 
-    internal static void OpenLegionScriptingGump()
+    internal static void OpenLegionScriptingGump(World world)
     {
-        UIManager.Add(new ScriptManagerGump());
+        UIManager.Add(new ScriptManagerGump(world));
     }
 
     /// <summary>
@@ -106,9 +106,9 @@ internal static class GameActions
         return false;
     }
 
-    internal static void OpenNearbyLootGump()
+    internal static void OpenNearbyLootGump(World world)
     {
-        UIManager.Add(new NearbyLootGump());
+        UIManager.Add(new NearbyLootGump(world));
     }
 
     internal static void OpenMacroGump(World world, string name)
@@ -147,7 +147,7 @@ internal static class GameActions
         {
             ModernPaperdoll modernPaperdoll = UIManager.GetGump<ModernPaperdoll>(serial);
             if (modernPaperdoll == null)
-                UIManager.Add(new ModernPaperdoll(serial));
+                UIManager.Add(new ModernPaperdoll(world, serial));
             else
             {
                 modernPaperdoll.SetInScreen();
@@ -198,7 +198,7 @@ internal static class GameActions
 
         if (opt == null)
         {
-            ModernOptionsGump optionsGump = new ModernOptionsGump();
+            ModernOptionsGump optionsGump = new ModernOptionsGump(world);
 
             UIManager.Add(optionsGump);
             optionsGump.ChangePage(page);
@@ -852,7 +852,7 @@ internal static class GameActions
 
     internal static void ReplyGump(World world, uint local, uint server, int button, uint[] switches = null, Tuple<ushort, string>[] entries = null)
     {
-        Socket.Send_GumpResponse(local,
+        Socket.Send_GumpResponse(world, local,
                                  server,
                                  button,
                                  switches,

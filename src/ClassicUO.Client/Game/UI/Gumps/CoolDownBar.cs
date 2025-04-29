@@ -24,7 +24,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         public BuffIconType buffIconType;
 
-        public CoolDownBar(TimeSpan _duration, string _name, ushort _hue, int x, int y, ushort graphic = ushort.MaxValue, BuffIconType type = BuffIconType.Unknown2, bool isBuffBar = false) : base(0, 0)
+        public CoolDownBar(World world, TimeSpan _duration, string _name, ushort _hue, int x, int y, ushort graphic = ushort.MaxValue, BuffIconType type = BuffIconType.Unknown2, bool isBuffBar = false) : base(world, 0, 0)
         {
             #region VARS
             Width = COOL_DOWN_WIDTH;

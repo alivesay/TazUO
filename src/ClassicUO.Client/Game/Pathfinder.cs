@@ -1030,7 +1030,6 @@ namespace ClassicUO.Game
             _activeCloseNodes = 0;
             _pathfindDistance = distance;
             _pathSize = 0;
-            PathFindingCanBeCancelled = true;
             StopAutoWalk();
             AutoWalking = true;
 

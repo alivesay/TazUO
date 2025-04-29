@@ -68,7 +68,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 menu.ContextMenu?.Show();
             };
-            menu.ContextMenu = new ContextMenuControl();
+            menu.ContextMenu = new ContextMenuControl(this);
             menu.ContextMenu.Add(new ContextMenuItemEntry("Show approximate location on world map", () =>
             {
                 if (foundMapLoc)
@@ -79,7 +79,7 @@ namespace ClassicUO.Game.UI.Gumps
                         if (mapFacet != -1)
                         {
                             if (World.MapIndex != mapFacet)
-                                GameActions.Print("You're on the wrong facet!", 32);
+                                GameActions.Print(World, "You're on the wrong facet!", 32);
                             else
                                 map.GoToMarker(mapX, mapY, true);
                         }
@@ -112,19 +112,19 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (distance > 10)
                     {
-                        GameActions.Print("You're too far away to try to pathfind, you need to be within 10 tiles.", 32);
+                        GameActions.Print(World, "You're too far away to try to pathfind, you need to be within 10 tiles.", 32);
                         return;
                     }
 
                     if (mapFacet != -1)
                     {
                         if (World.MapIndex != mapFacet)
-                            GameActions.Print("You're on the wrong facet!", 32);
+                            GameActions.Print(World, "You're on the wrong facet!", 32);
                         else
-                            Pathfinder.WalkTo(mapX, mapY, 0, 1);
+                            World.Player.Pathfinder.WalkTo(mapX, mapY, 0, 1);
                     }
                     else
-                        Pathfinder.WalkTo(mapX, mapY, 0, 1);
+                        World.Player.Pathfinder.WalkTo(mapX, mapY, 0, 1);
                 }
             }));
             menu.ContextMenu.Add(new ContextMenuItemEntry("Close", () => { Dispose(); }));
@@ -182,7 +182,7 @@ namespace ClassicUO.Game.UI.Gumps
                 //if (Width == 600)
                 //    multiplier = 2f;
                 if (CUOEnviroment.Debug)
-                    GameActions.Print($"Width: {Width}, Multiplier: {multiplier}, Facet: {mapFacet}, MapData: {mapX}, {mapY}, {mapEndX}, {mapEndY}");
+                    GameActions.Print(World, $"Width: {Width}, Multiplier: {multiplier}, Facet: {mapFacet}, MapData: {mapX}, {mapY}, {mapEndX}, {mapEndY}");
 
                 mapX = (int)(mapX + (x * multiplier));
                 mapY = (int)(mapY + (y * multiplier));

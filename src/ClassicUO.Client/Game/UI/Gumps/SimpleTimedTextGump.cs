@@ -11,7 +11,7 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private readonly DateTime expireAt;
 
-        public SimpleTimedTextGump(string text, Color color, TimeSpan duration) : base(0, 0)
+        public SimpleTimedTextGump(World world, string text, Color color, TimeSpan duration) : base(world, 0, 0)
         {
             expireAt = DateTime.Now.Add(duration);
             TextBox t;
@@ -21,7 +21,7 @@ namespace ClassicUO.Game.UI.Gumps
             WantUpdateSize = true;
         }
 
-        public SimpleTimedTextGump(string text, uint hue, TimeSpan duration, int width) : base(0, 0)
+        public SimpleTimedTextGump(World world, string text, uint hue, TimeSpan duration, int width) : base(world, 0, 0)
         {
             expireAt = DateTime.Now.Add(duration);
             TextBox t;

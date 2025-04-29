@@ -2,13 +2,12 @@
 using ClassicUO.Game.UI.Controls;
 using Microsoft.Xna.Framework;
 using System;
-using static ClassicUO.Game.UI.Gumps.OptionsGump;
 
 namespace ClassicUO.Game.UI.Gumps
 {
     internal class InputRequest : Gump
     {
-        public InputRequest(string message, string buttonText, string button2Text, Action<Result, string> result, string defaultInputValue = "") : base(0, 0)
+        public InputRequest(World world, string message, string buttonText, string button2Text, Action<Result, string> result, string defaultInputValue = "") : base(world, 0, 0)
         {
             Width = 400;
             Height = 0;

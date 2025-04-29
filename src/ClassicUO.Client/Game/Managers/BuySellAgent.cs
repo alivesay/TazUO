@@ -10,6 +10,13 @@ using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.Managers
 {
+    using System.Text.Json.Serialization;
+
+    [JsonSerializable(typeof(List<BuySellItemConfig>))]
+    [JsonSerializable(typeof(BuySellItemConfig))]
+    internal partial class BuySellAgentJsonContext : JsonSerializerContext
+    {
+    }
     internal class BuySellAgent
     {
         public static BuySellAgent Instance { get; private set; }
@@ -30,13 +37,13 @@ namespace ClassicUO.Game.Managers
                 string savePath = Path.Combine(ProfileManager.ProfilePath, "SellAgentConfig.json");
                 if (File.Exists(savePath))
                 {
-                    Instance.sellItems = JsonSerializer.Deserialize<List<BuySellItemConfig>>(File.ReadAllText(savePath));
+                    Instance.sellItems = JsonSerializer.Deserialize(File.ReadAllText(savePath), BuySellAgentJsonContext.Default.ListBuySellItemConfig);
                 }
 
                 savePath = Path.Combine(ProfileManager.ProfilePath, "BuyAgentConfig.json");
                 if (File.Exists(savePath))
                 {
-                    Instance.buyItems = JsonSerializer.Deserialize<List<BuySellItemConfig>>(File.ReadAllText(savePath));
+                    Instance.buyItems = JsonSerializer.Deserialize(File.ReadAllText(savePath), BuySellAgentJsonContext.Default.ListBuySellItemConfig);
                 }
             }
             catch (Exception ex)
@@ -47,8 +54,8 @@ namespace ClassicUO.Game.Managers
 
         public void DeleteConfig(BuySellItemConfig config)
         {
-            if(config == null) return;
-            
+            if (config == null) return;
+
             SellConfigs?.Remove(config);
             BuyConfigs?.Remove(config);
         }
@@ -79,13 +86,13 @@ namespace ClassicUO.Game.Managers
                 if (Instance.sellItems != null)
                 {
                     string savePath = Path.Combine(ProfileManager.ProfilePath, "SellAgentConfig.json");
-                    File.WriteAllText(savePath, JsonSerializer.Serialize(Instance.sellItems));
+                    File.WriteAllText(savePath, JsonSerializer.Serialize(Instance.sellItems, BuySellAgentJsonContext.Default.ListBuySellItemConfig));
                 }
 
                 if (Instance.buyItems != null)
                 {
                     string savePath = Path.Combine(ProfileManager.ProfilePath, "BuyAgentConfig.json");
-                    File.WriteAllText(savePath, JsonSerializer.Serialize(Instance.buyItems));
+                    File.WriteAllText(savePath, JsonSerializer.Serialize(Instance.buyItems, BuySellAgentJsonContext.Default.ListBuySellItemConfig));
                 }
             }
 

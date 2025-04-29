@@ -74,13 +74,13 @@ namespace ClassicUO.Game.Scenes
 
             if (string.IsNullOrEmpty(Settings.GlobalSettings.IP))
             {
-                UIManager.Add(new InputRequest("Please enter a server IP to connect to", "Save", "Cancel", (result, input) =>
+                UIManager.Add(new InputRequest(_world, "Please enter a server IP to connect to", "Save", "Cancel", (result, input) =>
                 {
                     if (result == InputRequest.Result.BUTTON1 && !string.IsNullOrEmpty(input))
                     {
                         if (Settings.GlobalSettings.Port <= 0)
                         {
-                            UIManager.Add(new InputRequest("Please enter the port for this server", "Save", "Cancel", (result, input) =>
+                            UIManager.Add(new InputRequest(_world, "Please enter the port for this server", "Save", "Cancel", (result, input) =>
                             {
                                 if (result == InputRequest.Result.BUTTON1 && !string.IsNullOrEmpty(input))
                                 {

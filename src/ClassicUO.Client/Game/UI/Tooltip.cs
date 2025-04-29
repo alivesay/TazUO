@@ -84,7 +84,7 @@ namespace ClassicUO.Game.UI
                 string finalString = _textHTML;
                 if (SerialHelper.IsItem(Serial))
                 {
-                    finalString = Managers.ToolTipOverrideData.ProcessTooltipText(Serial);
+                    finalString = Managers.ToolTipOverrideData.ProcessTooltipText(_world, Serial);
                     finalString ??= _textHTML;
                 }
 

@@ -20,7 +20,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         public event FinishedLoadingEvent OnOPLLoaded;
 
-        public CustomToolTip(Item item, int x, int y, Control hoverReference, string prepend = "", string append = "", Item compareTo = null) : base(0, 0)
+        public CustomToolTip(World world, Item item, int x, int y, Control hoverReference, string prepend = "", string append = "", Item compareTo = null) : base(world, 0, 0)
         {
             this.item = item;
             this.hoverReference = hoverReference;
@@ -71,7 +71,7 @@ namespace ClassicUO.Game.UI.Gumps
                     string finalString = FormatTooltip(name, data);
                     if (SerialHelper.IsItem(item.Serial))
                     {
-                        finalString = Managers.ToolTipOverrideData.ProcessTooltipText(item.Serial, compareTo == null ? uint.MinValue : compareTo.Serial);
+                        finalString = Managers.ToolTipOverrideData.ProcessTooltipText(World, item.Serial, compareTo == null ? uint.MinValue : compareTo.Serial);
                         if (finalString == null)
                             finalString = FormatTooltip(name, data);
                     }

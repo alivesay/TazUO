@@ -331,7 +331,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if(World.TargetManager.TargetingType == TargetType.Neutral && World.TargetManager.TargetingState == CursorTarget.MoveItemContainer)
                     {
-                        MultiItemMoveGump.OnTradeWindowTarget(ID1);
+                        MultiItemMoveGump.OnTradeWindowTarget(World, ID1);
                         World.TargetManager.CancelTarget();
                     }
                 }

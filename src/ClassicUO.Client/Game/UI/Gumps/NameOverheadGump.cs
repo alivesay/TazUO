@@ -501,7 +501,7 @@ namespace ClassicUO.Game.UI.Gumps
             }
             else
             {
-                if (entity == TargetManager.LastTargetInfo.Serial)
+                if (entity == World.TargetManager.LastTargetInfo.Serial)
                 {
                     if (!_isLastTarget) //Only set this if it was not already last target
                     {

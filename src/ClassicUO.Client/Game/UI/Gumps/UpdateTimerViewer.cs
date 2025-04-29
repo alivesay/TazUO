@@ -15,7 +15,7 @@ namespace ClassicUO.Game.UI.Gumps
         private ScrollArea scrollArea;
         private DataBox dataBox;
         private long lastUpdate = Time.Ticks;
-        public UpdateTimerViewer() : base(0, 0)
+        public UpdateTimerViewer(World world) : base(world, 0, 0)
         {
             UIManager.UpdateTimerEnabled = true;
 

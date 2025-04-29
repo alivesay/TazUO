@@ -60,7 +60,7 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        public ModernOptionsGump() : base(0, 0)
+        public ModernOptionsGump(World world) : base(world, 0, 0)
         {
             lang = Language.Instance.GetModernOptionsGumpLanguage;
             profile = ProfileManager.CurrentProfile;
@@ -114,7 +114,7 @@ namespace ClassicUO.Game.UI.Gumps
             b.MouseUp += (s, e) =>
             {
                 UIManager.GetGump<IgnoreManagerGump>()?.Dispose();
-                UIManager.Add(new IgnoreManagerGump());
+                UIManager.Add(new IgnoreManagerGump(world));
             };
             mainContent.AddToLeft(CategoryButton(lang.ButtonNameplates, (int)PAGE.NameplateOptions, mainContent.LeftWidth));
             mainContent.AddToLeft(CategoryButton(lang.ButtonCooldowns, (int)PAGE.TUOCooldowns, mainContent.LeftWidth));
@@ -183,7 +183,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.Indent();
             content.AddToRight(new SliderWithLabel(lang.GetGeneral.CorpseOpenDistance, 0, Theme.SLIDER_WIDTH, 0, 5, profile.AutoOpenCorpseRange, (r) => { profile.AutoOpenCorpseRange = r; }), true, page);
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.CorpseSkipEmpty, isChecked: profile.SkipEmptyCorpse, valueChanged: (b) => { profile.SkipEmptyCorpse = b; }), true, page);
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.CorpseOpenOptions, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.CorpseOptNone, lang.GetGeneral.CorpseOptNotTarg, lang.GetGeneral.CorpseOptNotHiding, lang.GetGeneral.CorpseOptBoth }, profile.CorpseOpenOptions, (s, n) => { profile.CorpseOpenOptions = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.CorpseOpenOptions, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.CorpseOptNone, lang.GetGeneral.CorpseOptNotTarg, lang.GetGeneral.CorpseOptNotHiding, lang.GetGeneral.CorpseOptBoth }, profile.CorpseOpenOptions, (s, n) => { profile.CorpseOpenOptions = s; }), true, page);
             content.RemoveIndent();
 
             content.BlankLine();
@@ -195,13 +195,13 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight(c = new CheckboxWithLabel(lang.GetGeneral.SallosEasyGrab, isChecked: profile.SallosEasyGrab, valueChanged: (b) => { profile.SallosEasyGrab = b; }), true, page);
             c.SetTooltip(lang.GetGeneral.SallosTooltip);
 
-            if (Client.Version > ClientVersion.CV_70796)
+            if (Client.Game.UO.Version > ClientVersion.CV_70796)
             {
                 content.BlankLine();
                 content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.ShowHouseContent, isChecked: profile.ShowHouseContent, valueChanged: (b) => { profile.ShowHouseContent = b; }), true, page);
             }
 
-            if (Client.Version >= ClientVersion.CV_7090)
+            if (Client.Game.UO.Version >= ClientVersion.CV_7090)
             {
                 content.BlankLine();
                 content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.SmoothBoat, isChecked: profile.UseSmoothBoatMovement, valueChanged: (b) => { profile.UseSmoothBoatMovement = b; }), true, page);
@@ -217,29 +217,29 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.ShowMobileHP, isChecked: profile.ShowMobilesHP, valueChanged: (b) => { profile.ShowMobilesHP = b; }), true, page);
             content.Indent();
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.MobileHPType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.HPTypePerc, lang.GetGeneral.HPTypeBar, lang.GetGeneral.HPTypeNBoth }, profile.MobileHPType, (s, n) => { profile.MobileHPType = s; }), true, page);
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.HPShowWhen, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.HPShowWhen_Always, lang.GetGeneral.HPShowWhen_Less100, lang.GetGeneral.HPShowWhen_Smart }, profile.MobileHPShowWhen, (s, n) => { profile.MobileHPShowWhen = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.MobileHPType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.HPTypePerc, lang.GetGeneral.HPTypeBar, lang.GetGeneral.HPTypeNBoth }, profile.MobileHPType, (s, n) => { profile.MobileHPType = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.HPShowWhen, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.HPShowWhen_Always, lang.GetGeneral.HPShowWhen_Less100, lang.GetGeneral.HPShowWhen_Smart }, profile.MobileHPShowWhen, (s, n) => { profile.MobileHPShowWhen = s; }), true, page);
             content.RemoveIndent();
 
             content.BlankLine();
 
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.HighlightPoisoned, isChecked: profile.HighlightMobilesByPoisoned, valueChanged: (b) => { profile.HighlightMobilesByPoisoned = b; }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetGeneral.PoisonHighlightColor, profile.PoisonHue, (h) => { profile.PoisonHue = h; }), true, page);
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetGeneral.PoisonHighlightColor, profile.PoisonHue, (h) => { profile.PoisonHue = h; }), true, page);
             content.RemoveIndent();
 
             content.BlankLine();
 
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.HighlightPara, isChecked: profile.HighlightMobilesByParalize, valueChanged: (b) => { profile.HighlightMobilesByParalize = b; }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetGeneral.ParaHighlightColor, profile.ParalyzedHue, (h) => { profile.ParalyzedHue = h; }), true, page);
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetGeneral.ParaHighlightColor, profile.ParalyzedHue, (h) => { profile.ParalyzedHue = h; }), true, page);
             content.RemoveIndent();
 
             content.BlankLine();
 
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.HighlightInvul, isChecked: profile.HighlightMobilesByInvul, valueChanged: (b) => { profile.HighlightMobilesByInvul = b; }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetGeneral.InvulHighlightColor, profile.InvulnerableHue, (h) => { profile.InvulnerableHue = h; }), true, page);
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetGeneral.InvulHighlightColor, profile.InvulnerableHue, (h) => { profile.InvulnerableHue = h; }), true, page);
             content.RemoveIndent();
 
             content.BlankLine();
@@ -252,11 +252,11 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.BlankLine();
 
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.AuraUnderFeet, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.AuraOptDisabled, lang.GetGeneral.AuroOptWarmode, lang.GetGeneral.AuraOptCtrlShift, lang.GetGeneral.AuraOptAlways }, profile.AuraUnderFeetType, (s, n) => { profile.AuraUnderFeetType = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.AuraUnderFeet, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.AuraOptDisabled, lang.GetGeneral.AuroOptWarmode, lang.GetGeneral.AuraOptCtrlShift, lang.GetGeneral.AuraOptAlways }, profile.AuraUnderFeetType, (s, n) => { profile.AuraUnderFeetType = s; }), true, page);
             content.Indent();
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.AuraForParty, isChecked: profile.PartyAura, valueChanged: (b) => { profile.PartyAura = b; }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetGeneral.AuraPartyColor, profile.PartyAuraHue, (h) => { profile.PartyAuraHue = h; }), true, page);
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetGeneral.AuraPartyColor, profile.PartyAuraHue, (h) => { profile.PartyAuraHue = h; }), true, page);
             content.RemoveIndent();
             content.RemoveIndent();
             #endregion
@@ -305,11 +305,11 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.BlankLine();
 
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.CloseHPGumpsWhen, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.CloseHPOptDisable, lang.GetGeneral.CloseHPOptOOR, lang.GetGeneral.CloseHPOptDead, lang.GetGeneral.CloseHPOptBoth }, profile.CloseHealthBarType, (s, n) => { profile.CloseHealthBarType = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.CloseHPGumpsWhen, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.CloseHPOptDisable, lang.GetGeneral.CloseHPOptOOR, lang.GetGeneral.CloseHPOptDead, lang.GetGeneral.CloseHPOptBoth }, profile.CloseHealthBarType, (s, n) => { profile.CloseHealthBarType = s; }), true, page);
 
             content.BlankLine();
 
-            content.AddToRight(c = new ComboBoxWithLabel(lang.GetGeneral.GridLoot, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.GridLootOptDisable, lang.GetGeneral.GridLootOptOnly, lang.GetGeneral.GridLootOptBoth }, profile.GridLootType, (s, n) => { profile.GridLootType = s; }), true, page);
+            content.AddToRight(c = new ComboBoxWithLabel(World, lang.GetGeneral.GridLoot, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.GridLootOptDisable, lang.GetGeneral.GridLootOptOnly, lang.GetGeneral.GridLootOptBoth }, profile.GridLootType, (s, n) => { profile.GridLootType = s; }), true, page);
             c.SetTooltip(lang.GetGeneral.GridLootTooltip);
 
             content.BlankLine();
@@ -329,7 +329,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.EnableCOT, isChecked: profile.UseCircleOfTransparency, valueChanged: (b) => { profile.UseCircleOfTransparency = b; }), true, page);
             content.Indent();
             content.AddToRight(new SliderWithLabel(lang.GetGeneral.COTDistance, 0, Theme.SLIDER_WIDTH, Constants.MIN_CIRCLE_OF_TRANSPARENCY_RADIUS, Constants.MAX_CIRCLE_OF_TRANSPARENCY_RADIUS, profile.CircleOfTransparencyRadius, (r) => { profile.CircleOfTransparencyRadius = r; }), true, page);
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.COTType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.COTTypeOptFull, lang.GetGeneral.COTTypeOptGrad, lang.GetGeneral.COTTypeOptModern }, profile.CircleOfTransparencyType, (s, n) => { profile.CircleOfTransparencyType = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.COTType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.COTTypeOptFull, lang.GetGeneral.COTTypeOptGrad, lang.GetGeneral.COTTypeOptModern }, profile.CircleOfTransparencyType, (s, n) => { profile.CircleOfTransparencyType = s; }), true, page);
             content.RemoveIndent();
 
             content.BlankLine();
@@ -352,10 +352,10 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.DragSelectHP, isChecked: profile.EnableDragSelect, valueChanged: (b) => { profile.EnableDragSelect = b; }), true, page);
             content.Indent();
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.DragKeyMod, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelectModifierKey, (s, n) => { profile.DragSelectModifierKey = s; }), true, page);
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.DragPlayersOnly, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelect_PlayersModifier, (s, n) => { profile.DragSelect_PlayersModifier = s; }), true, page);
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.DragMobsOnly, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelect_MonstersModifier, (s, n) => { profile.DragSelect_MonstersModifier = s; }), true, page);
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.DragNameplatesOnly, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelect_NameplateModifier, (s, n) => { profile.DragSelect_NameplateModifier = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.DragKeyMod, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelectModifierKey, (s, n) => { profile.DragSelectModifierKey = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.DragPlayersOnly, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelect_PlayersModifier, (s, n) => { profile.DragSelect_PlayersModifier = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.DragMobsOnly, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelect_MonstersModifier, (s, n) => { profile.DragSelect_MonstersModifier = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.DragNameplatesOnly, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelect_NameplateModifier, (s, n) => { profile.DragSelect_NameplateModifier = s; }), true, page);
             content.AddToRight(new SliderWithLabel(lang.GetGeneral.DragX, 0, Theme.SLIDER_WIDTH, 0, Client.Game.Scene.Camera.Bounds.Width, profile.DragSelectStartX, (r) => { profile.DragSelectStartX = r; }), true, page);
             content.AddToRight(new SliderWithLabel(lang.GetGeneral.DragY, 0, Theme.SLIDER_WIDTH, 0, Client.Game.Scene.Camera.Bounds.Width, profile.DragSelectStartY, (r) => { profile.DragSelectStartY = r; }), true, page);
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.DragAnchored, isChecked: profile.DragSelectAsAnchor, valueChanged: (b) => { profile.DragSelectAsAnchor = b; }), true, page);
@@ -394,7 +394,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.BlankLine();
 
-            content.AddToRight(new ComboBoxWithLabel(lang.GetGeneral.MagicFieldType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.MagicFieldOpt_Normal, lang.GetGeneral.MagicFieldOpt_Static, lang.GetGeneral.MagicFieldOpt_Tile }, profile.FieldsType, (s, n) => { profile.FieldsType = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetGeneral.MagicFieldType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetGeneral.MagicFieldOpt_Normal, lang.GetGeneral.MagicFieldOpt_Static, lang.GetGeneral.MagicFieldOpt_Tile }, profile.FieldsType, (s, n) => { profile.FieldsType = s; }), true, page);
 
             #endregion
 
@@ -612,7 +612,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.BlankLine();
 
-            content.AddToRight(new ComboBoxWithLabel(lang.GetVideo.LightType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetVideo.LightType_Absolute, lang.GetVideo.LightType_Minimum }, profile.LightLevelType, (s, n) => { profile.LightLevelType = s; }), true, page);
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetVideo.LightType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetVideo.LightType_Absolute, lang.GetVideo.LightType_Minimum }, profile.LightLevelType, (s, n) => { profile.LightLevelType = s; }), true, page);
 
             content.BlankLine();
 
@@ -683,6 +683,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 EntryDialog dialog = new EntryDialog
                 (
+                    World,
                     250,
                     150,
                     ResGumps.MacroName,
@@ -693,7 +694,7 @@ namespace ClassicUO.Game.UI.Gumps
                             return;
                         }
 
-                        MacroManager manager = Client.Game.GetScene<GameScene>().Macros;
+                        MacroManager manager = World.Macros;
 
                         if (manager.FindMacro(name) != null)
                         {
@@ -702,7 +703,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                         ModernButton nb;
 
-                        MacroControl macroControl = new MacroControl(name);
+                        MacroControl macroControl = new MacroControl(World, name);
 
                         content.AddToLeft(nb = new ModernButton(0, 0, content.LeftWidth, 40, ButtonAction.SwitchPage, name, Theme.BUTTON_FONT_COLOR) { ButtonParameter = bParam++, Tag = macroControl.Macro });
                         content.ResetRightSide();
@@ -731,7 +732,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                             UIManager.Gumps.OfType<MacroButtonGump>().FirstOrDefault(s => s.TheMacro == m)?.Dispose();
 
-                            MacroButtonGump macroButtonGump = new MacroButtonGump(m, Mouse.Position.X, Mouse.Position.Y);
+                            MacroButtonGump macroButtonGump = new MacroButtonGump(World, m, Mouse.Position.X, Mouse.Position.Y);
 
                             macroButtonGump.X = Mouse.Position.X - (macroButtonGump.Width >> 1);
                             macroButtonGump.Y = Mouse.Position.Y - (macroButtonGump.Height >> 1);
@@ -762,6 +763,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     QuestionGump dialog = new QuestionGump
                     (
+                        World,
                         ResGumps.MacroDeleteConfirmation,
                         b =>
                         {
@@ -773,7 +775,7 @@ namespace ClassicUO.Game.UI.Gumps
                             if (nb.Tag is Macro macro)
                             {
                                 UIManager.Gumps.OfType<MacroButtonGump>().FirstOrDefault(s => s.TheMacro == macro)?.Dispose();
-                                Client.Game.GetScene<GameScene>().Macros.Remove(macro);
+                                World.Macros.Remove(macro);
 
                                 foreach(var c in content.RightArea.Children){
                                     if(c.Page == nb.ButtonParameter){
@@ -796,13 +798,13 @@ namespace ClassicUO.Game.UI.Gumps
 
             #region Macros
             page = ((int)PAGE.Macros + 1002);
-            MacroManager macroManager = Client.Game.GetScene<GameScene>().Macros;
+            MacroManager macroManager = World.Macros;
             for (Macro macro = (Macro)macroManager.Items; macro != null; macro = (Macro)macro.Next)
             {
                 content.AddToLeft(b = new ModernButton(0, 0, content.LeftWidth, 40, ButtonAction.SwitchPage, macro.Name, Theme.BUTTON_FONT_COLOR) { ButtonParameter = bParam++, Tag = macro });
 
                 content.ResetRightSide();
-                content.AddToRight(new MacroControl(macro.Name), true, b.ButtonParameter);
+                content.AddToRight(new MacroControl(World, macro.Name), true, b.ButtonParameter);
             }
 
             b.IsSelected = true;
@@ -833,7 +835,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (infoBarGump == null)
                     {
-                        UIManager.Add(new InfoBarGump { X = 300, Y = 300 });
+                        UIManager.Add(new InfoBarGump(World) { X = 300, Y = 300 });
                     }
                     else
                     {
@@ -851,7 +853,7 @@ namespace ClassicUO.Game.UI.Gumps
             #endregion
             #region Select type infobar
             ComboBoxWithLabel c;
-            content.AddToLeft(c = new ComboBoxWithLabel(lang.GetInfoBars.HighlightType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetInfoBars.HighLightOpt_TextColor, lang.GetInfoBars.HighLightOpt_ColoredBars }, profile.InfoBarHighlightType, (i, s) => { profile.InfoBarHighlightType = i; }));
+            content.AddToLeft(c = new ComboBoxWithLabel(World, lang.GetInfoBars.HighlightType, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetInfoBars.HighLightOpt_TextColor, lang.GetInfoBars.HighLightOpt_ColoredBars }, profile.InfoBarHighlightType, (i, s) => { profile.InfoBarHighlightType = i; }));
             PositionHelper.BlankLine();
             PositionHelper.BlankLine();
             #endregion
@@ -864,12 +866,12 @@ namespace ClassicUO.Game.UI.Gumps
             addItem.MouseUp += (s, e) =>
             {
                 InfoBarItem ibi;
-                InfoBarBuilderControl ibbc = new InfoBarBuilderControl(ibi = new InfoBarItem("HP", InfoBarVars.HP, 0x3B9), content);
+                InfoBarBuilderControl ibbc = new InfoBarBuilderControl(World, ibi = new InfoBarItem("HP", InfoBarVars.HP, 0x3B9), content);
                 infoBarItems.Add(ibbc);
                 infoBarItems.ReArrangeChildren();
                 infoBarItems.ForceSizeUpdate();
                 infoBarItems.Parent?.ForceSizeUpdate();
-                Client.Game.GetScene<GameScene>().InfoBars?.AddItem(ibi);
+                World.InfoBars?.AddItem(ibi);
                 UIManager.GetGump<InfoBarGump>()?.ResetItems();
                 content.AddToLeft(ibbc);
                 content.ForceSizeUpdate();
@@ -898,11 +900,11 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToLeftText(TextBox.GetOne(lang.GetInfoBars.Data, Theme.FONT, Theme.STANDARD_TEXT_SIZE, Theme.TEXT_FONT_COLOR, TextBox.RTLOptions.DefaultCentered(100).MouseInput()), 180, 135);
             content.AddToLine(new Line(0, 10, content.LeftWidth, 1, Color.Gray.PackedValue), 0, 160);
             content.BlankLine();
-            InfoBarManager ibmanager = Client.Game.GetScene<GameScene>().InfoBars;
+            InfoBarManager ibmanager = World.InfoBars;
             List<InfoBarItem> _infoBarItems = ibmanager.GetInfoBars();
             for (int i = 0; i < _infoBarItems.Count; i++)
             {
-                InfoBarBuilderControl ibbc = new InfoBarBuilderControl(_infoBarItems[i], content);
+                InfoBarBuilderControl ibbc = new InfoBarBuilderControl(World, _infoBarItems[i], content);
                 infoBarItems.ReArrangeChildren();
                 infoBarItems.ForceSizeUpdate();
                 infoBarItems.Parent?.ForceSizeUpdate();
@@ -974,7 +976,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                     "",
-                    new ModernColorPickerWithLabel(lang.GetToolTips.ToolTipFont, profile.TooltipTextHue, (h) => { profile.TooltipTextHue = h; }),
+                    new ModernColorPickerWithLabel(World, lang.GetToolTips.ToolTipFont, profile.TooltipTextHue, (h) => { profile.TooltipTextHue = h; }),
                     mainContent.RightWidth,
                     PAGE.Tooltip
                 ));
@@ -1088,7 +1090,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                 "",
-                new ModernColorPickerWithLabel(lang.GetSpeech.SpeechColor, profile.SpeechHue, (h) => { profile.SpeechHue = h; }),
+                new ModernColorPickerWithLabel(World, lang.GetSpeech.SpeechColor, profile.SpeechHue, (h) => { profile.SpeechHue = h; }),
                 mainContent.RightWidth,
                 PAGE.Speech
             ));
@@ -1097,7 +1099,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                 "",
-                new ModernColorPickerWithLabel(lang.GetSpeech.YellColor, profile.YellHue, (h) => { profile.YellHue = h; }),
+                new ModernColorPickerWithLabel(World, lang.GetSpeech.YellColor, profile.YellHue, (h) => { profile.YellHue = h; }),
                 mainContent.RightWidth,
                 PAGE.Speech
             ));
@@ -1105,7 +1107,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                 "",
-                new ModernColorPickerWithLabel(lang.GetSpeech.PartyColor, profile.PartyMessageHue, (h) => { profile.PartyMessageHue = h; }),
+                new ModernColorPickerWithLabel(World, lang.GetSpeech.PartyColor, profile.PartyMessageHue, (h) => { profile.PartyMessageHue = h; }),
                 mainContent.RightWidth,
                 PAGE.Speech
             ));
@@ -1114,7 +1116,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                 "",
-                new ModernColorPickerWithLabel(lang.GetSpeech.AllianceColor, profile.AllyMessageHue, (h) => { profile.AllyMessageHue = h; }),
+                new ModernColorPickerWithLabel(World, lang.GetSpeech.AllianceColor, profile.AllyMessageHue, (h) => { profile.AllyMessageHue = h; }),
                 mainContent.RightWidth,
                 PAGE.Speech
             ));
@@ -1122,7 +1124,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                 "",
-                new ModernColorPickerWithLabel(lang.GetSpeech.EmoteColor, profile.EmoteHue, (h) => { profile.EmoteHue = h; }),
+                new ModernColorPickerWithLabel(World, lang.GetSpeech.EmoteColor, profile.EmoteHue, (h) => { profile.EmoteHue = h; }),
                 mainContent.RightWidth,
                 PAGE.Speech
             ));
@@ -1131,7 +1133,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                 "",
-                new ModernColorPickerWithLabel(lang.GetSpeech.WhisperColor, profile.WhisperHue, (h) => { profile.WhisperHue = h; }),
+                new ModernColorPickerWithLabel(World, lang.GetSpeech.WhisperColor, profile.WhisperHue, (h) => { profile.WhisperHue = h; }),
                 mainContent.RightWidth,
                 PAGE.Speech
             ));
@@ -1139,7 +1141,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                 "",
-                new ModernColorPickerWithLabel(lang.GetSpeech.GuildColor, profile.GuildMessageHue, (h) => { profile.GuildMessageHue = h; }),
+                new ModernColorPickerWithLabel(World, lang.GetSpeech.GuildColor, profile.GuildMessageHue, (h) => { profile.GuildMessageHue = h; }),
                 mainContent.RightWidth,
                 PAGE.Speech
             ));
@@ -1148,7 +1150,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                 "",
-                new ModernColorPickerWithLabel(lang.GetSpeech.CharColor, profile.ChatMessageHue, (h) => { profile.ChatMessageHue = h; }),
+                new ModernColorPickerWithLabel(World, lang.GetSpeech.CharColor, profile.ChatMessageHue, (h) => { profile.ChatMessageHue = h; }),
                 mainContent.RightWidth,
                 PAGE.Speech
             ));
@@ -1211,36 +1213,36 @@ namespace ClassicUO.Game.UI.Gumps
 
             PositionHelper.BlankLine();
 
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.InnocentColor, profile.InnocentHue, (h) => { profile.InnocentHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.InnocentColor, profile.InnocentHue, (h) => { profile.InnocentHue = h; }));
 
             PositionHelper.PositionControl(c);
 
             Control clast = c;
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.BeneficialSpell, profile.BeneficHue, (h) => { profile.BeneficHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.BeneficialSpell, profile.BeneficHue, (h) => { profile.BeneficHue = h; }));
             PositionHelper.PositionExact(c, 200, clast.Y);
 
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.FriendColor, profile.FriendHue, (h) => { profile.FriendHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.FriendColor, profile.FriendHue, (h) => { profile.FriendHue = h; }));
             PositionHelper.PositionControl(c);
             clast = c;
 
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.HarmfulSpell, profile.HarmfulHue, (h) => { profile.HarmfulHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.HarmfulSpell, profile.HarmfulHue, (h) => { profile.HarmfulHue = h; }));
             PositionHelper.PositionExact(c, 200, clast.Y);
 
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.Criminal, profile.CriminalHue, (h) => { profile.CriminalHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.Criminal, profile.CriminalHue, (h) => { profile.CriminalHue = h; }));
             PositionHelper.PositionControl(c);
             clast = c;
 
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.NeutralSpell, profile.NeutralHue, (h) => { profile.NeutralHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.NeutralSpell, profile.NeutralHue, (h) => { profile.NeutralHue = h; }));
             PositionHelper.PositionExact(c, 200, clast.Y);
 
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.CanBeAttackedHue, profile.CanAttackHue, (h) => { profile.CanAttackHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.CanBeAttackedHue, profile.CanAttackHue, (h) => { profile.CanAttackHue = h; }));
             PositionHelper.PositionControl(c);
             clast = c;
 
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.Murderer, profile.MurdererHue, (h) => { profile.MurdererHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.Murderer, profile.MurdererHue, (h) => { profile.MurdererHue = h; }));
             PositionHelper.PositionExact(c, 200, clast.Y);
 
-            scroll.Add(c = new ModernColorPickerWithLabel(lang.GetCombatSpells.Enemy, profile.EnemyHue, (h) => { profile.EnemyHue = h; }));
+            scroll.Add(c = new ModernColorPickerWithLabel(World, lang.GetCombatSpells.Enemy, profile.EnemyHue, (h) => { profile.EnemyHue = h; }));
             PositionHelper.PositionControl(c);
 
             PositionHelper.BlankLine();
@@ -1271,7 +1273,7 @@ namespace ClassicUO.Game.UI.Gumps
                             }
                             else
                             {
-                                UIManager.Add(counterGump = new CounterBarGump(200, 200));
+                                UIManager.Add(counterGump = new CounterBarGump(World, 200, 200));
                             }
                         }
                         else
@@ -1421,11 +1423,11 @@ namespace ClassicUO.Game.UI.Gumps
             PositionHelper.BlankLine();
             PositionHelper.BlankLine();
 
-            if (Client.Version >= ClientVersion.CV_705301)
+            if (Client.Game.UO.Version >= ClientVersion.CV_705301)
             {
                 options.Add(s = new SettingsOption(
                     "",
-                    new ComboBoxWithLabel(lang.GetContainers.CharacterBackpackStyle, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetContainers.BackpackOpt_Default, lang.GetContainers.BackpackOpt_Suede, lang.GetContainers.BackpackOpt_PolarBear, lang.GetContainers.BackpackOpt_GhoulSkin }, profile.BackpackStyle, (i, s) => { profile.BackpackStyle = i; }),
+                    new ComboBoxWithLabel(World, lang.GetContainers.CharacterBackpackStyle, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetContainers.BackpackOpt_Default, lang.GetContainers.BackpackOpt_Suede, lang.GetContainers.BackpackOpt_PolarBear, lang.GetContainers.BackpackOpt_GhoulSkin }, profile.BackpackStyle, (i, s) => { profile.BackpackStyle = i; }),
                     mainContent.RightWidth,
                     PAGE.Containers
                 ));
@@ -1460,7 +1462,7 @@ namespace ClassicUO.Game.UI.Gumps
             PositionHelper.RemoveIndent();
             PositionHelper.BlankLine();
 
-            if (Client.Version >= ClientVersion.CV_706000)
+            if (Client.Game.UO.Version >= ClientVersion.CV_706000)
             {
                 options.Add(s = new SettingsOption(
                     "",
@@ -1521,7 +1523,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             options.Add(s = new SettingsOption(
                     "",
-                    new ComboBoxWithLabel(lang.GetContainers.OverridePosition, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetContainers.PositionOpt_NearContainer, lang.GetContainers.PositionOpt_TopRight, lang.GetContainers.PositionOpt_LastDraggedPosition, lang.GetContainers.RememberEachContainer }, profile.OverrideContainerLocationSetting, (i, s) => { profile.OverrideContainerLocationSetting = i; }),
+                    new ComboBoxWithLabel(World, lang.GetContainers.OverridePosition, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetContainers.PositionOpt_NearContainer, lang.GetContainers.PositionOpt_TopRight, lang.GetContainers.PositionOpt_LastDraggedPosition, lang.GetContainers.RememberEachContainer }, profile.OverrideContainerLocationSetting, (i, s) => { profile.OverrideContainerLocationSetting = i; }),
                     mainContent.RightWidth,
                     PAGE.Containers
                 ));
@@ -1537,7 +1539,7 @@ namespace ClassicUO.Game.UI.Gumps
             ));
             rebuildContainers.MouseUp += (s, e) =>
             {
-                ContainerManager.BuildContainerFile(true);
+                World.ContainerManager.BuildContainerFile(true);
             };
             PositionHelper.PositionControl(s.FullControl);
         }
@@ -1605,6 +1607,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 EntryDialog dialog = new
                 (
+                    World,
                     250,
                     150,
                     lang.GetNamePlates.NameOverheadEntryName,
@@ -1641,9 +1644,9 @@ namespace ClassicUO.Game.UI.Gumps
                         );
                         nb.IsSelected = true;
                         content.ActivePage = nb.ButtonParameter;
-                        NameOverHeadManager.AddOption(option);
+                        World.NameOverHeadManager.AddOption(option);
 
-                        content.AddToRight(new NameOverheadAssignControl(option), false, nb.ButtonParameter);
+                        content.AddToRight(new NameOverheadAssignControl(World, option), false, nb.ButtonParameter);
                     }
                 )
                 {
@@ -1665,6 +1668,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     QuestionGump dialog = new QuestionGump
                     (
+                        World,
                         ResGumps.MacroDeleteConfirmation,
                         b =>
                         {
@@ -1675,7 +1679,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                             if (nb.Tag is NameOverheadOption option)
                             {
-                                NameOverHeadManager.RemoveOption(option);
+                                World.NameOverHeadManager.RemoveOption(option);
                                 nb.Dispose();
                             }
                         }
@@ -1717,7 +1721,7 @@ namespace ClassicUO.Game.UI.Gumps
                     }
                 );
 
-                content.AddToRight(new NameOverheadAssignControl(option), false, nb.ButtonParameter);
+                content.AddToRight(new NameOverheadAssignControl(World, option), false, nb.ButtonParameter);
             }
 
             if (nb != null)
@@ -1814,7 +1818,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Point pos = g.Location;
                     g.Dispose();
-                    g = new ModernOptionsGump() { Location = pos };
+                    g = new ModernOptionsGump(World) { Location = pos };
                     g.ChangePage((int)PAGE.TUOCooldowns);
                     UIManager.Add(g);
                 }
@@ -1879,7 +1883,7 @@ namespace ClassicUO.Game.UI.Gumps
                 profile.GridBorderAlpha = (byte)i;
             }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.BorderColor, profile.GridBorderHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.BorderColor, profile.GridBorderHue, (h) =>
             {
                 profile.GridBorderHue = h;
             }), true, page);
@@ -1893,7 +1897,7 @@ namespace ClassicUO.Game.UI.Gumps
                 GridContainer.UpdateAllGridContainers();
             }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.BackgroundColor, profile.AltGridContainerBackgroundHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.BackgroundColor, profile.AltGridContainerBackgroundHue, (h) =>
             {
                 profile.AltGridContainerBackgroundHue = h;
                 GridContainer.UpdateAllGridContainers();
@@ -1907,7 +1911,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.BlankLine();
 
-            content.AddToRight(new ComboBoxWithLabel(lang.GetTazUO.SearchStyle, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetTazUO.OnlyShow, lang.GetTazUO.Highlight }, profile.GridContainerSearchMode, (i, s) =>
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetTazUO.SearchStyle, 0, Theme.COMBO_BOX_WIDTH, new string[] { lang.GetTazUO.OnlyShow, lang.GetTazUO.Highlight }, profile.GridContainerSearchMode, (i, s) =>
             {
                 profile.GridContainerSearchMode = i;
             }), true, page);
@@ -1929,7 +1933,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.BlankLine();
 
-            content.AddToRight(new ComboBoxWithLabel(lang.GetTazUO.ContainerStyle, 0, Theme.COMBO_BOX_WIDTH, Enum.GetNames(typeof(GridContainer.BorderStyle)), profile.Grid_BorderStyle, (i, s) =>
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetTazUO.ContainerStyle, 0, Theme.COMBO_BOX_WIDTH, Enum.GetNames(typeof(GridContainer.BorderStyle)), profile.Grid_BorderStyle, (i, s) =>
             {
                 profile.Grid_BorderStyle = i;
                 GridContainer.UpdateAllGridContainers();
@@ -1961,7 +1965,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             c.MouseUp += (s, e) =>
             {
-                GridHightlightMenu.Open();
+                GridHightlightMenu.Open(World);
             };
             content.AddToRight(new SliderWithLabel(lang.GetTazUO.GridHighlightSize, 0, Theme.SLIDER_WIDTH, 1, 5, profile.GridHightlightSize, (i) =>
             {
@@ -1995,14 +1999,14 @@ namespace ClassicUO.Game.UI.Gumps
                 ResizableJournal.UpdateJournalOptions();
             }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.JournalBackgroundColor, profile.AltJournalBackgroundHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.JournalBackgroundColor, profile.AltJournalBackgroundHue, (h) =>
             {
                 profile.AltJournalBackgroundHue = h;
                 ResizableJournal.UpdateJournalOptions();
             }), true, page);
             content.RemoveIndent();
             content.BlankLine();
-            content.AddToRight(new ComboBoxWithLabel(lang.GetTazUO.JournalStyle, 0, Theme.COMBO_BOX_WIDTH, Enum.GetNames(typeof(ResizableJournal.BorderStyle)), profile.JournalStyle, (i, s) =>
+            content.AddToRight(new ComboBoxWithLabel(World, lang.GetTazUO.JournalStyle, 0, Theme.COMBO_BOX_WIDTH, Enum.GetNames(typeof(ResizableJournal.BorderStyle)), profile.JournalStyle, (i, s) =>
             {
                 profile.JournalStyle = i;
                 ResizableJournal.UpdateJournalOptions();
@@ -2040,13 +2044,13 @@ namespace ClassicUO.Game.UI.Gumps
             }), true, page);
             content.Indent();
             content.BlankLine();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.PaperdollHue, profile.ModernPaperDollHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.PaperdollHue, profile.ModernPaperDollHue, (h) =>
             {
                 profile.ModernPaperDollHue = h;
                 ModernPaperdoll.UpdateAllOptions();
             }), true, page);
             content.BlankLine();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.DurabilityBarHue, profile.ModernPaperDollDurabilityHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.DurabilityBarHue, profile.ModernPaperDollDurabilityHue, (h) =>
             {
                 profile.ModernPaperDollDurabilityHue = h;
                 ModernPaperdoll.UpdateAllOptions();
@@ -2108,25 +2112,25 @@ namespace ClassicUO.Game.UI.Gumps
             page = ((int)PAGE.TUOOptions + 1004);
             content.AddToLeft(SubCategoryButton(lang.GetTazUO.Mobiles, page, content.LeftWidth));
             content.ResetRightSide();
-            content.AddToRight(c = new ModernColorPickerWithLabel(lang.GetTazUO.DamageToSelf, profile.DamageHueSelf, (h) =>
+            content.AddToRight(c = new ModernColorPickerWithLabel(World, lang.GetTazUO.DamageToSelf, profile.DamageHueSelf, (h) =>
             {
                 profile.DamageHueSelf = h;
             }), true, page);
-            content.AddToRight(c = new ModernColorPickerWithLabel(lang.GetTazUO.DamageToOthers, profile.DamageHueOther, (h) =>
+            content.AddToRight(c = new ModernColorPickerWithLabel(World, lang.GetTazUO.DamageToOthers, profile.DamageHueOther, (h) =>
             {
                 profile.DamageHueOther = h;
             })
             { X = 250, Y = c.Y }, false, page);
-            content.AddToRight(c = new ModernColorPickerWithLabel(lang.GetTazUO.DamageToPets, profile.DamageHuePet, (h) =>
+            content.AddToRight(c = new ModernColorPickerWithLabel(World, lang.GetTazUO.DamageToPets, profile.DamageHuePet, (h) =>
             {
                 profile.DamageHuePet = h;
             }), true, page);
-            content.AddToRight(c = new ModernColorPickerWithLabel(lang.GetTazUO.DamageToAllies, profile.DamageHueAlly, (h) =>
+            content.AddToRight(c = new ModernColorPickerWithLabel(World, lang.GetTazUO.DamageToAllies, profile.DamageHueAlly, (h) =>
             {
                 profile.DamageHueAlly = h;
             })
             { X = 250, Y = c.Y }, false, page);
-            content.AddToRight(c = new ModernColorPickerWithLabel(lang.GetTazUO.DamageToLastAttack, profile.DamageHueLastAttck, (h) =>
+            content.AddToRight(c = new ModernColorPickerWithLabel(World, lang.GetTazUO.DamageToLastAttack, profile.DamageHueLastAttck, (h) =>
             {
                 profile.DamageHueLastAttck = h;
             }), true, page);
@@ -2164,7 +2168,7 @@ namespace ClassicUO.Game.UI.Gumps
                 profile.HiddenBodyAlpha = (byte)i;
             }), true, page);
             content.Indent();
-            content.AddToRight(c = new ModernColorPickerWithLabel(lang.GetTazUO.HiddenPlayerHue, profile.HiddenBodyHue, (h) =>
+            content.AddToRight(c = new ModernColorPickerWithLabel(World, lang.GetTazUO.HiddenPlayerHue, profile.HiddenBodyHue, (h) =>
             {
                 profile.HiddenBodyHue = h;
             }), true, page);
@@ -2227,13 +2231,13 @@ namespace ClassicUO.Game.UI.Gumps
                 profile.UseImprovedBuffBar = b;
             }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.BuffGumpHue, profile.ImprovedBuffBarHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.BuffGumpHue, profile.ImprovedBuffBarHue, (h) =>
             {
                 profile.ImprovedBuffBarHue = h;
             }), true, page);
             content.RemoveIndent();
             content.BlankLine();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.MainGameWindowBackground, profile.MainWindowBackgroundHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.MainGameWindowBackground, profile.MainWindowBackgroundHue, (h) =>
             {
                 profile.MainWindowBackgroundHue = h;
                 GameController.UpdateBackgroundHueShader();
@@ -2263,7 +2267,7 @@ namespace ClassicUO.Game.UI.Gumps
                 profile.SpellIcon_DisplayHotkey = b;
             }), true, page);
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.HotkeyTextHue, profile.SpellIcon_HotkeyHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.HotkeyTextHue, profile.SpellIcon_HotkeyHue, (h) =>
             {
                 profile.SpellIcon_HotkeyHue = h;
             }), true, page);
@@ -2300,13 +2304,13 @@ namespace ClassicUO.Game.UI.Gumps
               {
                   if (e.Button == MouseButtonType.Left)
                   {
-                      UIManager.Add(new InputRequest(lang.GetTazUO.InputRequestUrl, lang.GetTazUO.Download, lang.GetTazUO.Cancel, (r, s) =>
+                      UIManager.Add(new InputRequest(World, lang.GetTazUO.InputRequestUrl, lang.GetTazUO.Download, lang.GetTazUO.Cancel, (r, s) =>
                       {
                           if (r == InputRequest.Result.BUTTON1 && !string.IsNullOrEmpty(s))
                           {
                               if (Uri.TryCreate(s, UriKind.Absolute, out var uri))
                               {
-                                  GameActions.Print(lang.GetTazUO.AttemptingToDownloadSpellConfig);
+                                  GameActions.Print(World, lang.GetTazUO.AttemptingToDownloadSpellConfig);
                                   Task.Factory.StartNew(() =>
                                   {
                                       try
@@ -2315,12 +2319,12 @@ namespace ClassicUO.Game.UI.Gumps
                                           string result = httpClient.GetStringAsync(uri).Result;
                                           if (SpellVisualRangeManager.Instance.LoadFromString(result))
                                           {
-                                              GameActions.Print(lang.GetTazUO.SuccesfullyDownloadedNewSpellConfig);
+                                              GameActions.Print(World, lang.GetTazUO.SuccesfullyDownloadedNewSpellConfig);
                                           }
                                       }
                                       catch (Exception ex)
                                       {
-                                          GameActions.Print(string.Format(lang.GetTazUO.FailedToDownloadTheSpellConfigExMessage, ex.Message));
+                                          GameActions.Print(World, string.Format(lang.GetTazUO.FailedToDownloadTheSpellConfigExMessage, ex.Message));
                                       }
                                   });
                               }
@@ -2374,7 +2378,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.RemoveIndent();
             content.BlankLine();
 
-            content.AddToRight(new ModernColorPickerWithLabel(lang.GetTazUO.BackgroundHue, profile.ToolTipBGHue, (h) =>
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.BackgroundHue, profile.ToolTipBGHue, (h) =>
             {
                 profile.ToolTipBGHue = h;
             }), true, page);
@@ -2391,7 +2395,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.BlankLine();
             content.AddToRight(new HttpClickableLink("Tooltip Overrides Wiki", "https://github.com/bittiez/TazUO/wiki/TazUO.Tooltip-Override", Theme.TEXT_FONT_COLOR), true, page);
-            content.AddToRight(new ToolTipOverrideConfigs(content.RightWidth - 15), true, page);
+            content.AddToRight(new ToolTipOverrideConfigs(World, content.RightWidth - 15), true, page);
             #endregion
 
             #region Font settings
@@ -2543,7 +2547,7 @@ namespace ClassicUO.Game.UI.Gumps
                 if (e.Button == MouseButtonType.Left)
                 {
                     OverrideAllProfiles(locations);
-                    GameActions.Print(string.Format(lang.GetTazUO.OverrideSuccess, locations.Count - 1), 32, Data.MessageType.System);
+                    GameActions.Print(World, string.Format(lang.GetTazUO.OverrideSuccess, locations.Count - 1), 32, Data.MessageType.System);
                 }
             };
 
@@ -2553,7 +2557,7 @@ namespace ClassicUO.Game.UI.Gumps
                 if (e.Button == MouseButtonType.Left)
                 {
                     OverrideAllProfiles(sameServerLocations);
-                    GameActions.Print(string.Format(lang.GetTazUO.OverrideSuccess, sameServerLocations.Count - 1), 32, Data.MessageType.System);
+                    GameActions.Print(World, string.Format(lang.GetTazUO.OverrideSuccess, sameServerLocations.Count - 1), 32, Data.MessageType.System);
                 }
             };
 
@@ -2563,7 +2567,7 @@ namespace ClassicUO.Game.UI.Gumps
                 if (e.Button == MouseButtonType.Left)
                 {
                     ProfileManager.SetProfileAsDefault(ProfileManager.CurrentProfile);
-                    GameActions.Print(lang.GetTazUO.SetAsDefaultSuccess, 32, Data.MessageType.System);
+                    GameActions.Print(World, lang.GetTazUO.SetAsDefaultSuccess, 32, Data.MessageType.System);
                 }
             };
             #endregion
@@ -2631,7 +2635,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.BlankLine();
 
             bool rightSide = false;
-            foreach (Layer layer in (Layer[])Enum.GetValues(typeof(Layer)))
+            foreach (Layer layer in (Layer[])Enum.GetValues<Layer>())
             {
                 if (layer == Layer.Invalid || layer == Layer.Hair || layer == Layer.Beard || layer == Layer.Backpack || layer == Layer.ShopBuyRestock || layer == Layer.ShopBuy || layer == Layer.ShopSell || layer == Layer.Bank || layer == Layer.Face || layer == Layer.Talisman || layer == Layer.Mount)
                 {
@@ -2667,7 +2671,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight(new CheckboxWithLabel(lang.GetTazUO.AutoLootHumanCorpses, 0, profile.AutoLootHumanCorpses, b => profile.AutoLootHumanCorpses = b), true, page);
             content.BlankLine();
 
-            content.AddToRight(c = new AutoLootConfigs(content.RightWidth - Theme.SCROLL_BAR_WIDTH - 10), true, page);
+            content.AddToRight(c = new AutoLootConfigs(World, content.RightWidth - Theme.SCROLL_BAR_WIDTH - 10), true, page);
             #endregion
 
             #region Auto sell
@@ -2681,7 +2685,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight(new CheckboxWithLabel(lang.GetTazUO.AutoSellEnable, 0, profile.SellAgentEnabled, b => profile.SellAgentEnabled = b), true, page);
             content.BlankLine();
 
-            content.AddToRight(new SellAgentConfigs(content.RightWidth - Theme.SCROLL_BAR_WIDTH - 10), true, page);
+            content.AddToRight(new SellAgentConfigs(World, content.RightWidth - Theme.SCROLL_BAR_WIDTH - 10), true, page);
             #endregion
 
             #region Auto buy
@@ -2695,7 +2699,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight(new CheckboxWithLabel(lang.GetTazUO.AutoBuyEnable, 0, profile.BuyAgentEnabled, b => profile.BuyAgentEnabled = b), true, page);
             content.BlankLine();
 
-            content.AddToRight(new BuyAgentConfigs(content.RightWidth - Theme.SCROLL_BAR_WIDTH - 10), true, page);
+            content.AddToRight(new BuyAgentConfigs(World, content.RightWidth - Theme.SCROLL_BAR_WIDTH - 10), true, page);
             #endregion
 
             #region Graphic Filter
@@ -2703,7 +2707,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToLeft(SubCategoryButton(lang.GetTazUO.GraphicChangeFilter, page, content.LeftWidth));
             content.ResetRightSide();
 
-            content.AddToRight(new GraphicFilterConfigs(content.RightWidth - Theme.SCROLL_BAR_WIDTH - 10), true, page);
+            content.AddToRight(new GraphicFilterConfigs(World, content.RightWidth - Theme.SCROLL_BAR_WIDTH - 10), true, page);
             #endregion
 
             #region Hotkeys
@@ -2847,7 +2851,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             foreach (var profile in allProfiles)
             {
-                ProfileManager.CurrentProfile.Save(profile.ToString(), false);
+                ProfileManager.CurrentProfile.Save(World, profile.ToString(), false);
             }
         }
 
@@ -2855,7 +2859,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             string[] fontArray = TrueTypeLoader.Instance.Fonts;
             int selectedFontInd = Array.IndexOf(fontArray, selectedFont);
-            return new ComboBoxWithLabel(label, 0, Theme.COMBO_BOX_WIDTH, fontArray, selectedFontInd, onSelect);
+            return new ComboBoxWithLabel(World, label, 0, Theme.COMBO_BOX_WIDTH, fontArray, selectedFontInd, onSelect);
         }
 
         private ModernButton CategoryButton(string text, int page, int width, int height = 40)
@@ -2892,7 +2896,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         Point pos = g.Location;
                         g.Dispose();
-                        g = new ModernOptionsGump() { Location = pos };
+                        g = new ModernOptionsGump(World) { Location = pos };
                         g.ChangePage((int)PAGE.TUOCooldowns);
                         UIManager.Add(g);
                     }
@@ -2906,7 +2910,7 @@ namespace ClassicUO.Game.UI.Gumps
             _hueLabel.Y = 10;
             main.Add(_hueLabel);
 
-            ModernColorPickerWithLabel _hueSelector = new ModernColorPickerWithLabel(string.Empty, data.hue) { X = _hueLabel.X + _hueLabel.Width + 5, Y = 10 };
+            ModernColorPickerWithLabel _hueSelector = new ModernColorPickerWithLabel(World, string.Empty, data.hue) { X = _hueLabel.X + _hueLabel.Width + 5, Y = 10 };
             main.Add(_hueSelector);
 
             InputField _name = new InputField(140, 40, text: data.label) { X = _hueSelector.X + _hueSelector.Width + 10, Y = 1 };
@@ -2921,7 +2925,7 @@ namespace ClassicUO.Game.UI.Gumps
             _cooldown.X = _cooldownLabel.X + _cooldownLabel.Width + 10;
             main.Add(_cooldown);
 
-            ComboBoxWithLabel _message_type = new ComboBoxWithLabel(string.Empty, 0, 85, new string[] { "All", "Self", "Other" }, data.message_type) { X = _cooldown.X + _cooldown.Width + 10, Y = 10 };
+            ComboBoxWithLabel _message_type = new ComboBoxWithLabel(World, string.Empty, 0, 85, new string[] { "All", "Self", "Other" }, data.message_type) { X = _cooldown.X + _cooldown.Width + 10, Y = 10 };
             main.Add(_message_type);
 
             InputField _conditionText = new InputField(main.Width - 50, 40, text: data.trigger) { X = 1, Y = _delete.Height + 5 };
@@ -2949,7 +2953,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (int.TryParse(_cooldown.Text, out int value))
                 {
-                    CoolDownBarManager.AddCoolDownBar(TimeSpan.FromSeconds(value), _name.Text, _hueSelector.Hue, _replaceIfExists.IsChecked);
+                    CoolDownBarManager.AddCoolDownBar(World, TimeSpan.FromSeconds(value), _name.Text, _hueSelector.Hue, _replaceIfExists.IsChecked);
                 }
             };
             main.Add(_preview);
@@ -3006,9 +3010,11 @@ namespace ClassicUO.Game.UI.Gumps
         internal class ToolTipOverrideConfigs : Control
         {
             private DataBox dataBox;
-            public ToolTipOverrideConfigs(int width)
+            private World world;
+            public ToolTipOverrideConfigs(World world, int width)
             {
                 #region SET VARS
+                this.world = world;
                 Width = width;
                 CanMove = true;
                 AcceptMouseInput = true;
@@ -3037,7 +3043,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (e.Button == Input.MouseButtonType.Left)
                     {
-                        ToolTipOverrideData.ExportOverrideSettings();
+                        ToolTipOverrideData.ExportOverrideSettings(world);
                     }
                 };
 
@@ -3046,7 +3052,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (e.Button == Input.MouseButtonType.Left)
                     {
-                        ToolTipOverrideData.ImportOverrideSettings();
+                        ToolTipOverrideData.ImportOverrideSettings(world);
                     }
                 };
 
@@ -3056,7 +3062,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (e.Button == Input.MouseButtonType.Left)
                     {
-                        UIManager.Add(new QuestionGump("Are you sure?", (a) =>
+                        UIManager.Add(new QuestionGump(world, "Are you sure?", (a) =>
                         {
                             if (a)
                             {
@@ -3112,7 +3118,7 @@ namespace ClassicUO.Game.UI.Gumps
                                 return;
                             data.SearchText = _searchText.Text;
                             data.Save();
-                            UIManager.Add(new SimpleTimedTextGump("Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _searchText.ScreenCoordinateX, Y = _searchText.ScreenCoordinateY - 20 });
+                            UIManager.Add(new SimpleTimedTextGump(world, "Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _searchText.ScreenCoordinateX, Y = _searchText.ScreenCoordinateY - 20 });
                         }
                     });
                 };
@@ -3129,7 +3135,7 @@ namespace ClassicUO.Game.UI.Gumps
                         {
                             data.FormattedText = _formatText.Text;
                             data.Save();
-                            UIManager.Add(new SimpleTimedTextGump("Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _formatText.ScreenCoordinateX, Y = _formatText.ScreenCoordinateY - 20 });
+                            UIManager.Add(new SimpleTimedTextGump(world, "Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _formatText.ScreenCoordinateX, Y = _formatText.ScreenCoordinateY - 20 });
                         }
                     });
                 };
@@ -3150,7 +3156,7 @@ namespace ClassicUO.Game.UI.Gumps
                             {
                                 data.Min1 = val;
                                 data.Save();
-                                UIManager.Add(new SimpleTimedTextGump("Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _min1.ScreenCoordinateX, Y = _min1.ScreenCoordinateY - 20 });
+                                UIManager.Add(new SimpleTimedTextGump(world, "Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _min1.ScreenCoordinateX, Y = _min1.ScreenCoordinateY - 20 });
                             }
                         }
                     });
@@ -3170,7 +3176,7 @@ namespace ClassicUO.Game.UI.Gumps
                             {
                                 data.Max1 = val;
                                 data.Save();
-                                UIManager.Add(new SimpleTimedTextGump("Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _max1.ScreenCoordinateX, Y = _max1.ScreenCoordinateY - 20 });
+                                UIManager.Add(new SimpleTimedTextGump(world, "Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _max1.ScreenCoordinateX, Y = _max1.ScreenCoordinateY - 20 });
                             }
                         }
                     });
@@ -3193,7 +3199,7 @@ namespace ClassicUO.Game.UI.Gumps
                             {
                                 data.Min2 = val;
                                 data.Save();
-                                UIManager.Add(new SimpleTimedTextGump("Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _min2.ScreenCoordinateX, Y = _min2.ScreenCoordinateY - 20 });
+                                UIManager.Add(new SimpleTimedTextGump(world, "Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _min2.ScreenCoordinateX, Y = _min2.ScreenCoordinateY - 20 });
                             }
                         }
                     });
@@ -3213,18 +3219,18 @@ namespace ClassicUO.Game.UI.Gumps
                             {
                                 data.Max2 = val;
                                 data.Save();
-                                UIManager.Add(new SimpleTimedTextGump("Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _max2.ScreenCoordinateX, Y = _max2.ScreenCoordinateY - 20 });
+                                UIManager.Add(new SimpleTimedTextGump(world, "Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _max2.ScreenCoordinateX, Y = _max2.ScreenCoordinateY - 20 });
                             }
                         }
                     });
                 };
 
-                area.Add(_itemLater = new Combobox(_max2.X + _max2.Width + 5, _max2.Y, 110, Enum.GetNames(typeof(TooltipLayers)), Array.IndexOf(Enum.GetValues(typeof(TooltipLayers)), data.ItemLayer)));
+                area.Add(_itemLater = new Combobox(_max2.X + _max2.Width + 5, _max2.Y, 110, Enum.GetNames(typeof(TooltipLayers)), Array.IndexOf(Enum.GetValues<TooltipLayers>(), data.ItemLayer)));
                 _itemLater.OnOptionSelected += (s, e) =>
                 {
-                    data.ItemLayer = (TooltipLayers)(Enum.GetValues(typeof(TooltipLayers))).GetValue(_itemLater.SelectedIndex);
+                    data.ItemLayer = (TooltipLayers)(Enum.GetValues<TooltipLayers>()).GetValue(_itemLater.SelectedIndex);
                     data.Save();
-                    UIManager.Add(new SimpleTimedTextGump("Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _itemLater.ScreenCoordinateX, Y = _itemLater.ScreenCoordinateY - 20 });
+                    UIManager.Add(new SimpleTimedTextGump(world, "Saved", Microsoft.Xna.Framework.Color.LightGreen, TimeSpan.FromSeconds(1)) { X = _itemLater.ScreenCoordinateX, Y = _itemLater.ScreenCoordinateY - 20 });
                 };
 
                 area.Add(_del = new NiceButton(0, y, 20, 20, ButtonAction.Activate, "X") { IsSelectable = false });
@@ -3252,7 +3258,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             private DataBox _dataBox;
 
-            public GraphicFilterConfigs(int width)
+            public GraphicFilterConfigs(World world, int width)
             {
                 AcceptMouseInput = true;
                 CanMove = true;
@@ -3275,7 +3281,7 @@ namespace ClassicUO.Game.UI.Gumps
                 _dataBox.Add(b = new ModernButton(0, 0, 150, Theme.CHECKBOX_SIZE, ButtonAction.Default, "+ Target entity", Theme.BUTTON_FONT_COLOR));
                 b.MouseUp += (s, e) =>
                 {
-                    TargetHelper.TargetObject((e) =>
+                    TargetHelper.TargetObject(world, (e) =>
                     {
                         if (e == null) return;
                         var sc = GraphicsReplacement.NewFilter(e.Graphic, e.Graphic, e.Hue);
@@ -3392,7 +3398,7 @@ namespace ClassicUO.Game.UI.Gumps
         private class BuyAgentConfigs : Control
         {
             private DataBox _dataBox;
-            public BuyAgentConfigs(int width)
+            public BuyAgentConfigs(World world, int width)
             {
                 AcceptMouseInput = true;
                 CanMove = true;
@@ -3411,7 +3417,7 @@ namespace ClassicUO.Game.UI.Gumps
                 _dataBox.Add(b = new ModernButton(0, 0, 150, Theme.CHECKBOX_SIZE, ButtonAction.Default, "+ Target item", Theme.BUTTON_FONT_COLOR));
                 b.MouseUp += (s, e) =>
                 {
-                    TargetHelper.TargetObject((e) =>
+                    TargetHelper.TargetObject(world, (e) =>
                     {
                         if (e == null) return;
                         var sc = BuySellAgent.Instance.NewBuyConfig();
@@ -3546,7 +3552,7 @@ namespace ClassicUO.Game.UI.Gumps
         private class SellAgentConfigs : Control
         {
             private DataBox _dataBox;
-            public SellAgentConfigs(int width)
+            public SellAgentConfigs(World world, int width)
             {
                 AcceptMouseInput = true;
                 CanMove = true;
@@ -3565,7 +3571,7 @@ namespace ClassicUO.Game.UI.Gumps
                 _dataBox.Add(b = new ModernButton(0, 0, 150, Theme.CHECKBOX_SIZE, ButtonAction.Default, "+ Target item", Theme.BUTTON_FONT_COLOR));
                 b.MouseUp += (s, e) =>
                 {
-                    TargetHelper.TargetObject((e) =>
+                    TargetHelper.TargetObject(world, (e) =>
                     {
                         if (e == null) return;
                         var sc = BuySellAgent.Instance.NewSellConfig();
@@ -3699,7 +3705,7 @@ namespace ClassicUO.Game.UI.Gumps
         private class AutoLootConfigs : Control
         {
             private DataBox _dataBox;
-            public AutoLootConfigs(int width)
+            public AutoLootConfigs(World world, int width)
             {
                 AcceptMouseInput = true;
                 CanMove = true;
@@ -3719,7 +3725,7 @@ namespace ClassicUO.Game.UI.Gumps
                 _dataBox.Add(b = new ModernButton(0, 0, 200, Theme.CHECKBOX_SIZE, ButtonAction.Default, "+ Target item to add", Theme.BUTTON_FONT_COLOR));
                 b.MouseUp += (s, e) =>
                 {
-                    TargetHelper.TargetObject((o) =>
+                    TargetHelper.TargetObject(world, (o) =>
                     {
                         if (o != null)
                         {
@@ -3840,13 +3846,13 @@ namespace ClassicUO.Game.UI.Gumps
             private TextBox _label;
             private ModernColorPicker.HueDisplay _colorPicker;
 
-            public ModernColorPickerWithLabel(string text, ushort hue, Action<ushort> hueSelected = null, int maxWidth = 0)
+            public ModernColorPickerWithLabel(World world, string text, ushort hue, Action<ushort> hueSelected = null, int maxWidth = 0)
             {
                 AcceptMouseInput = true;
                 CanMove = true;
                 WantUpdateSize = false;
 
-                Add(_colorPicker = new ModernColorPicker.HueDisplay(hue, hueSelected, true));
+                Add(_colorPicker = new ModernColorPicker.HueDisplay(world, hue, hueSelected, true));
 
                 _label = TextBox.GetOne(text, Theme.FONT, Theme.STANDARD_TEXT_SIZE, Theme.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(maxWidth > 0 ? maxWidth : null));
                 _label.X = _colorPicker.Width + 5;
@@ -4290,14 +4296,14 @@ namespace ClassicUO.Game.UI.Gumps
             private Combobox _comboBox;
             private readonly string[] options;
 
-            public ComboBoxWithLabel(string label, int labelWidth, int comboWidth, string[] options, int selectedIndex, Action<int, string> onOptionSelected = null)
+            public ComboBoxWithLabel(World world, string label, int labelWidth, int comboWidth, string[] options, int selectedIndex, Action<int, string> onOptionSelected = null)
             {
                 AcceptMouseInput = true;
                 CanMove = true;
 
                 _label = TextBox.GetOne(label, Theme.FONT, Theme.STANDARD_TEXT_SIZE, Theme.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(labelWidth > 0 ? labelWidth : null));
                 Add(_label);
-                Add(_comboBox = new Combobox(comboWidth, options, selectedIndex, onOptionSelected: onOptionSelected) { X = _label.MeasuredSize.X + _label.X + 5 });
+                Add(_comboBox = new Combobox(world, comboWidth, options, selectedIndex, onOptionSelected: onOptionSelected) { X = _label.MeasuredSize.X + _label.X + 5 });
 
                 Width = labelWidth + comboWidth + 5;
                 Height = Math.Max(_label.MeasuredSize.Y, _comboBox.Height);
@@ -4357,9 +4363,11 @@ namespace ClassicUO.Game.UI.Gumps
                 private readonly int _maxHeight;
                 private TextBox _label;
                 private int _selectedIndex;
+                private World world;
 
                 public Combobox
                 (
+                    World world,
                     int width,
                     string[] items,
                     int selected = -1,
@@ -4367,6 +4375,7 @@ namespace ClassicUO.Game.UI.Gumps
                     Action<int, string> onOptionSelected = null
                     )
                 {
+                    this.world = world;
                     Width = width;
                     Height = 25;
                     SelectedIndex = selected;
@@ -4425,6 +4434,7 @@ namespace ClassicUO.Game.UI.Gumps
                     (
                         new ComboboxGump
                         (
+                            world,
                             ScreenCoordinateX,
                             comboY,
                             Width,
@@ -4443,13 +4453,14 @@ namespace ClassicUO.Game.UI.Gumps
 
                     public ComboboxGump
                     (
+                        World world,
                         int x,
                         int y,
                         int width,
                         int maxHeight,
                         string[] items,
                         Combobox combobox
-                    ) : base(0, 0)
+                    ) : base(world, 0, 0)
                     {
                         CanMove = false;
                         AcceptMouseInput = true;
@@ -5607,16 +5618,16 @@ namespace ClassicUO.Game.UI.Gumps
             private readonly ModernColorPickerWithLabel labelColor;
             private readonly ComboBoxWithLabel varStat;
 
-            public InfoBarBuilderControl(InfoBarItem item, mainScrollArea content)
+            public InfoBarBuilderControl(World world, InfoBarItem item, mainScrollArea content)
             {
                 AcceptMouseInput = true;
                 infoLabel = new InputField(130, 40, text: item.label, onTextChanges: (s, e) => { item.label = ((InputField.StbTextBox)s).Text; UIManager.GetGump<InfoBarGump>()?.ResetItems(); }) { X = 5 };
 
                 string[] dataVars = InfoBarManager.GetVars();
 
-                varStat = new ComboBoxWithLabel(string.Empty, 0, 170, dataVars, (int)item.var, onOptionSelected: (i, s) => { item.var = (InfoBarVars)i; UIManager.GetGump<InfoBarGump>()?.ResetItems(); }) { X = 200, Y = 8 };
+                varStat = new ComboBoxWithLabel(world, string.Empty, 0, 170, dataVars, (int)item.var, onOptionSelected: (i, s) => { item.var = (InfoBarVars)i; UIManager.GetGump<InfoBarGump>()?.ResetItems(); }) { X = 200, Y = 8 };
 
-                labelColor = new ModernColorPickerWithLabel(string.Empty, item.hue, (h) => { item.hue = h; UIManager.GetGump<InfoBarGump>()?.ResetItems(); }) { X = 150, Y = 10 };
+                labelColor = new ModernColorPickerWithLabel(world, string.Empty, item.hue, (h) => { item.hue = h; UIManager.GetGump<InfoBarGump>()?.ResetItems(); }) { X = 150, Y = 10 };
 
 
                 ModernButton deleteButton = new ModernButton
@@ -5641,7 +5652,7 @@ namespace ClassicUO.Game.UI.Gumps
                         db.ForceSizeUpdate();
                         content.ForceSizeUpdate();
                     }
-                    Client.Game.GetScene<GameScene>().InfoBars?.RemoveItem(item);
+                    world.InfoBars?.RemoveItem(item);
                     UIManager.GetGump<InfoBarGump>()?.ResetItems();
                     content.Remove(this);
                     content.ForceSizeUpdate();
@@ -6445,8 +6456,11 @@ namespace ClassicUO.Game.UI.Gumps
                 OpenButtonEditor
             }
 
-            public MacroControl(string name)
+            private World world;
+
+            public MacroControl(World world, string name)
             {
+                this.world = world;
                 CanMove = true;
                 TextBox _keyBinding;
                 Add(_keyBinding = TextBox.GetOne("Hotkey", Theme.FONT, Theme.STANDARD_TEXT_SIZE, Theme.TEXT_FONT_COLOR, TextBox.RTLOptions.Default()));
@@ -6469,7 +6483,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 Add(_databox = new DataBox(0, c.Y + c.Height + 5, 280, 280));
 
-                Macro = Client.Game.GetScene<GameScene>().Macros.FindMacro(name) ?? Macro.CreateEmptyMacro(name);
+                Macro = world.Macros.FindMacro(name) ?? Macro.CreateEmptyMacro(name);
 
                 SetupKeyByDefault();
                 SetupMacroUI();
@@ -6502,7 +6516,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 Macro.PushToBack(obj);
 
-                _databox.Add(new MacroEntry(this, obj, _allHotkeysNames));
+                _databox.Add(new MacroEntry(world, this, obj, _allHotkeysNames));
                 _databox.ReArrangeChildren();
                 _databox.ForceSizeUpdate();
                 ForceSizeUpdate();
@@ -6545,7 +6559,7 @@ namespace ClassicUO.Game.UI.Gumps
                 MacroObject obj = (MacroObject)Macro.Items;
                 while (obj != null)
                 {
-                    _databox.Add(new MacroEntry(this, obj, _allHotkeysNames));
+                    _databox.Add(new MacroEntry(world, this, obj, _allHotkeysNames));
 
                     if (obj.Next != null && obj.Code == MacroType.None)
                     {
@@ -6609,7 +6623,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (_hotkeyBox.Key != SDL.SDL_Keycode.SDLK_UNKNOWN)
                 {
-                    Macro macro = Client.Game.GetScene<GameScene>().Macros.FindMacro(_hotkeyBox.Key, alt, ctrl, shift);
+                    Macro macro = world.Macros.FindMacro(_hotkeyBox.Key, alt, ctrl, shift);
 
                     if (macro != null)
                     {
@@ -6619,14 +6633,14 @@ namespace ClassicUO.Game.UI.Gumps
                         }
 
                         SetupKeyByDefault();
-                        UIManager.Add(new MessageBoxGump(250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, macro.Name), null));
+                        UIManager.Add(new MessageBoxGump(world, 250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, macro.Name), null));
 
                         return;
                     }
                 }
                 else if (_hotkeyBox.MouseButton != MouseButtonType.None)
                 {
-                    Macro macro = Client.Game.GetScene<GameScene>().Macros.FindMacro(_hotkeyBox.MouseButton, alt, ctrl, shift);
+                    Macro macro = world.Macros.FindMacro(_hotkeyBox.MouseButton, alt, ctrl, shift);
 
                     if (macro != null)
                     {
@@ -6636,14 +6650,14 @@ namespace ClassicUO.Game.UI.Gumps
                         }
 
                         SetupKeyByDefault();
-                        UIManager.Add(new MessageBoxGump(250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, macro.Name), null));
+                        UIManager.Add(new MessageBoxGump(world, 250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, macro.Name), null));
 
                         return;
                     }
                 }
                 else if (_hotkeyBox.WheelScroll == true)
                 {
-                    Macro macro = Client.Game.GetScene<GameScene>().Macros.FindMacro(_hotkeyBox.WheelUp, alt, ctrl, shift);
+                    Macro macro = world.Macros.FindMacro(_hotkeyBox.WheelUp, alt, ctrl, shift);
 
                     if (macro != null)
                     {
@@ -6653,7 +6667,7 @@ namespace ClassicUO.Game.UI.Gumps
                         }
 
                         SetupKeyByDefault();
-                        UIManager.Add(new MessageBoxGump(250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, macro.Name), null));
+                        UIManager.Add(new MessageBoxGump(world, 250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, macro.Name), null));
 
                         return;
                     }
@@ -6703,13 +6717,13 @@ namespace ClassicUO.Game.UI.Gumps
                     case (int)buttonsOption.CreateNewMacro:
                         UIManager.Gumps.OfType<MacroButtonGump>().FirstOrDefault(s => s.TheMacro == Macro)?.Dispose();
 
-                        MacroButtonGump macroButtonGump = new MacroButtonGump(Macro, Mouse.Position.X, Mouse.Position.Y);
+                        MacroButtonGump macroButtonGump = new MacroButtonGump(world, Macro, Mouse.Position.X, Mouse.Position.Y);
                         UIManager.Add(macroButtonGump);
                         break;
                     case (int)buttonsOption.OpenMacroOptions:
                         UIManager.Gumps.OfType<MacroGump>().FirstOrDefault()?.Dispose();
 
-                        GameActions.OpenSettings(4);
+                        GameActions.OpenSettings(world, 4);
                         break;
                     case (int)buttonsOption.OpenButtonEditor:
                         UIManager.Gumps.OfType<MacroButtonEditorGump>().FirstOrDefault()?.Dispose();
@@ -6737,7 +6751,7 @@ namespace ClassicUO.Game.UI.Gumps
                         posX = (int)position.Value.X;
                         posY = (int)position.Value.Y;
                     }
-                    btnEditorGump = new MacroButtonEditorGump(macro, posX, posY);
+                    btnEditorGump = new MacroButtonEditorGump(world, macro, posX, posY);
                     UIManager.Add(btnEditorGump);
                 }
                 btnEditorGump.SetInScreen();
@@ -6751,14 +6765,16 @@ namespace ClassicUO.Game.UI.Gumps
                 private readonly string[] _items;
                 public event EventHandler<MacroObject> OnDelete;
                 ComboBoxWithLabel mainBox;
+                private World world;
 
-                public MacroEntry(MacroControl control, MacroObject obj, string[] items)
+                public MacroEntry(World world, MacroControl control, MacroObject obj, string[] items)
                 {
+                    this.world = world;
                     _control = control;
                     _items = items;
                     _obj = obj;
 
-                    mainBox = new ComboBoxWithLabel(string.Empty, 0, 200, _items, (int)obj.Code, BoxOnOnOptionSelected) { Tag = obj };
+                    mainBox = new ComboBoxWithLabel(world, string.Empty, 0, 200, _items, (int)obj.Code, BoxOnOnOptionSelected) { Tag = obj };
 
                     Add(mainBox);
 
@@ -6844,7 +6860,7 @@ namespace ClassicUO.Game.UI.Gumps
                                 names = namesList.ToArray();
                             }
 
-                            ComboBoxWithLabel sub = new ComboBoxWithLabel(string.Empty, 0, 200, names, (int)obj.SubCode - offset, (i, s) =>
+                            ComboBoxWithLabel sub = new ComboBoxWithLabel(world, string.Empty, 0, 200, names, (int)obj.SubCode - offset, (i, s) =>
                             {
                                 Macro.GetBoundByCode(obj.Code, ref count, ref offset);
                                 MacroSubType subType = (MacroSubType)(offset + i);
@@ -7183,8 +7199,11 @@ namespace ClassicUO.Game.UI.Gumps
                 UncheckAll,
             }
 
-            public NameOverheadAssignControl(NameOverheadOption option)
+            private World world;
+
+            public NameOverheadAssignControl(World world, NameOverheadOption option)
             {
+                this.world = world;
                 Option = option;
 
                 CanMove = true;
@@ -7366,7 +7385,7 @@ namespace ClassicUO.Game.UI.Gumps
                     return;
 
                 UpdateValueInHotkeyBox();
-                UIManager.Add(new MessageBoxGump(250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, option.Name), null));
+                UIManager.Add(new MessageBoxGump(world, 250, 150, string.Format(ResGumps.ThisKeyCombinationAlreadyExists, option.Name), null));
             }
 
             private void BoxOnHotkeyCancelled(object sender, EventArgs e)

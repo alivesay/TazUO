@@ -84,7 +84,7 @@ namespace ClassicUO.Game.Managers
                 "colorpicker",
                 s =>
                 {
-                    UIManager.Add(new UI.Gumps.ModernColorPicker(null, 8787));
+                    UIManager.Add(new UI.Gumps.ModernColorPicker(_world, null, 8787));
 
                 }
             );
@@ -126,7 +126,7 @@ namespace ClassicUO.Game.Managers
                 }
             });
 
-            Register("version", s => { UIManager.Add(new VersionHistory()); });
+            Register("version", s => { UIManager.Add(new VersionHistory(_world)); });
             Register("rain", s => { _world.Weather.Generate(WeatherType.WT_RAIN, 30, 75); });
 
             Register("marktile", s =>
@@ -209,7 +209,7 @@ namespace ClassicUO.Game.Managers
                 }
                 else
                 {
-                    UIManager.Add(new ModernPaperdoll(_world.Player));
+                    UIManager.Add(new ModernPaperdoll(_world, _world.Player));
                 }
 
             });
@@ -225,7 +225,7 @@ namespace ClassicUO.Game.Managers
                     }
                     else
                     {
-                        UIManager.Add(g = new ModernOptionsGump());
+                        UIManager.Add(g = new ModernOptionsGump(_world));
                         g.GoToPage(s[1]);
                     }
                 }
@@ -240,7 +240,7 @@ namespace ClassicUO.Game.Managers
 
             Register("genspelldef", (s) =>
             {
-                Task.Run(SpellDefinition.SaveAllSpellsToJson);
+                Task.Run(() => SpellDefinition.SaveAllSpellsToJson(_world));
             });
 
             Register("setinscreen", (s) =>
@@ -258,12 +258,12 @@ namespace ClassicUO.Game.Managers
 
             Register("updatedebug", (s) =>
             {
-                UIManager.Add(new UI.Gumps.UpdateTimerViewer());
+                UIManager.Add(new UI.Gumps.UpdateTimerViewer(_world));
             });
 
-            Register("artbrowser", (s) => { UIManager.Add(new ArtBrowserGump()); });
+            Register("artbrowser", (s) => { UIManager.Add(new ArtBrowserGump(_world)); });
 
-            Register("animbrowser", (s) => { UIManager.Add(new AnimBrowser()); });
+            Register("animbrowser", (s) => { UIManager.Add(new AnimBrowser(_world)); });
         }
 
 

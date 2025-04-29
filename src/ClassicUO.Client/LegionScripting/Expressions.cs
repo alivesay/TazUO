@@ -14,6 +14,8 @@ namespace ClassicUO.LegionScripting
 {
     internal static class Expressions
     {
+        private static World _world;
+        public static World World { get { if (_world == null) _world = Client.Game.UO.World; return _world; } }
         public static int GetPlayerMaxStam(string expression, Argument[] args, bool quiet) => World.Player.StaminaMax;
         public static int GetPlayerStam(string expression, Argument[] args, bool quiet) => World.Player.Stamina;
         public static int GetPlayerMaxHits(string expression, Argument[] args, bool quiet)
@@ -459,7 +461,7 @@ namespace ClassicUO.LegionScripting
         {
             return NetClient.Socket.Statistics.Ping;
         }
-        public static bool IsPathfinding(string expression, Argument[] args, bool quiet) => Pathfinder.AutoWalking;
+        public static bool IsPathfinding(string expression, Argument[] args, bool quiet) => World.Player.Pathfinder.AutoWalking;
         public static bool NearestCorpse(string expression, Argument[] args, bool quiet)
         {
             List<Item> items = Utility.FindItems(0x2006, groundRange: ProfileManager.CurrentProfile.AutoOpenCorpseRange);

@@ -361,7 +361,7 @@ namespace ClassicUO.Game.UI.Gumps.Login
             string[] accts = SimpleAccountManager.GetAccounts();
             if (accts.Length > 0)
             {
-                _textboxAccount.ContextMenu = new ContextMenuControl();
+                _textboxAccount.ContextMenu = new ContextMenuControl(this);
                 foreach (string acct in accts)
                 {
                     _textboxAccount.ContextMenu.Add(new ContextMenuItemEntry(acct, () => { _textboxAccount.SetText(acct); }));

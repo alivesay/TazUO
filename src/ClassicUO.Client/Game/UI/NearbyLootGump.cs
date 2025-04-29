@@ -44,11 +44,12 @@ namespace ClassicUO.Game.UI
         private static HashSet<uint> _openedCorpses = new HashSet<uint>();
         private static int selectedIndex;
         private static Point lastLocation;
+        private World world;
 
-        public NearbyLootGump() : base(0, 0)
+        public NearbyLootGump(World world) : base(world, 0, 0)
         {
             UIManager.GetGump<NearbyLootGump>()?.Dispose();
-
+            this.world = world;
             CanMove = true;
             AcceptMouseInput = true;
             AcceptKeyboardInput = true;
@@ -99,8 +100,8 @@ namespace ClassicUO.Game.UI
             {
                 if (e.Button != MouseButtonType.Left) return;
 
-                GameActions.Print(Resources.ResGumps.TargetContainerToGrabItemsInto);
-                TargetManager.SetTargeting(CursorTarget.SetGrabBag, 0, TargetType.Neutral);
+                GameActions.Print(World, Resources.ResGumps.TargetContainerToGrabItemsInto);
+                World.TargetManager.SetTargeting(CursorTarget.SetGrabBag, 0, TargetType.Neutral);
             };
 
             Add(scrollArea = new ScrollArea(0, lootButton.Y + lootButton.Height, Width, Height - lootButton.Y - lootButton.Height, true) { ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways });
@@ -153,7 +154,7 @@ namespace ClassicUO.Game.UI
 
         private ContextMenuControl GenOptionsContext()
         {
-            var c = new ContextMenuControl();
+            var c = new ContextMenuControl(this);
             c.Add(new ContextMenuItemEntry("Open human corpses?", () =>
             {
                 ProfileManager.CurrentProfile.NearbyLootOpensHumanCorpses ^= true;
@@ -187,7 +188,7 @@ namespace ClassicUO.Game.UI
 
             foreach (Item lootItem in finalItemList)
             {
-                dataBox.Add(NearbyItemDisplay.GetOne(lootItem, itemCount));
+                dataBox.Add(NearbyItemDisplay.GetOne(world, lootItem, itemCount));
                 itemCount++;
             }
 
@@ -361,6 +362,7 @@ namespace ClassicUO.Game.UI
         private bool highlight = false;
         private ushort borderHighlightHue = 0;
         private readonly Texture2D borderTexture;
+        private World world;
 
         private ushort bgHue
         {
@@ -375,24 +377,26 @@ namespace ClassicUO.Game.UI
                 return 0;
             }
         }
-        public static NearbyItemDisplay GetOne(Item item, int index)
+        public static NearbyItemDisplay GetOne(World world, Item item, int index)
         {
-            NearbyItemDisplay nearbyItemDisplay = pool.Count > 0 ? pool.Dequeue() : new NearbyItemDisplay(item, index);
+            NearbyItemDisplay nearbyItemDisplay = pool.Count > 0 ? pool.Dequeue() : new NearbyItemDisplay(world, item, index);
 
             if (nearbyItemDisplay.IsDisposed)
-                return new NearbyItemDisplay(item, index);
+                return new NearbyItemDisplay(world, item, index);
 
             nearbyItemDisplay.SetItem(item, index);
             return nearbyItemDisplay;
         }
 
-        public NearbyItemDisplay(Item item, int index)
+        public NearbyItemDisplay(World world, Item item, int index)
         {
             if (item == null)
             {
                 Dispose();
                 return;
             }
+            this.world = world;
+
             borderTexture = SolidColorTextureCache.GetTexture(Color.White);
             CanMove = true;
             AcceptMouseInput = true;
@@ -437,7 +441,7 @@ namespace ClassicUO.Game.UI
                 itemLabel.Text = name;
             }
 
-            ItemPropertiesData data = new ItemPropertiesData(item);
+            ItemPropertiesData data = new ItemPropertiesData(world, item);
             foreach (GridHighlightData config in GridHighlightData.AllConfigs)
             {
                 if (config.IsMatch(data))
@@ -489,7 +493,7 @@ namespace ClassicUO.Game.UI
             if (Keyboard.Shift && currentItem != null && ProfileManager.CurrentProfile.EnableAutoLoot && !ProfileManager.CurrentProfile.HoldShiftForContext && !ProfileManager.CurrentProfile.HoldShiftToSplitStack)
             {
                 AutoLootManager.Instance.AddAutoLootEntry(currentItem.Graphic, currentItem.Hue, currentItem.Name);
-                GameActions.Print($"Added this item to auto loot.");
+                GameActions.Print(world, $"Added this item to auto loot.");
             }
 
             AutoLootManager.Instance.LootItem(LocalSerial);
@@ -501,8 +505,8 @@ namespace ClassicUO.Game.UI
 
             Vector3 hueVector = ShaderHueTranslator.GetHueVector(currentItem.Hue, currentItem.ItemData.IsPartialHue, 1, true);
 
-            ref readonly var texture = ref Client.Game.Arts.GetArt((uint)currentItem.DisplayedGraphic);
-            Rectangle _rect = Client.Game.Arts.GetRealArtBounds((uint)currentItem.DisplayedGraphic);
+            ref readonly var texture = ref Client.Game.UO.Arts.GetArt((uint)currentItem.DisplayedGraphic);
+            Rectangle _rect = Client.Game.UO.Arts.GetRealArtBounds((uint)currentItem.DisplayedGraphic);
 
 
             Point _originalSize = new Point(ITEM_SIZE, ITEM_SIZE);

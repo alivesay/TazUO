@@ -431,7 +431,7 @@ namespace ClassicUO.Game.Managers
                     case CursorTarget.MoveItemContainer:
                         if (SerialHelper.IsItem(serial))
                         {
-                            MultiItemMoveGump.OnContainerTarget(serial);
+                            MultiItemMoveGump.OnContainerTarget(_world, serial);
                         }
                         ClearTargetingWithoutTargetCancelPacket();
                         return;

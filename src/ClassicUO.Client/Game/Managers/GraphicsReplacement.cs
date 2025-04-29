@@ -2,9 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ClassicUO.Game.Managers
 {
+    [JsonSerializable(typeof(Dictionary<ushort, GraphicChangeFilter>))]
+    [JsonSerializable(typeof(GraphicChangeFilter))]
+    internal partial class GraphicsReplacementJsonContext : JsonSerializerContext
+    {
+    }
     internal static class GraphicsReplacement
     {
         private static Dictionary<ushort, GraphicChangeFilter> graphicChangeFilters = new Dictionary<ushort, GraphicChangeFilter>();
@@ -16,7 +22,7 @@ namespace ClassicUO.Game.Managers
             {
                 try
                 {
-                    graphicChangeFilters = JsonSerializer.Deserialize<Dictionary<ushort, GraphicChangeFilter>>(File.ReadAllText(GetSavePath()));
+                    graphicChangeFilters = JsonSerializer.Deserialize(File.ReadAllText(GetSavePath()), GraphicsReplacementJsonContext.Default.DictionaryUInt16GraphicChangeFilter);
                     foreach (var filter in graphicChangeFilters)
                         quickLookup.Add(filter.Key);
                 }
@@ -33,7 +39,7 @@ namespace ClassicUO.Game.Managers
             {
                 try
                 {
-                    File.WriteAllText(GetSavePath(), JsonSerializer.Serialize<Dictionary<ushort, GraphicChangeFilter>>(graphicChangeFilters));
+                    File.WriteAllText(GetSavePath(), JsonSerializer.Serialize(graphicChangeFilters, GraphicsReplacementJsonContext.Default.DictionaryUInt16GraphicChangeFilter));
                 }
                 catch (Exception e)
                 {

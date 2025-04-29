@@ -18,7 +18,7 @@ namespace ClassicUO.LegionScripting
         private bool built;
         private TTFTextInputField textArea;
 
-        public ScriptEditor(ScriptFile scriptFile) : base(600, 400, 600, 400, 0, 0)
+        public ScriptEditor(World world, ScriptFile scriptFile) : base(world, 600, 400, 600, 400, 0, 0)
         {
             AnchorType = ANCHOR_TYPE.DISABLED;
             ScriptFile = scriptFile;
@@ -84,13 +84,13 @@ namespace ClassicUO.LegionScripting
             try
             {
                 File.WriteAllText(ScriptFile.FullPath, sb);
-                GameActions.Print($"Saved {ScriptFile.FileName}.");
+                GameActions.Print(World, $"Saved {ScriptFile.FileName}.");
                 if (ScriptFile.ScriptType == ScriptType.LegionScript)
                     ScriptFile.ReloadFromFile();
             }
             catch (Exception ex)
             {
-                GameActions.Print(ex.ToString());
+                GameActions.Print(World, ex.ToString());
             }
         }
 

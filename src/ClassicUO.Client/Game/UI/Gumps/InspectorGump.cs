@@ -222,7 +222,7 @@ namespace ClassicUO.Game.UI.Gumps
             if (l != null)
             {
                 SDL.SDL_SetClipboardText(l.Text);
-                GameActions.Print($"Copied to clipboard: {l.Text}");
+                GameActions.Print(World, $"Copied to clipboard: {l.Text}");
             }
         }
 

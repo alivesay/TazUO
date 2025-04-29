@@ -8,12 +8,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using static ClassicUO.Game.UI.Gumps.OptionsGump;
 
 namespace ClassicUO.Game.UI.Gumps
 {
+    [JsonSerializable(typeof(GridHightlightMenu.GridHighlightData))]
+    [JsonSerializable(typeof(GridHightlightMenu.GridHighlightData[]))]
+    internal partial class GridHighlightJsonContext : JsonSerializerContext
+    {
+    }
     internal class GridHightlightMenu : Gump
     {
         private const int WIDTH = 350, HEIGHT = 500;
@@ -21,7 +27,7 @@ namespace ClassicUO.Game.UI.Gumps
         private SettingsSection highlightSection;
         private ScrollArea highlightSectionScroll;
 
-        public GridHightlightMenu(int x = 100, int y = 100) : base(0, 0)
+        public GridHightlightMenu(World world, int x = 100, int y = 100) : base(world, 0, 0)
         {
             #region SET VARS
             Width = WIDTH;
@@ -74,7 +80,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (e.Button == Input.MouseButtonType.Left)
                     {
-                        ImportGridHighlightSettings();
+                        ImportGridHighlightSettings(World);
                     }
                 };
 
@@ -110,12 +116,12 @@ namespace ClassicUO.Game.UI.Gumps
                 if (e.Button == Input.MouseButtonType.Left)
                 {
                     UIManager.GetGump<GridHightlightProperties>()?.Dispose();
-                    UIManager.Add(new GridHightlightProperties(keyLoc, 100, 100));
+                    UIManager.Add(new GridHightlightProperties(World, keyLoc, 100, 100));
                 }
             };
 
             ModernColorPicker.HueDisplay hueDisplay;
-            area.Add(hueDisplay = new ModernColorPicker.HueDisplay(data.Hue, null, true) { X = 150, Y = y });
+            area.Add(hueDisplay = new ModernColorPicker.HueDisplay(World, data.Hue, null, true) { X = 150, Y = y });
             hueDisplay.SetTooltip("Select grid highlight hue");
             hueDisplay.HueChanged += (s, e) =>
             {
@@ -151,7 +157,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     data.Delete();
                     Dispose();
-                    UIManager.Add(new GridHightlightMenu(X, Y));
+                    UIManager.Add(new GridHightlightMenu(World, X, Y));
                 }
             };
 
@@ -160,10 +166,10 @@ namespace ClassicUO.Game.UI.Gumps
             return area;
         }
 
-        public static void Open()
+        public static void Open(World world)
         {
             UIManager.GetGump<GridHightlightMenu>()?.Dispose();
-            UIManager.Add(new GridHightlightMenu());
+            UIManager.Add(new GridHightlightMenu(world));
         }
         public static GridHighlightData[] GetAllGridHighlightData()
         {
@@ -178,83 +184,29 @@ namespace ClassicUO.Game.UI.Gumps
         public static void ExportGridHightlightSettings()
         {
             GridHighlightData[] allData = GetAllGridHighlightData();
-
-            if (!CUOEnviroment.IsUnix)
-            {
-                Thread t = new Thread(() =>
-                {
-                    System.Windows.Forms.SaveFileDialog saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-                    saveFileDialog1.Filter = "Json|*.json";
-                    saveFileDialog1.Title = "Save grid highlight settings";
-                    saveFileDialog1.ShowDialog();
-
-                    string result = JsonSerializer.Serialize(allData);
-
-                    // If the file name is not an empty string open it for saving.
-                    if (saveFileDialog1.FileName != "")
-                    {
-                        System.IO.FileStream fs =
-                            (System.IO.FileStream)saveFileDialog1.OpenFile();
-                        // NOTE that the FilterIndex property is one-based.
-                        switch (saveFileDialog1.FilterIndex)
-                        {
-                            default:
-                                byte[] data = Encoding.UTF8.GetBytes(result);
-                                fs.Write(data, 0, data.Length);
-                                break;
-                        }
-
-                        fs.Close();
-                    }
-                });
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();
-            }
+            string result = JsonSerializer.Serialize(allData, GridHighlightJsonContext.Default.GridHighlightDataArray);
+            string path = Path.Combine(CUOEnviroment.ExecutablePath, "Grid Highlighting.json");
+            File.WriteAllText(path, result);
         }
 
-        public static void ImportGridHighlightSettings()
+        public static void ImportGridHighlightSettings(World world)
         {
-            if (!CUOEnviroment.IsUnix)
+            UIManager.Add(new InputRequest(world, "Input the path to your json highlighting file.", "Import", "Cancel", (r, p) =>
             {
-                Thread t = new Thread(() =>
+                if (r == InputRequest.Result.BUTTON2) return;
+
+                if (File.Exists(p))
                 {
-                    System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
-                    openFileDialog.Filter = "Json|*.json";
-                    openFileDialog.Title = "Import grid highlight settings";
-                    openFileDialog.ShowDialog();
+                    string data = File.ReadAllText(p);
+                    GridHighlightData[] imported = JsonSerializer.Deserialize(data, GridHighlightJsonContext.Default.GridHighlightDataArray);
 
-                    // If the file name is not an empty string open it for saving.
-                    if (openFileDialog.FileName != "")
-                    {
-                        // NOTE that the FilterIndex property is one-based.
-                        switch (openFileDialog.FilterIndex)
-                        {
-                            default:
-                                try
-                                {
-                                    string result = File.ReadAllText(openFileDialog.FileName);
+                    foreach (GridHighlightData importedData in imported)
+                        importedData.Save();
 
-                                    GridHighlightData[] imported = JsonSerializer.Deserialize<GridHighlightData[]>(result);
-
-                                    foreach (GridHighlightData importedData in imported)
-                                        importedData.Save();
-
-                                    UIManager.GetGump<GridHightlightMenu>()?.Dispose();
-                                    UIManager.Add(new GridHightlightMenu());
-
-                                }
-                                catch (System.Exception e)
-                                {
-                                    GameActions.Print("It looks like there was an error trying to import your grid highlight settings.", 32);
-                                    Console.WriteLine(e.ToString());
-                                }
-                                break;
-                        }
-                    }
-                });
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();
-            }
+                    UIManager.GetGump<GridHightlightMenu>()?.Dispose();
+                    UIManager.Add(new GridHightlightMenu(world));
+                }
+            }));
         }
 
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)
@@ -428,7 +380,7 @@ namespace ClassicUO.Game.UI.Gumps
             GridHighlightData data;
             private readonly int keyLoc;
 
-            public GridHightlightProperties(int keyLoc, int x, int y) : base(0, 0)
+            public GridHightlightProperties(World world, int keyLoc, int x, int y) : base(world, 0, 0)
             {
                 data = GridHighlightData.GetGridHighlightData(keyLoc);
                 X = x;
@@ -531,7 +483,7 @@ namespace ClassicUO.Game.UI.Gumps
                         data.Properties.RemoveAt(subKeyLoc);
                         data.PropMinVal.RemoveAt(subKeyLoc);
                         data.Save();
-                        UIManager.Add(new GridHightlightProperties(keyLoc, X, Y));
+                        UIManager.Add(new GridHightlightProperties(World, keyLoc, X, Y));
                     }
                 };
             }

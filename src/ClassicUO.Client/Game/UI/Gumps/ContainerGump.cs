@@ -114,7 +114,7 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        public ContainerGump(uint serial, ushort gumpid, bool playsound, bool showGridToggle) : this(serial, gumpid, playsound)
+        public ContainerGump(World world, uint serial, ushort gumpid, bool playsound, bool showGridToggle) : this(world, serial, gumpid, playsound)
         {
             this.showGridToggle = showGridToggle;
         }
@@ -217,7 +217,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         UIManager.GetGump<GridContainer>(LocalSerial)?.Dispose();
                         GridContainer c;
-                        UIManager.Add(c = new GridContainer(LocalSerial, Graphic, true));
+                        UIManager.Add(c = new GridContainer(World, LocalSerial, Graphic, true));
                         Dispose();
                     }
                 };

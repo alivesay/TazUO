@@ -1058,19 +1058,19 @@ namespace ClassicUO.Game.Managers
                     break;
                 case MacroType.ToggleDurabilityGump:
                     if (!GameActions.CloseDurabilityGump())
-                        GameActions.OpenDurabilityGump();
+                        GameActions.OpenDurabilityGump(_world);
 
                     break;
 
                 case MacroType.ToggleNearbyLootGump:
                     if (!GameActions.CloseNearbyLootGump())
-                        GameActions.OpenNearbyLootGump();
+                        GameActions.OpenNearbyLootGump(_world);
 
                     break;
 
                 case MacroType.ToggleLegionScripting:
                     if (!GameActions.CloseLegionScriptingGump())
-                        GameActions.OpenLegionScriptingGump();
+                        GameActions.OpenLegionScriptingGump(_world);
 
                     break;
 
@@ -1606,7 +1606,7 @@ namespace ClassicUO.Game.Managers
                         }
                         else
                         {
-                            UIManager.Add(new ImprovedBuffGump());
+                            UIManager.Add(new ImprovedBuffGump(_world));
                         }
                     }
                     else
@@ -1998,7 +1998,7 @@ namespace ClassicUO.Game.Managers
                     break;
 
                 case MacroType.ShowNearbyItems:
-                    UIManager.Add(new NearbyItems());
+                    UIManager.Add(new NearbyItems(_world));
                     break;
             }
 

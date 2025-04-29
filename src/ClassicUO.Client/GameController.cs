@@ -892,7 +892,7 @@ namespace ClassicUO
                         Gump g = UIManager.GetGump<ModernOptionsGump>();
                         if (g == null)
                         {
-                            UIManager.Add(new ModernOptionsGump());
+                            UIManager.Add(new ModernOptionsGump(UIManager.World));
                         }
                         else
                         {

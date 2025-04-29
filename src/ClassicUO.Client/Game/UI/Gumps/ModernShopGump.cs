@@ -31,7 +31,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         private int itemY = 0;
 
-        public ModernShopGump(uint serial, bool isPurchaseGump) : base(serial, 0)
+        public ModernShopGump(World world, uint serial, bool isPurchaseGump) : base(world, serial, 0)
         {
             #region VARS
             Width = WIDTH;
@@ -149,6 +149,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         public void AddItem
             (
+                World world,
                 uint serial,
                 ushort graphic,
                 ushort hue,
@@ -160,7 +161,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             if (IsDisposed)
                 return;
-            ShopItem _ = new ShopItem(serial, graphic, hue, amount, price, name, scrollArea.Width - scrollArea.ScrollBarWidth(), 50, isPurchaseGump, LocalSerial);
+            ShopItem _ = new ShopItem(world, serial, graphic, hue, amount, price, name, scrollArea.Width - scrollArea.ScrollBarWidth(), 50, isPurchaseGump, LocalSerial);
             _.Y = itemY;
             scrollArea.Add(_);
             shopItems.Add(_);
@@ -192,15 +193,17 @@ namespace ClassicUO.Game.UI.Gumps
 
         private class ShopItem : Control
         {
-            AlphaBlendControl backgound;
-            Area itemInfo, purchaseSell;
-            BuySellButton buySellButton;
+            private AlphaBlendControl backgound;
+            private Area itemInfo, purchaseSell;
+            private BuySellButton buySellButton;
             private readonly bool isPurchase;
             private readonly uint gumpSerial;
-            TextBox textBoxName;
+            private TextBox textBoxName;
+            private World world;
 
-            public ShopItem(uint serial, ushort graphic, ushort hue, int count, uint price, string name, int width, int height, bool isPurchase, uint gumpSerial)
+            public ShopItem(World world, uint serial, ushort graphic, ushort hue, int count, uint price, string name, int width, int height, bool isPurchase, uint gumpSerial)
             {
+                this.world = world;
                 Serial = serial;
                 Graphic = graphic;
                 Hue = hue;
@@ -364,11 +367,11 @@ namespace ClassicUO.Game.UI.Gumps
                     }
 
                     byte group = GetAnimGroup(graphic);
-                    var frames = Client.Game.Animations.GetAnimationFrames(graphic, group, 1, out var hue2, out _, true);
+                    var frames = Client.Game.UO.Animations.GetAnimationFrames(graphic, group, 1, out var hue2, out _, true);
 
                     if (frames.Length != 0)
                     {
-                        hueVector = ShaderHueTranslator.GetHueVector(hue2, TileDataLoader.Instance.StaticData[Graphic].IsPartialHue, 1f);
+                        hueVector = ShaderHueTranslator.GetHueVector(hue2, Client.Game.UO.FileManager.TileData.StaticData[Graphic].IsPartialHue, 1f);
 
                         ref var spriteInfo = ref frames[0];
 
@@ -392,11 +395,11 @@ namespace ClassicUO.Game.UI.Gumps
                 }
                 else
                 {
-                    ref readonly var texture = ref Client.Game.Arts.GetArt((uint)Graphic);
+                    ref readonly var texture = ref Client.Game.UO.Arts.GetArt((uint)Graphic);
 
-                    hueVector = ShaderHueTranslator.GetHueVector(Hue, TileDataLoader.Instance.StaticData[Graphic].IsPartialHue, 1f);
+                    hueVector = ShaderHueTranslator.GetHueVector(Hue, Client.Game.UO.FileManager.TileData.StaticData[Graphic].IsPartialHue, 1f);
 
-                    var rect = Client.Game.Arts.GetRealArtBounds(Graphic);
+                    var rect = Client.Game.UO.Arts.GetRealArtBounds(Graphic);
 
                     Point originalSize = new Point(Height, Height);
                     Point point = new Point();
@@ -439,8 +442,8 @@ namespace ClassicUO.Game.UI.Gumps
 
             private static byte GetAnimGroup(ushort graphic)
             {
-                var groupType = Client.Game.Animations.GetAnimType(graphic);
-                switch (AnimationsLoader.Instance.GetGroupIndex(graphic, groupType))
+                var groupType = Client.Game.UO.Animations.GetAnimType(graphic);
+                switch (Client.Game.UO.FileManager.Animations.GetGroupIndex(graphic, groupType))
                 {
                     case AnimationGroups.Low:
                         return (byte)LowAnimationGroup.Stand;
@@ -459,7 +462,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (Name.ToLower().Contains(text))
                     return true;
-                if (World.OPL.TryGetNameAndData(Serial, out string name, out string data))
+                if (world.OPL.TryGetNameAndData(Serial, out string name, out string data))
                 {
                     if (data.ToLower().Contains(text))
                         return true;

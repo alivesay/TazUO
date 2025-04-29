@@ -74,7 +74,7 @@ namespace ClassicUO.Game.Managers
 
             if (textType == TextType.OBJECT)
             {
-                if (currentProfile.ForceTooltipsOnOldClients && ForcedTooltipManager.IsObjectTextRequested(parent, text, hue))
+                if (currentProfile.ForceTooltipsOnOldClients && ForcedTooltipManager.IsObjectTextRequested(_world, parent, text, hue))
                     return;
             }
 

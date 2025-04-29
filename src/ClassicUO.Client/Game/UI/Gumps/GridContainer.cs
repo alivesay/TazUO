@@ -88,8 +88,6 @@ namespace ClassicUO.Game.UI.Gumps
 
         private GridScrollArea scrollArea;
         private GridSlotManager gridSlotManager;
-
-        private World world;
         #endregion
 
         #region private tooltip vars
@@ -127,8 +125,6 @@ namespace ClassicUO.Game.UI.Gumps
                 Dispose();
                 return;
             }
-
-            this.world = world;
 
             #region SET VARS
             isCorpse = container.IsCorpse || container.Graphic == 0x0009;
@@ -337,7 +333,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             control.Add(new ContextMenuItemEntry("Open Grid highlight settings", () =>
             {
-                GridHightlightMenu.Open();
+                GridHightlightMenu.Open(World);
             }));
             return control;
         }
@@ -397,8 +393,8 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (Client.Game.UO.GameCursor.ItemHold.Enabled)
                     GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, 0xFFFF, 0xFFFF, 0, LocalSerial);
-                else if (world.TargetManager.IsTargeting && !ProfileManager.CurrentProfile.DisableTargetingGridContainers)
-                    world.TargetManager.Target(LocalSerial);
+                else if (World.TargetManager.IsTargeting && !ProfileManager.CurrentProfile.DisableTargetingGridContainers)
+                    World.TargetManager.Target(LocalSerial);
             }
             else if (e.Button == MouseButtonType.Right)
             {
@@ -447,12 +443,12 @@ namespace ClassicUO.Game.UI.Gumps
                 }
             }
 
-            world.ContainerManager.CalculateContainerPosition(serial, graphic);
+            World.ContainerManager.CalculateContainerPosition(serial, graphic);
 
-            var container = new ContainerGump(this.container.Serial, graphic, true, true)
+            var container = new ContainerGump(World, this.container.Serial, graphic, true, true)
             {
-                X = world.ContainerManager.X,
-                Y = world.ContainerManager.Y,
+                X = World.ContainerManager.X,
+                Y = World.ContainerManager.Y,
                 InvalidateContents = true
             };
 
@@ -822,7 +818,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             public void AddText(string text, ushort hue)
             {
-                var timedText = new SimpleTimedTextGump(text, (uint)hue, TimeSpan.FromSeconds(2), 200)
+                var timedText = new SimpleTimedTextGump(world, text, (uint)hue, TimeSpan.FromSeconds(2), 200)
                 {
                     X = ScreenCoordinateX,
                     Y = ScreenCoordinateY
@@ -845,7 +841,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (_item == null) return;
 
-                ItemPropertiesData itemData = new ItemPropertiesData(_item);
+                ItemPropertiesData itemData = new ItemPropertiesData(world, _item);
 
                 if (!itemData.HasData) return;
 
@@ -984,7 +980,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         if (!MultiItemMoveGump.MoveItems.Contains(_item))
                             MultiItemMoveGump.MoveItems.Enqueue(_item);
-                        MultiItemMoveGump.AddMultiItemMoveGumpToUI(gridContainer.X - 200, gridContainer.Y);
+                        MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, gridContainer.X - 200, gridContainer.Y);
                         SelectHighlight = true;
                         Mouse.CancelDoubleClick = true;
                     }
@@ -1071,7 +1067,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (!MultiItemMoveGump.MoveItems.Contains(_item))
                         MultiItemMoveGump.MoveItems.Enqueue(_item);
-                    MultiItemMoveGump.AddMultiItemMoveGumpToUI(gridContainer.X - 200, gridContainer.Y);
+                    MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, gridContainer.X - 200, gridContainer.Y);
                     SelectHighlight = true;
                 }
 
@@ -1102,7 +1098,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         if (!MultiItemMoveGump.MoveItems.Contains(_item))
                             MultiItemMoveGump.MoveItems.Enqueue(_item);
-                        MultiItemMoveGump.AddMultiItemMoveGumpToUI(gridContainer.X - 200, gridContainer.Y);
+                        MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, gridContainer.X - 200, gridContainer.Y);
                         SelectHighlight = true;
                     }
 
@@ -1124,15 +1120,15 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         hit.ClearTooltip();
                         List<CustomToolTip> toolTipList = new List<CustomToolTip>();
-                        toolTipThis = new CustomToolTip(_item, Mouse.Position.X + 5, Mouse.Position.Y + 5, hit, compareTo: compItem);
+                        toolTipThis = new CustomToolTip(world, _item, Mouse.Position.X + 5, Mouse.Position.Y + 5, hit, compareTo: compItem);
                         toolTipList.Add(toolTipThis);
-                        toolTipitem1 = new CustomToolTip(compItem, toolTipThis.X + toolTipThis.Width + 10, toolTipThis.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
+                        toolTipitem1 = new CustomToolTip(world, compItem, toolTipThis.X + toolTipThis.Width + 10, toolTipThis.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
                         toolTipList.Add(toolTipitem1);
 
                         if (CUOEnviroment.Debug)
                         {
-                            ItemPropertiesData i1 = new ItemPropertiesData(_item);
-                            ItemPropertiesData i2 = new ItemPropertiesData(compItem);
+                            ItemPropertiesData i1 = new ItemPropertiesData(world, _item);
+                            ItemPropertiesData i2 = new ItemPropertiesData(world, compItem);
 
                             if (i1.GenerateComparisonTooltip(i2, out string compileToolTip))
                                 GameActions.Print(world,compileToolTip);
@@ -1143,7 +1139,7 @@ namespace ClassicUO.Game.UI.Gumps
                             Item compItem2 = world.Player.FindItemByLayer(Layer.TwoHanded);
                             if (compItem2 != null)
                             {
-                                toolTipitem2 = new CustomToolTip(compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
+                                toolTipitem2 = new CustomToolTip(world, compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
                                 //UIManager.Add(toolTipitem2);
                                 toolTipList.Add(toolTipitem2);
                             }
@@ -1153,13 +1149,13 @@ namespace ClassicUO.Game.UI.Gumps
                             Item compItem2 = world.Player.FindItemByLayer(Layer.OneHanded);
                             if (compItem2 != null)
                             {
-                                toolTipitem2 = new CustomToolTip(compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
+                                toolTipitem2 = new CustomToolTip(world, compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
                                 //UIManager.Add(toolTipitem2);
                                 toolTipList.Add(toolTipitem2);
                             }
                         }
 
-                        MultipleToolTipGump multipleToolTipGump = new MultipleToolTipGump(Mouse.Position.X + 10, Mouse.Position.Y + 10, toolTipList.ToArray(), hit);
+                        MultipleToolTipGump multipleToolTipGump = new MultipleToolTipGump(world, Mouse.Position.X + 10, Mouse.Position.Y + 10, toolTipList.ToArray(), hit);
                         UIManager.Add(multipleToolTipGump);
                     }
                 }

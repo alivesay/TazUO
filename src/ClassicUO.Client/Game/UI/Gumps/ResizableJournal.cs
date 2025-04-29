@@ -115,7 +115,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (e.Button == MouseButtonType.Left)
                 {
-                    UIManager.Add(new InputRequest("Enter a tab name", "Save", "Cancel", (r, entry) =>
+                    UIManager.Add(new InputRequest(World, "Enter a tab name", "Save", "Cancel", (r, entry) =>
                     {
                         if (r == InputRequest.Result.BUTTON1 && !string.IsNullOrEmpty(entry))
                         {
@@ -211,7 +211,7 @@ namespace ClassicUO.Game.UI.Gumps
                     break;
                 case BorderStyle.Style8:
                     {
-                        if (Client.Game.Gumps.GetGump(40303).Texture != null)
+                        if (Client.Game.UO.Gumps.GetGump(40303).Texture != null)
                             graphic = 40303;
                         else
                             graphic = 83;
@@ -388,7 +388,7 @@ namespace ClassicUO.Game.UI.Gumps
                 ButtonParameter = _tab.Count,
                 IsSelectable = true,
                 CanCloseWithRightClick = false,
-                ContextMenu = new TabContextEntry(Name)
+                ContextMenu = new TabContextEntry(this, Name)
             });
 
             nb.MouseUp += (sender, e) =>
@@ -406,7 +406,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             if (journalEntry == null)
                 return;
-            if (!string.IsNullOrEmpty(journalEntry.Name) && IgnoreManager.IgnoredCharsList.Contains(journalEntry.Name))
+            if (!string.IsNullOrEmpty(journalEntry.Name) && World.IgnoreManager.IgnoredCharsList.Contains(journalEntry.Name))
                 return;
             _journalArea.AddEntry($"{journalEntry.Name}: {journalEntry.Text}", journalEntry.Hue, journalEntry.Time, journalEntry.TextType, journalEntry.MessageType);
         }
@@ -659,13 +659,13 @@ namespace ClassicUO.Game.UI.Gumps
 
         private class TabContextEntry : ContextMenuControl
         {
-            public TabContextEntry(string name)
+            public TabContextEntry(Gump gump, string name) : base(gump)
             {
                 if (ProfileManager.CurrentProfile.JournalTabs.ContainsKey(name))
                 {
                     MessageType[] selectedTypes = ProfileManager.CurrentProfile.JournalTabs[name];
 
-                    foreach (MessageType item in Enum.GetValues(typeof(MessageType)))
+                    foreach (MessageType item in Enum.GetValues<MessageType>())
                     {
                         string entryName = string.Empty;
                         switch (item)
@@ -746,7 +746,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 Add("X Delete Tab", () =>
                 {
-                    UIManager.Add(new QuestionGump($"Delete [{name}] tab?", (yes) =>
+                    UIManager.Add(new QuestionGump(gump.World, $"Delete [{name}] tab?", (yes) =>
                     {
                         if (yes)
                         {

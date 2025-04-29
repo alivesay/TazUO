@@ -15,12 +15,13 @@ namespace ClassicUO.Game.UI.Gumps
         public const int SIZE = 75;
         public static NearbyItems NearbyItemGump;
 
-        private int playerX = World.Player.X;
-        private int playerY = World.Player.Y;
+        private int playerX, playerY;
 
         private long openedTicks = Time.Ticks;
-        public NearbyItems() : base(0, 0)
+        public NearbyItems(World world) : base(world, 0, 0)
         {
+            playerX = world.Player.X;
+            playerY = world.Player.Y;
             NearbyItemGump?.Dispose();
             NearbyItemGump = this;
             CanCloseWithRightClick = true;
@@ -56,7 +57,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if(!i.IsLootable) continue;
 
-                items.Add(new NearbyItemDisplay(i));
+                items.Add(new NearbyItemDisplay(World, i));
             }
 
             if (items.Count == 0)
@@ -108,15 +109,15 @@ namespace ClassicUO.Game.UI.Gumps
         private readonly AlphaBlendControl background;
 
 
-        public NearbyItemDisplay(Item item)
+        public NearbyItemDisplay(World world, Item item)
         {
             Width = NearbyItems.SIZE;
             Height = NearbyItems.SIZE;
             background = new AlphaBlendControl() { Width = Width, Height = Height };
             originalSize = new Point(Width, Height);
             hueVector = ShaderHueTranslator.GetHueVector(item.Hue, item.ItemData.IsPartialHue, 1f);
-            realArtRectBounds = Client.Game.Arts.GetRealArtBounds((uint)item.DisplayedGraphic);
-            itemSpriteInfo = Client.Game.Arts.GetArt((uint)(item.DisplayedGraphic));
+            realArtRectBounds = Client.Game.UO.Arts.GetRealArtBounds((uint)item.DisplayedGraphic);
+            itemSpriteInfo = Client.Game.UO.Arts.GetArt((uint)(item.DisplayedGraphic));
 
             HitBox loot = new HitBox(0, 0, Width, Height / 2);
             loot.Add(TextBox.GetOne("Loot", TrueTypeLoader.EMBEDDED_FONT, 16, Color.White, TextBox.RTLOptions.DefaultCentered(Width)));
@@ -124,7 +125,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if(e.Button != MouseButtonType.Left) return;
 
-                GameActions.GrabItem(item, item.Amount);
+                GameActions.GrabItem(world, item, item.Amount);
                 Dispose();
             };
             Add(loot);
@@ -136,7 +137,7 @@ namespace ClassicUO.Game.UI.Gumps
             use.MouseDown += (s, e) =>
             {
                 if (e.Button != MouseButtonType.Left) return;
-                GameActions.DoubleClick(item);
+                GameActions.DoubleClick(world, item);
             };
             Add(use);
 

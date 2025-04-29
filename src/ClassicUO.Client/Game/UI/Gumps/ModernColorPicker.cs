@@ -42,7 +42,7 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        public ModernColorPicker(Action<ushort> hueChanged, uint serial = 0) : base(0, 0)
+        public ModernColorPicker(World world, Action<ushort> hueChanged, uint serial = 0) : base(world, 0, 0)
         {
             CanCloseWithRightClick = true;
             CanMove = true;
@@ -93,7 +93,7 @@ namespace ClassicUO.Game.UI.Gumps
                 for (int row = 1; row < ROWS + 1; row++)
                 {
                     int _ = row + ((col - 1) * ROWS);
-                    area.Add(new HueDisplay((ushort)(_ + (page * (ROWS * COLUMNS)) - 1), hueChanged, sendSysMessage: serial == 8787 ? true : false) { X = (col - 1) * 18, Y = (row - 1) * 18 });
+                    area.Add(new HueDisplay(World, (ushort)(_ + (page * (ROWS * COLUMNS)) - 1), hueChanged, sendSysMessage: serial == 8787 ? true : false) { X = (col - 1) * 18, Y = (row - 1) * 18 });
                 }
             }
         }
@@ -111,6 +111,7 @@ namespace ClassicUO.Game.UI.Gumps
             private bool flash = false;
             private float flashAlpha = 1f;
             private bool rev = false;
+            private World world;
 
             public ushort Hue
             {
@@ -129,12 +130,13 @@ namespace ClassicUO.Game.UI.Gumps
 
             public event EventHandler HueChanged;
 
-            public HueDisplay(ushort hue, Action<ushort> hueChanged, bool isClickable = false, bool sendSysMessage = false)
+            public HueDisplay(World world, ushort hue, Action<ushort> hueChanged, bool isClickable = false, bool sendSysMessage = false)
             {
+                this.world = world;
                 hueVector = ShaderHueTranslator.GetHueVector(hue, true, 1);
-                ref readonly var staticArt = ref Client.Game.Arts.GetArt(0x0FAB);
+                ref readonly var staticArt = ref Client.Game.UO.Arts.GetArt(0x0FAB);
                 texture = staticArt.Texture;
-                rect = Client.Game.Arts.GetRealArtBounds(0x0FAB);
+                rect = Client.Game.UO.Arts.GetRealArtBounds(0x0FAB);
                 Width = 18;
                 Height = 18;
                 this.bounds = staticArt.UV;
@@ -160,7 +162,7 @@ namespace ClassicUO.Game.UI.Gumps
                     if (isClickable)
                     {
                         UIManager.GetGump<ModernColorPicker>()?.Dispose();
-                        UIManager.Add(new ModernColorPicker(s => Hue = s) { X = 100, Y = 100 });
+                        UIManager.Add(new ModernColorPicker(world, s => Hue = s) { X = 100, Y = 100 });
                     }
                     else
                     {
@@ -168,7 +170,7 @@ namespace ClassicUO.Game.UI.Gumps
                         flash = true;
                     }
                     if (sendSysMessage)
-                        GameActions.Print($"Selected hue: {hue}");
+                        GameActions.Print(world, $"Selected hue: {hue}");
                 }
             }
 

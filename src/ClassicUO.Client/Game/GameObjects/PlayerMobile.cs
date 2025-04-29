@@ -36,11 +36,11 @@ namespace ClassicUO.Game.GameObjects
             {
                 if (ProfileManager.CurrentProfile.DisplaySkillBarOnChange)
                 {
-                    SkillProgressBar.QueManager.AddSkill(e.Index);
+                    SkillProgressBar.QueManager.AddSkill(world, e.Index);
                 }
             };
 
-            UIManager.Add(castTimer = new SpellVisualRangeManager.CastTimerProgressBar());
+            UIManager.Add(castTimer = new SpellVisualRangeManager.CastTimerProgressBar(world));
         }
 
         public Skill[] Skills { get; }

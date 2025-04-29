@@ -1,9 +1,15 @@
 ﻿using System.IO;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ClassicUO.Configuration
 {
+    using System.Text.Json.Serialization;
+
+    [JsonSerializable(typeof(Language))]
+    internal partial class LanguageJsonContext : JsonSerializerContext
+    {
+    }
+
     public class Language
     {
         public ModernOptionsGumpLanguage GetModernOptionsGumpLanguage { get; set; } = new ModernOptionsGumpLanguage();
@@ -24,7 +30,7 @@ namespace ClassicUO.Configuration
         {
             if (File.Exists(languageFilePath))
             {
-                Language f = JsonSerializer.Deserialize<Language>(File.ReadAllText(languageFilePath));
+                Language f = JsonSerializer.Deserialize(File.ReadAllText(languageFilePath), LanguageJsonContext.Default.Language);
                 Instance = f;
                 Save(); //To update language file with new additions as needed
             }
@@ -38,13 +44,13 @@ namespace ClassicUO.Configuration
         {
             Directory.CreateDirectory(Path.Combine(CUOEnviroment.ExecutablePath, "Data"));
 
-            string defaultLanguage = JsonSerializer.Serialize<Language>(Instance, new JsonSerializerOptions() { WriteIndented = true });
+            string defaultLanguage = JsonSerializer.Serialize(Instance, LanguageJsonContext.Default.Language);
             File.WriteAllText(languageFilePath, defaultLanguage);
         }
 
         private static void Save()
         {
-            string language = JsonSerializer.Serialize<Language>(Instance, new JsonSerializerOptions() { WriteIndented = true });
+            string language = JsonSerializer.Serialize(Instance, LanguageJsonContext.Default.Language);
             File.WriteAllText(languageFilePath, language);
         }
 

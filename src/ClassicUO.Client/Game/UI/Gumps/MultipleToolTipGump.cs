@@ -13,7 +13,7 @@ namespace ClassicUO.Game.UI.Gumps
         public static int SSX, SSY;
         public static int SSWidth, SSHeight;
 
-        public MultipleToolTipGump(int x, int y, CustomToolTip[] toolTips, Controls.Control hoverReference) : base(0, 0)
+        public MultipleToolTipGump(World world, int x, int y, CustomToolTip[] toolTips, Controls.Control hoverReference) : base(world, 0, 0)
         {
             this.toolTips = toolTips;
             this.hoverReference = hoverReference;

@@ -28,7 +28,7 @@ namespace ClassicUO.LegionScripting
         public override GumpType GumpType => GumpType.ScriptManager;
         public static bool RefreshContent = false;
         public const string NOGROUPTEXT = "No group";
-        public ScriptManagerGump() : base(lastWidth, lastHeight, 300, 200, 0, 0)
+        public ScriptManagerGump(World world) : base(world, lastWidth, lastHeight, 300, 200, 0, 0)
         {
             X = lastX;
             Y = lastY;
@@ -55,7 +55,7 @@ namespace ClassicUO.LegionScripting
                 if (e.Button != MouseButtonType.Left) return;
 
                 Dispose();
-                ScriptManagerGump g = new ScriptManagerGump() { X = X, Y = Y };
+                ScriptManagerGump g = new ScriptManagerGump(world) { X = X, Y = Y };
                 g.ResizeWindow(new Point(Width, Height));
                 UIManager.Add(g);
             };
@@ -101,7 +101,7 @@ namespace ClassicUO.LegionScripting
 
             foreach (var group in groupsMap)
             {
-                var g = new GroupControl(group.Key == "" ? NOGROUPTEXT : group.Key, Width - scrollArea.ScrollBarWidth() - 2 - GROUPINDENT) { Y = y };
+                var g = new GroupControl(World, this, group.Key == "" ? NOGROUPTEXT : group.Key, Width - scrollArea.ScrollBarWidth() - 2 - GROUPINDENT) { Y = y };
                 g.GroupExpandedShrunk += GroupExpandedShrunk;
                 g.AddGroups(group.Value);
 
@@ -230,8 +230,13 @@ while True:
                     return dataBox.IsVisible ? "-" : "+";
                 }
             }
-            public GroupControl(string group, int width, string parentGroup = "")
+
+            private World World;
+            private Gump parentGump;
+            public GroupControl(World world, Gump parentGump, string group, int width, string parentGroup = "")
             {
+                this.parentGump = parentGump;
+                World = world;
                 CanMove = true;
                 Width = width;
                 Height = HEIGHT;
@@ -253,16 +258,16 @@ while True:
                 label.Y = (HEIGHT - label.Height) / 2;
 
                 options = new NiceButton(label.X + label.Width, 0, 25, HEIGHT, ButtonAction.Default, "*") { IsSelectable = false };
-                options.ContextMenu = new ContextMenuControl();
+                options.ContextMenu = new ContextMenuControl(parentGump);
                 options.ContextMenu.Add(new ContextMenuItemEntry("New script", () =>
                 {
-                    InputRequest r = new InputRequest("Enter a name for this script. \nUse /c[#da6e22].lscript/cd or /c[#da6e22].py", "Create", "Cancel", (r, s) =>
+                    InputRequest r = new InputRequest(world, "Enter a name for this script. \nUse /c[#da6e22].lscript/cd or /c[#da6e22].py", "Create", "Cancel", (r, s) =>
                     {
                         if (r == InputRequest.Result.BUTTON1 && !string.IsNullOrEmpty(s))
                         {
                             if (!s.EndsWith(".lscript") && !s.EndsWith(".py"))
                             {
-                                GameActions.Print("Script files must end with .lscript or .py", 32);
+                                GameActions.Print(world, "Script files must end with .lscript or .py", 32);
                                 return;
                             }
                             try
@@ -276,7 +281,7 @@ while True:
                                     ScriptManagerGump.RefreshContent = true;
                                 }
                             }
-                            catch (Exception e) { GameActions.Print(e.ToString(), 32); }
+                            catch (Exception e) { GameActions.Print(world, e.ToString(), 32); }
                         }
                     });
                     r.CenterXInScreen();
@@ -287,7 +292,7 @@ while True:
                 if (string.IsNullOrEmpty(parentGroup))
                     options.ContextMenu.Add(new ContextMenuItemEntry("New group", () =>
                     {
-                        InputRequest r = new InputRequest("Enter a name for this group.", "Create", "Cancel", (r, s) =>
+                        InputRequest r = new InputRequest(world, "Enter a name for this group.", "Create", "Cancel", (r, s) =>
                         {
                             if (r == InputRequest.Result.BUTTON1 && !string.IsNullOrEmpty(s))
                             {
@@ -317,7 +322,7 @@ while True:
                 if (group != NOGROUPTEXT && group != "")
                     options.ContextMenu.Add(new ContextMenuItemEntry("Delete group", () =>
                     {
-                        QuestionGump g = new QuestionGump("Delete group?", (r) =>
+                        QuestionGump g = new QuestionGump(world, "Delete group?", (r) =>
                         {
                             if (r)
                             {
@@ -381,7 +386,7 @@ while True:
             public void AddItems(List<ScriptFile> files)
             {
                 foreach (ScriptFile file in files)
-                    dataBox.Add(new ScriptControl(dataBox.Width, file));
+                    dataBox.Add(new ScriptControl(parentGump, dataBox.Width, file));
 
                 dataBox.ReArrangeChildren(V_SPACING);
                 dataBox.ForceSizeUpdate();
@@ -394,7 +399,7 @@ while True:
                 {
                     if (!string.IsNullOrEmpty(obj.Key))
                     {
-                        GroupControl subG = new GroupControl(obj.Key, Width - GROUPINDENT, group) { X = GROUPINDENT };
+                        GroupControl subG = new GroupControl(World, parentGump, obj.Key, Width - GROUPINDENT, group) { X = GROUPINDENT };
                         subG.AddItems(obj.Value);
                         subG.GroupExpandedShrunk += SubG_GroupExpandedShrunk;
                         dataBox.Add(subG);
@@ -456,9 +461,13 @@ while True:
                     return "Play";
                 }
             }
+            private World World;
+            private Gump parentGump;
 
-            public ScriptControl(int w, ScriptFile script)
+            public ScriptControl(Gump parentGump, int w, ScriptFile script)
             {
+                this.parentGump = parentGump;
+                World = parentGump.World;
                 Width = w;
                 Height = 25;
                 Script = script;
@@ -485,15 +494,15 @@ while True:
                 UpdateSize(w);
                 SetBGColors();
 
-                ContextMenu = new ContextMenuControl();
+                ContextMenu = new ContextMenuControl(parentGump);
 
                 ContextMenu.Add(new ContextMenuItemEntry(Script.FileName) { IsSelected = true });
-                ContextMenu.Add(new ContextMenuItemEntry("Edit", () => { UIManager.Add(new ScriptEditor(Script)); }));
+                ContextMenu.Add(new ContextMenuItemEntry("Edit", () => { UIManager.Add(new ScriptEditor(World, Script)); }));
                 ContextMenu.Add(new ContextMenuItemEntry("Edit Externally", () => { OpenFileWithDefaultApp(Script.FullPath); }));
                 ContextMenu.Add(new ContextMenuItemEntry("Autostart", () => { GenAutostartContext().Show(); }));
                 ContextMenu.Add(new ContextMenuItemEntry("Delete", () =>
                 {
-                    QuestionGump g = new QuestionGump("Are you sure?", (r) =>
+                    QuestionGump g = new QuestionGump(World, "Are you sure?", (r) =>
                     {
                         if (r)
                         {
@@ -565,7 +574,7 @@ while True:
             }
             private ContextMenuControl GenAutostartContext()
             {
-                ContextMenuControl context = new ContextMenuControl();
+                ContextMenuControl context = new ContextMenuControl(parentGump);
                 bool global = LegionScripting.AutoLoadEnabled(Script, true);
                 bool chara = LegionScripting.AutoLoadEnabled(Script, false);
 

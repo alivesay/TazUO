@@ -16,7 +16,7 @@ namespace ClassicUO.Game.UI.Gumps
     {
         public uint Graphic { get; set; } = 5587;
 
-        public DurabilityGumpMinimized() : base(0, 0)
+        public DurabilityGumpMinimized(World world) : base(world, 0, 0)
         {
             SetTooltip("Open Equipment Durability Tracker");
 
@@ -28,7 +28,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)
         {
-            ref readonly var texture = ref Client.Game.Gumps.GetGump(Graphic);
+            ref readonly var texture = ref Client.Game.UO.Gumps.GetGump(Graphic);
             if (texture.Texture != null)
             {
                 Rectangle rect = new Rectangle(x, y, Width, Height);
@@ -46,7 +46,7 @@ namespace ClassicUO.Game.UI.Gumps
         protected override void OnMouseUp(int x, int y, MouseButtonType button)
         {
             UIManager.GetGump<DurabilitysGump>()?.Dispose();
-            UIManager.Add(new DurabilitysGump());
+            UIManager.Add(new DurabilitysGump(World));
         }
     }
     internal class DurabilitysGump : Gump
@@ -66,7 +66,7 @@ namespace ClassicUO.Game.UI.Gumps
         private DataBox _dataBox;
         public override GumpType GumpType => GumpType.DurabilityGump;
 
-        public DurabilitysGump() : base(0, 0)
+        public DurabilitysGump(World world) : base(world, 0, 0)
         {
 
             LayerOrder = UILayer.Default;
@@ -146,7 +146,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             _dataBox.Clear();
             _dataBox.WantUpdateSize = true;
-            Rectangle barBounds = Client.Game.Gumps.GetGump((uint)DurabilityColors.RED).UV;
+            Rectangle barBounds = Client.Game.UO.Gumps.GetGump((uint)DurabilityColors.RED).UV;
             var startY = 0;
 
             var items = World.DurabilityManager?.Durabilities ?? new List<DurabiltyProp>();
@@ -192,7 +192,7 @@ namespace ClassicUO.Game.UI.Gumps
                     a.Add(new GumpPicTiled(0, red.Y, (int)Math.Floor(barBounds.Width * durability.Percentage), barBounds.Height, (ushort)statusGump));
                 }
 
-                var durWidth = FontsLoader.Instance.GetWidthUnicode(0, $"{durability.Durabilty} / {durability.MaxDurabilty}");
+                var durWidth = Client.Game.UO.FileManager.Fonts.GetWidthUnicode(0, $"{durability.Durabilty} / {durability.MaxDurabilty}");
 
                 a.Add(new Label($"{durability.Durabilty} / {durability.MaxDurabilty}", true, 0xFFFF)
                 {

@@ -10,7 +10,7 @@ namespace ClassicUO.Game.UI.Gumps
     internal class SkillProgressBar : Gump
     {
         private long expireAt = long.MaxValue;
-        public SkillProgressBar(int skillIndex) : base(0, 0)
+        public SkillProgressBar(World world, int skillIndex) : base(world, 0, 0)
         {
             Height = 40;
             Width = 300;
@@ -64,7 +64,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 Add(tb);
 
-                Rectangle barBounds = Client.Game.Gumps.GetGump(0x0805).UV;
+                Rectangle barBounds = Client.Game.UO.Gumps.GetGump(0x0805).UV;
 
                 int widthPercent = (int)(barBounds.Width * (s.Value / s.Cap));
                 if(widthPercent > barBounds.Width)
@@ -90,7 +90,7 @@ namespace ClassicUO.Game.UI.Gumps
         public override void Dispose()
         {
             base.Dispose();
-            QueManager.ShowNext();
+            QueManager.ShowNext(World);
         }
 
         public static class QueManager
@@ -99,19 +99,19 @@ namespace ClassicUO.Game.UI.Gumps
             public static SkillProgressBar CurrentProgressBar;
 
 
-            public static void AddSkill(int skillIndex)
+            public static void AddSkill(World world, int skillIndex)
             {
-                skillProgressBars.Enqueue(new SkillProgressBar(skillIndex));
+                skillProgressBars.Enqueue(new SkillProgressBar(world, skillIndex));
 
                 if (CurrentProgressBar == null || CurrentProgressBar.IsDisposed)
                 {
-                    ShowNext();
+                    ShowNext(world);
                 }
             }
 
-            public static void ShowNext()
+            public static void ShowNext(World world)
             {
-                if (World.InGame)
+                if (world.InGame)
                     if (skillProgressBars.TryDequeue(out var skillProgressBar))
                     {
                         CurrentProgressBar = skillProgressBar;

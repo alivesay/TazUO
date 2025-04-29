@@ -1,11 +1,9 @@
 ﻿using ClassicUO.Assets;
-using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
-using System.Linq;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -34,7 +32,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         private double offset = 0.0;
 
-        public Supporters() : base(0, 0)
+        public Supporters(World world) : base(world, 0, 0)
         {
             Width = WIDTH;
             Height = HEIGHT;

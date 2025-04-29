@@ -42,6 +42,7 @@ namespace ClassicUO.Game.Managers
                     if (e.Text.Contains(ProfileManager.CurrentProfile.Condition_Trigger[i]))
                     {
                         AddCoolDownBar(
+                            World,
                             TimeSpan.FromSeconds(ProfileManager.CurrentProfile.Condition_Duration[i]),
                             ProfileManager.CurrentProfile.Condition_Label[i],
                             ProfileManager.CurrentProfile.Condition_Hue[i],
@@ -53,7 +54,7 @@ namespace ClassicUO.Game.Managers
 
         }
 
-        public static void AddCoolDownBar(TimeSpan _duration, string _name, ushort _hue, bool replace)
+        public static void AddCoolDownBar(World world, TimeSpan _duration, string _name, ushort _hue, bool replace)
         {
             if (replace)
                 for (int i = 0; i < coolDownBars.Length; i++)
@@ -61,7 +62,7 @@ namespace ClassicUO.Game.Managers
                     if (coolDownBars[i] != null && !coolDownBars[i].IsDisposed && coolDownBars[i].textLabel.Text == _name)
                     {
                         coolDownBars[i].Dispose();
-                        coolDownBars[i] = new CoolDownBar(_duration, _name, _hue, CoolDownBar.DEFAULT_X, CoolDownBar.DEFAULT_Y + (i * (CoolDownBar.COOL_DOWN_HEIGHT + 5)));
+                        coolDownBars[i] = new CoolDownBar(world, _duration, _name, _hue, CoolDownBar.DEFAULT_X, CoolDownBar.DEFAULT_Y + (i * (CoolDownBar.COOL_DOWN_HEIGHT + 5)));
                         UIManager.Add(coolDownBars[i]);
                         return;
                     }
@@ -70,7 +71,7 @@ namespace ClassicUO.Game.Managers
             {
                 if (coolDownBars[i] == null || coolDownBars[i].IsDisposed)
                 {
-                    coolDownBars[i] = new CoolDownBar(_duration, _name, _hue, CoolDownBar.DEFAULT_X, CoolDownBar.DEFAULT_Y + (i * (CoolDownBar.COOL_DOWN_HEIGHT + 5)));
+                    coolDownBars[i] = new CoolDownBar(world, _duration, _name, _hue, CoolDownBar.DEFAULT_X, CoolDownBar.DEFAULT_Y + (i * (CoolDownBar.COOL_DOWN_HEIGHT + 5)));
                     UIManager.Add(coolDownBars[i]);
                     return;
                 }

@@ -151,7 +151,7 @@ namespace ClassicUO.Game.UI.Gumps
                 },
                 1
             );
-            supporters.MouseUp += (s, e) => { UIManager.Add(new Supporters()); };
+            supporters.MouseUp += (s, e) => { UIManager.Add(new Supporters(world)); };
 
             RighClickableButton moreMenu;
             Add
@@ -180,7 +180,7 @@ namespace ClassicUO.Game.UI.Gumps
             moreMenu.MouseUp += (s, e) => { moreMenu.ContextMenu?.Show(); };
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry(Language.Instance.TopBarGump.CommandsEntry, () =>
             {
-                UIManager.Add(new CommandsGump());
+                UIManager.Add(new CommandsGump(world));
             }));
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry(cliloc.GetString(1079449, ResGumps.Info), () =>
             {
@@ -222,13 +222,13 @@ namespace ClassicUO.Game.UI.Gumps
                 }
             }));
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry(cliloc.GetString(3000134, ResGumps.Help), () => { GameActions.RequestHelp(); }));
-            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Open boat control", () => { UIManager.Add(new BoatControl() { X = 200, Y = 200 }); }));
+            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Open boat control", () => { UIManager.Add(new BoatControl(world) { X = 200, Y = 200 }); }));
 
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Toggle nameplates", World.NameOverHeadManager.ToggleOverheads));
             
-            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Legion Scripting", () => { UIManager.Add(new LegionScripting.ScriptManagerGump()); }));
+            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Legion Scripting", () => { UIManager.Add(new LegionScripting.ScriptManagerGump(world)); }));
 
-            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Nearby Loot Gump", () => { UIManager.Add(new NearbyLootGump()); }));
+            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Nearby Loot Gump", () => { UIManager.Add(new NearbyLootGump(world)); }));
 
             startX += largeWidth + 1;
 
@@ -301,7 +301,7 @@ namespace ClassicUO.Game.UI.Gumps
                     }
                     else
                     {
-                        UIManager.Add(XmlGumpHandler.CreateGumpFromFile(System.IO.Path.Combine(XmlGumpHandler.XmlGumpPath, xml + ".xml")));
+                        UIManager.Add(XmlGumpHandler.CreateGumpFromFile(World, System.IO.Path.Combine(XmlGumpHandler.XmlGumpPath, xml + ".xml")));
                     }
                     RefreshXmlGumps();
                 }, false, ProfileManager.CurrentProfile.AutoOpenXmlGumps.Contains(xml)));

@@ -1356,7 +1356,7 @@ sealed class PacketHandlers
             ShopGump gump = null;
 
             if (ProfileManager.CurrentProfile.UseModernShopGump)
-                UIManager.Add(modernShopGump = new ModernShopGump(vendor, true));
+                UIManager.Add(modernShopGump = new ModernShopGump(world, vendor, true));
             else
                 UIManager.Add(gump = new ShopGump(world, serial, true, 150, 5));
 
@@ -1392,6 +1392,7 @@ sealed class PacketHandlers
                     if (ProfileManager.CurrentProfile.UseModernShopGump)
                         modernShopGump.AddItem
                         (
+                            world,
                             it.Serial,
                             it.Graphic,
                             it.Hue,
@@ -1546,7 +1547,7 @@ sealed class PacketHandlers
                         }
                         else
                         {
-                            UIManager.Add(new GridContainer(serial, graphic));
+                            UIManager.Add(new GridContainer(world, serial, graphic));
                         }
                     }
                     else
@@ -2781,7 +2782,7 @@ sealed class PacketHandlers
         if (ProfileManager.CurrentProfile.UseModernShopGump)
         {
             modernGump?.Dispose();
-            UIManager.Add(modernGump = new ModernShopGump(vendor, true));
+            UIManager.Add(modernGump = new ModernShopGump(world, vendor, true));
         }
         else
         {
@@ -3171,7 +3172,7 @@ sealed class PacketHandlers
             }
             else
             {
-                UIManager.Add(new ModernPaperdoll(mobile.Serial));
+                UIManager.Add(new ModernPaperdoll(world, mobile.Serial));
             }
         }
         else
@@ -3482,7 +3483,7 @@ sealed class PacketHandlers
         modernGump?.Dispose();
 
         if (ProfileManager.CurrentProfile.UseModernShopGump)
-            modernGump = new ModernShopGump(vendor, false);
+            modernGump = new ModernShopGump(world, vendor, false);
         else
             gump = new ShopGump(world, vendor, false, 100, 0);
 
@@ -3518,6 +3519,7 @@ sealed class PacketHandlers
             if (ProfileManager.CurrentProfile.UseModernShopGump)
                 modernGump.AddItem
                     (
+                        world,
                     serial,
                     graphic,
                     hue,

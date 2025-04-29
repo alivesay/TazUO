@@ -49,6 +49,9 @@ namespace ClassicUO.Game
             CommandManager = new CommandManager(this);
             Weather = new Weather(this);
             InfoBars = new InfoBarManager(this);
+            DurabilityManager = new DurabilityManager(this);
+            OPL = new ObjectPropertiesListManager(this);
+            CoolDownBarManager = new CoolDownBarManager(this);
         }
 
         public Point RangeSize;
@@ -63,8 +66,8 @@ namespace ClassicUO.Game
 
         public uint LastObject, ObjectToRemove;
 
-        public ObjectPropertiesListManager OPL { get; } = new ObjectPropertiesListManager();
-        public DurabilityManager DurabilityManager { get; } = new DurabilityManager();
+        public ObjectPropertiesListManager OPL { get; }
+        public DurabilityManager DurabilityManager { get; }
 
         public CorpseManager CorpseManager { get; }
 
@@ -121,7 +124,7 @@ namespace ClassicUO.Game
 
         public JournalManager Journal { get; } = new JournalManager();
 
-        public CoolDownBarManager CoolDownBarManager { get; } = new CoolDownBarManager();
+        public CoolDownBarManager CoolDownBarManager { get; }
 
 
         public int MapIndex

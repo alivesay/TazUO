@@ -14,6 +14,12 @@ namespace ClassicUO.Game.Managers
     internal sealed class ObjectPropertiesListManager
     {
         private readonly Dictionary<uint, ItemProperty> _itemsProperties = new Dictionary<uint, ItemProperty>();
+        private World _world;
+
+        public ObjectPropertiesListManager(World world)
+        {
+            _world = world;
+        }
 
         public void Add(uint serial, uint revision, string name, string data, int namecliloc)
         {
@@ -37,13 +43,13 @@ namespace ClassicUO.Game.Managers
             if (_itemsProperties.TryGetValue(serial, out ItemProperty p))
             {
                 if (ProfileManager.CurrentProfile.ForceTooltipsOnOldClients)
-                    ForcedTooltipManager.RequestName(serial);
+                    ForcedTooltipManager.RequestName(_world, serial);
 
                 return true; //p.Revision != 0;  <-- revision == 0 can contain the name.
             }
 
             if (ProfileManager.CurrentProfile.ForceTooltipsOnOldClients)
-                ForcedTooltipManager.RequestName(serial);
+                ForcedTooltipManager.RequestName(_world, serial);
 
             // if we don't have the OPL of this item, let's request it to the server.
             // Original client seems asking for OPL when character is not running.

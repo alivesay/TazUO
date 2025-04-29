@@ -13,7 +13,7 @@ namespace ClassicUO.Game.UI.Gumps
         public Color ForegrouneColor { get; set; } = Color.Blue;
 
         private Vector3 hueVector = ShaderHueTranslator.GetHueVector(0, false, 0.6f);
-        public ProgressBarGump(string title, double startPercentage = 1.0, int width = 200, int height = 20) : base(0, 0)
+        public ProgressBarGump(World world, string title, double startPercentage = 1.0, int width = 200, int height = 20) : base(world, 0, 0)
         {
             CanCloseWithRightClick = true;
             AcceptMouseInput = false;

@@ -6,7 +6,6 @@ using System.Xml;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.Managers;
-using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
@@ -22,7 +21,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         public override bool IsLocked => _isLocked;
 
-        public InfoBarGump(World world) : base(ProfileManager.CurrentProfile.InfoBarSize.X, ProfileManager.CurrentProfile.InfoBarSize.Y, 50, 20, world, 0, 0)
+        public InfoBarGump(World world) : base(world, ProfileManager.CurrentProfile.InfoBarSize.X, ProfileManager.CurrentProfile.InfoBarSize.Y, 50, 20, 0, 0)
         {
             CanBeLocked = true; //For base gump locking, resizable uses a special locking procedure
             CanMove = true;

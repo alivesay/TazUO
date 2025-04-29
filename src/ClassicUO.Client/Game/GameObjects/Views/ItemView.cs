@@ -61,7 +61,7 @@ namespace ClassicUO.Game.GameObjects
             if (ProfileManager.CurrentProfile.AutoAvoidObstacules) {
                 if  (StaticFilters.isHumanAndMonster(graphic))
                 {
-                    if (StaticFilters.IsOutStamina())
+                    if (StaticFilters.IsOutStamina(World))
                     {
                         Client.Game.UO.FileManager.TileData.StaticData[Graphic].SetImpassable(true);
                     }

@@ -56,14 +56,14 @@ namespace ClassicUO.Game.UI.Gumps
         private Area _optionsArea;
         private Area _previewArea;
 
-        public MacroButtonEditorGump() : base(0, 0)
+        public MacroButtonEditorGump(World world) : base(world, 0, 0)
         {
             CanMove = true;
             AcceptMouseInput = true;
             CanCloseWithRightClick = true;
             _macro = Macro.CreateEmptyMacro("No Action");
         }
-        public MacroButtonEditorGump(Macro macro, int x, int y) : this()
+        public MacroButtonEditorGump(World world, Macro macro, int x, int y) : this(world)
         {
             X = x;
             Y = y;
@@ -217,7 +217,7 @@ namespace ClassicUO.Game.UI.Gumps
             area.Add(_scale);
 
 
-            ModernColorPicker.HueDisplay _hueDisplay = new ModernColorPicker.HueDisplay(_macro.Hue, null, true)
+            ModernColorPicker.HueDisplay _hueDisplay = new ModernColorPicker.HueDisplay(World, _macro.Hue, null, true)
             {
                 X = 10,
                 Y = _scale.Y + _scale.Height + 15
@@ -298,7 +298,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             _previewArea.Clear();
             _previewArea.Children.Clear();
-            var _preview = new MacroButtonGump(_macro, 0, 0) { AcceptMouseInput = false };
+            var _preview = new MacroButtonGump(World, _macro, 0, 0) { AcceptMouseInput = false };
 
             _preview.X = ((WIDTH - 10) >> 1) - (_preview.Width >> 1);
             _preview.Y = ((_previewArea.Height - 10) >> 1) - (_preview.Height >> 1);
@@ -312,7 +312,7 @@ namespace ClassicUO.Game.UI.Gumps
             switch (buttonID)
             {
                 case 1:
-                    Client.Game.GetScene<GameScene>().Macros.Save();
+                    World.Macros.Save();
                     var existing = UIManager.Gumps.OfType<MacroButtonGump>().FirstOrDefault(s => s.TheMacro == _macro);
                     if (existing != null)
                     {

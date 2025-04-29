@@ -620,7 +620,7 @@ namespace ClassicUO.LegionScripting
         /// <param name="hue">Hue to color the cooldown bar</param>
         public void CreateCooldownBar(double seconds, string text, ushort hue) => InvokeOnMainThread(() =>
         {
-            Game.Managers.CoolDownBarManager.AddCoolDownBar(TimeSpan.FromSeconds(seconds), text, hue, false);
+            Game.Managers.CoolDownBarManager.AddCoolDownBar(World, TimeSpan.FromSeconds(seconds), text, hue, false);
         });
 
         /// <summary>

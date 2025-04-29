@@ -13,20 +13,22 @@ namespace ClassicUO.LegionScripting
 {
     internal static class Commands
     {
+        private static World _world;
+        public static World World { get { if (_world == null) _world = Client.Game.UO.World; return _world; } }
         public static bool AddCoolDown(string command, Argument[] args, bool quiet, bool force)
         {
             if (args.Length < 2)
                 throw new RunTimeError(null, "Usage: addcooldown 'text' 'duration milliseconds' 'hue'");
 
             string text = args[0].AsString();
-            if(string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(text))
                 throw new RunTimeError(null, "Cooldown text cannot be empty.");
 
             ushort hue = 7;
-            if(args.Length >= 3)
+            if (args.Length >= 3)
                 hue = args[2].AsUShort();
 
-            CoolDownBarManager.AddCoolDownBar(TimeSpan.FromMilliseconds(args[1].AsUInt()), text, hue, false);
+            CoolDownBarManager.AddCoolDownBar(World, TimeSpan.FromMilliseconds(args[1].AsUInt()), text, hue, false);
             return true;
         }
         public static bool TargetLandRel(string command, Argument[] args, bool quiet, bool force)
@@ -34,14 +36,14 @@ namespace ClassicUO.LegionScripting
             if (args.Length < 2)
                 throw new RunTimeError(null, "Usage: targetlandrel 'x' 'y'");
 
-            if (!TargetManager.IsTargeting)
+            if (!_world.TargetManager.IsTargeting)
                 return true;
 
             ushort x = (ushort)(World.Player.X + args[0].AsInt());
             ushort y = (ushort)(World.Player.Y + args[1].AsInt());
 
             World.Map.GetMapZ(x, y, out sbyte gZ, out sbyte sZ);
-            TargetManager.Target(0, x, y, gZ);
+            World.TargetManager.Target(0, x, y, gZ);
             return true;
         }
         public static bool TargetTileRel(string command, Argument[] args, bool quiet, bool force)
@@ -49,7 +51,7 @@ namespace ClassicUO.LegionScripting
             if (args.Length < 2)
                 throw new RunTimeError(null, "Usage: targettilerel 'x' 'y' ['graphic']");
 
-            if (!TargetManager.IsTargeting)
+            if (!World.TargetManager.IsTargeting)
                 return true;
 
             ushort x = (ushort)(World.Player.X + args[0].AsInt());
@@ -65,7 +67,7 @@ namespace ClassicUO.LegionScripting
                     return true;
             }
 
-            TargetManager.Target(g.Graphic, x, y, g.Z);
+            World.TargetManager.Target(g.Graphic, x, y, g.Z);
             return true;
         }
         public static bool CommandFly(string command, Argument[] args, bool quiet, bool force)
@@ -83,17 +85,17 @@ namespace ClassicUO.LegionScripting
         }
         public static bool UseSecondaryAbility(string command, Argument[] args, bool quiet, bool force)
         {
-            GameActions.UsePrimaryAbility();
+            GameActions.UsePrimaryAbility(World);
             return true;
         }
         public static bool UsePrimaryAbility(string command, Argument[] args, bool quiet, bool force)
         {
-            GameActions.UseSecondaryAbility();
+            GameActions.UseSecondaryAbility(World);
             return true;
         }
         public static bool BandageSelf(string command, Argument[] args, bool quiet, bool force)
         {
-            if (Client.Version < ClientVersion.CV_5020 || ProfileManager.CurrentProfile.BandageSelfOld)
+            if (Client.Game.UO.Version < ClientVersion.CV_5020 || ProfileManager.CurrentProfile.BandageSelfOld)
             {
                 Item band = World.Player.FindBandage();
 
@@ -104,7 +106,7 @@ namespace ClassicUO.LegionScripting
             }
             else
             {
-                GameActions.BandageSelf();
+                GameActions.BandageSelf(World);
             }
 
             return true;
@@ -114,7 +116,7 @@ namespace ClassicUO.LegionScripting
             if (args.Length < 1)
                 throw new RunTimeError(null, "Usage: clickobject 'serial'");
 
-            GameActions.SingleClick(args[0].AsSerial());
+            GameActions.SingleClick(World, args[0].AsSerial());
             return true;
         }
         public static bool CommandAttack(string command, Argument[] args, bool quiet, bool force)
@@ -122,7 +124,7 @@ namespace ClassicUO.LegionScripting
             if (args.Length < 1)
                 throw new RunTimeError(null, "Usage: attack 'serial'");
 
-            GameActions.Attack(args[0].AsSerial());
+            GameActions.Attack(World, args[0].AsSerial());
             return true;
         }
         public static bool WaitForJournal(string command, Argument[] args, bool quiet, bool force)
@@ -158,7 +160,7 @@ namespace ClassicUO.LegionScripting
             int z = args[4].AsInt();
 
 
-            if(GameActions.PickUp(item, 0, 0, amt))
+            if (GameActions.PickUp(World, item, 0, 0, amt))
                 GameActions.DropItem
                 (
                     item,
@@ -184,7 +186,7 @@ namespace ClassicUO.LegionScripting
             if (args.Length > 2)
                 amt = args[2].AsUShort();
 
-            if (GameActions.PickUp(item, 0, 0, amt))
+            if (GameActions.PickUp(World, item, 0, 0, amt))
                 GameActions.DropItem(item, 0xFFFF, 0xFFFF, 0, bag);
             return true;
         }
@@ -201,13 +203,13 @@ namespace ClassicUO.LegionScripting
                 hue = args[1].AsUShort();
 
 
-            GameActions.Print(msg, hue);
+            GameActions.Print(World, msg, hue);
             return true;
         }
         public static bool CancelTarget(string command, Argument[] args, bool quiet, bool force)
         {
-            if (TargetManager.IsTargeting)
-                TargetManager.CancelTarget();
+            if (World.TargetManager.IsTargeting)
+                World.TargetManager.CancelTarget();
 
             return true;
         }
@@ -279,7 +281,7 @@ namespace ClassicUO.LegionScripting
 
             if (items.Count > 0)
             {
-                GameActions.DoubleClick(items[0]);
+                GameActions.DoubleClick(World, items[0]);
             }
 
             return true;
@@ -295,12 +297,12 @@ namespace ClassicUO.LegionScripting
 
             Interpreter.Timeout(args.Length >= 2 ? args[1].AsInt() : 10000, LegionScripting.ReturnTrue);
 
-            if (TargetManager.IsTargeting)
+            if (World.TargetManager.IsTargeting)
             {
                 if (type == TargetType.Neutral)
                     return true;
 
-                if (TargetManager.TargetingType == type)
+                if (World.TargetManager.TargetingType == type)
                     return true;
             }
 
@@ -311,7 +313,7 @@ namespace ClassicUO.LegionScripting
             if (args.Length < 1)
                 throw new RunTimeError(null, "Usage: target 'serial'");
 
-            TargetManager.Target(args[0].AsSerial());
+            World.TargetManager.Target(args[0].AsSerial());
 
             return true;
         }
@@ -331,7 +333,7 @@ namespace ClassicUO.LegionScripting
             if (useQueue)
                 GameActions.DoubleClickQueued(args[0].AsSerial());
             else
-                GameActions.DoubleClick(args[0].AsSerial());
+                GameActions.DoubleClick(World, args[0].AsSerial());
 
             return true;
         }
@@ -365,7 +367,7 @@ namespace ClassicUO.LegionScripting
                     {
                         if (item.Hue == hue)
                         {
-                            if (GameActions.PickUp(item, 0, 0, amount < 1 ? item.Amount : amount))
+                            if (GameActions.PickUp(World, item, 0, 0, amount < 1 ? item.Amount : amount))
                             {
                                 GameActions.DropItem(item, 0xFFFF, 0xFFFF, 0, target);
                                 return true;
@@ -374,7 +376,7 @@ namespace ClassicUO.LegionScripting
                     }
                     else
                     {
-                        if (GameActions.PickUp(item, 0, 0, amount < 1 ? item.Amount : amount))
+                        if (GameActions.PickUp(World, item, 0, 0, amount < 1 ? item.Amount : amount))
                             GameActions.DropItem(item, 0xFFFF, 0xFFFF, 0, target);
                         return true;
                     }
@@ -429,7 +431,7 @@ namespace ClassicUO.LegionScripting
         }
         public static bool InfoGump(string command, Argument[] args, bool quiet, bool force)
         {
-            TargetManager.SetTargeting(CursorTarget.SetTargetClientSide, CursorType.Target, TargetType.Neutral);
+            World.TargetManager.SetTargeting(CursorTarget.SetTargetClientSide, CursorType.Target, TargetType.Neutral);
             return true;
         }
         public static bool SetSkillLock(string command, Argument[] args, bool quiet, bool force)
@@ -478,7 +480,7 @@ namespace ClassicUO.LegionScripting
         }
         public static bool Logout(string command, Argument[] args, bool quiet, bool force)
         {
-            GameActions.Logout();
+            GameActions.Logout(World);
             return true;
         }
         public static bool RenamePet(string command, Argument[] args, bool quiet, bool force)
@@ -500,7 +502,7 @@ namespace ClassicUO.LegionScripting
             if (args.Length > 2 && args[2].AsString().ToLower() == "front")
                 front = true;
 
-            if (args[1].IsSerial())                     
+            if (args[1].IsSerial())
                 Interpreter.PushList(args[0].AsString(), new Argument(Interpreter.ActiveScript, new ASTNode(ASTNodeType.SERIAL, args[1].AsSerial().ToString(), null, 0)), front, force);
             else
                 Interpreter.PushList(args[0].AsString(), args[1], front, force);
@@ -548,7 +550,7 @@ namespace ClassicUO.LegionScripting
         }
         public static bool ShowNames(string command, Argument[] args, bool quiet, bool force)
         {
-            GameActions.AllNames();
+            GameActions.AllNames(World);
             return true;
         }
         public static bool PopList(string command, Argument[] args, bool quiet, bool force)
@@ -585,7 +587,7 @@ namespace ClassicUO.LegionScripting
 
             if (g != null)
             {
-                GameActions.ReplyGump(g.LocalSerial, gumpID, buttonID, new uint[0] { }, new Tuple<ushort, string>[0]);
+                GameActions.ReplyGump(World, g.LocalSerial, gumpID, buttonID, new uint[0] { }, new Tuple<ushort, string>[0]);
                 g.Dispose();
             }
 
@@ -617,12 +619,12 @@ namespace ClassicUO.LegionScripting
 
             if (Interpreter.IsTargetRequested())
             {
-                if (TargetManager.IsTargeting && TargetManager.TargetingState == CursorTarget.Internal)
+                if (World.TargetManager.IsTargeting && World.TargetManager.TargetingState == CursorTarget.Internal)
                     return false;
 
-                if (TargetManager.LastTargetInfo.IsEntity)
+                if (World.TargetManager.LastTargetInfo.IsEntity)
                 {
-                    Interpreter.SetAlias(args[0].AsString(), TargetManager.LastTargetInfo.Serial);
+                    Interpreter.SetAlias(args[0].AsString(), World.TargetManager.LastTargetInfo.Serial);
                     Interpreter.SetTargetRequested(false);
                     return true;
                 }
@@ -632,7 +634,7 @@ namespace ClassicUO.LegionScripting
                 return true;
             }
 
-            TargetManager.SetTargeting(CursorTarget.Internal, CursorType.Target, TargetType.Neutral);
+            World.TargetManager.SetTargeting(CursorTarget.Internal, CursorType.Target, TargetType.Neutral);
             Interpreter.SetTargetRequested(true);
 
             return false;
@@ -645,7 +647,7 @@ namespace ClassicUO.LegionScripting
             if (mount != null)
             {
                 Interpreter.SetAlias(Constants.LASTMOUNT + World.Player.Serial.ToString(), mount);
-                GameActions.DoubleClick(World.Player.Serial);
+                GameActions.DoubleClick(World, World.Player.Serial);
                 return true;
             }
             else
@@ -653,7 +655,7 @@ namespace ClassicUO.LegionScripting
                 uint serial = Interpreter.GetAlias(Constants.LASTMOUNT + World.Player.Serial.ToString());
                 if (serial != uint.MaxValue)
                 {
-                    GameActions.DoubleClick(serial);
+                    GameActions.DoubleClick(World, serial);
                     return true;
                 }
             }
@@ -669,8 +671,8 @@ namespace ClassicUO.LegionScripting
 
             if (SerialHelper.IsItem(serial))
             {
-                GameActions.PickUp(serial, 0, 0, 1);
-                GameActions.Equip(serial);
+                GameActions.PickUp(World, serial, 0, 0, 1);
+                GameActions.Equip(World, serial);
             }
 
             return true;
@@ -692,7 +694,7 @@ namespace ClassicUO.LegionScripting
                 Item i = World.Player.FindItemByLayer(hand);
                 if (i != null) //Item is in hand, lets unequip and save it
                 {
-                    GameActions.GrabItem(i, 0, World.Player.FindItemByLayer(Layer.Backpack));
+                    GameActions.GrabItem(World, i, 0, World.Player.FindItemByLayer(Layer.Backpack));
                     Interpreter.SetAlias(Constants.LASTITEMINHAND + hand.ToString(), i);
                     return true;
                 }
@@ -701,8 +703,8 @@ namespace ClassicUO.LegionScripting
                     uint serial = Interpreter.GetAlias(Constants.LASTITEMINHAND + hand.ToString());
                     if (SerialHelper.IsItem(serial))
                     {
-                        GameActions.PickUp(serial, 0, 0, 1);
-                        GameActions.Equip();
+                        GameActions.PickUp(World, serial, 0, 0, 1);
+                        GameActions.Equip(World);
                         return true;
                     }
                 }
@@ -748,7 +750,7 @@ namespace ClassicUO.LegionScripting
             if (args.Length < 1)
                 throw new RunTimeError(null, "Usage: playmacro 'macroname'");
 
-            var mm = MacroManager.TryGetMacroManager();
+            var mm = MacroManager.TryGetMacroManager(World);
 
             if (mm != null)
             {
@@ -766,7 +768,7 @@ namespace ClassicUO.LegionScripting
 
             Entity e = World.Get(args[0].AsSerial());
 
-            MessageManager.HandleMessage(e, args[1].AsString(), "", ProfileManager.CurrentProfile.SpeechHue, MessageType.Label, 3, TextType.OBJECT);
+            World.MessageManager.HandleMessage(e, args[1].AsString(), "", ProfileManager.CurrentProfile.SpeechHue, MessageType.Label, 3, TextType.OBJECT);
 
             return true;
         }
@@ -831,20 +833,20 @@ namespace ClassicUO.LegionScripting
 
             Interpreter.Timeout(duration, LegionScripting.ReturnTrue);
 
-            return MessageManager.PromptData.Prompt != ConsolePrompt.None;
+            return World.MessageManager.PromptData.Prompt != ConsolePrompt.None;
         }
         public static bool CancelPrompt(string command, Argument[] args, bool quiet, bool force)
         {
-            if (MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
+            if (World.MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
             {
-                NetClient.Socket.Send_ASCIIPromptResponse(string.Empty, true);
+                NetClient.Socket.Send_ASCIIPromptResponse(World, string.Empty, true);
             }
-            else if (MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
+            else if (World.MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
             {
-                NetClient.Socket.Send_UnicodePromptResponse(string.Empty, Settings.GlobalSettings.Language, true);
+                NetClient.Socket.Send_UnicodePromptResponse(World, string.Empty, Settings.GlobalSettings.Language, true);
             }
 
-            MessageManager.PromptData = default;
+            World.MessageManager.PromptData = default;
             return true;
         }
         public static bool PromptResponse(string command, Argument[] args, bool quiet, bool force)
@@ -854,18 +856,18 @@ namespace ClassicUO.LegionScripting
 
             string text = args[0].AsString();
 
-            if (MessageManager.PromptData.Prompt != ConsolePrompt.None)
+            if (World.MessageManager.PromptData.Prompt != ConsolePrompt.None)
             {
-                if (MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
+                if (World.MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
                 {
-                    NetClient.Socket.Send_ASCIIPromptResponse(text, text.Length < 1);
+                    NetClient.Socket.Send_ASCIIPromptResponse(World, text, text.Length < 1);
                 }
-                else if (MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
+                else if (World.MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
                 {
-                    NetClient.Socket.Send_UnicodePromptResponse(text, Settings.GlobalSettings.Language, text.Length < 1);
+                    NetClient.Socket.Send_UnicodePromptResponse(World, text, Settings.GlobalSettings.Language, text.Length < 1);
                 }
 
-                MessageManager.PromptData = default;
+                World.MessageManager.PromptData = default;
             }
 
             return true;
@@ -924,13 +926,13 @@ namespace ClassicUO.LegionScripting
             if (args.Length < 3)
                 throw new RunTimeError(null, "Usage: pathfind 'x' 'y' 'z'");
 
-            Pathfinder.WalkTo(args[0].AsInt(), args[1].AsInt(), args[2].AsInt(), 0);
+            World.Player.Pathfinder.WalkTo(args[0].AsInt(), args[1].AsInt(), args[2].AsInt(), 0);
 
             return true;
         }
         public static bool CancelPathfind(string command, Argument[] args, bool quiet, bool force)
         {
-            Pathfinder.StopAutoWalk();
+            World.Player.Pathfinder.StopAutoWalk();
             return true;
         }
     }

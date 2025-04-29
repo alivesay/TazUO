@@ -315,7 +315,7 @@ namespace ClassicUO.Game.UI.Gumps
             _virtueMenuPic.MouseDoubleClick += VirtueMenu_MouseDoubleClickEvent;
 
             if (LocalSerial == World.Player.Serial)
-                Add(new DurabilityGumpMinimized()
+                Add(new DurabilityGumpMinimized(World)
                 {
                     X = settings.Position_X_Durability,
                     Y = settings.Position_Y_Durability,
@@ -382,7 +382,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 Add(_combatBook = new GumpPic(settings.Position_X_CombatBook, settings.Position_Y_CombatBook, settings.Graphic_Button_Combat, 0));
                 _combatBook.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
-                _combatBook.MouseDoubleClick += (sender, e) => GameActions.OpenAbilitiesBook();
+                _combatBook.MouseDoubleClick += (sender, e) => GameActions.OpenAbilitiesBook(World);
 
                 if (showRacialAbilitiesBook)
                 {
@@ -427,6 +427,7 @@ namespace ClassicUO.Game.UI.Gumps
             if (args.Button == MouseButtonType.Left)
             {
                 GameActions.ReplyGump(
+                    World,
                     World.Player,
                     0x000001CD,
                     0x00000001,

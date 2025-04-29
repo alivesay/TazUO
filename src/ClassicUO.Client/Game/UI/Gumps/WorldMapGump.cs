@@ -69,9 +69,6 @@ internal class WorldMapGump : ResizableGump
 
     private static Mobile following;
 
-    private static uint[] _pixelBuffer;
-    private static sbyte[] _zBuffer;
-
     public Texture2D MapTexture { get { return _mapTexture; } }
 
     private Renderer.SpriteFont _markerFont = Fonts.Map1;
@@ -100,7 +97,6 @@ internal class WorldMapGump : ResizableGump
     private WMapMarker _gotoMarker;
 
     private int _mapLoading;
-    private uint _mapLoadingTime;
     private Task _loadingTask;
     private World _world;
 
@@ -2439,9 +2435,9 @@ internal class WorldMapGump : ResizableGump
 
         }
 
-        if (_world.Player.Pathfinder.AutoWalking && Pathfinder.PathSize > 0)
+        if (_world.Player.Pathfinder.AutoWalking && World.Player.Pathfinder.PathSize > 0)
         {
-            Point end = RotatePoint(Pathfinder.EndPoint.X - _center.X, Pathfinder.EndPoint.Y - _center.Y, Zoom, 1, _flipMap ? 45f : 0f);
+            Point end = RotatePoint(World.Player.Pathfinder.EndPoint.X - _center.X, World.Player.Pathfinder.EndPoint.Y - _center.Y, Zoom, 1, _flipMap ? 45f : 0f);
             end.X += gX + halfWidth;
             end.Y += gY + halfHeight;
             Point start = RotatePoint(World.Player.X - _center.X, World.Player.Y - _center.Y, Zoom, 1, _flipMap ? 45f : 0f);

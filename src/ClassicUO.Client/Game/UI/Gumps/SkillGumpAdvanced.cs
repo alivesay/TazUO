@@ -219,12 +219,12 @@ namespace ClassicUO.Game.UI.Gumps
                 0xFF,
                 1153
             ));
-            showGrp.IsChecked = SkillsGroupManager.IsActive;
+            showGrp.IsChecked = World.SkillsGroupManager.IsActive;
             showGrp.ValueChanged += (sender, e) =>
             {
-                SkillsGroupManager.IsActive = showGrp.IsChecked;
+                World.SkillsGroupManager.IsActive = showGrp.IsChecked;
                 ForceUpdate();
-                SkillsGroupManager.Save();
+                World.SkillsGroupManager.Save();
             };
 
 
@@ -286,9 +286,9 @@ namespace ClassicUO.Game.UI.Gumps
             _skillListEntries.Clear();
             PropertyInfo pi = typeof(Skill).GetProperty(_sortField);
 
-            if (SkillsGroupManager.IsActive)
+            if (World.SkillsGroupManager.IsActive)
             {
-                SkillsGroupManager.Groups.Sort((s1, s2) =>
+                World.SkillsGroupManager.Groups.Sort((s1, s2) =>
                 {
                     var m1 = Regex.Match(s1.Name, "^\\d+");
                     var m2 = Regex.Match(s2.Name, "^\\d+");
@@ -306,10 +306,10 @@ namespace ClassicUO.Game.UI.Gumps
                 });
                 if (_sortAsc)
                 {
-                    SkillsGroupManager.Groups.Reverse();
+                    World.SkillsGroupManager.Groups.Reverse();
                 }
 
-                foreach (SkillsGroup g in SkillsGroupManager.Groups)
+                foreach (SkillsGroup g in World.SkillsGroupManager.Groups)
                 {
                     var skillEntries = new List<SkillListEntry>();
                     var a = new Area();
@@ -338,7 +338,7 @@ namespace ClassicUO.Game.UI.Gumps
                     for (int i = 0; i < g.Count; i++)
                     {
                         byte index = g.GetSkill(i);
-                        if (index < SkillsLoader.Instance.SkillsCount)
+                        if (index < Client.Game.UO.FileManager.Skills.SkillsCount)
                         {
                             skills.Add(World.Player.Skills[index]);
                         }
@@ -358,7 +358,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                     foreach (var s in skills)
                     {
-                        skillEntries.Add(new SkillListEntry(s));
+                        skillEntries.Add(new SkillListEntry(this, s));
                     }
                     a.Add
                     (
@@ -439,7 +439,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     _totalReal += skill.Base;
                     _totalValue += skill.Value;
-                    _skillListEntries.Add(new SkillListEntry(skill));
+                    _skillListEntries.Add(new SkillListEntry(this, skill));
                 }
                 foreach (var entry in _skillListEntries)
                 {
@@ -540,7 +540,7 @@ namespace ClassicUO.Game.UI.Gumps
         private readonly SkillGumpAdvanced _gump;
         private readonly Button _activeUse;
         private readonly Skill _skill;
-        public SkillListEntry(Skill skill)
+        public SkillListEntry(SkillGumpAdvanced gump, Skill skill)
         {
             _gump = gump;
             Height = 20;

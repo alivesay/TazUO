@@ -167,7 +167,7 @@ namespace ClassicUO.Game.Managers
 
         public static void ImportOverrideSettings(World world)
         {
-            var input = new InputRequest("Enter the path to the tooltip overrides json file", "Import", "Cancel", (r, path) =>
+            var input = new InputRequest(world, "Enter the path to the tooltip overrides json file", "Import", "Cancel", (r, path) =>
             {
                 if (r == InputRequest.Result.BUTTON2) return;
 

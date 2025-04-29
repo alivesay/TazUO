@@ -16,9 +16,15 @@ using LScript;
 using Microsoft.Scripting.Hosting;
 using static ClassicUO.LegionScripting.Commands;
 using static ClassicUO.LegionScripting.Expressions;
+using System.Text.Json.Serialization;
 
 namespace ClassicUO.LegionScripting
 {
+    [JsonSerializable(typeof(LScriptSettings))]
+    internal partial class LScriptJsonContext : JsonSerializerContext
+    {
+    }
+
     internal static class LegionScripting
     {
         public static string ScriptPath;
@@ -36,8 +42,11 @@ namespace ClassicUO.LegionScripting
 
         public static Dictionary<int, ScriptFile> PyThreads = new Dictionary<int, ScriptFile>();
 
-        public static void Init()
+        private static World World;
+
+        public static void Init(World world)
         {
+            World = world;
             Task.Factory.StartNew(() => Python.CreateEngine());
             ScriptPath = Path.GetFullPath(Path.Combine(CUOEnviroment.ExecutablePath, "LegionScripts"));
 
@@ -55,11 +64,11 @@ namespace ClassicUO.LegionScripting
             AutoPlayChar();
             _enabled = true;
 
-            CommandManager.Register("playlscript", a =>
+            world.CommandManager.Register("playlscript", a =>
             {
                 if (a.Length < 2)
                 {
-                    GameActions.Print("Usage: playlscript <filename>");
+                    GameActions.Print(world, "Usage: playlscript <filename>");
                     return;
                 }
 
@@ -73,15 +82,15 @@ namespace ClassicUO.LegionScripting
                 }
             });
 
-            CommandManager.Register("stoplscript", a =>
+            world.CommandManager.Register("stoplscript", a =>
             {
                 if (a.Length < 2)
                 {
-                    GameActions.Print("Usage: stoplscript <filename>");
+                    GameActions.Print(world, "Usage: stoplscript <filename>");
                     return;
                 }
 
-                foreach(ScriptFile sf in runningScripts)
+                foreach (ScriptFile sf in runningScripts)
                 {
                     if (sf.FileName == string.Join(" ", a.Skip(1)))
                     {
@@ -91,15 +100,15 @@ namespace ClassicUO.LegionScripting
                 }
             });
 
-            CommandManager.Register("togglelscript", a =>
+            world.CommandManager.Register("togglelscript", a =>
             {
                 if (a.Length < 2)
                 {
-                    GameActions.Print("Usage: togglelscript <filename>");
+                    GameActions.Print(world, "Usage: togglelscript <filename>");
                     return;
                 }
 
-                foreach(ScriptFile sf in runningScripts)
+                foreach (ScriptFile sf in runningScripts)
                 {
                     if (sf.FileName == string.Join(" ", a.Skip(1)))
                     {
@@ -151,7 +160,7 @@ namespace ClassicUO.LegionScripting
             string p = Path.GetDirectoryName(path);
             string fname = Path.GetFileName(path);
 
-            LoadedScripts.Add(new ScriptFile(p, fname));
+            LoadedScripts.Add(new ScriptFile(World, p, fname));
         }
         /// <summary>
         /// Returns a list of sub directories
@@ -284,7 +293,7 @@ namespace ClassicUO.LegionScripting
             {
                 if (File.Exists(path))
                 {
-                    lScriptSettings = JsonSerializer.Deserialize<LScriptSettings>(File.ReadAllText(path));
+                    lScriptSettings = JsonSerializer.Deserialize(File.ReadAllText(path), LScriptJsonContext.Default.LScriptSettings);
                     for (int i = 0; i < lScriptSettings.CharAutoStartScripts.Count; i++)
                     {
                         var val = lScriptSettings.CharAutoStartScripts.ElementAt(i);
@@ -305,7 +314,7 @@ namespace ClassicUO.LegionScripting
         {
             string path = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "lscript.json");
 
-            string json = JsonSerializer.Serialize(lScriptSettings);
+            string json = JsonSerializer.Serialize(lScriptSettings, LScriptJsonContext.Default.LScriptSettings);
             try
             {
                 File.WriteAllText(path, json);
@@ -391,10 +400,11 @@ namespace ClassicUO.LegionScripting
         }
         private static void ExecutePythonScript(ScriptFile script)
         {
-            if(script.pythonEngine == null){
+            if (script.pythonEngine == null)
+            {
                 script.pythonEngine = Python.CreateEngine();
 
-                string dir = Path.GetDirectoryName(script.FullPath);                       
+                string dir = Path.GetDirectoryName(script.FullPath);
                 ICollection<string> paths = script.pythonEngine.GetSearchPaths();
 
                 if (!string.IsNullOrWhiteSpace(dir))
@@ -421,8 +431,8 @@ namespace ClassicUO.LegionScripting
             catch (ThreadAbortException) { }
             catch (Exception e)
             {
-                GameActions.Print("Python Script Error:");
-                GameActions.Print(e.Message);
+                GameActions.Print(World, "Python Script Error:");
+                GameActions.Print(World, e.Message);
             }
             script.pythonScope = null;
             script.scopedAPI = null;
@@ -465,7 +475,7 @@ namespace ClassicUO.LegionScripting
                     case "backpack": return World.Player.FindItemByLayer(Layer.Backpack);
                     case "bank": return World.Player.FindItemByLayer(Layer.Bank);
                     case "lastobject": return World.LastObject;
-                    case "lasttarget": return TargetManager.LastTargetInfo.Serial;
+                    case "lasttarget": return World.TargetManager.LastTargetInfo.Serial;
                     case "lefthand": return World.Player.FindItemByLayer(Layer.OneHanded);
                     case "righthand": return World.Player.FindItemByLayer(Layer.TwoHanded);
                     case "self": return World.Player;
@@ -632,11 +642,11 @@ namespace ClassicUO.LegionScripting
         }
         public static void LScriptError(string msg)
         {
-            GameActions.Print($"[{Interpreter.ActiveScript.CurrentLine}][LScript Error]" + msg);
+            GameActions.Print(World, $"[{Interpreter.ActiveScript.CurrentLine}][LScript Error]" + msg);
         }
         public static void LScriptWarning(string msg)
         {
-            GameActions.Print($"[{Interpreter.ActiveScript.CurrentLine}][LScript Warning]" + msg);
+            GameActions.Print(World, $"[{Interpreter.ActiveScript.CurrentLine}][LScript Warning]" + msg);
         }
     }
 
@@ -675,15 +685,18 @@ namespace ClassicUO.LegionScripting
         {
             get
             {
-                if(ScriptType == ScriptType.LegionScript && GetScript != null)
+                if (ScriptType == ScriptType.LegionScript && GetScript != null)
                     return GetScript.IsPlaying;
 
                 return PythonThread != null;
             }
         }
 
-        public ScriptFile(string path, string fileName)
+        private World World;
+
+        public ScriptFile(World world, string path, string fileName)
         {
+            World = world;
             Path = path;
 
             var cleanPath = path.Replace(System.IO.Path.DirectorySeparatorChar, '/');
@@ -710,13 +723,14 @@ namespace ClassicUO.LegionScripting
                 GenerateScript();
         }
 
-        public ScriptFile(string path, string source, string fileName)
+        public ScriptFile(World world, string path, string source, string fileName)
         {
+            World = world;
             Path = path;
             FileName = fileName;
             FullPath = System.IO.Path.Combine(Path, FileName);
             FileContents = source.Split(new[] { '\n' }, StringSplitOptions.None);
-            GetScript = new Script(Lexer.Lex(FileContents));
+            GetScript = new Script(Lexer.Lex(FileContents), world);
         }
 
         public void ReloadFromFile()
@@ -752,7 +766,7 @@ namespace ClassicUO.LegionScripting
             try
             {
                 if (GetScript == null)
-                    GetScript = new Script(Lexer.Lex(FullPath));
+                    GetScript = new Script(Lexer.Lex(FullPath), World);
                 else
                     GetScript.UpdateScript(Lexer.Lex(FullPath));
             }

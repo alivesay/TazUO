@@ -61,7 +61,7 @@ namespace ClassicUO.Game.UI.Gumps
                     IsChecked = NameOverHeadManager.IsPermaToggled,
                 }
             );
-            stayActive.ValueChanged += (sender, e) => { NameOverHeadManager.SetOverheadToggled(stayActive.IsChecked); CanCloseWithRightClick = stayActive.IsChecked; };
+            stayActive.ValueChanged += (sender, e) => { World.NameOverHeadManager.SetOverheadToggled(stayActive.IsChecked); CanCloseWithRightClick = stayActive.IsChecked; };
 
 
             Checkbox hideFullHp;
@@ -161,14 +161,14 @@ namespace ClassicUO.Game.UI.Gumps
 
             if (button.IsChecked)
             {
-                NameOverHeadManager.SetActiveOption(option);
+                World.NameOverHeadManager.SetActiveOption(option);
             }
 
             button.ValueChanged += (sender, e) =>
             {
                 if (button.IsChecked)
                 {
-                    NameOverHeadManager.SetActiveOption(option);
+                    World.NameOverHeadManager.SetActiveOption(option);
                 }
             };
 

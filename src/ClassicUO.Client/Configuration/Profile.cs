@@ -780,7 +780,7 @@ namespace ClassicUO.Configuration
                             {
                                 case GumpType.Buff:
                                     if (ProfileManager.CurrentProfile.UseImprovedBuffBar)
-                                        gump = new ImprovedBuffGump();
+                                        gump = new ImprovedBuffGump(world);
                                     else
                                         gump = new BuffGump(world);
 
@@ -823,7 +823,7 @@ namespace ClassicUO.Configuration
 
                                     break;
                                 case GumpType.MacroButtonEditor:
-                                    gump = new MacroButtonEditorGump();
+                                    gump = new MacroButtonEditorGump(world);
 
                                     break;
 
@@ -840,7 +840,7 @@ namespace ClassicUO.Configuration
 
                                     if (ProfileManager.CurrentProfile.UseModernPaperdoll && serial == world.Player.Serial)
                                     {
-                                        gump = new ModernPaperdoll(serial);
+                                        gump = new ModernPaperdoll(world, serial);
                                         x = ProfileManager.CurrentProfile.ModernPaperdollPosition.X;
                                         y = ProfileManager.CurrentProfile.ModernPaperdollPosition.Y;
                                     }
@@ -929,10 +929,10 @@ namespace ClassicUO.Configuration
                                     }
                                     break;
                                 case GumpType.DurabilityGump:
-                                    gump = new DurabilitysGump();
+                                    gump = new DurabilitysGump(world);
                                     break;
                                 case GumpType.ScriptManager:
-                                    gump = new LegionScripting.ScriptManagerGump();
+                                    gump = new LegionScripting.ScriptManagerGump(world);
                                     break;
                             }
 
@@ -1031,7 +1031,7 @@ namespace ClassicUO.Configuration
                                         gump = new InfoBarGump(world);
                                         break;
                                     case GumpType.PaperDoll:
-                                        gump = new ModernPaperdoll(world.Player.Serial);
+                                        gump = new ModernPaperdoll(world, world.Player.Serial);
                                         break;
                                 }
 

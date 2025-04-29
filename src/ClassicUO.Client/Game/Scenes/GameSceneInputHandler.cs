@@ -756,12 +756,12 @@ namespace ClassicUO.Game.Scenes
                             {
                                 case Land land:
                                     _world.TargetManager.Reset();
-                                    MultiItemMoveGump.OnContainerTarget(land.X, land.Y, land.Z);
+                                    MultiItemMoveGump.OnContainerTarget(_world, land.X, land.Y, land.Z);
                                     break;
 
                                 case Entity o:
                                     _world.TargetManager.Reset();
-                                    MultiItemMoveGump.OnContainerTarget(o.Serial);
+                                    MultiItemMoveGump.OnContainerTarget(_world, o.Serial);
                                     break;
                             }
                         }
@@ -1523,7 +1523,7 @@ namespace ClassicUO.Game.Scenes
 
             if (e.keysym.sym != SDL.SDL_Keycode.SDLK_UNKNOWN)
             {
-                NameOverHeadManager.RegisterKeyDown(e.keysym);
+                _world.NameOverHeadManager.RegisterKeyDown(e.keysym);
             }
         }
 

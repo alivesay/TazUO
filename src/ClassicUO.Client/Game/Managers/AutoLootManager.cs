@@ -256,7 +256,7 @@ namespace ClassicUO.Game.Managers
         {
             if (ProfileManager.CurrentProfile.EnableAutoLootProgressBar && (progressBarGump == null || progressBarGump.IsDisposed))
             {
-                progressBarGump = new ProgressBarGump("Auto looting...", 0)
+                progressBarGump = new ProgressBarGump(World, "Auto looting...", 0)
                 {
                     Y = (ProfileManager.CurrentProfile.GameWindowPosition.Y + ProfileManager.CurrentProfile.GameWindowSize.Y) - 150,
                     ForegrouneColor = Color.DarkOrange

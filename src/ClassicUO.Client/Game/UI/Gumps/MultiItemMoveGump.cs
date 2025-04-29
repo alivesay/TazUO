@@ -19,7 +19,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         public static int ObjDelay = 1000;
 
-        public MultiItemMoveGump(int x, int y) : base(0, 0)
+        public MultiItemMoveGump(World world, int x, int y) : base(world, 0, 0)
         {
             Width = 200;
             Height = 100;
@@ -84,8 +84,8 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (e.Button == MouseButtonType.Left)
                 {
-                    GameActions.Print("Where should we move these items?");
-                    TargetManager.SetTargeting(CursorTarget.MoveItemContainer, CursorType.Target, TargetType.Neutral);
+                    GameActions.Print(World, "Where should we move these items?");
+                    World.TargetManager.SetTargeting(CursorTarget.MoveItemContainer, CursorType.Target, TargetType.Neutral);
                     delay.IsEditable = false;
                 }
             };
@@ -98,48 +98,48 @@ namespace ClassicUO.Game.UI.Gumps
                 if (e.Button == MouseButtonType.Left)
                 {
                     delay.IsEditable = false;
-                    processItemMoves(World.Player.FindItemByLayer(Data.Layer.Backpack));
+                    processItemMoves(World, World.Player.FindItemByLayer(Data.Layer.Backpack));
                 }
             };
 
             Add(new SimpleBorder() { Width = Width, Height = Height, Alpha = 0.75f });
         }
 
-        public static void OnContainerTarget(uint serial)
+        public static void OnContainerTarget(World world, uint serial)
         {
             if (SerialHelper.IsItem(serial))
             {
-                Item moveToContainer = World.Items.Get(serial);
+                Item moveToContainer = world.Items.Get(serial);
                 if (!moveToContainer.ItemData.IsContainer)
                 {
-                    GameActions.Print("That does not appear to be a container...");
+                    GameActions.Print(world, "That does not appear to be a container...");
                     return;
                 }
-                GameActions.Print("Moving items to the selected container..");
-                processItemMoves(moveToContainer);
+                GameActions.Print(world, "Moving items to the selected container..");
+                processItemMoves(world, moveToContainer);
             }
         }
-        public static void OnContainerTarget(int x, int y, int z)
+        public static void OnContainerTarget(World world, int x, int y, int z)
         {
-            processItemMoves(x, y, z);
+            processItemMoves(world, x, y, z);
         }
 
-        public static void OnTradeWindowTarget(uint tradeID)
+        public static void OnTradeWindowTarget(World world, uint tradeID)
         {
-            processItemMoves(tradeID);
+            processItemMoves(world, tradeID);
         }
 
-        public static void AddMultiItemMoveGumpToUI(int x, int y)
+        public static void AddMultiItemMoveGumpToUI(World world, int x, int y)
         {
             if (MoveItems.Count > 0)
             {
                 Gump moveItemGump = UIManager.GetGump<MultiItemMoveGump>();
                 if (moveItemGump == null)
-                    UIManager.Add(new MultiItemMoveGump(x, y));
+                    UIManager.Add(new MultiItemMoveGump(world, x, y));
             }
         }
 
-        private static void processItemMoves(Item container)
+        private static void processItemMoves(World world, Item container)
         {
             Task.Factory.StartNew(() =>
             {
@@ -147,7 +147,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     while (MoveItems.TryDequeue(out Item moveItem))
                     {
-                        if (GameActions.PickUp(moveItem.Serial, 0, 0, moveItem.Amount))
+                        if (GameActions.PickUp(world, moveItem.Serial, 0, 0, moveItem.Amount))
                             GameActions.DropItem(moveItem.Serial, 0xFFFF, 0xFFFF, 0, container);
                         Task.Delay(ObjDelay).Wait();
                     }
@@ -156,27 +156,27 @@ namespace ClassicUO.Game.UI.Gumps
             });
         }
 
-        private static void processItemMoves(int x, int y, int z)
+        private static void processItemMoves(World world, int x, int y, int z)
         {
             Task.Factory.StartNew(() =>
             {
                 while (MoveItems.TryDequeue(out Item moveItem))
                 {
-                    Assets.StaticTiles itemData = Assets.TileDataLoader.Instance.StaticData[moveItem.Graphic];
-                    if (GameActions.PickUp(moveItem.Serial, 0, 0, moveItem.Amount))
+                    Assets.StaticTiles itemData = Client.Game.UO.FileManager.TileData.StaticData[moveItem.Graphic];
+                    if (GameActions.PickUp(world, moveItem.Serial, 0, 0, moveItem.Amount))
                         GameActions.DropItem(moveItem.Serial, x, y, z + (sbyte)(itemData.Height == 0xFF ? 0 : itemData.Height), 0);
                     Task.Delay(ObjDelay).Wait();
                 }
             });
         }
 
-        private static void processItemMoves(uint tradeID)
+        private static void processItemMoves(World world, uint tradeID)
         {
             Task.Factory.StartNew(() =>
             {
                 while (MoveItems.TryDequeue(out Item moveItem))
                 {
-                    if (GameActions.PickUp(moveItem.Serial, 0, 0, moveItem.Amount))
+                    if (GameActions.PickUp(world, moveItem.Serial, 0, 0, moveItem.Amount))
                         GameActions.DropItem(moveItem.Serial, RandomHelper.GetValue(0, 20), RandomHelper.GetValue(0, 20), 0, tradeID);
                     Task.Delay(ObjDelay).Wait();
                 }

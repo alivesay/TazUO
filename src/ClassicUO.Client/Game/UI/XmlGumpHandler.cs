@@ -19,9 +19,9 @@ namespace ClassicUO.Game.UI
     {
         public static string XmlGumpPath { get => Path.Combine(CUOEnviroment.ExecutablePath, "Data", "XmlGumps"); }
 
-        public static XmlGump CreateGumpFromFile(string filePath)
+        public static XmlGump CreateGumpFromFile(World world, string filePath)
         {
-            XmlGump gump = new XmlGump();
+            XmlGump gump = new XmlGump(world);
             gump.CanCloseWithRightClick = true;
             gump.AcceptMouseInput = true;
             gump.CanMove = true;
@@ -35,7 +35,7 @@ namespace ClassicUO.Game.UI
                 {
                     xmlDoc.LoadXml(File.ReadAllText(filePath));
                 }
-                catch (Exception e) { GameActions.Print(e.Message); }
+                catch (Exception e) { GameActions.Print(world, e.Message); }
 
                 if (xmlDoc.DocumentElement != null)
                 {
@@ -72,7 +72,7 @@ namespace ClassicUO.Game.UI
                         }
                     }
 
-                    ProcessChildNodes(gump, root);
+                    ProcessChildNodes(world, gump, root);
                 }
                 gump.ForceSizeUpdate();
             }
@@ -80,12 +80,12 @@ namespace ClassicUO.Game.UI
             return gump;
         }
 
-        public static void TryAutoOpenByName(string name)
+        public static void TryAutoOpenByName(World world, string name)
         {
             string fullFile = Path.Combine(XmlGumpPath, name + ".xml");
             if (File.Exists(fullFile))
             {
-                UIManager.Add(CreateGumpFromFile(fullFile));
+                UIManager.Add(CreateGumpFromFile(world, fullFile));
             }
         }
 
@@ -113,7 +113,7 @@ namespace ClassicUO.Game.UI
             return fileList.ToArray();
         }
 
-        private static void ProcessChildNodes(XmlGump gump, XmlNode node)
+        private static void ProcessChildNodes(World world, XmlGump gump, XmlNode node)
         {
             foreach (XmlNode child in node.ChildNodes)
             {
@@ -122,7 +122,7 @@ namespace ClassicUO.Game.UI
                     case XmlNodeType.Element:
                         if (child.Name.ToLower().Equals("text"))
                         {
-                            HandleTextTag(gump, child);
+                            HandleTextTag(world, gump, child);
                             break;
                         }
                         if (child.Name.ToLower().Equals("colorbox"))
@@ -137,17 +137,17 @@ namespace ClassicUO.Game.UI
                         }
                         if (child.Name.ToLower().Equals("image_progress_bar"))
                         {
-                            HandleImageProgressBar(gump, child);
+                            HandleImageProgressBar(world, gump, child);
                             break;
                         }
                         if (child.Name.ToLower().Equals("color_progress_bar"))
                         {
-                            HandleColorProgressBar(gump, child);
+                            HandleColorProgressBar(world, gump, child);
                             break;
                         }
                         if (child.Name.ToLower().Equals("control"))
                         {
-                            HandleControl(gump, child);
+                            HandleControl(world, gump, child);
                             break;
                         }
                         if (child.Name.ToLower().Equals("simple_border"))
@@ -157,22 +157,22 @@ namespace ClassicUO.Game.UI
                         }
                         if (child.Name.ToLower().Equals("macro_button_color"))
                         {
-                            HandleMacroButton(gump, child);
+                            HandleMacroButton(world, gump, child);
                             break;
                         }
                         if (child.Name.ToLower().Equals("macro_button_graphic"))
                         {
-                            HandleMacroButtonGraphic(gump, child);
+                            HandleMacroButtonGraphic(world, gump, child);
                             break;
                         }
                         if (child.Name.ToLower().Equals("hp_bar_color"))
                         {
-                            HandleColorHPBar(gump, child);
+                            HandleColorHPBar(world, gump, child);
                             break;
                         }
                         if (child.Name.ToLower().Equals("hp_bar_image"))
                         {
-                            HandleImageHPBar(gump, child);
+                            HandleImageHPBar(world, gump, child);
                             break;
                         }
                         break;
@@ -180,9 +180,9 @@ namespace ClassicUO.Game.UI
             }
         }
 
-        private static void HandleImageHPBar(XmlGump gump, XmlNode node)
+        private static void HandleImageHPBar(World world, XmlGump gump, XmlNode node)
         {
-            XmlHealthBar hpBar = new XmlHealthBar(World.Player);
+            XmlHealthBar hpBar = new XmlHealthBar(world, world.Player);
             ApplyBasicAttributes(hpBar, node);
             hpBar.SetImageType();
 
@@ -243,9 +243,9 @@ namespace ClassicUO.Game.UI
             gump.Add(hpBar);
         }
 
-        private static void HandleColorHPBar(XmlGump gump, XmlNode node)
+        private static void HandleColorHPBar(World world, XmlGump gump, XmlNode node)
         {
-            XmlHealthBar hpBar = new XmlHealthBar(World.Player);
+            XmlHealthBar hpBar = new XmlHealthBar(world, world.Player);
             ApplyBasicAttributes(hpBar, node);
             hpBar.SetColoredType();
 
@@ -287,7 +287,7 @@ namespace ClassicUO.Game.UI
             gump.Add(hpBar);
         }
 
-        private static void HandleMacroButtonGraphic(XmlGump gump, XmlNode node)
+        private static void HandleMacroButtonGraphic(World world, XmlGump gump, XmlNode node)
         {
             HitBox hb = new HitBox(0, 0, 0, 0, null, 0);
             ApplyBasicAttributes(hb, node);
@@ -340,7 +340,7 @@ namespace ClassicUO.Game.UI
                         }
                         break;
                     case "macro":
-                        MacroManager manager = Client.Game.GetScene<GameScene>().Macros;
+                        var manager = world.Macros;
                         Macro m = manager.FindMacro(attr.Value);
                         if (m != null)
                         {
@@ -353,7 +353,7 @@ namespace ClassicUO.Game.UI
             gump.Add(hb);
         }
 
-        private static void HandleMacroButton(XmlGump gump, XmlNode node)
+        private static void HandleMacroButton(World world, XmlGump gump, XmlNode node)
         {
             HitBox hb = new HitBox(0, 0, 0, 0, null, 0);
             ApplyBasicAttributes(hb, node);
@@ -388,7 +388,7 @@ namespace ClassicUO.Game.UI
                         }
                         break;
                     case "macro":
-                        MacroManager manager = Client.Game.GetScene<GameScene>().Macros;
+                        MacroManager manager = world.Macros;
                         Macro m = manager.FindMacro(attr.Value);
                         if (m != null)
                         {
@@ -425,12 +425,12 @@ namespace ClassicUO.Game.UI
             gump.Add(ApplyBasicAttributes(new SimpleBorder() { Hue = hue, Width = width, Height = height }, node));
         }
 
-        private static void HandleControl(XmlGump gump, XmlNode node)
+        private static void HandleControl(World world, XmlGump gump, XmlNode node)
         {
-            XmlGump newControl = new XmlGump();
+            XmlGump newControl = new XmlGump(world);
             ApplyBasicAttributes(newControl, node);
 
-            ProcessChildNodes(newControl, node);
+            ProcessChildNodes(world, newControl, node);
 
             if (newControl.Width < 1)
             {
@@ -440,7 +440,7 @@ namespace ClassicUO.Game.UI
             gump.Add(newControl);
         }
 
-        private static void HandleColorProgressBar(XmlGump gump, XmlNode node)
+        private static void HandleColorProgressBar(World world, XmlGump gump, XmlNode node)
         {
             ushort bg_hue = 0, fg_hue = 0;
             int value = 0, maxval = 0;
@@ -462,14 +462,14 @@ namespace ClassicUO.Game.UI
                         originalValue = attr.Value;
                         if (!int.TryParse(attr.Value, out value))
                         {
-                            int.TryParse(FormatText(attr.Value), out value);
+                            int.TryParse(FormatText(world, attr.Value), out value);
                         }
                         break;
                     case "max_value":
                         originalMaxVal = attr.Value;
                         if (!int.TryParse(attr.Value, out maxval))
                         {
-                            int.TryParse(FormatText(attr.Value), out maxval);
+                            int.TryParse(FormatText(world, attr.Value), out maxval);
                         }
                         break;
                     case "updates":
@@ -507,7 +507,7 @@ namespace ClassicUO.Game.UI
             }
         }
 
-        private static void HandleImageProgressBar(XmlGump gump, XmlNode node)
+        private static void HandleImageProgressBar(World world, XmlGump gump, XmlNode node)
         {
             ushort bg_graphic = 0, fg_graphic = 0, bg_hue = 0, fg_hue = 0;
             int value = 0, maxval = 0;
@@ -535,14 +535,14 @@ namespace ClassicUO.Game.UI
                         originalValue = attr.Value;
                         if (!int.TryParse(attr.Value, out value))
                         {
-                            int.TryParse(FormatText(attr.Value), out value);
+                            int.TryParse(FormatText(world, attr.Value), out value);
                         }
                         break;
                     case "max_value":
                         originalMaxVal = attr.Value;
                         if (!int.TryParse(attr.Value, out maxval))
                         {
-                            int.TryParse(FormatText(attr.Value), out maxval);
+                            int.TryParse(FormatText(world, attr.Value), out maxval);
                         }
                         break;
                     case "updates":
@@ -649,7 +649,7 @@ namespace ClassicUO.Game.UI
             gump.Add(ApplyBasicAttributes(new ColorBox(0, 0, hue) { Alpha = alpha, AcceptMouseInput = true, CanCloseWithRightClick = true, CanMove = true }, colorNode));
         }
 
-        private static void HandleTextTag(XmlGump gump, XmlNode textNode)
+        private static void HandleTextTag(World world, XmlGump gump, XmlNode textNode)
         {
             string font = TrueTypeLoader.EMBEDDED_FONT;
             int x = 0, y = 0, fontSize = 16, width = 0, hue = 997;
@@ -700,7 +700,7 @@ namespace ClassicUO.Game.UI
             TextBox t;
 
             TextBox.RTLOptions textboxOptions = new (){Width = width > 0 ? width : null, Align = align};
-            gump.Add(t = TextBox.GetOne(FormatText(textNode.InnerText), font, fontSize, hue, textboxOptions));
+            gump.Add(t = TextBox.GetOne(FormatText(world, textNode.InnerText), font, fontSize, hue, textboxOptions));
             t.X = x;
             t.Y = y;
             t.AcceptMouseInput = false;
@@ -752,47 +752,47 @@ namespace ClassicUO.Game.UI
             return (float)(value / max);
         }
 
-        public static string FormatText(string text)
+        public static string FormatText(World world, string text)
         {
-            text = text.Replace("{charname}", World.Player.Name);
-            text = text.Replace("{hp}", World.Player.Hits.ToString());
-            text = text.Replace("{maxhp}", World.Player.HitsMax.ToString());
-            text = text.Replace("{mana}", World.Player.Mana.ToString());
-            text = text.Replace("{maxmana}", World.Player.ManaMax.ToString());
-            text = text.Replace("{stam}", World.Player.Stamina.ToString());
-            text = text.Replace("{maxstam}", World.Player.StaminaMax.ToString());
-            text = text.Replace("{weight}", World.Player.Weight.ToString());
-            text = text.Replace("{maxweight}", World.Player.WeightMax.ToString());
-            text = text.Replace("{str}", World.Player.Strength.ToString());
-            text = text.Replace("{dex}", World.Player.Dexterity.ToString());
-            text = text.Replace("{int}", World.Player.Intelligence.ToString());
-            text = text.Replace("{damagemin}", World.Player.DamageMin.ToString());
-            text = text.Replace("{damagemax}", World.Player.DamageMax.ToString());
-            text = text.Replace("{hci}", World.Player.HitChanceIncrease.ToString());
-            text = text.Replace("{di}", World.Player.DamageIncrease.ToString());
-            text = text.Replace("{ssi}", World.Player.SwingSpeedIncrease.ToString());
-            text = text.Replace("{defchance}", World.Player.DefenseChanceIncrease.ToString());
-            text = text.Replace("{defchancemax}", World.Player.MaxDefenseChanceIncrease.ToString());
-            text = text.Replace("{sdi}", World.Player.SpellDamageIncrease.ToString());
-            text = text.Replace("{fc}", World.Player.FasterCasting.ToString());
-            text = text.Replace("{fcr}", World.Player.FasterCastRecovery.ToString());
-            text = text.Replace("{lmc}", World.Player.LowerManaCost.ToString());
-            text = text.Replace("{lrc}", World.Player.LowerReagentCost.ToString());
-            text = text.Replace("{phyres}", World.Player.PhysicalResistance.ToString());
-            text = text.Replace("{phyresmax}", World.Player.MaxPhysicResistence.ToString());
-            text = text.Replace("{fireres}", World.Player.FireResistance.ToString());
-            text = text.Replace("{fireresmax}", World.Player.MaxFireResistence.ToString());
-            text = text.Replace("{coldres}", World.Player.ColdResistance.ToString());
-            text = text.Replace("{coldresmax}", World.Player.MaxColdResistence.ToString());
-            text = text.Replace("{poisonres}", World.Player.PoisonResistance.ToString());
-            text = text.Replace("{poisonresmax}", World.Player.MaxPoisonResistence.ToString());
-            text = text.Replace("{energyres}", World.Player.EnergyResistance.ToString());
-            text = text.Replace("{energyresmax}", World.Player.MaxEnergyResistence.ToString());
-            text = text.Replace("{maxstats}", World.Player.StatsCap.ToString());
-            text = text.Replace("{luck}", World.Player.Luck.ToString());
-            text = text.Replace("{gold}", World.Player.Gold.ToString());
-            text = text.Replace("{pets}", World.Player.Followers.ToString());
-            text = text.Replace("{petsmax}", World.Player.FollowersMax.ToString());
+            text = text.Replace("{charname}", world.Player.Name);
+            text = text.Replace("{hp}", world.Player.Hits.ToString());
+            text = text.Replace("{maxhp}", world.Player.HitsMax.ToString());
+            text = text.Replace("{mana}", world.Player.Mana.ToString());
+            text = text.Replace("{maxmana}", world.Player.ManaMax.ToString());
+            text = text.Replace("{stam}", world.Player.Stamina.ToString());
+            text = text.Replace("{maxstam}", world.Player.StaminaMax.ToString());
+            text = text.Replace("{weight}", world.Player.Weight.ToString());
+            text = text.Replace("{maxweight}", world.Player.WeightMax.ToString());
+            text = text.Replace("{str}", world.Player.Strength.ToString());
+            text = text.Replace("{dex}", world.Player.Dexterity.ToString());
+            text = text.Replace("{int}", world.Player.Intelligence.ToString());
+            text = text.Replace("{damagemin}", world.Player.DamageMin.ToString());
+            text = text.Replace("{damagemax}", world.Player.DamageMax.ToString());
+            text = text.Replace("{hci}", world.Player.HitChanceIncrease.ToString());
+            text = text.Replace("{di}", world.Player.DamageIncrease.ToString());
+            text = text.Replace("{ssi}", world.Player.SwingSpeedIncrease.ToString());
+            text = text.Replace("{defchance}", world.Player.DefenseChanceIncrease.ToString());
+            text = text.Replace("{defchancemax}", world.Player.MaxDefenseChanceIncrease.ToString());
+            text = text.Replace("{sdi}", world.Player.SpellDamageIncrease.ToString());
+            text = text.Replace("{fc}", world.Player.FasterCasting.ToString());
+            text = text.Replace("{fcr}", world.Player.FasterCastRecovery.ToString());
+            text = text.Replace("{lmc}", world.Player.LowerManaCost.ToString());
+            text = text.Replace("{lrc}", world.Player.LowerReagentCost.ToString());
+            text = text.Replace("{phyres}", world.Player.PhysicalResistance.ToString());
+            text = text.Replace("{phyresmax}", world.Player.MaxPhysicResistence.ToString());
+            text = text.Replace("{fireres}", world.Player.FireResistance.ToString());
+            text = text.Replace("{fireresmax}", world.Player.MaxFireResistence.ToString());
+            text = text.Replace("{coldres}", world.Player.ColdResistance.ToString());
+            text = text.Replace("{coldresmax}", world.Player.MaxColdResistence.ToString());
+            text = text.Replace("{poisonres}", world.Player.PoisonResistance.ToString());
+            text = text.Replace("{poisonresmax}", world.Player.MaxPoisonResistence.ToString());
+            text = text.Replace("{energyres}", world.Player.EnergyResistance.ToString());
+            text = text.Replace("{energyresmax}", world.Player.MaxEnergyResistence.ToString());
+            text = text.Replace("{maxstats}", world.Player.StatsCap.ToString());
+            text = text.Replace("{luck}", world.Player.Luck.ToString());
+            text = text.Replace("{gold}", world.Player.Gold.ToString());
+            text = text.Replace("{pets}", world.Player.Followers.ToString());
+            text = text.Replace("{petsmax}", world.Player.FollowersMax.ToString());
 
             return text;
         }
@@ -832,7 +832,7 @@ namespace ClassicUO.Game.UI
         private bool savingFile = false;
         private uint saveFileAfter = uint.MaxValue;
 
-        public XmlGump() : base(0, 0)
+        public XmlGump(World world) : base(world, 0, 0)
         {
         }
 
@@ -846,7 +846,7 @@ namespace ClassicUO.Game.UI
                 {
                     if (t.Item1 != null && !t.Item1.IsDisposed)
                     {
-                        string newString = XmlGumpHandler.FormatText(t.Item2.Item1);
+                        string newString = XmlGumpHandler.FormatText(World, t.Item2.Item1);
                         if (t.Item1.Text != newString)
                         {
                             if (t.Item2.Item2 < 1)
@@ -865,9 +865,9 @@ namespace ClassicUO.Game.UI
                 {
                     if (p.Control != null && !p.Control.IsDisposed)
                     {
-                        if (int.TryParse(XmlGumpHandler.FormatText(p.Value), out int val))
+                        if (int.TryParse(XmlGumpHandler.FormatText(World, p.Value), out int val))
                         {
-                            if (int.TryParse(XmlGumpHandler.FormatText(p.MaxValue), out int max))
+                            if (int.TryParse(XmlGumpHandler.FormatText(World, p.MaxValue), out int max))
                             {
                                 p.Control.Width = (int)(XmlGumpHandler.GetPercentage(val, max) * p.MaxSize);
                             }
@@ -879,9 +879,9 @@ namespace ClassicUO.Game.UI
                 {
                     if (p.Control != null && !p.Control.IsDisposed)
                     {
-                        if (int.TryParse(XmlGumpHandler.FormatText(p.Value), out int val))
+                        if (int.TryParse(XmlGumpHandler.FormatText(World, p.Value), out int val))
                         {
-                            if (int.TryParse(XmlGumpHandler.FormatText(p.MaxValue), out int max))
+                            if (int.TryParse(XmlGumpHandler.FormatText(World, p.MaxValue), out int max))
                             {
                                 int newHeight = (int)(XmlGumpHandler.GetPercentage(val, max) * p.MaxSize);
                                 if (p.Control is GumpPicInPic picnpic)
@@ -941,7 +941,7 @@ namespace ClassicUO.Game.UI
                             xmlDoc.Save(FilePath);
                         }
                     }
-                    catch (Exception e) { GameActions.Print(e.Message); }
+                    catch (Exception e) { GameActions.Print(World, e.Message); }
 
                 }
 
@@ -1015,12 +1015,12 @@ namespace ClassicUO.Game.UI
             }
         }
 
-        public XmlHealthBar(uint serial)
+        public XmlHealthBar(World world, uint serial)
         {
             LocalSerial = serial;
             if (SerialHelper.IsMobile(serial))
             {
-                mobile = World.Get(serial) as Mobile;
+                mobile = world.Get(serial) as Mobile;
             }
             AcceptMouseInput = false;
         }

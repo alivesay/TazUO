@@ -258,7 +258,7 @@ namespace ClassicUO.Game.UI.Gumps
             "\n\n/c[white]For further history please visit our discord."
         };
 
-        public VersionHistory() : base(0, 0)
+        public VersionHistory(World world) : base(world, 0, 0)
         {
             Width = 400;
             Height = 500;

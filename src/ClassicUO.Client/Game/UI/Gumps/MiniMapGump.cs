@@ -363,7 +363,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                             if (isLand && color > 0x4000)
                             {
-                                color = HuesLoader.Instance.GetHueColorRgba5551(16, (ushort) (color - 0x4000));
+                                color = Client.Game.UO.FileManager.Hues.GetHueColorRgba5551(16, (ushort) (color - 0x4000));
                                 //                                 color = Client.Game.UO.FileManager.Hues.GetColor16(
                                 //     16384,
                                 //     (ushort)(color - 0x4000)

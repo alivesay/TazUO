@@ -143,7 +143,7 @@ namespace ClassicUO.Game.Scenes
             }
 
             NetClient.Socket.Disconnected += SocketOnDisconnected;
-            _world.EventSink.MessageReceived += ChatOnMessageReceived;
+            EventSink.MessageReceived += ChatOnMessageReceived;
             UIManager.ContainerScale = ProfileManager.CurrentProfile.ContainersScale / 100f;
 
             SDL.SDL_SetWindowMinimumSize(Client.Game.Window.Handle, 640, 480);
@@ -170,16 +170,16 @@ namespace ClassicUO.Game.Scenes
             Plugin.OnConnected();
             EventSink.InvokeOnConnected(null);
             GameController.UpdateBackgroundHueShader();
-            SpellDefinition.LoadCustomSpells();
+            SpellDefinition.LoadCustomSpells(_world);
             SpellVisualRangeManager.Instance.OnSceneLoad();
             AutoLootManager.Instance.OnSceneLoad();
 
             foreach (var xml in ProfileManager.CurrentProfile.AutoOpenXmlGumps)
             {
-                XmlGumpHandler.TryAutoOpenByName(xml);
+                XmlGumpHandler.TryAutoOpenByName(_world, xml);
             }
 
-            LegionScripting.LegionScripting.Init();
+            LegionScripting.LegionScripting.Init(_world);
             BuySellAgent.Load();
             GraphicsReplacement.Load();
         }
@@ -347,7 +347,7 @@ namespace ClassicUO.Game.Scenes
             // special case for wmap. this allow us to save settings
             UIManager.GetGump<WorldMapGump>()?.SaveSettings();
 
-            ProfileManager.CurrentProfile?.Save(ProfileManager.ProfilePath);
+            ProfileManager.CurrentProfile?.Save(_world, ProfileManager.ProfilePath);
             TileMarkerManager.Instance.Save();
             SpellVisualRangeManager.Instance.Save();
             SpellVisualRangeManager.Instance.OnSceneUnload();
@@ -376,7 +376,7 @@ namespace ClassicUO.Game.Scenes
             _world.DelayedObjectClickManager.Clear();
 
             _useItemQueue?.Clear();
-            _world.EventSink.MessageReceived -= ChatOnMessageReceived;
+            EventSink.MessageReceived -= ChatOnMessageReceived;
 
             Settings.GlobalSettings.WindowSize = new Point(
                 Client.Game.Window.ClientBounds.Width,
@@ -625,7 +625,7 @@ namespace ClassicUO.Game.Scenes
 
             GetViewPort();
 
-            var useObjectHandles = _world.NameOverHeadManager.IsShowing;
+            var useObjectHandles = NameOverHeadManager.IsShowing;
             if (useObjectHandles != _useObjectHandles)
             {
                 _useObjectHandles = useObjectHandles;
@@ -788,15 +788,7 @@ namespace ClassicUO.Game.Scenes
                 //Last ping > ~5 seconds
                 NetClient.Socket.Send_Resync();
                 _lastResync = Time.Ticks;
-                GameActions.Print("Possible connection hang, resync attempted", 32, MessageType.System);
-            }
-
-            if (currentProfile.ForceResyncOnHang && Time.Ticks - NetClient.Socket.Statistics.LastPingReceived > 5000 && Time.Ticks - _lastResync > 5000)
-            {
-                //Last ping > ~5 seconds
-                NetClient.Socket.Send_Resync();
-                _lastResync = Time.Ticks;
-                GameActions.Print("Possible connection hang, resync attempted", 32, MessageType.System);
+                GameActions.Print(_world, "Possible connection hang, resync attempted", 32, MessageType.System);
             }
 
             _world.Update();
@@ -822,7 +814,7 @@ namespace ClassicUO.Game.Scenes
                 }
             }
 
-            if (currentProfile.FollowingMode && SerialHelper.IsMobile(currentProfile.FollowingTarget) && !Pathfinder.AutoWalking)
+            if (currentProfile.FollowingMode && SerialHelper.IsMobile(currentProfile.FollowingTarget) && !_world.Player.Pathfinder.AutoWalking)
             {
                 Mobile follow = _world.Mobiles.Get(currentProfile.FollowingTarget);
 
@@ -836,7 +828,7 @@ namespace ClassicUO.Game.Scenes
                     }
                     else if (distance > currentProfile.AutoFollowDistance)
                     {
-                        if (!Pathfinder.WalkTo(follow.X, follow.Y, follow.Z, currentProfile.AutoFollowDistance) && !World.Player.IsParalyzed)
+                        if (!_world.Player.Pathfinder.WalkTo(follow.X, follow.Y, follow.Z, currentProfile.AutoFollowDistance) && !_world.Player.IsParalyzed)
                         {
                             StopFollowing(); //Can't get there
                         }
@@ -1408,7 +1400,7 @@ namespace ClassicUO.Game.Scenes
             {
                 ProfileManager.CurrentProfile.FollowingMode = false;
                 ProfileManager.CurrentProfile.FollowingTarget = 0;
-                Pathfinder.StopAutoWalk();
+                _world.Player.Pathfinder.StopAutoWalk();
 
                 _world.MessageManager.HandleMessage(
                     _world.Player,

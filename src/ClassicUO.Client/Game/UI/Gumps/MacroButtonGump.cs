@@ -2,6 +2,7 @@
 
 using System;
 using System.Xml;
+using ClassicUO.Assets;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
 using ClassicUO.Input;
@@ -106,9 +107,9 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (value.HasValue)
                 {
-                    ref readonly var texture = ref Client.Game.Gumps.GetGump(value.Value);
+                    ref readonly var texture = ref Client.Game.UO.Gumps.GetGump(value.Value);
                     _bounds = texture.UV;
-                    IsPartialHue = texture.Texture == null ? false : TileDataLoader.Instance.StaticData[value.Value].IsPartialHue;
+                    IsPartialHue = texture.Texture == null ? false : Client.Game.UO.FileManager.TileData.StaticData[value.Value].IsPartialHue;
                 }
 
                 Width = (int)(_bounds.Width * factor);
@@ -201,7 +202,7 @@ namespace ClassicUO.Game.UI.Gumps
             if (Graphic.HasValue)
             {
                 //var texture = GumpsLoader.Instance.GetGumpTexture(, out Rectangle bounds);
-                ref readonly var texture = ref Client.Game.Gumps.GetGump(Graphic.Value);
+                ref readonly var texture = ref Client.Game.UO.Gumps.GetGump(Graphic.Value);
                 if (texture.Texture != null)
                 {
                     Rectangle rect = new Rectangle(x, y, Width, Height);

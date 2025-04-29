@@ -5,8 +5,8 @@
     <ApplicationIcon>cuoicon.ico</ApplicationIcon>
     <AssemblyName>cuo</AssemblyName>
     <RootNamespace>ClassicUO</RootNamespace>
-    <AssemblyVersion>3.28.27</AssemblyVersion>
-    <FileVersion>3.28.27</FileVersion>
+    <AssemblyVersion>3.28.28</AssemblyVersion>
+    <FileVersion>3.28.28</FileVersion>
     <PackageProjectUrl>https://github.com/bittiez/TazUO</PackageProjectUrl>
     <PublishAot>true</PublishAot>
     <PlatformTarget>x64</PlatformTarget>
@@ -82,18 +82,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Game\Managers\DefaultSpellIndicatorConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Game\Managers\DefaultSpellIndicatorConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="IronPython" Version="3.4.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="cuoapi">
       <HintPath>..\..\external\cuoapi\cuoapi.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http">
-      <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.Net.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Forms">
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.Windows.Forms.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

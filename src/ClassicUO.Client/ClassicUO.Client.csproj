@@ -98,9 +98,6 @@
       <HintPath>..\..\external\cuoapi\cuoapi.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="System.Text.Json" Version="8.0.5" />
-  </ItemGroup>
 
   <PropertyGroup>
     <_IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</_IsWindows>

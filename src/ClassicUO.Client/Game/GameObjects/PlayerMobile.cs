@@ -273,27 +273,27 @@ namespace ClassicUO.Game.GameObjects
         {
             AbilityData.DefaultItemAbilities.Set(Abilities);
             
-            if ((FindItemByLayer(Layer.OneHanded) ?? FindItemByLayer(Layer.TwoHanded)) is { Graphic: > 0 } weapon)
+            if ((FindItemByLayer(Layer.OneHanded) ?? FindItemByLayer(Layer.TwoHanded)) is { OriginalGraphic: > 0 } weapon)
             {
                 ushort animId = weapon.ItemData.AnimID;
                 ushort animGraphic = 0;
 
-                if (Client.Game.UO.FileManager.TileData.StaticData[weapon.Graphic - 1].AnimID == animId)
+                if (Client.Game.UO.FileManager.TileData.StaticData[weapon.OriginalGraphic - 1].AnimID == animId)
                 {
-                    animGraphic = (ushort)(weapon.Graphic - 1);
+                    animGraphic = (ushort)(weapon.OriginalGraphic - 1);
                 }
-                else if (Client.Game.UO.FileManager.TileData.StaticData[weapon.Graphic + 1].AnimID == animId)
+                else if (Client.Game.UO.FileManager.TileData.StaticData[weapon.OriginalGraphic + 1].AnimID == animId)
                 {
-                    animGraphic = (ushort)(weapon.Graphic + 1);
+                    animGraphic = (ushort)(weapon.OriginalGraphic + 1);
                 }
 
-                if (AbilityData.GraphicToAbilitiesMap.TryGetValue(weapon.Graphic, out var abilities) || AbilityData.GraphicToAbilitiesMap.TryGetValue(animGraphic, out abilities))
+                if (AbilityData.GraphicToAbilitiesMap.TryGetValue(weapon.OriginalGraphic, out var abilities) || AbilityData.GraphicToAbilitiesMap.TryGetValue(animGraphic, out abilities))
                 {
                     abilities.Set(Abilities);
                 }
                 else
                 {
-                    Log.Warn($"Could not update abilities ${weapon.Graphic} \"${weapon.Name}\" has no GraphicToAbilitiesMap[graphic] data");
+                    Log.Warn($"Could not update abilities ${weapon.OriginalGraphic} \"${weapon.Name}\" has no GraphicToAbilitiesMap[OriginalGraphic] data");
                 }
             }
 

@@ -527,6 +527,8 @@ namespace ClassicUO.Game.UI.Gumps
 
                     foreach (JournalData _ in journalDatas)
                     {
+                        if (_ is null)
+                            continue;
                         _.EntryText.Width = Width - BORDER_WIDTH - (ProfileManager.CurrentProfile.HideJournalTimestamp ? 0 : _.TimeStamp.Width);
                         _.EntryText.Update(); //Because this control isn't a child of any gump, it doesn't get updated
                     }
@@ -573,10 +575,10 @@ namespace ClassicUO.Game.UI.Gumps
 
                 while (journalDatas.Count > (ProfileManager.CurrentProfile == null ? 200 : ProfileManager.CurrentProfile.MaxJournalEntries))
                     journalDatas.RemoveFromFront().Destroy();
-                    
+
                 TextBox timeS = TextBox.GetOne($"{time:t}", ProfileManager.CurrentProfile.SelectedTTFJournalFont, ProfileManager.CurrentProfile.SelectedJournalFontSize - 2, 1150, TextBox.RTLOptions.Default());
-                TextBox je = TextBox.GetOne(text, ProfileManager.CurrentProfile.SelectedTTFJournalFont, ProfileManager.CurrentProfile.SelectedJournalFontSize, hue, 
-                    new TextBox.RTLOptions(){Width = Width - (ProfileManager.CurrentProfile.HideJournalTimestamp ? 0 : timeS.Width)});
+                TextBox je = TextBox.GetOne(text, ProfileManager.CurrentProfile.SelectedTTFJournalFont, ProfileManager.CurrentProfile.SelectedJournalFontSize, hue,
+                    new TextBox.RTLOptions() { Width = Width - (ProfileManager.CurrentProfile.HideJournalTimestamp ? 0 : timeS.Width) });
 
                 journalDatas.AddToBack(
                     new JournalData(

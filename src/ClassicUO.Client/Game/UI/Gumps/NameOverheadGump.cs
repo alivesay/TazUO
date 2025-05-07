@@ -77,6 +77,8 @@ namespace ClassicUO.Game.UI.Gumps
                 return false;
             }
 
+            _text ??= TextBox.GetOne(string.Empty, ProfileManager.CurrentProfile.NamePlateFont, ProfileManager.CurrentProfile.NamePlateFontSize, entity is Mobile m ? Notoriety.GetHue(m.NotorietyFlag) : (ushort)0x0481, TextBox.RTLOptions.DefaultCenterStroked());
+
             if (entity is Item item)
             {
                 if (!World.OPL.TryGetNameAndData(item, out string t, out _))

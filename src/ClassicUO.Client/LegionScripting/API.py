@@ -2,6 +2,9 @@ JournalEntries = None
 Backpack = None
 Player = None
 Random = None
+LastTargetSerial = None
+LastTargetPos = None
+LastTargetGraphic = None
 
 class ScanType:
     Hostile = 0
@@ -240,6 +243,9 @@ def NearestMobile(notoriety: list[Any], maxDistance: int = 10):
     pass
 
 def NearestCorpse(distance: int = 3):
+    pass
+
+def NearestMobiles(notoriety: list[Any], maxDistance: int = 10):
     pass
 
 def FindMobile(serial: int):

@@ -12,6 +12,10 @@ using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Network;
 using Microsoft.Xna.Framework;
+using Button = ClassicUO.Game.UI.Controls.Button;
+using Control = ClassicUO.Game.UI.Controls.Control;
+using Label = ClassicUO.Game.UI.Controls.Label;
+using RadioButton = ClassicUO.Game.UI.Controls.RadioButton;
 
 namespace ClassicUO.LegionScripting
 {
@@ -21,6 +25,7 @@ namespace ClassicUO.LegionScripting
     internal class API
     {
         public static readonly ConcurrentQueue<Action> QueuedPythonActions = new();
+
         private static T InvokeOnMainThread<T>(Func<T> func)
         {
             var resultEvent = new ManualResetEvent(false);
@@ -34,8 +39,10 @@ namespace ClassicUO.LegionScripting
 
             QueuedPythonActions.Enqueue(action);
             resultEvent.WaitOne(); // Wait for the main thread to complete the operation
+
             return result;
         }
+
         private static void InvokeOnMainThread(Action action)
         {
             var resultEvent = new ManualResetEvent(false);
@@ -70,6 +77,11 @@ namespace ClassicUO.LegionScripting
         /// `API.Random.Next(100)` will return a number between 0 and 100.
         /// </summary>
         public Random Random { get; set; } = new();
+        
+        public uint LastTargetSerial => InvokeOnMainThread(() => TargetManager.LastTargetInfo.Serial);
+        public Vector3 LastTargetPos => InvokeOnMainThread(() => TargetManager.LastTargetInfo.Position);
+        public ushort LastTargetGraphic => InvokeOnMainThread(()=>TargetManager.LastTargetInfo.Graphic);
+
         #endregion
 
         #region Enum
@@ -134,16 +146,22 @@ namespace ClassicUO.LegionScripting
         /// ```  
         /// </summary>
         /// <returns>The item that was in your hand</returns>
-        public Item ClearLeftHand() => InvokeOnMainThread(() =>
-        {
-            Item i = World.Player.FindItemByLayer(Game.Data.Layer.OneHanded);
-            if (i != null)
+        public Item ClearLeftHand() => InvokeOnMainThread
+        (
+            () =>
             {
-                GameActions.GrabItem(World, i, i.Amount, Backpack);
-                return i;
+                Item i = World.Player.FindItemByLayer(Layer.OneHanded);
+
+                if (i != null)
+                {
+                    GameActions.GrabItem(World, i, 0, World.Player.FindItemByLayer(Game.Data.Layer.Backpack));
+
+                    return i;
+                }
+
+                return null;
             }
-            return null;
-        });
+        );
 
         /// <summary>
         /// If you have an item in your right hand, move it to your backpack  
@@ -155,16 +173,22 @@ namespace ClassicUO.LegionScripting
         ///  ```  
         /// </summary>
         /// <returns>The item that was in your hand</returns>
-        public Item ClearRightHand() => InvokeOnMainThread(() =>
-        {
-            Item i = World.Player.FindItemByLayer(Game.Data.Layer.TwoHanded);
-            if (i != null)
+        public Item ClearRightHand() => InvokeOnMainThread
+        (
+            () =>
             {
-                GameActions.GrabItem(World, i, i.Amount, Backpack);
-                return i;
+                Item i = World.Player.FindItemByLayer(Layer.TwoHanded);
+
+                if (i != null)
+                {
+                    GameActions.GrabItem(World, i, 0, World.Player.FindItemByLayer(Game.Data.Layer.Backpack));
+
+                    return i;
+                }
+
+                return null;
             }
-            return null;
-        });
+        );
 
         /// <summary>
         /// Single click an object  
@@ -185,7 +209,16 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         /// <param name="serial">The serial</param>
         /// <param name="skipQueue">Defaults true, set to false to use a double click queue</param>
-        public void UseObject(uint serial, bool skipQueue = true) => InvokeOnMainThread(() => { if (skipQueue) GameActions.DoubleClick(World, serial); else GameActions.DoubleClickQueued(serial); });
+        public void UseObject(uint serial, bool skipQueue = true) => InvokeOnMainThread
+        (
+            () =>
+            {
+                if (skipQueue)
+                    GameActions.DoubleClick(serial);
+                else
+                    GameActions.DoubleClickQueued(serial);
+            }
+        );
 
         /// <summary>
         /// Get an item count for the contents of a container  
@@ -262,11 +295,14 @@ namespace ClassicUO.LegionScripting
         /// <param name="amt">Amount to move</param>
         /// <param name="x">X coordinate inside a container</param>
         /// <param name="y">Y coordinate inside a container</param>
-        public void MoveItem(uint serial, uint destination, int amt = 0, int x = 0xFFFF, int y = 0xFFFF) => InvokeOnMainThread(() =>
-        {
-            if (GameActions.PickUp(World, serial, 0, 0, amt))
-                GameActions.DropItem(serial, x, y, 0, destination);
-        });
+        public void MoveItem(uint serial, uint destination, int amt = 0, int x = 0xFFFF, int y = 0xFFFF) => InvokeOnMainThread
+        (
+            () =>
+            {
+                if (GameActions.PickUp(World, serial, 0, 0, amt))
+                    GameActions.DropItem(serial, x, y, 0, destination);
+            }
+        );
 
         /// <summary>
         /// Move an item to the ground near you.  
@@ -283,17 +319,14 @@ namespace ClassicUO.LegionScripting
         /// <param name="x">Offset from your location</param>
         /// <param name="y">Offset from your location</param>
         /// <param name="z">Offset from your location</param>
-        public void MoveItemOffset(uint serial, int amt = 0, int x = 0, int y = 0, int z = 0) => InvokeOnMainThread(() =>
-        {
-            if (GameActions.PickUp(World, serial, 0, 0, amt))
-                GameActions.DropItem(
-                    serial,
-                    World.Player.X + x,
-                    World.Player.Y + y,
-                    World.Player.Z + z,
-                    0
-                );
-        });
+        public void MoveItemOffset(uint serial, int amt = 0, int x = 0, int y = 0, int z = 0) => InvokeOnMainThread
+        (
+            () =>
+            {
+                if (GameActions.PickUp(World, serial, 0, 0, amt))
+                    GameActions.DropItem(serial, World.Player.X + x, World.Player.Y + y, World.Player.Z + z, 0);
+            }
+        );
 
         /// <summary>
         /// Use a skill.  

@@ -14,6 +14,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.Managers
 {
@@ -68,6 +69,7 @@ namespace ClassicUO.Game.Managers
         public uint Serial;
         public ushort X, Y;
         public sbyte Z;
+        public Vector3 Position => new Vector3(X, Y, Z);
 
 
         public void SetEntity(uint serial)

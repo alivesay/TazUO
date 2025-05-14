@@ -70,14 +70,15 @@ namespace ClassicUO.Game.GameObjects
 
         // FIXME: remove it
         public sbyte FoliageIndex = -1;
-        public ushort OriginalGraphic => originalGraphic;
+        public ushort OriginalGraphic => originalGraphic == 0 ? Graphic : originalGraphic;
         public ushort Graphic
         {
             get => graphic; set
             {
-                if (originalGraphic == default)
+                if (originalGraphic == 0)
                     originalGraphic = value;
-                GraphicsReplacement.Replace(ref value, ref hue);
+                GraphicsReplacement.Replace(originalGraphic, ref value, ref hue);
+                Hue = hue; //Workaround for making sure hues are replaced as-well
                 graphic = value;
             }
         }
@@ -86,8 +87,8 @@ namespace ClassicUO.Game.GameObjects
             get => hue;
             set
             {
+                GraphicsReplacement.ReplaceHue(OriginalGraphic, ref value);
                 hue = value;
-                GraphicsReplacement.Replace(ref originalGraphic, ref hue);
             }
         }
         public Vector3 Offset;
@@ -384,6 +385,7 @@ namespace ClassicUO.Game.GameObjects
             Offset = Vector3.Zero;
             RealScreenPosition = Point.Zero;
             IsFlipped = false;
+            originalGraphic = 0;
             Graphic = 0;
             ObjectHandlesStatus = ObjectHandlesStatus.NONE;
             FrameInfo = Rectangle.Empty;

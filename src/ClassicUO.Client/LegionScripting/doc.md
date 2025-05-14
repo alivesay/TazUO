@@ -3,7 +3,7 @@ All methods, properties, enums, etc need to pre prefaced with `API.` for example
 If you download the [API.py](API.py) file, put it in the same folder as your python scripts and add `import API` to your script, that will enable some mild form of autocomplete in an editor like VS Code.  
 
 
-This was generated on `4/10/2025`.
+This was generated on `5/13/2025`.
 # API  
 
 ## Class Description
@@ -23,6 +23,9 @@ This was generated on `4/10/2025`.
  `API.Random.Next(1, 100)` will return a number between 1 and 100.
  `API.Random.Next(100)` will return a number between 0 and 100.
 
+- **LastTargetSerial** (*uint*)
+- **LastTargetPos** (*Vector3*)
+- **LastTargetGraphic** (*ushort*)
 
 ## Enums
 ### ScanType
@@ -1671,6 +1674,32 @@ This was generated on `4/10/2025`.
 | --- | --- | --- | --- |
 | distance | int | Yes |  |
 #### Return Type: *Item*
+
+</details>
+
+***
+
+
+<details>
+<summary><h3>NearestMobiles(notoriety, maxDistance)</h3></summary>
+
+ Get all mobiles matching Notoriety and distance.  
+ Example:  
+ ```py
+ mob = API.NearestMobiles([API.Notoriety.Murderer, API.Notoriety.Criminal], 7)
+ if len(mob) > 0:
+   API.SysMsg("Found enemies!")
+   API.Msg("Guards!")
+   API.Attack(mob[0])
+   ```
+
+
+**Parameters**  
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| notoriety | IList<Notoriety> | No | List of notorieties |
+| maxDistance | int | Yes |  |
+#### Return Type: *Mobile[]*
 
 </details>
 

@@ -186,7 +186,8 @@ namespace ClassicUO.Game.GameObjects
             }
         }
 
-        protected virtual bool IsWalking => LastStepTime > Time.Ticks - Constants.WALKING_DELAY;
+        public virtual bool IsWalking => LastStepTime > Time.Ticks - Constants.WALKING_DELAY;
+        public bool IsAttackable => (Flags & Flags.YellowBar) == 0; //Added for Python API
 
         public byte AnimationFrameCount;
         public bool AnimationFromServer;

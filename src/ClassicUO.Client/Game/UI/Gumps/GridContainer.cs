@@ -728,6 +728,13 @@ namespace ClassicUO.Game.UI.Gumps
             scrollArea.Height = adjustedHeight - TOP_BAR_HEIGHT;
         }
 
+        public override bool Draw(UltimaBatcher2D batcher, int x, int y)
+        {
+            if(CUOEnviroment.Debug)
+                batcher.DrawString(Renderer.Fonts.Bold, LocalSerial.ToString(), x, y - 40, ShaderHueTranslator.GetHueVector(32));
+            return base.Draw(batcher, x, y);
+        }
+
         public enum BorderStyle
         {
             Default,

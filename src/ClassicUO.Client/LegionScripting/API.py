@@ -203,6 +203,9 @@ def CloseGump(ID: int = 1337):
 def GumpContains(text: str, ID: int = 1337):
     pass
 
+def GetGump(ID: int = 1337):
+    pass
+
 def ToggleFly():
     pass
 

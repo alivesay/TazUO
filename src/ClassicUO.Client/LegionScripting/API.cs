@@ -60,6 +60,8 @@ namespace ClassicUO.LegionScripting
         private ConcurrentBag<uint> ignoreList = new();
         private ConcurrentQueue<JournalEntry> journalEntries = new();
         private World World = Client.Game.UO.World;
+        private Item backpack;
+        private PlayerMobile player;
 
         public ConcurrentQueue<JournalEntry> JournalEntries
         {
@@ -73,15 +75,28 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         public Item Backpack
         {
-            get { return InvokeOnMainThread(() => World.Player.FindItemByLayer(Game.Data.Layer.Backpack)); }
+            get
+            {
+                if (backpack == null)
+                    backpack = InvokeOnMainThread(() => World.Player.FindItemByLayer(Game.Data.Layer.Backpack));
+
+                return backpack;
+            }
         }
+
 
         /// <summary>
         /// Returns the player character
         /// </summary>
         public PlayerMobile Player
         {
-            get { return InvokeOnMainThread(() => World.Player); }
+            get
+            {
+                if (player == null)
+                    player = InvokeOnMainThread(() => World.Player);
+
+                return player;
+            }
         }
 
         /// <summary>
@@ -91,8 +106,19 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         public Random Random { get; set; } = new();
 
+        /// <summary>
+        /// The serial of the last target, if it has a serial.
+        /// </summary>
         public uint LastTargetSerial => InvokeOnMainThread(() => World.TargetManager.LastTargetInfo.Serial);
+
+        /// <summary>
+        /// The last target's position
+        /// </summary>
         public Vector3 LastTargetPos => InvokeOnMainThread(() => World.TargetManager.LastTargetInfo.Position);
+
+        /// <summary>
+        /// The graphic of the last targeting object
+        /// </summary>
         public ushort LastTargetGraphic => InvokeOnMainThread(() => World.TargetManager.LastTargetInfo.Graphic);
 
         #endregion
@@ -1226,9 +1252,11 @@ namespace ClassicUO.LegionScripting
             {
                 Gump g = UIManager.GetGumpServer(ID == uint.MaxValue ? World.Player.LastGumpID : ID);
 
-                if (g != null)
-                {
-                    bool regex = text.StartsWith("$");
+                if (g == null)
+                    return false;
+
+
+                bool regex = text.StartsWith("$");
 
                     if (regex)
                         text = text.Substring(1);
@@ -1244,9 +1272,29 @@ namespace ClassicUO.LegionScripting
                             return true;
                         }
                     }
-                }
 
                 return false;
+            }
+        );
+
+        /// <summary>
+        /// Get a gump by ID.  
+        /// Example:  
+        /// ```py
+        /// gump = API.GetGump()
+        /// if gump:
+        ///   API.SysMsg("Found the gump!")
+        ///   API.CloseGump(gump)
+        /// ```
+        /// </summary>
+        /// <param name="ID">Leabe blank to use last gump opened from server</param>
+        /// <returns></returns>
+        public Gump GetGump(uint ID = uint.MaxValue) => InvokeOnMainThread
+        (() =>
+            {
+                Gump g = UIManager.GetGumpServer(ID == uint.MaxValue ? World.Player.LastGumpID : ID);
+
+                return g;
             }
         );
 
@@ -1507,6 +1555,33 @@ namespace ClassicUO.LegionScripting
         /// <param name="distance"></param>
         /// <returns></returns>
         public Item NearestCorpse(int distance = 3) => InvokeOnMainThread(() => Utility.FindNearestCorpsePython(distance, this));
+
+        /// <summary>
+        /// Get all mobiles matching Notoriety and distance.  
+        /// Example:  
+        /// ```py
+        /// mob = API.NearestMobiles([API.Notoriety.Murderer, API.Notoriety.Criminal], 7)
+        /// if len(mob) > 0:
+        ///   API.SysMsg("Found enemies!")
+        ///   API.Msg("Guards!")
+        ///   API.Attack(mob[0])
+        ///   ```
+        /// </summary>
+        /// <param name="notoriety">List of notorieties</param>
+        /// <param name="maxDistance"></param>
+        /// <returns></returns>
+        public Mobile[] NearestMobiles(IList<Notoriety> notoriety, int maxDistance = 10) => InvokeOnMainThread<Mobile[]>
+        (() =>
+            {
+                if (notoriety == null || notoriety.Count == 0)
+                    return null;
+
+                return World.Mobiles.Values.Where
+                (m => !m.IsDestroyed && !m.IsDead && m.Serial != World.Player.Serial && notoriety.Contains
+                     ((Notoriety)(byte)m.NotorietyFlag) && m.Distance <= maxDistance && !OnIgnoreList(m)
+                ).OrderBy(m => m.Distance).ToArray();
+            }
+        );
 
         /// <summary>
         /// Get a mobile from its serial.  

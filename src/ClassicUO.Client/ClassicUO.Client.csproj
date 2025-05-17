@@ -5,8 +5,8 @@
     <ApplicationIcon>cuoicon.ico</ApplicationIcon>
     <AssemblyName>ClassicUO</AssemblyName>
     <RootNamespace>ClassicUO</RootNamespace>
-    <AssemblyVersion>3.28.39</AssemblyVersion>
-    <FileVersion>3.28.39</FileVersion>
+    <AssemblyVersion>3.28.41</AssemblyVersion>
+    <FileVersion>3.28.41</FileVersion>
     <PackageProjectUrl>https://github.com/bittiez/TazUO</PackageProjectUrl>
     <PublishAot>false</PublishAot>
     <PlatformTarget>x64</PlatformTarget>

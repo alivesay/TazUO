@@ -20,6 +20,7 @@ using ClassicUO.Utility.Platforms;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -6781,7 +6782,8 @@ sealed class PacketHandlers
                 continue;
             }
 
-            string entry = gparams[0];
+                string entry = gparams[0];
+                gump.PacketGumpText += string.Join(" ", gparams) + "\n";
 
             if (string.Equals(entry, "button", StringComparison.InvariantCultureIgnoreCase))
             {

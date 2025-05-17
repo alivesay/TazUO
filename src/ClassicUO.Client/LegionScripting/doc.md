@@ -3,7 +3,7 @@ All methods, properties, enums, etc need to pre prefaced with `API.` for example
 If you download the [API.py](API.py) file, put it in the same folder as your python scripts and add `import API` to your script, that will enable some mild form of autocomplete in an editor like VS Code.  
 
 
-This was generated on `5/13/2025`.
+This was generated on `5/15/2025`.
 # API  
 
 ## Class Description
@@ -24,8 +24,14 @@ This was generated on `5/13/2025`.
  `API.Random.Next(100)` will return a number between 0 and 100.
 
 - **LastTargetSerial** (*uint*)
+  -  The serial of the last target, if it has a serial.
+
 - **LastTargetPos** (*Vector3*)
+  -  The last target's position
+
 - **LastTargetGraphic** (*ushort*)
+  -  The graphic of the last targeting object
+
 
 ## Enums
 ### ScanType
@@ -1386,6 +1392,30 @@ This was generated on `5/13/2025`.
 | text | string | No | Can be regex if you start with $, otherwise it's just regular search. Case Sensitive. |
 | ID | uint | Yes | Gump ID, blank to use the last gump. |
 #### Return Type: *bool*
+
+</details>
+
+***
+
+
+<details>
+<summary><h3>GetGump(ID)</h3></summary>
+
+ Get a gump by ID.  
+ Example:  
+ ```py
+ gump = API.GetGump()
+ if gump:
+   API.SysMsg("Found the gump!")
+   API.CloseGump(gump)
+ ```
+
+
+**Parameters**  
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| ID | uint | Yes | Leabe blank to use last gump opened from server |
+#### Return Type: *Gump*
 
 </details>
 

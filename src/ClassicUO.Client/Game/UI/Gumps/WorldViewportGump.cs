@@ -5,7 +5,6 @@ using ClassicUO.Game.Managers;
 using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Input;
-using ClassicUO.Assets;
 using ClassicUO.Network;
 using ClassicUO.Renderer;
 using ClassicUO.Resources;
@@ -286,8 +285,6 @@ namespace ClassicUO.Game.UI.Gumps
 
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)
         {
-            bool res = base.Draw(batcher, x, y);
-
             if (World.InGame && ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.EnableHealthIndicator)
             {
                 float hpPercent = (float)World.Player.Hits / (float)World.Player.HitsMax;
@@ -321,7 +318,7 @@ namespace ClassicUO.Game.UI.Gumps
                 }
             }
 
-            return res;
+            return base.Draw(batcher, x, y);;
         }
     }
 

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace ClassicUO.Game.Managers
 {
     [JsonSerializable(typeof(AutoLootManager.AutoLootConfigEntry))]
-    [JsonSerializable(typeof(AutoLootManager.AutoLootConfigEntry[]))]
+    [JsonSerializable(typeof(List<AutoLootManager.AutoLootConfigEntry>))]
     internal partial class AutoLootJsonContext : JsonSerializerContext
     {
     }
@@ -282,8 +282,7 @@ namespace ClassicUO.Game.Managers
                     try
                     {
                         string data = File.ReadAllText(savePath);
-                        AutoLootConfigEntry[] tItem = JsonSerializer.Deserialize(data, AutoLootJsonContext.Default.AutoLootConfigEntryArray);
-                        autoLootItems = tItem.ToList<AutoLootConfigEntry>();
+                        autoLootItems = JsonSerializer.Deserialize(data, AutoLootJsonContext.Default.ListAutoLootConfigEntry);
                         loaded = true;
                     }
                     catch
@@ -302,7 +301,7 @@ namespace ClassicUO.Game.Managers
             {
                 try
                 {
-                    string fileData = JsonSerializer.Serialize(autoLootItems, AutoLootJsonContext.Default.AutoLootConfigEntryArray);
+                    string fileData = JsonSerializer.Serialize(autoLootItems, AutoLootJsonContext.Default.ListAutoLootConfigEntry);
 
                     File.WriteAllText(savePath, fileData);
                 }

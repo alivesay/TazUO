@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls;
 
-public class DiscordMessageControl : Control
+internal class DiscordMessageControl : Control
 {
     public DiscordMessageControl(MessageHandle msg, int width)
     {

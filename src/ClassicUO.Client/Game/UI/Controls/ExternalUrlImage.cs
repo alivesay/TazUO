@@ -9,7 +9,7 @@ using ClassicUO.Renderer;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    public class ExternalUrlImage : Control
+    internal class ExternalUrlImage : Control
     {
         private Texture2D _texture;
         private bool _loading;

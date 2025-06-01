@@ -8,7 +8,7 @@ using TextBox = ClassicUO.Game.UI.Controls.TextBox;
 
 namespace ClassicUO.Game.UI.Gumps;
 
-public class DiscordGump : Gump
+internal class DiscordGump : Gump
 {
     public ulong ActiveChannel => _discordChatArea == null ? 0 : _discordChatArea.ActiveChannel;
 
@@ -23,7 +23,7 @@ public class DiscordGump : Gump
     private DiscordChatAreaControl _discordChatArea;
     private MenuButton menuButton;
 
-    public DiscordGump() : base(0, 0)
+    public DiscordGump(World world) : base(world, 0, 0)
     {
         Width = WIDTH;
         Height = HEIGHT;
@@ -221,7 +221,7 @@ public class DiscordGump : Gump
             Add(menuButton);
         }
         
-        menuButton.ContextMenu = new ContextMenuControl();
+        menuButton.ContextMenu = new ContextMenuControl(this);
         menuButton.ContextMenu.Add(new ContextMenuItemEntry("Show DM messages in system chat and journal?", () => { DiscordManager.DiscordSettings.ShowDMInGame = !DiscordManager.DiscordSettings.ShowDMInGame; GenMenuContextMenu(true); }, true, DiscordManager.DiscordSettings.ShowDMInGame));
         menuButton.ContextMenu.Add(new ContextMenuItemEntry("Show Channel messages in system chat and journal?", () => { DiscordManager.DiscordSettings.ShowChatInGame = !DiscordManager.DiscordSettings.ShowChatInGame; GenMenuContextMenu(true); }, true, DiscordManager.DiscordSettings.ShowChatInGame));
     }

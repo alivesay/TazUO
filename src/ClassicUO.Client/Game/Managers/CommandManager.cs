@@ -29,15 +29,15 @@ namespace ClassicUO.Game.Managers
             _world = world; 
         }
 
-        public static void Initialize()
+        public void Initialize()
         {
-            Register("dis", (s)=>UIManager.Add(new DiscordGump()));
+            Register("dis", (s)=>UIManager.Add(new DiscordGump(_world)));
             
             Register("dm", (a) =>
             {
                 if (a.Length < 3)
                 {
-                    GameActions.Print("Usage: -dm userID msg");
+                    GameActions.Print(_world, "Usage: -dm userID msg");
 
                     return;
                 }

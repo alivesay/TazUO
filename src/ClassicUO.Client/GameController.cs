@@ -140,6 +140,7 @@ namespace ClassicUO
             SetScene(new LoginScene(UO.World));
 #endif
             SetWindowPositionBySettings();
+            new DiscordManager(UO.World); //Instance is set inside the constructor
             DiscordManager.Instance.FromSavedToken();
         }
 

@@ -6,12 +6,12 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps;
 
-public class DiscordUserPopupGump : Gump
+internal class DiscordUserPopupGump : Gump
 {
     private ulong userId;
     private UserHandle userHandle;
 
-    public DiscordUserPopupGump(ulong user, int x, int y) : base(0, 0)
+    public DiscordUserPopupGump(World world, ulong user, int x, int y) : base(world, 0, 0)
     {
         Width = 200;
         Height = 300;

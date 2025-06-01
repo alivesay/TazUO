@@ -17,7 +17,7 @@ namespace ClassicUO.Game.Managers;
 
 public class DiscordManager
 {
-    public static DiscordManager Instance { get; } = new DiscordManager();
+    public static DiscordManager Instance { get; private set; }
 
     private const string TUOLOBBY = "TazUODiscordSocialSDKLobby";
     private const ulong CLIENT_ID = 1255990139499577377;
@@ -68,12 +68,15 @@ public class DiscordManager
     private Dictionary<ulong, List<MessageHandle>> messageHistory = new();
     private static Dictionary<ulong, Color> userHueMemory = new();
     private Dictionary<ulong, LobbyHandle> currentLobbies = new();
+    private World World;
 
     private int disconnectAttempts = 0;
     int pendingDisconnectLeaves;
 
-    private DiscordManager()
+    internal DiscordManager(World world)
     {
+        Instance = this;
+        World = world;
         LoadDiscordSettings();
 
         client = new DClient();
@@ -465,7 +468,7 @@ public class DiscordManager
             chan = channel != null ? channel.Name() : ((lobby != null) ? GetLobbyName(lobby) : "Discord");
 
         if ((isdm && DiscordSettings.ShowDMInGame) || (!isdm && DiscordSettings.ShowChatInGame))
-            MessageManager.HandleMessage(null, $"{msg.Content()}", $"[{chan}] {author.DisplayName()}", GetHueFromId(author.Id()), MessageType.ChatSystem, 255, TextType.SYSTEM);
+            World.MessageManager.HandleMessage(null, $"{msg.Content()}", $"[{chan}] {author.DisplayName()}", GetHueFromId(author.Id()), MessageType.ChatSystem, 255, TextType.SYSTEM);
     }
 
     private static void OnLog(string message, LoggingSeverity severity)

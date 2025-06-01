@@ -66,7 +66,7 @@ namespace ClassicUO.Game.Scenes
         private uint _timeToPlaceMultiInHouseCustomization;
         private readonly bool _use_render_target = false;
         private readonly UseItemQueue _useItemQueue;
-        private MoveItemQueue _moveItemQueue = new MoveItemQueue();
+        private MoveItemQueue _moveItemQueue;
         private bool _useObjectHandles;
         private RenderTarget2D _world_render_target, _lightRenderTarget;
         private AnimatedStaticsManager _animatedStaticsManager;
@@ -77,6 +77,7 @@ namespace ClassicUO.Game.Scenes
         {
             _world = world;
             _useItemQueue = new UseItemQueue(world);
+            _moveItemQueue = new MoveItemQueue(_world);
         }
 
         public MoveItemQueue MoveItemQueue => _moveItemQueue;

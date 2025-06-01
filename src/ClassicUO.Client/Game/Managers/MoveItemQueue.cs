@@ -3,14 +3,16 @@ using ClassicUO.Configuration;
 
 namespace ClassicUO.Game.Managers
 {
-    public class MoveItemQueue
+    internal class MoveItemQueue
     {
         private static long delay = 1000;
         private readonly ConcurrentQueue<MoveRequest> _queue = new();
         private long nextMove;
+        private World world;
 
-        public MoveItemQueue()
+        public MoveItemQueue(World world)
         {
+            this.world = world;
             delay = ProfileManager.CurrentProfile.MoveMultiObjectDelay;
         }
 
@@ -27,8 +29,8 @@ namespace ClassicUO.Game.Managers
             if (!_queue.TryDequeue(out var request))
                 return;
 
-            GameActions.PickUp(request.Serial, 0, 0, request.Amount);
-                GameActions.DropItem(request.Serial, request.X, request.Y, request.Z, request.Destination);
+            GameActions.PickUp(world, request.Serial, 0, 0, request.Amount);
+            GameActions.DropItem(request.Serial, request.X, request.Y, request.Z, request.Destination);
             
             nextMove = Time.Ticks + delay;
         }

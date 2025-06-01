@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls;
 
-public class DiscordUserListItem : Control
+internal class DiscordUserListItem : Control
 {
     private readonly DiscordGump gump;
     private UserHandle user;
@@ -19,10 +19,12 @@ public class DiscordUserListItem : Control
     private Vector3 shue;
     private long showPopupAt = long.MaxValue;
     private bool showPopupMouseOver;
+    private World world;
     
     public override bool AcceptMouseInput => true;
-    public DiscordUserListItem(DiscordGump gump, UserHandle user, int width = 100, int height = 25)
+    public DiscordUserListItem(World world, DiscordGump gump, UserHandle user, int width = 100, int height = 25)
     {
+        this.world = world;
         Width = width;
         Height = height;
         CanMove = true;
@@ -67,7 +69,7 @@ public class DiscordUserListItem : Control
         {
             if (showPopupMouseOver)
             {
-                UIManager.Add(new DiscordUserPopupGump(user.Id(), Mouse.Position.X + 20, Mouse.Position.Y + 20));
+                UIManager.Add(new DiscordUserPopupGump(world, user.Id(), Mouse.Position.X + 20, Mouse.Position.Y + 20));
             }
 
             showPopupAt = long.MaxValue;

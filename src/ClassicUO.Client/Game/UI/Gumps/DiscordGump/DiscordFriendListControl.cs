@@ -5,7 +5,7 @@ using DiscordSocialSDK.Wrapper;
 
 namespace ClassicUO.Game.UI.Controls;
 
-public class DiscordFriendListControl : Control
+internal class DiscordFriendListControl : Control
 {
     private DataBox _friendList;
     private DiscordGump _gump;
@@ -52,7 +52,7 @@ public class DiscordFriendListControl : Control
             if (user == null)
                 continue;
 
-            _friendList.Add(new DiscordUserListItem(_gump, user, Width - 20)); //-20 for scroll bar
+            _friendList.Add(new DiscordUserListItem(_gump.World, _gump, user, Width - 20)); //-20 for scroll bar
         }
 
         _friendList.ReArrangeChildren();

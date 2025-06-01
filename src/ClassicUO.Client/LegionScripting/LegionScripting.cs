@@ -21,7 +21,7 @@ using System.Text.Json.Serialization;
 namespace ClassicUO.LegionScripting
 {
     [JsonSerializable(typeof(LScriptSettings))]
-    internal partial class LScriptJsonContext : JsonSerializerContext
+    public partial class LScriptJsonContext : JsonSerializerContext
     {
     }
 
@@ -428,8 +428,8 @@ namespace ClassicUO.LegionScripting
             script.pythonScope = script.pythonEngine.CreateScope();
             var api = new API();
             script.scopedAPI = api;
-            //script.pythonScope.SetVariable("API", api);
-            script.pythonEngine.GetBuiltinModule().SetVariable("API", api);
+            script.pythonScope.SetVariable("API", api);
+            //script.pythonEngine.GetBuiltinModule().SetVariable("API", api);
             try
             {
                 script.pythonEngine.Execute(script.FileContentsJoined, script.pythonScope);
@@ -464,7 +464,7 @@ namespace ClassicUO.LegionScripting
                     if (script.PythonThread != null)
                     {
                         PyThreads.Remove(script.PythonThread.ManagedThreadId);
-                        script.PythonThread.Abort();
+                        script.PythonThread.Interrupt();
                     }
                     script.scopedAPI = null;
                     script.PythonThread = null;
@@ -656,7 +656,7 @@ namespace ClassicUO.LegionScripting
         }
     }
 
-    internal class ScriptInfoEvent
+    public class ScriptInfoEvent
     {
         public ScriptFile GetScript;
 
@@ -666,13 +666,13 @@ namespace ClassicUO.LegionScripting
         }
     }
 
-    internal enum ScriptType
+    public enum ScriptType
     {
         LegionScript,
         Python
     }
 
-    internal class ScriptFile
+    public class ScriptFile
     {
         public string Path;
         public string FileName;

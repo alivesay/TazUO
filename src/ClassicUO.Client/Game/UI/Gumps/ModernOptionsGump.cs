@@ -24,7 +24,7 @@ using static ClassicUO.Game.Managers.AutoLootManager;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ModernOptionsGump : Gump
+    public class ModernOptionsGump : Gump
     {
         private LeftSideMenuRightSideContent mainContent;
         private List<SettingsOption> options = new List<SettingsOption>();
@@ -3007,7 +3007,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
 
         #region Custom Controls For Options
-        internal class ToolTipOverrideConfigs : Control
+        public class ToolTipOverrideConfigs : Control
         {
             private DataBox dataBox;
             private World world;
@@ -4789,7 +4789,7 @@ namespace ClassicUO.Game.UI.Gumps
             }
 
 
-            internal class StbTextBox : Control, ITextEditHandler
+            public class StbTextBox : Control, ITextEditHandler
             {
                 protected static readonly Color SELECTION_COLOR = new Color() { PackedValue = 0x80a06020 };
                 private const int FONT_SIZE = 20;

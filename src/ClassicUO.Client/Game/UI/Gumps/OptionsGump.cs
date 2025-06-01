@@ -2,7 +2,7 @@
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class OptionsGump : Gump
+    public class OptionsGump : Gump
     {
         public OptionsGump(World world) : base(world, 0, 0)
         {

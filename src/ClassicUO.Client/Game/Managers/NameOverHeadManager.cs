@@ -55,7 +55,7 @@ namespace ClassicUO.Game.Managers
         MobilesAndCorpses = AllMobiles | MonsterCorpses | HumanoidCorpses,
     }
 
-    internal sealed class NameOverHeadManager
+    public sealed class NameOverHeadManager
     {
         private NameOverHeadHandlerGump _gump;
         private static SDL.SDL_Keycode _lastKeySym = SDL.SDL_Keycode.SDLK_UNKNOWN;

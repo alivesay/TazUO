@@ -4,7 +4,7 @@ using ClassicUO.Renderer;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class ScissorControl : Control
+    public class ScissorControl : Control
     {
         public ScissorControl(bool enabled, int x, int y, int width, int height) : this(enabled)
         {

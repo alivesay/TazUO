@@ -14,7 +14,7 @@ using Keyboard = ClassicUO.Input.Keyboard;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal abstract class Control
+    public abstract class Control
     {
         internal static int _StepsDone = 1;
         internal static int _StepChanger = 1;

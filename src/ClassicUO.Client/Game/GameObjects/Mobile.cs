@@ -13,7 +13,7 @@ using ClassicUO.Assets;
 
 namespace ClassicUO.Game.GameObjects
 {
-    internal partial class Mobile : Entity
+    public partial class Mobile : Entity
     {
         //private static readonly QueuedPool<Mobile> _pool = new QueuedPool<Mobile>(
         //    Constants.PREDICTABLE_CHUNKS,

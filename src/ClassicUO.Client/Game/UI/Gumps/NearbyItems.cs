@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class NearbyItems : Gump
+    public class NearbyItems : Gump
     {
         public const int SIZE = 75;
         public static NearbyItems NearbyItemGump;
@@ -98,7 +98,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class NearbyItemDisplay : Control
+    public class NearbyItemDisplay : Control
     {
         private Point originalSize;
         private float scale = (ProfileManager.CurrentProfile.GridContainersScale / 100f);

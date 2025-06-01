@@ -6,7 +6,7 @@ using System;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class ExpandableScroll : Control
+    public class ExpandableScroll : Control
     {
         private const int c_ExpandableScrollHeight_Min = 274;
         private const int c_ExpandableScrollHeight_Max = 800;

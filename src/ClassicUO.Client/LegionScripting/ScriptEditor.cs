@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.LegionScripting
 {
-    internal class ScriptEditor : ResizableGump
+    public class ScriptEditor : ResizableGump
     {
         private NiceButton save;
         private AlphaBlendControl background;

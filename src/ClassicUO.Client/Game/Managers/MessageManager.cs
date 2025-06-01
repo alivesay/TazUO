@@ -38,7 +38,7 @@ namespace ClassicUO.Game.Managers
     }
 
 
-    internal sealed class MessageManager
+    public sealed class MessageManager
     {
         private readonly World _world;
 

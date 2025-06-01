@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup Label="NuGet">
 		<PackageId>YellowDogMan.DiscordSocialSDK.Wrapper</PackageId>
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<LangVersion>13</LangVersion>
 	</PropertyGroup>
 

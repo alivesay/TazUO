@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.Scenes
 {
-    internal enum LoginSteps
+    public enum LoginSteps
     {
         Main,
         Connecting,
@@ -36,7 +36,7 @@ namespace ClassicUO.Game.Scenes
         PopUpMessage
     }
 
-    internal sealed class LoginScene : Scene
+    public sealed class LoginScene : Scene
     {
         private Gump _currentGump;
         private LoginSteps _lastLoginStep;
@@ -952,7 +952,7 @@ namespace ClassicUO.Game.Scenes
         }
     }
 
-    internal class ServerListEntry
+    public class ServerListEntry
     {
         private IPAddress _ipAddress;
         private IPAddress _ipAddressLittleEndian;
@@ -1110,7 +1110,7 @@ namespace ClassicUO.Game.Scenes
         }
     }
 
-    internal class CityInfo
+    public class CityInfo
     {
         public CityInfo
         (

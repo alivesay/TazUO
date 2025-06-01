@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class StaticPic : Control
+    public class StaticPic : Control
     {
         private ushort graphic;
         private Vector3 hueVector;

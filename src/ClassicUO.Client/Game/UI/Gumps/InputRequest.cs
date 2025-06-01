@@ -5,7 +5,7 @@ using System;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class InputRequest : Gump
+    public class InputRequest : Gump
     {
         public InputRequest(World world, string message, string buttonText, string button2Text, Action<Result, string> result, string defaultInputValue = "") : base(world, 0, 0)
         {

@@ -39,7 +39,7 @@ namespace ClassicUO.Game.UI.Gumps;
 [JsonSerializable(typeof(List<int>), GenerationMode = JsonSourceGenerationMode.Metadata)]
 sealed partial class ZonesJsonContext : JsonSerializerContext { }
 
-internal class WorldMapGump : ResizableGump
+public class WorldMapGump : ResizableGump
 {
     public const string USER_MARKERS_FILE = "userMarkers";
 
@@ -1448,7 +1448,7 @@ internal class WorldMapGump : ResizableGump
         }
     }
 
-    internal class ZonesFileZoneData
+    public class ZonesFileZoneData
     {
         public string Label { get; set; }
 
@@ -1457,7 +1457,7 @@ internal class WorldMapGump : ResizableGump
         public List<List<int>> Polygon { get; set; }
     }
 
-    internal class ZonesFile
+    public class ZonesFile
     {
         public int MapIndex { get; set; }
         public List<ZonesFileZoneData> Zones { get; set; }

@@ -3,7 +3,7 @@ using ClassicUO.Renderer;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class MultipleToolTipGump : Gump
+    public class MultipleToolTipGump : Gump
     {
         private readonly CustomToolTip[] toolTips;
         private readonly Control hoverReference;

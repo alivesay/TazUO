@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class UseSpellButtonGump : AnchorableGump
+    public class UseSpellButtonGump : AnchorableGump
     {
         const ushort LOCK_GRAPHIC = 0x1086;
 

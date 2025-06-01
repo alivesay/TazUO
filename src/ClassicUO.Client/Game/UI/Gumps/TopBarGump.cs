@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class TopBarGump : Gump
+    public class TopBarGump : Gump
     {
         private RighClickableButton XmlGumps;
 

@@ -9,7 +9,7 @@ using System;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ModernColorPicker : Gump
+    public class ModernColorPicker : Gump
     {
         private const int WIDTH = 200, HEIGHT = 400;
 

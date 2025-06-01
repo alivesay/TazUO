@@ -14,11 +14,11 @@ namespace ClassicUO.Game.Managers
 {
     [JsonSerializable(typeof(ToolTipOverrideData))]
     [JsonSerializable(typeof(ToolTipOverrideData[]))]
-    internal partial class ToolTipOverrideContext : JsonSerializerContext
+    public partial class ToolTipOverrideContext : JsonSerializerContext
     {
     }
 
-    internal class ToolTipOverrideData
+    public class ToolTipOverrideData
     {
         public ToolTipOverrideData() { }
         public ToolTipOverrideData(int index, string searchText, string formattedText, int min1, int max1, int min2, int max2, byte layer)

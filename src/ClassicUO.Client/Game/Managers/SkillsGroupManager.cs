@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace ClassicUO.Game.Managers
 {
-    internal sealed class SkillsGroup
+    public sealed class SkillsGroup
     {
         private readonly byte[] _list = new byte[60];
 
@@ -155,7 +155,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal sealed class SkillsGroupManager
+    public sealed class SkillsGroupManager
     {
         private bool _isActive;
         public bool IsActive

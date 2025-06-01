@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class ResizableStaticPic : Control
+    public class ResizableStaticPic : Control
     {
         private uint graphic;
         private ushort hue = 0;

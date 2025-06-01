@@ -24,7 +24,7 @@ using System.Text;
 
 namespace LScript
 {
-    internal class TextParser
+    public class TextParser
     {
         private readonly char[] _delimiters, _comments, _quotes;
         private int _eol;

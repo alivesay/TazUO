@@ -15,7 +15,7 @@ using static ClassicUO.Game.UI.XmlGumpHandler;
 
 namespace ClassicUO.Game.UI
 {
-    internal class XmlGumpHandler
+    public class XmlGumpHandler
     {
         public static string XmlGumpPath { get => Path.Combine(CUOEnviroment.ExecutablePath, "Data", "XmlGumps"); }
 
@@ -797,7 +797,7 @@ namespace ClassicUO.Game.UI
             return text;
         }
 
-        internal class XmlProgressBarInfo
+        public class XmlProgressBarInfo
         {
             public XmlProgressBarInfo(Control control, int maxSize, string value, string maxValue)
             {
@@ -814,7 +814,7 @@ namespace ClassicUO.Game.UI
         }
     }
 
-    internal class XmlGump : Gump
+    public class XmlGump : Gump
     {
         /// <summary>
         /// The frequency of UI updates for Xml Gumps for text/progress bar changes. This affects all xml gumps, it is not set individually.
@@ -950,7 +950,7 @@ namespace ClassicUO.Game.UI
         }
     }
 
-    internal class XmlHealthBar : Control
+    public class XmlHealthBar : Control
     {
         private ColorBox color_background, color_foreground;
         private GumpPic image_background;

@@ -13,7 +13,7 @@ using ClassicUO.Renderer.Gumps;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class MacroControl : Control
+    public class MacroControl : Control
     {
         private static readonly string[] _allHotkeysNames = Enum.GetNames(typeof(MacroType));
         private static readonly string[] _allSubHotkeysNames = Enum.GetNames(typeof(MacroSubType));

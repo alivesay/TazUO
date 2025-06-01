@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class PaperDollInteractable : Control
+    public class PaperDollInteractable : Control
     {
         private static readonly Layer[] _layerOrder =
         {

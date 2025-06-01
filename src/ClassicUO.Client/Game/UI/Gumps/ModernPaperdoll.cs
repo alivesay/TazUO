@@ -18,7 +18,7 @@ using System.IO;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ModernPaperdoll : AnchorableGump
+    public class ModernPaperdoll : AnchorableGump
     {
         #region CONST
         private const int WIDTH = 250, HEIGHT = 380;

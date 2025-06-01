@@ -15,7 +15,7 @@ using ClassicUO.Utility.Collections;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class JournalGump : Gump
+    public class JournalGump : Gump
     {
         private const int _diffY = 22;
         private readonly ExpandableScroll _background;

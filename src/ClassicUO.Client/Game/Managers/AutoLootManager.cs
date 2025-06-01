@@ -15,11 +15,11 @@ namespace ClassicUO.Game.Managers
 {
     [JsonSerializable(typeof(AutoLootManager.AutoLootConfigEntry))]
     [JsonSerializable(typeof(List<AutoLootManager.AutoLootConfigEntry>))]
-    internal partial class AutoLootJsonContext : JsonSerializerContext
+    public partial class AutoLootJsonContext : JsonSerializerContext
     {
     }
 
-    internal class AutoLootManager
+    public class AutoLootManager
     {
         public static AutoLootManager Instance { get; private set; } = new AutoLootManager();
         public bool IsLoaded { get { return loaded; } }

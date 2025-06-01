@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps;
 
-internal class DiscordUserPopupGump : Gump
+public class DiscordUserPopupGump : Gump
 {
     private ulong userId;
     private UserHandle userHandle;

@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace ClassicUO.Game.Managers
 {
-    internal sealed class AudioManager
+    public sealed class AudioManager
     {
         const float SOUND_DELTA = 250;
 

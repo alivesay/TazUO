@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class SkillGumpAdvanced : Gump
+    public class SkillGumpAdvanced : Gump
     {
         private const int WIDTH = 400;
 
@@ -535,7 +535,7 @@ namespace ClassicUO.Game.UI.Gumps
     }
 
 
-    internal class SkillListEntry : Control
+    public class SkillListEntry : Control
     {
         private readonly SkillGumpAdvanced _gump;
         private readonly Button _activeUse;

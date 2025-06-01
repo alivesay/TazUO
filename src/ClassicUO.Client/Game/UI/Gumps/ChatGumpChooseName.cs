@@ -7,7 +7,7 @@ using ClassicUO.Resources;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ChatGumpChooseName : Gump
+    public class ChatGumpChooseName : Gump
     {
         private readonly StbTextBox _textBox;
 

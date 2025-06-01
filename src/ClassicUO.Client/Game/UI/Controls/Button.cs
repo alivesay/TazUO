@@ -17,7 +17,7 @@ namespace ClassicUO.Game.UI.Controls
         Activate = 1
     }
 
-    internal class Button : Control
+    public class Button : Control
     {
         private readonly string _caption;
         private bool _entered;

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls;
 
-internal class DiscordChatAreaControl : Control
+public class DiscordChatAreaControl : Control
 {
     public ulong ActiveChannel => _selectedChannel;
     private ScrollArea _chatScroll;

@@ -15,7 +15,7 @@ using ClassicUO.Game.Scenes;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class NameOverheadGump : Gump
+    public class NameOverheadGump : Gump
     {
         private AlphaBlendControl _background;
         private Point _lockedPosition,

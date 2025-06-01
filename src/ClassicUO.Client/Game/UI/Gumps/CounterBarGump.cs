@@ -17,7 +17,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class CounterBarGump : Gump
+    public class CounterBarGump : Gump
     {
         private AlphaBlendControl _background;
 

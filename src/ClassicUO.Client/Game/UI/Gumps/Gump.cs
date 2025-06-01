@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class Gump : Control
+    public class Gump : Control
     {
         private bool isLocked = false;
 

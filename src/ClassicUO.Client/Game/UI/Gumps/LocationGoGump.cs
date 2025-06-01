@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps;
 
-internal partial class LocationGoGump : Gump
+public partial class LocationGoGump : Gump
 {
     /**
      * Valid inputs:

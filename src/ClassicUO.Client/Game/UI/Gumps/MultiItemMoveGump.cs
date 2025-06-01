@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class MultiItemMoveGump : Gump
+    public class MultiItemMoveGump : Gump
     {
         private Label label;
 

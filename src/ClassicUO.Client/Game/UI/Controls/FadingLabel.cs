@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class FadingLabel : Label
+    public class FadingLabel : Label
     {
         private readonly int tickSpeed;
         private int c = 0;

@@ -11,7 +11,7 @@ using ClassicUO.Network.Socket;
 
 namespace ClassicUO.Network
 {
-    internal sealed class NetClient
+    public sealed class NetClient
     {
         private const int BUFF_SIZE = 0x10000;
 

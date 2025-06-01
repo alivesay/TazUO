@@ -13,7 +13,7 @@ namespace ClassicUO.Game.UI.Controls
         ShowAlways
     }
 
-    internal class ScrollArea : Control
+    public class ScrollArea : Control
     {
         private bool _isNormalScroll;
         private readonly ScrollBarBase _scrollBar;

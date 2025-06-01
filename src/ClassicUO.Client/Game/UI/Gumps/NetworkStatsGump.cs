@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class NetworkStatsGump : Gump
+    public class NetworkStatsGump : Gump
     {
         private static Point _last_position = new Point(-1, -1);
 

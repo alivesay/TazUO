@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class GumpPicTiled : Control
+    public class GumpPicTiled : Control
     {
         private ushort _graphic;
         private ushort hue;

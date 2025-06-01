@@ -5,7 +5,7 @@ using Discord.Sdk;
 
 namespace ClassicUO.Game.UI.Controls;
 
-internal class DiscordChannelListControl : Control
+public class DiscordChannelListControl : Control
 {
     public override bool AcceptMouseInput => true;
 

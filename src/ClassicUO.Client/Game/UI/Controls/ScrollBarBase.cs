@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal abstract class ScrollBarBase : Control
+    public abstract class ScrollBarBase : Control
     {
         private const int TIME_BETWEEN_CLICKS = 2;
 

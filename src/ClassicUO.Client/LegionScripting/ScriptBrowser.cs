@@ -19,10 +19,10 @@ namespace ClassicUO.LegionScripting
     [JsonSerializable(typeof(List<ScriptBrowser.GHFileObject>))]
     [JsonSerializable(typeof(ScriptBrowser.GHFileObject))]
     [JsonSerializable(typeof(ScriptBrowser._Links))]
-    internal partial class ScriptBrowserJsonContext : JsonSerializerContext
+    public partial class ScriptBrowserJsonContext : JsonSerializerContext
     {
     }
-        internal class ScriptBrowser : Gump
+        public class ScriptBrowser : Gump
     {
         private const int WIDTH = 400;
         private const int HEIGHT = 600;
@@ -107,7 +107,7 @@ namespace ClassicUO.LegionScripting
         }
 
 
-        internal class GHFileObject
+        public class GHFileObject
         {
             public string name { get; set; }
             public string path { get; set; }
@@ -121,7 +121,7 @@ namespace ClassicUO.LegionScripting
             public _Links _links { get; set; }
         }
 
-        internal class _Links
+        public class _Links
         {
             public string self { get; set; }
             public string git { get; set; }
@@ -129,7 +129,7 @@ namespace ClassicUO.LegionScripting
         }
 
 
-        internal class ItemControl : Control
+        public class ItemControl : Control
         {
             private World World;
             public ItemControl(World world, GHFileObject gHFileObject, ScriptBrowser scriptBrowser)

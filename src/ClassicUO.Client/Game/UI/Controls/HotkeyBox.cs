@@ -9,7 +9,7 @@ using SDL2;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class HotkeyBox : Control
+    public class HotkeyBox : Control
     {
         private bool _actived;
         private readonly Button _buttonOK, _buttonCancel;

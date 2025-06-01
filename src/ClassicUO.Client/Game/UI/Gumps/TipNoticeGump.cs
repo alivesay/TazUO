@@ -5,7 +5,7 @@ using ClassicUO.Network;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class TipNoticeGump : Gump
+    public class TipNoticeGump : Gump
     {
         private readonly ExpandableScroll _background;
         private readonly ScrollArea _scrollArea;

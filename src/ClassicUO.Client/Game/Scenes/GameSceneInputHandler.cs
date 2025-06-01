@@ -18,7 +18,7 @@ using ClassicUO.Assets;
 
 namespace ClassicUO.Game.Scenes
 {
-    internal partial class GameScene
+    public partial class GameScene
     {
         private bool _boatRun,
             _boatIsMoving;

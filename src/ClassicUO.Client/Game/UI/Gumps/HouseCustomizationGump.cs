@@ -15,7 +15,7 @@ using ClassicUO.Game.Scenes;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class HouseCustomizationGump : Gump
+    public class HouseCustomizationGump : Gump
     {
         private readonly HouseCustomizationManager _customHouseManager;
         private readonly DataBox _dataBox;

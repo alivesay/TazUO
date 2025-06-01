@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class CustomToolTip : Gump
+    public class CustomToolTip : Gump
     {
         private readonly Item item;
         private Control hoverReference;

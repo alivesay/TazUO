@@ -7,7 +7,7 @@ using System.IO;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class Supporters : Gump
+    public class Supporters : Gump
     {
         private const int WIDTH = 512;
         private const int HEIGHT = 512;

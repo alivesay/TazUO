@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.LegionScripting
 {
-    internal class ScriptManagerGump : ResizableGump
+    public class ScriptManagerGump : ResizableGump
     {
         private AlphaBlendControl background;
         private ScrollArea scrollArea;
@@ -191,7 +191,7 @@ namespace ClassicUO.LegionScripting
             }
         }
 
-        internal class GroupControl : Control
+        public class GroupControl : Control
         {
             public event EventHandler<EventArgs> GroupExpandedShrunk;
             private readonly NiceButton expand, options;
@@ -430,7 +430,7 @@ while True:
             }
         }
 
-        internal class ScriptControl : Control
+        public class ScriptControl : Control
         {
             private readonly AlphaBlendControl background;
             private readonly TextBox label;

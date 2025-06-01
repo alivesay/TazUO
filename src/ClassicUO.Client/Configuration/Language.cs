@@ -6,7 +6,7 @@ namespace ClassicUO.Configuration
     using System.Text.Json.Serialization;
 
     [JsonSerializable(typeof(Language))]
-    internal partial class LanguageJsonContext : JsonSerializerContext
+    public partial class LanguageJsonContext : JsonSerializerContext
     {
     }
 

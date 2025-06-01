@@ -5,7 +5,7 @@ using ClassicUO.Game.Managers;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class BoatControl : Gump
+    public class BoatControl : Gump
     {
         Checkbox reg, slow, one;
 

@@ -41,7 +41,7 @@ using System;
 
 namespace ClassicUO.Game.Managers
 {
-    internal class DurabilityManager : IDisposable
+    public class DurabilityManager : IDisposable
     {
         private readonly ConcurrentDictionary<uint, DurabiltyProp> _itemLayerSlots = new ConcurrentDictionary<uint, DurabiltyProp>();
         

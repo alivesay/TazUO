@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.Managers
 {
-    internal class TextRenderer : TextObject
+    public class TextRenderer : TextObject
     {
         private readonly List<Rectangle> _bounds = new List<Rectangle>();
 

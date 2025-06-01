@@ -8,7 +8,7 @@ using ClassicUO.Game.UI.Controls;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class UpdateTimerViewer : Gump
+    public class UpdateTimerViewer : Gump
     {
         private const long UPDATE_INTERVAL = 2000;
 

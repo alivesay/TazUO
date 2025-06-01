@@ -87,7 +87,7 @@ namespace LScript
         }
     }
 
-    internal class Scope
+    public class Scope
     {
         private Dictionary<string, Argument> _namespace = new Dictionary<string, Argument>();
 
@@ -121,7 +121,7 @@ namespace LScript
         }
     }
 
-    internal class Argument
+    public class Argument
     {
         private ASTNode _node;
         private Script _script;
@@ -265,7 +265,7 @@ namespace LScript
         }
     }
 
-    internal class Script
+    public class Script
     {
         public bool IsPlaying = false;
 
@@ -1200,7 +1200,7 @@ namespace LScript
         TIMING_OUT
     };
 
-    internal static class Interpreter
+    public static class Interpreter
     {
         // Aliases only hold serial numbers
         private static Dictionary<string, uint> _aliases = new Dictionary<string, uint>();

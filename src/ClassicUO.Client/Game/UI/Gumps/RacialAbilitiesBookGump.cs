@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class RacialAbilitiesBookGump : Gump
+    public class RacialAbilitiesBookGump : Gump
     {
         private static readonly string[] _humanNames = { "Strong Back", "Tough", "Workhorse", "Jack of All Trades" };
         private static readonly string[] _elfNames =

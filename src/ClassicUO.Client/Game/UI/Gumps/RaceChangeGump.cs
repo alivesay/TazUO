@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class RaceChangeGump : Gump
+    public class RaceChangeGump : Gump
     {
         private bool isFemale { get; } = false;
         private RaceType selectedRace { get; } = RaceType.HUMAN;

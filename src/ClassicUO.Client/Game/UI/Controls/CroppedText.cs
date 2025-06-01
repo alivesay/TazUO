@@ -6,7 +6,7 @@ using ClassicUO.Utility;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class CroppedText : Control
+    public class CroppedText : Control
     {
         private readonly RenderedText _gameText;
 

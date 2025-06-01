@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.GameObjects
 {
-    internal partial class Mobile
+    public partial class Mobile
     {
         private const int SIT_OFFSET_Y = 4;
         private static EquipConvData? _equipConvData;

@@ -15,7 +15,7 @@ using SDL2;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class InspectorGump : Gump
+    public class InspectorGump : Gump
     {
         private const int WIDTH = 500;
         private const int HEIGHT = 400;

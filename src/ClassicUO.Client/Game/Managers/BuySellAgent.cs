@@ -14,10 +14,10 @@ namespace ClassicUO.Game.Managers
 
     [JsonSerializable(typeof(List<BuySellItemConfig>))]
     [JsonSerializable(typeof(BuySellItemConfig))]
-    internal partial class BuySellAgentJsonContext : JsonSerializerContext
+    public partial class BuySellAgentJsonContext : JsonSerializerContext
     {
     }
-    internal class BuySellAgent
+    public class BuySellAgent
     {
         public static BuySellAgent Instance { get; private set; }
 
@@ -202,7 +202,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal class BuySellItemConfig
+    public class BuySellItemConfig
     {
         public ushort Graphic { get; set; }
         public ushort Hue { get; set; } = ushort.MaxValue;
@@ -215,7 +215,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal class VendorSellInfo
+    public class VendorSellInfo
     {
         public List<VendorSellItemData> AvailableItems { get; set; } = new List<VendorSellItemData>();
         public void HandleSellPacketItem(uint serial, ushort graphic, ushort hue, ushort amount, uint price)
@@ -224,7 +224,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal class VendorSellItemData
+    public class VendorSellItemData
     {
         public uint Serial;
         public ushort Graphic;

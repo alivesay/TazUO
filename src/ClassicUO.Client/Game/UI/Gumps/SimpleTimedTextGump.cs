@@ -7,7 +7,7 @@ using System;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class SimpleTimedTextGump : Gump
+    public class SimpleTimedTextGump : Gump
     {
         private readonly DateTime expireAt;
 

@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls;
 
-internal class DiscordUserListItem : Control
+public class DiscordUserListItem : Control
 {
     private readonly DiscordGump gump;
     private UserHandle user;

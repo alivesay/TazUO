@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace ClassicUO.Game.Data
 {
-    internal class SpellDefinition : IEquatable<SpellDefinition>
+    public class SpellDefinition : IEquatable<SpellDefinition>
     {
         public static SpellDefinition EmptySpell = new SpellDefinition
         (

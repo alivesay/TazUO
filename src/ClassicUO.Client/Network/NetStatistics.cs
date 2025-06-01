@@ -4,7 +4,7 @@ using System;
 
 namespace ClassicUO.Network
 {
-    sealed class NetStatistics
+    public sealed class NetStatistics
     {
         private readonly NetClient _socket;
         private uint _lastTotalBytesReceived, _lastTotalBytesSent, _lastTotalPacketsReceived, _lastTotalPacketsSent;

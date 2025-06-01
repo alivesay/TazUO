@@ -14,7 +14,7 @@ using Point = Microsoft.Xna.Framework.Point;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ResizableJournal : ResizableGump
+    public class ResizableJournal : ResizableGump
     {
         #region VARS
         public static bool ReloadTabs { get; set; } = false;

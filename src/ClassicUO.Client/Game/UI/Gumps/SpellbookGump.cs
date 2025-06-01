@@ -18,7 +18,7 @@ using System.Xml;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class SpellbookGump : Gump
+    public class SpellbookGump : Gump
     {
         private DataBox _dataBox;
         private HitBox _hitBox;

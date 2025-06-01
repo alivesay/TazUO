@@ -3,7 +3,7 @@ using ClassicUO.Configuration;
 
 namespace ClassicUO.Game.Managers
 {
-    internal class MoveItemQueue
+    public class MoveItemQueue
     {
         private static long delay = 1000;
         private readonly ConcurrentQueue<MoveRequest> _queue = new();

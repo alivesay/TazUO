@@ -10,7 +10,7 @@ using ClassicUO.Network;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class RacialAbilityButton : Gump
+    public class RacialAbilityButton : Gump
     {
         public RacialAbilityButton(World world, ushort graphic) : this(world)
         {

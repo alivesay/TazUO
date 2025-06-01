@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class InfoBarGump : ResizableGump
+    public class InfoBarGump : ResizableGump
     {
         private readonly AlphaBlendControl _background;
 
@@ -124,7 +124,7 @@ namespace ClassicUO.Game.UI.Gumps
     }
 
 
-    internal class InfoBarControl : Control
+    public class InfoBarControl : Control
     {
         private readonly InfoBarGump _gump;
         private readonly TextBox _data;

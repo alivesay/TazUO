@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.Managers
 {
-    internal sealed class HealthLinesManager
+    public sealed class HealthLinesManager
     {
         private const int BAR_WIDTH = 34; //28;
         private const int BAR_HEIGHT = 8;

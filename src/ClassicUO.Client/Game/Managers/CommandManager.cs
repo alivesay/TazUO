@@ -17,7 +17,7 @@ using ClassicUO.Configuration;
 
 namespace ClassicUO.Game.Managers
 {
-    internal sealed class CommandManager
+    public sealed class CommandManager
     {
         private readonly Dictionary<string, Action<string[]>> _commands = new Dictionary<string, Action<string[]>>();
         public Dictionary<string, Action<string[]>> Commands => _commands;

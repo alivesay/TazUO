@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class QuestArrowGump : Gump
+    public class QuestArrowGump : Gump
     {
         private GumpPic _arrow;
         private Direction _direction;

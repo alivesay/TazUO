@@ -33,7 +33,7 @@ namespace ClassicUO.Game.UI.Gumps
         UOChat
     }
 
-    internal class SystemChatControl : Control
+    public class SystemChatControl : Control
     {
         private const int MAX_MESSAGE_LENGHT = 100;
         private const int CHAT_X_OFFSET = 3;

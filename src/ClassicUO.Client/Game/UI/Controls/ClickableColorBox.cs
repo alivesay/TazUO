@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class ClickableColorBox : ColorBox
+    public class ClickableColorBox : ColorBox
     {
         private readonly World _world;
 

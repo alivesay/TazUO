@@ -6,7 +6,7 @@ using System;
 
 namespace ClassicUO.Game.Managers
 {
-    internal class MessageEventArgs : EventArgs
+    public class MessageEventArgs : EventArgs
     {
         public MessageEventArgs
         (

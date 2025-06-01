@@ -2,7 +2,7 @@ using System;
 using ClassicUO.Renderer;
 
 namespace ClassicUO.Game.UI.Controls;
-internal class InputField : Control
+public class InputField : Control
 {
     private readonly StbTextBox _textbox;
 

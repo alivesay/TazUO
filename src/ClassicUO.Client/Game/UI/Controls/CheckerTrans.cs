@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class CheckerTrans : Control
+    public class CheckerTrans : Control
     {
         private Vector3 hueVector = ShaderHueTranslator.GetHueVector(0, false, 0.5f);
 

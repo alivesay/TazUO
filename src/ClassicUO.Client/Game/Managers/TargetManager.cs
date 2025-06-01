@@ -107,7 +107,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal sealed class TargetManager
+    public sealed class TargetManager
     {
         private uint _targetCursorId, _lastAttack;
         private readonly World _world;

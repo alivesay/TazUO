@@ -14,7 +14,7 @@ using ClassicUO.Game.Scenes;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class GridLootGump : Gump
+    public class GridLootGump : Gump
     {
         private const int MAX_WIDTH = 300;
         private const int MAX_HEIGHT = 420;

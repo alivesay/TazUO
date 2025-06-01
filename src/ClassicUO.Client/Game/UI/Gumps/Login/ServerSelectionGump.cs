@@ -15,7 +15,7 @@ using SDL2;
 
 namespace ClassicUO.Game.UI.Gumps.Login
 {
-    internal class ServerSelectionGump : Gump
+    public class ServerSelectionGump : Gump
     {
         private const ushort SELECTED_COLOR = 0x0021;
         private const ushort NORMAL_COLOR = 0x034F;

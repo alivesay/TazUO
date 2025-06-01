@@ -24,7 +24,7 @@ using System.Net.Sockets;
 
 namespace ClassicUO.Game.Scenes
 {
-    internal partial class GameScene : Scene
+    public partial class GameScene : Scene
     {
         private static readonly Lazy<BlendState> _darknessBlend = new Lazy<BlendState>(() =>
         {

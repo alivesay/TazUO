@@ -7,7 +7,7 @@ using ClassicUO.Utility;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class PopupMenuGump : Gump
+    public class PopupMenuGump : Gump
     {   
         public static uint CloseNext = uint.MaxValue;
 

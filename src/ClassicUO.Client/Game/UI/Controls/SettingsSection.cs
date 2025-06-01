@@ -1,6 +1,6 @@
 namespace ClassicUO.Game.UI.Controls;
 
-internal class SettingsSection : Control
+public class SettingsSection : Control
 {
     private const byte FONT = 0xFF;
     private const ushort HUE_FONT = 0xFFFF;

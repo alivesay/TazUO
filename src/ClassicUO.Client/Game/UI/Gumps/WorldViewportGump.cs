@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class WorldViewportGump : Gump
+    public class WorldViewportGump : Gump
     {
         public const int BORDER_WIDTH = 5;
         private readonly BorderControl _borderControl;
@@ -322,7 +322,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class BorderControl : Control
+    public class BorderControl : Control
     {
         private int _borderSize;
 

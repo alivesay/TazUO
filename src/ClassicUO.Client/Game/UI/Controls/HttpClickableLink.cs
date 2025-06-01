@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class HttpClickableLink : Control
+    public class HttpClickableLink : Control
     {
         private string url;
 

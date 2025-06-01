@@ -11,7 +11,7 @@ using ClassicUO.Network;
 
 namespace ClassicUO.Game.Managers
 {
-    internal sealed class ObjectPropertiesListManager
+    public sealed class ObjectPropertiesListManager
     {
         private readonly Dictionary<uint, ItemProperty> _itemsProperties = new Dictionary<uint, ItemProperty>();
         private World _world;
@@ -128,7 +128,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal class ItemProperty
+    public class ItemProperty
     {
         public bool IsEmpty => string.IsNullOrEmpty(Name) && string.IsNullOrEmpty(Data);
         public string Data;
@@ -143,7 +143,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal class ItemPropertiesData
+    public class ItemPropertiesData
     {
         public readonly bool HasData = false;
         public string Name = "";

@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class SkillProgressBar : Gump
+    public class SkillProgressBar : Gump
     {
         private long expireAt = long.MaxValue;
         public SkillProgressBar(World world, int skillIndex) : base(world, 0, 0)

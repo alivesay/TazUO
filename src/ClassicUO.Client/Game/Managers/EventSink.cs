@@ -5,7 +5,7 @@ using System;
 
 namespace ClassicUO.Game.Managers
 {
-    internal class EventSink
+    public class EventSink
     {
         /// <summary>
         /// Invoked when the player is created
@@ -195,7 +195,7 @@ namespace ClassicUO.Game.Managers
         public byte Temp { get; }
     }
 
-    internal class PlayerStatChangedArgs : EventArgs
+    public class PlayerStatChangedArgs : EventArgs
     {
         public PlayerStatChangedArgs(PlayerStat stat, int oldValue, int newValue)
         {

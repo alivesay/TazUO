@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class SimpleBorder : Control
+    public class SimpleBorder : Control
     {
         public ushort Hue
         {

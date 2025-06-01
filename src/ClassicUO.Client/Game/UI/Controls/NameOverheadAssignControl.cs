@@ -40,7 +40,7 @@ using SDL2;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class NameOverheadAssignControl : Control
+    public class NameOverheadAssignControl : Control
     {
         private readonly HotkeyBox _hotkeyBox;
         private readonly Dictionary<NameOverheadOptions, Checkbox> checkboxDict = new();

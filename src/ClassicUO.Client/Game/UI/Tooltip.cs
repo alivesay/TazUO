@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI
 {
-    internal class Tooltip
+    public class Tooltip
     {
         private uint _hash;
         private uint _lastHoverTime;
@@ -153,7 +153,7 @@ namespace ClassicUO.Game.UI
             Vector3 hue_vec = ShaderHueTranslator.GetHueVector(1, false, alpha);
 
             if (ProfileManager.CurrentProfile != null)
-                hue_vec.X = ProfileManager.CurrentProfile.ToolTipBGHue - 1;
+                hue_vec.X = ProfileManager.CurrentProfile.ToolTipBGHue;
 
             batcher.Draw
             (

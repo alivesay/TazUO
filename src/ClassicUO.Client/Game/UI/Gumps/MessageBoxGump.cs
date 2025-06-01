@@ -8,14 +8,14 @@ using SDL2;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    enum MessageButtonType
+    public enum MessageButtonType
     {
         OK,
         OK_CANCEL,
 
     }
 
-    internal class MessageBoxGump : Gump
+    public class MessageBoxGump : Gump
     {
         private readonly Action<bool> _action;
 
@@ -145,7 +145,7 @@ namespace ClassicUO.Game.UI.Gumps
     }
 
 
-    internal class EntryDialog : Gump
+    public class EntryDialog : Gump
     {
         private readonly Action<string> _action;
         private readonly StbTextBox _textBox;

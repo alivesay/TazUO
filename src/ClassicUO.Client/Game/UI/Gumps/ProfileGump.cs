@@ -8,7 +8,7 @@ using ClassicUO.Network;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ProfileGump : Gump
+    public class ProfileGump : Gump
     {
         private const int _diffY = 22;
         private readonly DataBox _databox;

@@ -20,7 +20,7 @@ using static SDL2.SDL;
 
 namespace ClassicUO.Game.Managers
 {
-    internal sealed class MacroManager : LinkedObject
+    public sealed class MacroManager : LinkedObject
     {
         public static readonly string[] MacroNames = Enum.GetNames(typeof(MacroType));
         private readonly uint[] _itemsInHand = new uint[2];

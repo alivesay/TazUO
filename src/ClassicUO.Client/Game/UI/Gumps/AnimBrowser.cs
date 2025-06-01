@@ -6,7 +6,7 @@ using SDL2;
 
 namespace ClassicUO.Game.UI.Gumps;
 
-internal class AnimBrowser : Gump
+public class AnimBrowser : Gump
 {
     private DataBox dataBox = new DataBox(0, 0, 500, 700);
     private AnimationDisplay[] animationDisplays;

@@ -19,11 +19,11 @@ namespace ClassicUO.Game.Managers
 
     [JsonSerializable(typeof(SpellVisualRangeManager.SpellRangeInfo))]
     [JsonSerializable(typeof(SpellVisualRangeManager.SpellRangeInfo[]))]
-    internal partial class SpellVisualRangeJsonContext : JsonSerializerContext
+    public partial class SpellVisualRangeJsonContext : JsonSerializerContext
     {
     }
 
-    internal class SpellVisualRangeManager
+    public class SpellVisualRangeManager
     {
         public static SpellVisualRangeManager Instance => instance ??= new SpellVisualRangeManager();
 

@@ -18,7 +18,7 @@ using System.Diagnostics;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class StandardSkillsGump : Gump
+    public class StandardSkillsGump : Gump
     {
         private const int _diffY = 22;
 

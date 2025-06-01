@@ -8,7 +8,7 @@ using TextBox = ClassicUO.Game.UI.Controls.TextBox;
 
 namespace ClassicUO.Game.UI.Gumps;
 
-internal class DiscordGump : Gump
+public class DiscordGump : Gump
 {
     public ulong ActiveChannel => _discordChatArea == null ? 0 : _discordChatArea.ActiveChannel;
 

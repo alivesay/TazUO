@@ -10,7 +10,7 @@ using StbTextEditSharp;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class TTFTextInputField : Control
+    public class TTFTextInputField : Control
     {
         public readonly StbTextBox TextBox;
         private AlphaBlendControl _background;

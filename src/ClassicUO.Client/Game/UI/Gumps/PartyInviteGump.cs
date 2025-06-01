@@ -8,7 +8,7 @@ using ClassicUO.Resources;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class PartyInviteGump : Gump
+    public class PartyInviteGump : Gump
     {
         public PartyInviteGump(World world, uint inviter) : base(world, 0, 0)
         {

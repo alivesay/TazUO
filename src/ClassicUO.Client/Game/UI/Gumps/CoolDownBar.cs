@@ -7,7 +7,7 @@ using System;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class CoolDownBar : Gump
+    public class CoolDownBar : Gump
     {
         public const int COOL_DOWN_WIDTH = 180, COOL_DOWN_HEIGHT = 30;
         public static int DEFAULT_X { get { return ProfileManager.CurrentProfile.CoolDownX; } }

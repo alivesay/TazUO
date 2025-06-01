@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal abstract class GumpPicBase : Control
+    public abstract class GumpPicBase : Control
     {
         private ushort _graphic;
 
@@ -72,7 +72,7 @@ namespace ClassicUO.Game.UI.Controls
         }
     }
 
-    internal class EmbeddedGumpPic : GumpPicBase
+    public class EmbeddedGumpPic : GumpPicBase
     {
         private Texture2D _customTexture;
 
@@ -116,7 +116,7 @@ namespace ClassicUO.Game.UI.Controls
         }
     }
 
-    internal class GumpPic : GumpPicBase
+    public class GumpPic : GumpPicBase
     {
         public GumpPic(int x, int y, ushort graphic, ushort hue)
         {
@@ -190,7 +190,7 @@ namespace ClassicUO.Game.UI.Controls
         }
     }
 
-    internal class VirtueGumpPic : GumpPic
+    public class VirtueGumpPic : GumpPic
     {
         private readonly World _world;
 
@@ -212,7 +212,7 @@ namespace ClassicUO.Game.UI.Controls
         }
     }
 
-    internal class GumpPicInPic : GumpPicBase
+    public class GumpPicInPic : GumpPicBase
     {
         private Rectangle _picInPicBounds;
 

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class HoveredLabel : Label
+    public class HoveredLabel : Label
     {
         private readonly ushort _overHue, _normalHue, _selectedHue;
         private Vector3 hueVector = ShaderHueTranslator.GetHueVector(0);

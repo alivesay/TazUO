@@ -51,7 +51,7 @@ using static ClassicUO.Game.UI.Gumps.GridHightlightMenu;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class GridContainer : ResizableGump
+    public class GridContainer : ResizableGump
     {
         #region CONSTANTS
         private const int X_SPACING = 1, Y_SPACING = 1;

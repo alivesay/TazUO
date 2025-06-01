@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal abstract class StatusGumpBase : Gump
+    public abstract class StatusGumpBase : Gump
     {
         protected const ushort LOCK_UP_GRAPHIC = 0x0984;
         protected const ushort LOCK_DOWN_GRAPHIC = 0x0986;
@@ -208,7 +208,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class StatusGumpOld : StatusGumpBase
+    public class StatusGumpOld : StatusGumpBase
     {
         public StatusGumpOld(World world) : base(world)
         {
@@ -577,7 +577,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class StatusGumpModern : StatusGumpBase
+    public class StatusGumpModern : StatusGumpBase
     {
         private static Settings _settings;
         private static Settings settings

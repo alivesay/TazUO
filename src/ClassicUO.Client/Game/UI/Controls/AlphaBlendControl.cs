@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal sealed class AlphaBlendControl : Control
+    public sealed class AlphaBlendControl : Control
     {
         private Vector3 hueVector;
         private ushort hue;

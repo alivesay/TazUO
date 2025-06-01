@@ -6,7 +6,7 @@ using SDL2;
 
 namespace ClassicUO.Game.UI.Gumps;
 
-internal class ArtBrowserGump : Gump
+public class ArtBrowserGump : Gump
 {
     private DataBox dataBox = new DataBox(0, 0, 500, 700);
     private ResizableStaticPic[] resizableStaticPics;

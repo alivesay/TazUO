@@ -42,7 +42,7 @@ namespace ClassicUO.Game.Managers
         //}
     }
 
-    internal sealed class WorldMapEntityManager
+    public sealed class WorldMapEntityManager
     {
         private bool _ackReceived;
         private uint _lastUpdate, _lastPacketSend, _lastPacketRecv;

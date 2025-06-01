@@ -6,7 +6,7 @@ using ClassicUO.Network;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class TextEntryDialogGump : Gump
+    public class TextEntryDialogGump : Gump
     {
         private readonly StbTextBox _textBox;
 

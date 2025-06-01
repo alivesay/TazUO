@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class ColorPickerBox : Gump
+    public class ColorPickerBox : Gump
     {
         private readonly int _cellHeight;
         private readonly int _cellWidth;

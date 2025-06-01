@@ -15,7 +15,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ModernBookGump : Gump
+    public class ModernBookGump : Gump
     {
         internal const int MAX_BOOK_LINES = 8;
         private const int MAX_BOOK_CHARS_PER_LINE = 53;

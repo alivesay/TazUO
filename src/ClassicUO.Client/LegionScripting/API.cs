@@ -23,7 +23,7 @@ namespace ClassicUO.LegionScripting
     /// <summary>
     /// Python scripting access point
     /// </summary>
-    internal class API
+    public class API
     {
         public static readonly ConcurrentQueue<Action> QueuedPythonActions = new();
 
@@ -1989,4 +1989,5 @@ namespace ClassicUO.LegionScripting
 
         #endregion
     }
+    
 }

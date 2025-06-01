@@ -6,14 +6,14 @@ using SDL2;
 
 namespace ClassicUO.Game.Managers
 {
-    internal class HotKeyCombination
+    public class HotKeyCombination
     {
         public SDL.SDL_Keycode Key { get; set; }
         public SDL.SDL_Keymod Mod { get; set; }
         public HotkeyAction KeyAction { get; set; }
     }
 
-    internal class HotkeysManager
+    public class HotkeysManager
     {
         private readonly Dictionary<HotkeyAction, Action> _actions = new Dictionary<HotkeyAction, Action>();
 
@@ -292,7 +292,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal enum HotkeyAction
+    public enum HotkeyAction
     {
         None,
 

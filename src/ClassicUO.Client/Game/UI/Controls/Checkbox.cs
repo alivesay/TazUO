@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class Checkbox : Control
+    public class Checkbox : Control
     {
         private bool _isChecked;
         private readonly RenderedText _text;

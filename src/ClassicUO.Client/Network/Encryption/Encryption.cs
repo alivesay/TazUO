@@ -5,7 +5,7 @@ using System;
 
 namespace ClassicUO.Network.Encryption
 {
-    internal enum EncryptionType
+    public enum EncryptionType
     {
         NONE,
         OLD_BFISH,
@@ -15,7 +15,7 @@ namespace ClassicUO.Network.Encryption
         TWOFISH_MD5
     }
 
-    internal sealed class EncryptionHelper
+    public sealed class EncryptionHelper
     {
         private static readonly LoginCryptBehaviour _loginCrypt = new LoginCryptBehaviour();
         private static readonly BlowfishEncryption _blowfishEncryption = new BlowfishEncryption();

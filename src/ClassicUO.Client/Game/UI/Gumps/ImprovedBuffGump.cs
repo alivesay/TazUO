@@ -8,7 +8,7 @@ using System.Xml;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ImprovedBuffGump : Gump
+    public class ImprovedBuffGump : Gump
     {
         public const int HEIGHT = CoolDownBar.COOL_DOWN_HEIGHT * (BuffBarManager.MAX_COOLDOWN_BARS + 2);
         private GumpPic _background;

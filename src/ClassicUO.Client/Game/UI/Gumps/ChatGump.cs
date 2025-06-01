@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ChatGump : Gump
+    public class ChatGump : Gump
     {
         private ChannelCreationBox _channelCreationBox;
 

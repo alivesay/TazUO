@@ -21,7 +21,7 @@ namespace ClassicUO.Configuration
             });
     }
 
-    internal sealed class Settings
+    public sealed class Settings
     {
         public const string SETTINGS_FILENAME = "settings.json";
         public static Settings GlobalSettings = new Settings();

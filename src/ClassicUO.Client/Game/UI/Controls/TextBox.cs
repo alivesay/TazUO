@@ -43,7 +43,7 @@ using System.Text.RegularExpressions;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class TextBox : Control
+    public class TextBox : Control
     {
         private static Queue<TextBox> _pool = new();
         private RichTextLayout _rtl;

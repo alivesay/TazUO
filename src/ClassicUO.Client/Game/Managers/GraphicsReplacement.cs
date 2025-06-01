@@ -8,7 +8,7 @@ namespace ClassicUO.Game.Managers
 {
     [JsonSerializable(typeof(Dictionary<ushort, GraphicChangeFilter>))]
     [JsonSerializable(typeof(GraphicChangeFilter))]
-    internal partial class GraphicsReplacementJsonContext : JsonSerializerContext
+    public partial class GraphicsReplacementJsonContext : JsonSerializerContext
     {
     }
     internal static class GraphicsReplacement
@@ -123,7 +123,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal class GraphicChangeFilter
+    public class GraphicChangeFilter
     {
         public ushort OriginalGraphic { get; set; }
         public ushort ReplacementGraphic { get; set; }

@@ -17,7 +17,7 @@ using System.Runtime.CompilerServices;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class MiniMapGump : Gump
+    public class MiniMapGump : Gump
     {
         struct ColorInfo
         {

@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace ClassicUO.Configuration
 {
-    internal abstract class UISettings
+    public abstract class UISettings
     {
         private static string savePath { get { return Path.Combine(CUOEnviroment.ExecutablePath, "Data", "UI"); } }
         private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions() { WriteIndented = true };

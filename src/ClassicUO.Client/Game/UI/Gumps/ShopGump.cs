@@ -18,7 +18,7 @@ using ClassicUO.Renderer.Animations;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ShopGump : Gump
+    public class ShopGump : Gump
     {
         enum ButtonScroll
         {

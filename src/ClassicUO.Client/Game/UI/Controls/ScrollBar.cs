@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class ScrollBar : ScrollBarBase
+    public class ScrollBar : ScrollBarBase
     {
         private Rectangle _rectSlider,
             _emptySpace;

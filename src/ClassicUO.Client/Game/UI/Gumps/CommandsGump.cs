@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class CommandsGump : Gump
+    public class CommandsGump : Gump
     {
         public CommandsGump(World world) : base(world, 0, 0)
         {

@@ -26,7 +26,7 @@ namespace ClassicUO.Game.Managers
         public int X, Y, Z;
     }
 
-    internal sealed class HouseCustomizationManager
+    public sealed class HouseCustomizationManager
     {
         public readonly List<CustomHouseWallCategory> Walls = new List<CustomHouseWallCategory>();
         public readonly List<CustomHouseFloor> Floors = new List<CustomHouseFloor>();

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class MapGump : Gump
+    public class MapGump : Gump
     {
         private readonly Button[] _buttons = new Button[3];
         private readonly List<Control> _container = new List<Control>();

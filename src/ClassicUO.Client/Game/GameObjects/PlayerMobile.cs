@@ -13,7 +13,7 @@ using ClassicUO.Assets;
 
 namespace ClassicUO.Game.GameObjects
 {
-    internal class PlayerMobile : Mobile
+    public class PlayerMobile : Mobile
     {
         private readonly Dictionary<BuffIconType, BuffIcon> _buffIcons = new Dictionary<BuffIconType, BuffIcon>();
 

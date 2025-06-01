@@ -6,7 +6,7 @@ using ClassicUO.Network;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ColorPickerGump : Gump
+    public class ColorPickerGump : Gump
     {
         private const int SLIDER_MIN = 0;
         private const int SLIDER_MAX = 4;

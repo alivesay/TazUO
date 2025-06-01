@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.GameObjects
 {
-    internal sealed partial class Land : GameObject
+    public sealed partial class Land : GameObject
     {
         //private static readonly QueuedPool<Land> _pool = new QueuedPool<Land>
         //(

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class ContextMenuControl
+    public class ContextMenuControl
     {
         private readonly List<ContextMenuItemEntry> _items;
         private readonly Gump _gump;
@@ -87,7 +87,7 @@ namespace ClassicUO.Game.UI.Controls
     }
 
 
-    internal class ContextMenuShowMenu : Gump
+    public class ContextMenuShowMenu : Gump
     {
         private readonly AlphaBlendControl _background;
         private List<ContextMenuShowMenu> _subMenus;

@@ -7,7 +7,7 @@ using ClassicUO.Renderer;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class QuestionGump : Gump
+    public class QuestionGump : Gump
     {
         private readonly Action<bool> _result;
 

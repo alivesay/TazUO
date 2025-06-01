@@ -10,7 +10,7 @@ using ClassicUO.Resources;
 
 namespace ClassicUO.Game.Managers
 {
-    internal sealed class PartyManager
+    public sealed class PartyManager
     {
         public bool InParty => Leader != 0;
             
@@ -218,7 +218,7 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal class PartyMember : IEquatable<PartyMember>
+    public class PartyMember : IEquatable<PartyMember>
     {
         private readonly World _world;
         private string _name;

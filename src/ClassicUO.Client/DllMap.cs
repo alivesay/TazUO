@@ -123,20 +123,19 @@ namespace ClassicUO
 
             NativeLibrary.SetDllImportResolver(assembly, mapAndLoad);
 
-            static IntPtr mapAndLoad(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+            static IntPtr mapAndLoad(
+                string libraryName,
+                Assembly assembly,
+                DllImportSearchPath? dllImportSearchPath
+            )
             {
-                string mappedName = mapDictionary.TryGetValue(libraryName, out var result) ? result : libraryName;
-
-                // Try loading from the executable directory
-                string localPath = Path.Combine(AppContext.BaseDirectory, mappedName);
-                
-                if (File.Exists(localPath))
+                string mappedName;
+                if (!mapDictionary.TryGetValue(libraryName, out mappedName))
                 {
-                    return NativeLibrary.Load(localPath);
+                    mappedName = libraryName;
                 }
 
-                // Fallback to default behavior
-                return NativeLibrary.Load(mappedName, assembly, searchPath);
+                return NativeLibrary.Load(mappedName, assembly, dllImportSearchPath);
             }
 
             static string getPlatformName()

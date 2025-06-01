@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.GameObjects
 {
-    internal class TextContainer : LinkedObject
+    public class TextContainer : LinkedObject
     {
         public int Size,
             MaxSize = 5;
@@ -52,7 +52,7 @@ namespace ClassicUO.Game.GameObjects
 
 
 
-    internal class OverheadDamage
+    public class OverheadDamage
     {
         private const int DAMAGE_Y_MOVING_TIME = 25;
         private readonly Deque<TextObject> _messages;

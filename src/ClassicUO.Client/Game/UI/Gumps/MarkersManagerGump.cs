@@ -13,7 +13,7 @@ using ClassicUO.Renderer;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal sealed class MarkersManagerGump : Gump
+    public sealed class MarkersManagerGump : Gump
     {
         private const int WIDTH = 620;
         private const int HEIGHT = 500;
@@ -311,7 +311,7 @@ namespace ClassicUO.Game.UI.Gumps
             base.Dispose();
         }
 
-        internal class DrawTexture : Control
+        public class DrawTexture : Control
         {
             public Texture2D Texture;
 

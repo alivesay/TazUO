@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class Line : Control
+    public class Line : Control
     {
         private readonly Texture2D _texture;
         private Vector3 hueVector = ShaderHueTranslator.GetHueVector(0, false, 1f);

@@ -16,7 +16,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ContainerGump : TextContainerGump
+    public class ContainerGump : TextContainerGump
     {
         private long _corpseEyeTicks;
         private ContainerData _data;

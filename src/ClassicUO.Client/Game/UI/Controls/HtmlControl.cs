@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class HtmlControl : Control
+    public class HtmlControl : Control
     {
         private RenderedText _gameText;
         private ScrollBarBase _scrollBar;

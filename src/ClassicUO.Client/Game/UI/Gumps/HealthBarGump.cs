@@ -20,7 +20,7 @@ using System.Text.Json.Serialization;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal abstract class BaseHealthBarGump : AnchorableGump
+    public abstract class BaseHealthBarGump : AnchorableGump
     {
         private bool _targetBroke;
 
@@ -438,7 +438,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class HealthBarGumpCustom : BaseHealthBarGump
+    public class HealthBarGumpCustom : BaseHealthBarGump
     {
         private static Settings _settings;
         private static Settings settings
@@ -1495,7 +1495,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class HealthBarGump : BaseHealthBarGump
+    public class HealthBarGump : BaseHealthBarGump
     {
         private static Settings _settings;
         private static Settings settings

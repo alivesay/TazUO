@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ProgressBarGump : Gump
+    public class ProgressBarGump : Gump
     {
         public double MaxValue { get; set; } = 1;
         public double MinValue { get; set; } = 0;

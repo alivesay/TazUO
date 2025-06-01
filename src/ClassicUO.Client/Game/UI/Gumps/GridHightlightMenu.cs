@@ -17,10 +17,10 @@ namespace ClassicUO.Game.UI.Gumps
 {
     [JsonSerializable(typeof(GridHightlightMenu.GridHighlightData))]
     [JsonSerializable(typeof(GridHightlightMenu.GridHighlightData[]))]
-    internal partial class GridHighlightJsonContext : JsonSerializerContext
+    public partial class GridHighlightJsonContext : JsonSerializerContext
     {
     }
-    internal class GridHightlightMenu : Gump
+    public class GridHightlightMenu : Gump
     {
         private const int WIDTH = 350, HEIGHT = 500;
         private AlphaBlendControl background;

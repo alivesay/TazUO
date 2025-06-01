@@ -5,7 +5,7 @@ using ClassicUO.Utility;
 
 namespace ClassicUO.Game.UI.Gumps.Login
 {
-    internal class LoginBackground : Gump
+    public class LoginBackground : Gump
     {
         public LoginBackground(World world) : base(world, 0, 0)
         {

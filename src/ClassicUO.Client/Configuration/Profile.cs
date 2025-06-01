@@ -47,7 +47,7 @@ namespace ClassicUO.Configuration
 
 
 
-    internal sealed class Profile
+    public sealed class Profile
     {
         [JsonIgnore] public string Username { get; set; }
         [JsonIgnore] public string ServerName { get; set; }

@@ -5,7 +5,7 @@ using ClassicUO.Utility.Collections;
 
 namespace ClassicUO.Game.Managers
 {
-    internal sealed class UseItemQueue
+    public sealed class UseItemQueue
     {
         private readonly Deque<uint> _actions = new Deque<uint>();
         private long _timer;

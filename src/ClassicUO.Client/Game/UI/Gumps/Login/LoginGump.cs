@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Gumps.Login
 {
-    internal class LoginGump : Gump
+    public class LoginGump : Gump
     {
         private readonly ushort _buttonNormal;
         private readonly ushort _buttonOver;

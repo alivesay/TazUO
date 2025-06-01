@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class NameOverHeadHandlerGump : Gump
+    public class NameOverHeadHandlerGump : Gump
     {
         public static Point? LastPosition;
 

@@ -15,7 +15,7 @@ using static ClassicUO.Game.UI.Gumps.GridHightlightMenu;
 
 namespace ClassicUO.Game.UI
 {
-    internal class NearbyLootGump : Gump
+    public class NearbyLootGump : Gump
     {
         public const int WIDTH = 250;
 
@@ -351,7 +351,7 @@ namespace ClassicUO.Game.UI
         }
     }
 
-    internal class NearbyItemDisplay : Control
+    public class NearbyItemDisplay : Control
     {
         private const int ITEM_SIZE = 40;
         private static Queue<NearbyItemDisplay> pool = new Queue<NearbyItemDisplay>();

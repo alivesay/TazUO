@@ -825,6 +825,10 @@ namespace ClassicUO.Assets
                 {
                     if (dbuf.Length < entry.DecompressedLength)
                         dbuf = new byte[entry.DecompressedLength];
+                    
+                    //For some unknown reason, the Zlib will error out and close the app without these info log lines here
+                    Log.Info($"Decompressing {entry.Length} bytes to {entry.DecompressedLength} bytes");
+                    Log.Info($"Buffers: {buf.Length} bytes to {dbuf} bytes");
 
                     var ok = ZLib.Decompress(buf.AsSpan(0, entry.Length), dbuf.AsSpan(0, entry.DecompressedLength));
                     if (ok != ZLib.ZLibError.Ok)

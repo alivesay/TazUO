@@ -24,7 +24,7 @@ namespace ClassicUO.Game
         WT_INVALID_1 = 0xFF
     }
 
-    internal sealed class Weather
+    public sealed class Weather
     {
         private const int MAX_WEATHER_EFFECT = 70;
         private const float SIMULATION_TIME = 37.0f;

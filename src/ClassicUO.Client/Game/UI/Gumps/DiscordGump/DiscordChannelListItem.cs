@@ -6,7 +6,7 @@ using Discord.Sdk;
 
 namespace ClassicUO.Game.UI.Controls;
 
-internal class DiscordChannelListItem : Control
+public class DiscordChannelListItem : Control
 {
     private readonly DiscordGump gump;
     private LobbyHandle lobby;

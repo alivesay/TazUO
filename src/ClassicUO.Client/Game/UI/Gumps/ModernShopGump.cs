@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class ModernShopGump : Gump
+    public class ModernShopGump : Gump
     {
         private int WIDTH = 450;
 

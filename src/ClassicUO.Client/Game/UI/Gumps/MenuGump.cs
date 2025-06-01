@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class MenuGump : Gump
+    public class MenuGump : Gump
     {
         private readonly ContainerHorizontal _container;
         private bool _isDown,
@@ -251,7 +251,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class GrayMenuGump : Gump
+    public class GrayMenuGump : Gump
     {
         private readonly ResizePic _resizePic;
 

@@ -5,7 +5,7 @@ using System;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class DataBox : Control
+    public class DataBox : Control
     {
         public DataBox(int x, int y, int w, int h)
         {

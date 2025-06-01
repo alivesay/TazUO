@@ -9,7 +9,7 @@ using ClassicUO.Resources;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class PartyGump : Gump
+    public class PartyGump : Gump
     {
         public PartyGump(World world, int x, int y, bool canloot) : base(world, 0, 0)
         {

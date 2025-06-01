@@ -13,7 +13,7 @@ using ClassicUO.Utility;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class BulletinBoardGump : Gump
+    public class BulletinBoardGump : Gump
     {
         private readonly DataBox _databox;
 
@@ -139,7 +139,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class BulletinBoardItem : Gump
+    public class BulletinBoardItem : Gump
     {
         private readonly ExpandableScroll _articleContainer;
         private readonly Button _buttonPost;
@@ -482,7 +482,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class BulletinBoardObject : Control
+    public class BulletinBoardObject : Control
     {
         public BulletinBoardObject(uint serial, string text)
         {

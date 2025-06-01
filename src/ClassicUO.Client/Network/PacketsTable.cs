@@ -5,7 +5,7 @@ using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Network
 {
-    internal sealed class PacketsTable
+    public sealed class PacketsTable
     {
         private readonly short[] _packetsTable =
         {

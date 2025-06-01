@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class MacroButtonGump : AnchorableGump
+    public class MacroButtonGump : AnchorableGump
     {
         private Texture2D backgroundTexture;
         private Vector3 hueVector;

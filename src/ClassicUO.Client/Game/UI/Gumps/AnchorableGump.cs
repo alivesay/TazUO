@@ -17,7 +17,7 @@ namespace ClassicUO.Game.UI.Gumps
         DISABLED
     }
 
-    internal abstract class AnchorableGump : Gump
+    public abstract class AnchorableGump : Gump
     {
         private AnchorableGump _anchorCandidate;
 

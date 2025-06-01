@@ -48,7 +48,7 @@ using ClassicUO.Game.Scenes;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class MacroButtonEditorGump : Gump
+    public class MacroButtonEditorGump : Gump
     {
         private const int WIDTH = 400;
         private const int HEIGHT = 400;

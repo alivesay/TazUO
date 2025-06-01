@@ -2,7 +2,7 @@
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class MenuButton : Control
+    public class MenuButton : Control
     {
         public MenuButton(int width, uint hue, float alpha, string tooltip = "", uint linehue = UInt32.MaxValue)
         {

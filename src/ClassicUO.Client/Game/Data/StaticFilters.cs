@@ -13,7 +13,7 @@ using ClassicUO.Utility.Logging;
 namespace ClassicUO.Game.Data
 {
     [Flags]
-    internal enum STATIC_TILES_FILTER_FLAGS : byte
+    public enum STATIC_TILES_FILTER_FLAGS : byte
     {
         STFF_CAVE = 0x01,
         STFF_STUMP = 0x02,

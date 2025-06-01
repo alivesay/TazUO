@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class DurabilityGumpMinimized : Gump
+    public class DurabilityGumpMinimized : Gump
     {
         public uint Graphic { get; set; } = 5587;
 
@@ -51,7 +51,7 @@ namespace ClassicUO.Game.UI.Gumps
         }
     }
 
-    internal class DurabilitysGump : Gump
+    public class DurabilitysGump : Gump
     {
         private const int WIDTH = 300, HEIGHT = 400;
         private static int lastX, lastY;

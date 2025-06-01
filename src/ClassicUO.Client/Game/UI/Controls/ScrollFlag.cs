@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls
 {
-    internal class ScrollFlag : ScrollBarBase
+    public class ScrollFlag : ScrollBarBase
     {
         private readonly bool _showButtons;
 

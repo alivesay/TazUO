@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Controls;
 
-internal class AnimationDisplay : Control
+public class AnimationDisplay : Control
 {
     private ushort _graphic;
     public ushort Graphic => _graphic;

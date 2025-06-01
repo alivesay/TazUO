@@ -18,7 +18,7 @@ using SDL2;
 
 namespace ClassicUO.Game
 {
-    internal sealed class GameCursor
+    public sealed class GameCursor
     {
         private static readonly ushort[,] _cursorData = new ushort[3, 16]
         {

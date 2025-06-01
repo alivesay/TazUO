@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Gumps.Login
 {
-    internal class CharacterSelectionGump : Gump
+    public class CharacterSelectionGump : Gump
     {
         private const ushort SELECTED_COLOR = 0x0021;
         private const ushort NORMAL_COLOR = 0x034F;

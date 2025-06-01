@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps
 {
-    internal class VersionHistory : Gump
+    public class VersionHistory : Gump
     {
         private static string[] updateTexts = {
             "/c[white][3.30.0]/cd\n" +

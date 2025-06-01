@@ -5,7 +5,7 @@ using DiscordSocialSDK.Wrapper;
 
 namespace ClassicUO.Game.UI.Controls;
 
-internal class DiscordFriendListControl : Control
+public class DiscordFriendListControl : Control
 {
     private DataBox _friendList;
     private DiscordGump _gump;

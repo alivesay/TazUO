@@ -10,10 +10,10 @@ namespace ClassicUO.Game.Managers
     using System.Text.Json.Serialization;
 
     [JsonSerializable(typeof(Dictionary<string, ushort>))]
-    internal partial class TileMarkerJsonContext : JsonSerializerContext
+    public partial class TileMarkerJsonContext : JsonSerializerContext
     {
     }
-    internal class TileMarkerManager
+    public class TileMarkerManager
     {
         public static TileMarkerManager Instance { get; private set; } = new TileMarkerManager();
 

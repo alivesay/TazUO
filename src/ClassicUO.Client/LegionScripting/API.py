@@ -50,7 +50,16 @@ def ContextMenu(serial: int, entry: int):
 def EquipItem(serial: int):
     pass
 
+def ClearMoveQueue():
+    pass
+
+def QueMoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: int = 0xFFFF):
+    pass
+
 def MoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: int = 0xFFFF):
+    pass
+
+def QueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0):
     pass
 
 def MoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0):

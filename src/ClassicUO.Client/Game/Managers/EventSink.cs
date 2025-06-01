@@ -8,6 +8,12 @@ namespace ClassicUO.Game.Managers
     internal class EventSink
     {
         /// <summary>
+        /// Invoked when the player is created
+        /// </summary>
+        public static event EventHandler<EventArgs> OnPlayerCreated;
+        public static void InvokeOnPlayerCreated() => OnPlayerCreated?.Invoke(null, EventArgs.Empty);
+        
+        /// <summary>
         /// Invoked when an item is added to the client, sender is the Item
         /// </summary>
         internal static event EventHandler<EventArgs> OnItemCreated;

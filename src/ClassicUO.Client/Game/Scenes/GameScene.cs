@@ -66,6 +66,7 @@ namespace ClassicUO.Game.Scenes
         private uint _timeToPlaceMultiInHouseCustomization;
         private readonly bool _use_render_target = false;
         private readonly UseItemQueue _useItemQueue;
+        private MoveItemQueue _moveItemQueue = new MoveItemQueue();
         private bool _useObjectHandles;
         private RenderTarget2D _world_render_target, _lightRenderTarget;
         private AnimatedStaticsManager _animatedStaticsManager;
@@ -78,6 +79,7 @@ namespace ClassicUO.Game.Scenes
             _useItemQueue = new UseItemQueue(world);
         }
 
+        public MoveItemQueue MoveItemQueue => _moveItemQueue;
         public bool UpdateDrawPosition { get; set; }
         public bool DisconnectionRequested { get; set; }
         public bool UseLights =>
@@ -312,6 +314,8 @@ namespace ClassicUO.Game.Scenes
             {
                 return;
             }
+            
+            _moveItemQueue.Clear();
 
             GraphicsReplacement.Save();
             BuySellAgent.Unload();
@@ -798,6 +802,7 @@ namespace ClassicUO.Game.Scenes
             _world.DelayedObjectClickManager.Update();
 
             AutoLootManager.Instance.Update();
+            _moveItemQueue.ProcessQueue();
 
             if (!MoveCharacterByMouseInput() && !currentProfile.DisableArrowBtn && !MoveCharByController())
             {

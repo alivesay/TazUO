@@ -7,6 +7,9 @@ using ClassicUO.Game.GameObjects;
 using ClassicUO.Input;
 using ClassicUO.Resources;
 using ClassicUO.Utility.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.UI.Gumps;
@@ -23,11 +26,28 @@ namespace ClassicUO.Game.Managers
 
         public CommandManager(World world)
         {
-            _world = world;
+            _world = world; 
         }
 
-        public void Initialize()
+        public static void Initialize()
         {
+            Register("dis", (s)=>UIManager.Add(new DiscordGump()));
+            
+            Register("dm", (a) =>
+            {
+                if (a.Length < 3)
+                {
+                    GameActions.Print("Usage: -dm userID msg");
+
+                    return;
+                }
+
+                if (ulong.TryParse(a[1], out ulong id))
+                {
+                    DiscordManager.Instance.SendDM(id, string.Join(" ", a.Skip(2)));
+                }
+            });
+            
             Register
             (
                 "info",

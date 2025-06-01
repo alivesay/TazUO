@@ -17,7 +17,7 @@ namespace ClassicUO.Game.UI.Controls
 
         public event EventHandler TextChanged { add { TextBox.TextChanged += value; } remove { TextBox.TextChanged -= value; } }
         public new event EventHandler<KeyboardEventArgs> KeyDown { add { TextBox.KeyDown += value; } remove { TextBox.KeyDown -= value; } }
-
+        public event EventHandler EnterPressed;
         public int CaretIndex { get { return TextBox.CaretIndex; } }
         public bool ConvertHtmlColors { get { return TextBox.ConvertHtmlColors; } set { TextBox.ConvertHtmlColors = value; } }
         public TTFTextInputField
@@ -100,6 +100,12 @@ namespace ClassicUO.Game.UI.Controls
         public void SetText(string text)
         {
             TextBox.SetText(text);
+        }
+        
+        public override void OnKeyboardReturn(int textID, string text)
+        {
+            base.OnKeyboardReturn(textID, text);
+            EnterPressed?.Invoke(this, EventArgs.Empty);
         }
 
         public class StbTextBox : Control, ITextEditHandler

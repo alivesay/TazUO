@@ -140,10 +140,12 @@ namespace ClassicUO
             SetScene(new LoginScene(UO.World));
 #endif
             SetWindowPositionBySettings();
+            DiscordManager.Instance.FromSavedToken();
         }
 
         protected override void UnloadContent()
         {
+            DiscordManager.Instance.BeginDisconnect();
             SDL_GetWindowBordersSize(Window.Handle, out int top, out int left, out _, out _);
 
             Settings.GlobalSettings.WindowPosition = new Point(
@@ -155,8 +157,9 @@ namespace ClassicUO
             Settings.GlobalSettings.Save();
             Plugin.OnClosing();
 
-            UO.Unload();
 
+            UO.Unload();
+            DiscordManager.Instance.FinalizeDisconnect();
             base.UnloadContent();
         }
 
@@ -418,6 +421,21 @@ namespace ClassicUO
 
             UO.GameCursor?.Update();
             Audio?.Update();
+            
+            DiscordManager.Instance.Update(); 
+
+
+            for (var i = _queuedActions.Count - 1; i >= 0; i--)
+            {
+                (var time, var fn) = _queuedActions[i];
+
+                if (Time.Ticks > time)
+                {
+                    fn();
+                    _queuedActions.RemoveAt(i);
+                    break;
+                }
+            }
 
 
             for (var i = _queuedActions.Count - 1; i >= 0; i--)

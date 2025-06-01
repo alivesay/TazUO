@@ -102,7 +102,7 @@ namespace ClassicUO.Game.Managers
         /// <returns></returns>
         public AutoLootConfigEntry AddAutoLootEntry(ushort graphic = 0, ushort hue = ushort.MaxValue, string name = "")
         {
-            AutoLootConfigEntry item = new AutoLootConfigEntry() { Graphic = (short)graphic, Hue = hue, Name = name };
+            AutoLootConfigEntry item = new AutoLootConfigEntry() { Graphic = graphic, Hue = hue, Name = name };
 
             foreach (AutoLootConfigEntry entry in autoLootItems)
             {
@@ -312,7 +312,7 @@ namespace ClassicUO.Game.Managers
         public class AutoLootConfigEntry
         {
             public string Name { get; set; } = "";
-            public short Graphic { get; set; } = 0;
+            public int Graphic { get; set; } = 0;
             public ushort Hue { get; set; } = ushort.MaxValue;
             public string RegexSearch { get; set; } = string.Empty;
             private bool RegexMatch => !string.IsNullOrEmpty(RegexSearch);

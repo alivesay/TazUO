@@ -54,11 +54,12 @@ namespace ClassicUO.Game.UI.Gumps
             if (World.Player.Skills.Length > skillIndex)
             {
                 Skill s = World.Player.Skills[skillIndex];
-                TextBox tb = TextBox.GetOne(string.Format(ProfileManager.CurrentProfile.SkillBarFormat, s.Name, s.Value, s.Cap),
-                    ProfileManager.CurrentProfile.GameWindowSideChatFont,
-                    ProfileManager.CurrentProfile.GameWindowSideChatFontSize, 
-                    Color.White,
-                    TextBox.RTLOptions.Default());
+
+                TextBox tb = TextBox.GetOne
+                (
+                    string.Format(ProfileManager.CurrentProfile.SkillBarFormat, s.Name, s.Value, s.Cap), ProfileManager.CurrentProfile.GameWindowSideChatFont,
+                    ProfileManager.CurrentProfile.GameWindowSideChatFontSize, Color.White, TextBox.RTLOptions.Default()
+                );
 
                 tb.X = (Width / 2) - (tb.MeasuredSize.X / 2);
 
@@ -67,13 +68,26 @@ namespace ClassicUO.Game.UI.Gumps
                 Rectangle barBounds = Client.Game.UO.Gumps.GetGump(0x0805).UV;
 
                 int widthPercent = (int)(barBounds.Width * (s.Value / s.Cap));
-                if(widthPercent > barBounds.Width)
+
+                if (widthPercent > barBounds.Width)
                     widthPercent = barBounds.Width;
 
-                Add(new GumpPic(0, Height - barBounds.Height, 0x0805, 0) { X = (Width / 2) - (barBounds.Width / 2) }); //Background
+                Add
+                (
+                    new GumpPic(0, Height - barBounds.Height, 0x0805, 0)
+                    {
+                        X = (Width / 2) - (barBounds.Width / 2)
+                    }
+                ); //Background
 
                 if (widthPercent > 0)
-                    Add(new GumpPicTiled(0, Height - barBounds.Height, widthPercent, barBounds.Height, 0x0806) { X = (Width / 2) - (barBounds.Width / 2) });//Foreground
+                    Add
+                    (
+                        new GumpPicTiled(0, Height - barBounds.Height, widthPercent, barBounds.Height, 0x0806)
+                        {
+                            X = (Width / 2) - (barBounds.Width / 2)
+                        }
+                    ); //Foreground
             }
         }
 
@@ -97,6 +111,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             private static ConcurrentQueue<SkillProgressBar> skillProgressBars = new ConcurrentQueue<SkillProgressBar>();
             public static SkillProgressBar CurrentProgressBar;
+            private static bool beingReset;
 
 
             public static void AddSkill(World world, int skillIndex)
@@ -111,25 +126,35 @@ namespace ClassicUO.Game.UI.Gumps
 
             public static void ShowNext(World world)
             {
-                if (world.InGame)
-                    if (skillProgressBars.TryDequeue(out var skillProgressBar))
-                    {
-                        CurrentProgressBar = skillProgressBar;
-                        skillProgressBar.SetDuration(4000); //Expire in 4 seconds
-                        UIManager.Add(skillProgressBar);
-                    }
-                    else
-                    {
-                        //Not in game anymore, clear the que
-                        Reset();
-                    }
+                if (beingReset)
+                    return;
+                
+                if (!world.InGame)
+                    return;
+
+                if (!ProfileManager.CurrentProfile.DisplaySkillBarOnChange)
+                {
+                    Reset();
+                    return;
+                }
+
+                if (skillProgressBars.TryDequeue(out var skillProgressBar))
+                {
+                    CurrentProgressBar = skillProgressBar;
+                    skillProgressBar.SetDuration(4000); //Expire in 4 seconds
+                    UIManager.Add(skillProgressBar);
+                }
             }
 
             public static void Reset()
             {
-                while(skillProgressBars.TryDequeue( out var skillProgressBar))
+                beingReset = true;
+                
+                while (skillProgressBars.TryDequeue(out var skillProgressBar))
                     skillProgressBar?.Dispose();
+
                 skillProgressBars = new ConcurrentQueue<SkillProgressBar>();
+                beingReset = false;
             }
         }
     }

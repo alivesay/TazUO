@@ -55,6 +55,8 @@ namespace ClassicUO.Game.Managers
         private World World;
 
         public List<DurabiltyProp> Durabilities => _itemLayerSlots.Values.ToList();
+        
+        public static bool HasDurabilityData { get; private set; }
 
         public DurabilityManager(World world)
         {
@@ -93,6 +95,7 @@ namespace ClassicUO.Game.Managers
                         }
                     }
                 }
+                HasDurabilityData = _itemLayerSlots.Count > 0;
             });
         }
 

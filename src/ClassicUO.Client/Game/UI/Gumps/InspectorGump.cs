@@ -231,8 +231,8 @@ namespace ClassicUO.Game.UI.Gumps
         {
             Dictionary<string, string> dict = new Dictionary<string, string>();
 
-            dict["Graphics"] = $"0x{obj.Graphic:X4}";
-            dict["Hue"] = $"0x{obj.Hue:X4}";
+            dict["Graphics"] = $"{obj.Graphic}";
+            dict["Hue"] = $"{obj.Hue}";
             dict["Position"] = $"X={obj.X}, Y={obj.Y}, Z={obj.Z}";
             dict["PriorityZ"] = obj.PriorityZ.ToString();
             dict["Distance"] = obj.Distance.ToString();

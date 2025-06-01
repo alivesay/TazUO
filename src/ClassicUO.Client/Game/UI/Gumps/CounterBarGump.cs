@@ -86,7 +86,6 @@ namespace ClassicUO.Game.UI.Gumps
             AcceptKeyboardInput = false;
             CanCloseWithRightClick = false;
             WantUpdateSize = false;
-
             Width = _rectSize * _columns + 1;
             Height = _rectSize * _rows + 1;
 
@@ -548,10 +547,17 @@ namespace ClassicUO.Game.UI.Gumps
                         Use();
                         return;
                     }
+
+                    if (Keyboard.Alt && Keyboard.Ctrl)
+                    {
+                        if(Parent is Gump pg)
+                            pg.IsLocked = !pg.IsLocked;
+                    }
                 }
                 else if (button == MouseButtonType.Right && Keyboard.Alt && Graphic != 0)
                 {
                     RemoveItem();
+
                     return;
                 }
 

@@ -3,7 +3,7 @@ All methods, properties, enums, etc need to pre prefaced with `API.` for example
 If you download the [API.py](API.py) file, put it in the same folder as your python scripts and add `import API` to your script, that will enable some mild form of autocomplete in an editor like VS Code.  
 
 
-This was generated on `5/15/2025`.
+This was generated on `5/23/2025`.
 # API  
 
 ## Class Description
@@ -255,6 +255,55 @@ This was generated on `5/15/2025`.
 
 
 <details>
+<summary><h3>ClearMoveQueue()</h3></summary>
+
+ Clear the move item que of all items.
+
+
+#### Does not return anything
+
+</details>
+
+***
+
+
+<details>
+<summary><h3>QueMoveItem(serial, destination, amt, x, y)</h3></summary>
+
+ Move an item to another container.  
+ Use x, and y if you don't want items stacking in the desination container.  
+ Example:  
+ ```py
+ items = API.ItemsInContainer(API.Backpack)
+
+ API.SysMsg("Target your fish barrel", 32)
+ barrel = API.RequestTarget()
+
+
+ if len(items) > 0 and barrel:
+     for item in items:
+         data = API.ItemNameAndProps(item)
+         if data and "An Exotic Fish" in data:
+             API.QueMoveItem(item, barrel)
+ ```  
+
+
+**Parameters**  
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| serial | uint | No |  |
+| destination | uint | No |  |
+| amt | ushort | Yes | Amount to move |
+| x | int | Yes | X coordinate inside a container |
+| y | int | Yes | Y coordinate inside a container |
+#### Does not return anything
+
+</details>
+
+***
+
+
+<details>
 <summary><h3>MoveItem(serial, destination, amt, x, y)</h3></summary>
 
  Move an item to another container.  
@@ -284,6 +333,33 @@ This was generated on `5/15/2025`.
 | amt | int | Yes | Amount to move |
 | x | int | Yes | X coordinate inside a container |
 | y | int | Yes | Y coordinate inside a container |
+#### Does not return anything
+
+</details>
+
+***
+
+
+<details>
+<summary><h3>QueMoveItemOffset(serial, amt, x, y, z)</h3></summary>
+
+ Move an item to the ground near you.  
+ Example:  
+ ```py
+ items = API.ItemsInContainer(API.Backpack)
+ for item in items:
+   API.QueMoveItemOffset(item, 0, 1, 0, 0)
+ ```  
+
+
+**Parameters**  
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| serial | uint | No |  |
+| amt | ushort | Yes | 0 to grab entire stack |
+| x | int | Yes | Offset from your location |
+| y | int | Yes | Offset from your location |
+| z | int | Yes | Offset from your location |
 #### Does not return anything
 
 </details>

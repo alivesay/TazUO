@@ -12,6 +12,8 @@ namespace ClassicUO.Game.Managers
 {
     internal sealed class PartyManager
     {
+        public bool InParty => Leader != 0;
+            
         private const int PARTY_SIZE = 10;
 
         private readonly World _world;

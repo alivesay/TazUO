@@ -26,29 +26,31 @@ namespace ClassicUO.Game.UI.Gumps
             Height = 30;
         }
 
+        public override bool AcceptMouseInput => DurabilityManager.HasDurabilityData;
+
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)
         {
             ref readonly var texture = ref Client.Game.UO.Gumps.GetGump(Graphic);
-            if (texture.Texture != null)
+
+            if (texture.Texture != null && DurabilityManager.HasDurabilityData)
             {
                 Rectangle rect = new Rectangle(x, y, Width, Height);
-                batcher.Draw
-                (
-                    texture.Texture,
-                    rect,
-                    texture.UV,
-                    ShaderHueTranslator.GetHueVector(0)
-                );
+                batcher.Draw(texture.Texture, rect, texture.UV, ShaderHueTranslator.GetHueVector(0));
             }
 
-            return base.Draw(batcher, x, y); ;
+            return base.Draw(batcher, x, y);
         }
+
         protected override void OnMouseUp(int x, int y, MouseButtonType button)
         {
-            UIManager.GetGump<DurabilitysGump>()?.Dispose();
-            UIManager.Add(new DurabilitysGump(World));
+            if (button == MouseButtonType.Left && DurabilityManager.HasDurabilityData)
+            {
+                UIManager.GetGump<DurabilitysGump>()?.Dispose();
+                UIManager.Add(new DurabilitysGump(World));
+            }
         }
     }
+
     internal class DurabilitysGump : Gump
     {
         private const int WIDTH = 300, HEIGHT = 400;
@@ -68,7 +70,6 @@ namespace ClassicUO.Game.UI.Gumps
 
         public DurabilitysGump(World world) : base(world, 0, 0)
         {
-
             LayerOrder = UILayer.Default;
             CanCloseWithRightClick = true;
             CanMove = true;
@@ -79,33 +80,29 @@ namespace ClassicUO.Game.UI.Gumps
             X = lastX;
             Y = lastY;
 
-            if(lastX == default || lastY == default)
+            if (lastX == default || lastY == default)
             {
                 X = lastX = (Client.Game.Scene.Camera.Bounds.Width - Width) / 2;
                 Y = lastY = Client.Game.Scene.Camera.Bounds.Y + 20;
-            }            
+            }
 
 
-            var _borderControl = new BorderControl
-               (
-                   0,
-                   0,
-                   Width,
-                   Height,
-                   4
-               );
+            var _borderControl = new BorderControl(0, 0, Width, Height, 4);
 
             Add(_borderControl);
-            Add(new AlphaBlendControl(0.9f) { Width = Width, Height = Height });
+
+            Add
+            (
+                new AlphaBlendControl(0.9f)
+                {
+                    Width = Width,
+                    Height = Height
+                }
+            );
+
             BuildHeader();
-            ScrollArea area = new ScrollArea
-              (
-                  10,
-                  30,
-                  Width - 20,
-                  Height - 50,
-                  true
-              )
+
+            ScrollArea area = new ScrollArea(10, 30, Width - 20, Height - 50, true)
             {
                 ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways
             };
@@ -157,7 +154,9 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     continue;
                 }
+
                 var item = World.Items.Get((uint)durability.Serial);
+
                 if (item == null)
                 {
                     continue;
@@ -194,11 +193,15 @@ namespace ClassicUO.Game.UI.Gumps
 
                 var durWidth = Client.Game.UO.FileManager.Fonts.GetWidthUnicode(0, $"{durability.Durabilty} / {durability.MaxDurabilty}");
 
-                a.Add(new Label($"{durability.Durabilty} / {durability.MaxDurabilty}", true, 0xFFFF)
-                {
-                    Y = red.Y - 2,
-                    X = Width - 38 - durWidth
-                });
+                a.Add
+                (
+                    new Label($"{durability.Durabilty} / {durability.MaxDurabilty}", true, 0xFFFF)
+                    {
+                        Y = red.Y - 2,
+                        X = Width - 38 - durWidth
+                    }
+                );
+
                 _dataBox.Add(a);
 
                 startY += a.Height + 4;
@@ -209,6 +212,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             base.Update();
         }
+
         public override void Save(XmlTextWriter writer)
         {
             base.Save(writer);

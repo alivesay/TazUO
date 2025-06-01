@@ -77,6 +77,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileEmbed", "external\FileE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FontStashSharp.FNA.Core", "external\FontStashSharp\src\XNA\FontStashSharp.FNA.Core.csproj", "{5ACA68DA-A282-434D-919F-B243A801D4C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordSocialSDK.Wrapper", "external\DiscordSocialSDK.Wrapper\DiscordSocialSDK.Wrapper\DiscordSocialSDK.Wrapper.csproj", "{83A3839A-3A9A-42DB-8293-17EFAF482F32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -249,6 +251,14 @@ Global
 		{5ACA68DA-A282-434D-919F-B243A801D4C3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5ACA68DA-A282-434D-919F-B243A801D4C3}.Release|x64.ActiveCfg = Release|Any CPU
 		{5ACA68DA-A282-434D-919F-B243A801D4C3}.Release|x64.Build.0 = Release|Any CPU
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32}.Debug|Any CPU.Build.0 = Debug|x64
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32}.Debug|x64.ActiveCfg = Debug|x64
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32}.Debug|x64.Build.0 = Debug|x64
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32}.Release|Any CPU.ActiveCfg = Release|x64
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32}.Release|Any CPU.Build.0 = Release|x64
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32}.Release|x64.ActiveCfg = Release|x64
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -267,6 +277,7 @@ Global
 		{8974A04C-8360-4225-ABDD-0C56555F676D} = {8EAF9583-DC5B-46DC-A01E-47B00A1C862E}
 		{027B5178-C306-4900-996D-97E8E43567B6} = {FA5D7AB8-3570-4E55-95B0-35BA6842FEE3}
 		{5ACA68DA-A282-434D-919F-B243A801D4C3} = {FA5D7AB8-3570-4E55-95B0-35BA6842FEE3}
+		{83A3839A-3A9A-42DB-8293-17EFAF482F32} = {FA5D7AB8-3570-4E55-95B0-35BA6842FEE3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A99E91A-ADAB-45C3-8170-2656140F6EFA}

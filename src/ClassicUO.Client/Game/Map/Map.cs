@@ -287,5 +287,19 @@ namespace ClassicUO.Game.Map
 
             _usedIndices.Clear();
         }
+
+        public override string ToString()
+        {
+            switch (Index)
+            {
+                default:
+                case 0: return "Fel";
+                case 1: return "Tram";
+                case 2: return "Ilshenar";
+                case 3: return "Malas";
+                case 4: return "Tokuno";
+                case 5: return "TerMur";
+            }
+        }
     }
 }

@@ -229,6 +229,8 @@ namespace ClassicUO.Game.UI.Gumps
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Legion Scripting", () => { UIManager.Add(new LegionScripting.ScriptManagerGump(world)); }));
 
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Nearby Loot Gump", () => { UIManager.Add(new NearbyLootGump(world)); }));
+            
+            moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Discord", () => { UIManager.Add(new DiscordGump()); }));
 
             startX += largeWidth + 1;
 

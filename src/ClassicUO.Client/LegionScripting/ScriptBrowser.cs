@@ -63,12 +63,11 @@ namespace ClassicUO.LegionScripting
             {
                 lastP = Path.GetDirectoryName(lastPath);
                 scrollArea.Add(new ItemControl(World, new GHFileObject() { type = "dir", name = $"<- Back{(string.IsNullOrEmpty(lastP) ? "" : $" ({lastP})")}", path = lastP }, this));
-
             }
 
             foreach (GHFileObject file in files)
             {
-                if (file.type == "file" && !file.name.EndsWith(".lscript"))
+                if (file.type == "file" && !(file.name.EndsWith(".lscript") || file.name.EndsWith(".py")))
                     continue;
 
                 scrollArea.Add(new ItemControl(World, file, this));
@@ -147,7 +146,7 @@ namespace ClassicUO.LegionScripting
                     Add(GenTextBox("Directory", 14, 5, 5));
                     MouseDown += DirectoryMouseDown;
                 }
-                else if (gHFileObject.type == "file" && gHFileObject.name.EndsWith(".lscript"))
+                else if (gHFileObject.type == "file" && (gHFileObject.name.EndsWith(".lscript") || gHFileObject.name.EndsWith(".py")))
                 {
                     Add(GenTextBox("Script", 14, 5, 5));
                     MouseDown += FileMouseDown;

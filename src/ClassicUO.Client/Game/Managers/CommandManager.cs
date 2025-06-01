@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Configuration;
+using ClassicUO.LegionScripting;
 
 namespace ClassicUO.Game.Managers
 {
@@ -31,6 +32,8 @@ namespace ClassicUO.Game.Managers
 
         public void Initialize()
         {
+            Register("sbrowser", (s)=>UIManager.Add(new ScriptBrowser(_world)));
+            
             Register("dis", (s)=>UIManager.Add(new DiscordGump(_world)));
             
             Register("dm", (a) =>

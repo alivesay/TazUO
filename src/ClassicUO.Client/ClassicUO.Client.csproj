@@ -112,9 +112,32 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <_IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</_IsWindows>
-    <_IsMacOS Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</_IsMacOS>
-    <_IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</_IsLinux>
+    <!-- Windows: use RuntimeIdentifier if set, otherwise fall back -->
+    <_IsWindows Condition="
+    ('$([System.String]::IsNullOrEmpty($(RuntimeIdentifier)))' == 'true' AND
+     '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true')
+    OR
+    ('$([System.String]::IsNullOrEmpty($(RuntimeIdentifier)))' == 'false' AND
+     $(RuntimeIdentifier.StartsWith('win')) )
+  ">true</_IsWindows>
+
+    <!-- MacOS -->
+    <_IsMacOS Condition="
+    ('$([System.String]::IsNullOrEmpty($(RuntimeIdentifier)))' == 'true' AND
+     '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true')
+    OR
+    ('$([System.String]::IsNullOrEmpty($(RuntimeIdentifier)))' == 'false' AND
+     $(RuntimeIdentifier.StartsWith('osx')) )
+  ">true</_IsMacOS>
+
+    <!-- Linux -->
+    <_IsLinux Condition="
+    ('$([System.String]::IsNullOrEmpty($(RuntimeIdentifier)))' == 'true' AND
+     '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true')
+    OR
+    ('$([System.String]::IsNullOrEmpty($(RuntimeIdentifier)))' == 'false' AND
+     $(RuntimeIdentifier.StartsWith('linux')) )
+  ">true</_IsLinux>
   </PropertyGroup>
 
   <Target Name="CopyExternalDeps_build" AfterTargets="Build">

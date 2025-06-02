@@ -120,7 +120,7 @@ jobs:
           ${{ steps.release_notes.outputs.RELEASE_NOTES }}
     
     - name: Upload Release
-      uses: ncipollo/release-action@v1
+      uses: ncipollo/release-action@v1.16.0
       with:
         artifacts: "${{ env.CUO_OUTPUT_PATH }}/${{ env.CUO_ZIP_NAME }}"
         name: 'TazUO Develpoment Build v${{ env.VERSION }}'

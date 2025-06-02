@@ -1,0 +1,69 @@
+name: TUO-Net9-Deploy
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    branches: [merge-cuo]
+    workflows: [Build-Test]
+    types:
+      - completed
+      
+concurrency:
+  group: maindeploy
+  cancel-in-progress: true
+
+env:
+  CUO_OUTPUT_PATH: '../../bin/dist'
+  CUO_PROJECT_PATH: "src/ClassicUO.Client/ClassicUO.Client.csproj"
+  TAG_NAME: "TazUO-BleedingEdge"
+
+  DOTNET_NOLOGO: false
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  NUGET_XMLDOC_MODE: skip
+
+jobs:
+  build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+       os: [  windows-latest, ubuntu-latest, macos-latest, macos-12 ]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: 'merge-cuo'
+
+    - name: Get submodules
+      run: |
+        git config --global url."https://".insteadOf git://
+        git submodule update --init --recursive
+        
+    - name: Setup .NET 9
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9
+            
+    - name: Build
+      run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }} -p:IS_DEV_BUILD=true
+      
+    - name: Create package
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        directory: ${{ env.CUO_OUTPUT_PATH }}
+        filename: net9-${{ matrix.os }}.zip
+        exclusions: '*.zip'
+    
+    - name: Upload Release
+      uses: ncipollo/release-action@v1.16.0
+      with:
+        artifacts: "${{ env.CUO_OUTPUT_PATH }}/net9-${{ matrix.os }}.zip"
+        makeLatest: false
+        allowUpdates: true
+        prerelease: true
+        tag: ${{ env.TAG_NAME }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+        

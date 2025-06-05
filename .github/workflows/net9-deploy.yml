@@ -13,10 +13,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CUO_OUTPUT_PATH: '../../bin/dist'
+  CUO_OUTPUT_PATH: 'build/dist'
   CUO_PROJECT_PATH: "src/ClassicUO.Client/ClassicUO.Client.csproj"
   BOOTSTRAP: "src/ClassicUO.Bootstrap/src/ClassicUO.Bootstrap.csproj"
-  BOOT_OUTPUT_PATH: "../../bin/bootstrap"
+  BOOT_OUTPUT_PATH: "build/bootstrap"
   TAG_NAME: "TazUO-BleedingEdge"
 
   DOTNET_NOLOGO: false

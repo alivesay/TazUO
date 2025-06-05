@@ -168,19 +168,26 @@ sealed class ClassicUOHost : IPluginHandler
 
     public void Run(string[] args)
     {
-        var libName = "./cuo";
+        var libName = "./TazUO";
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            libName += ".dylib";
+            if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
+            {
+                libName += "-arm64.dylib"; //  is
+            }
+            else if (RuntimeInformation.OSArchitecture == Architecture.X64)
+            {
+                libName += "-x64.dylib";
+            }
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            libName += ".so";
+            libName += "-linux-x64.so";
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            libName += ".dll";
+            libName += "-win-x64.dll";
         }
         else
         {

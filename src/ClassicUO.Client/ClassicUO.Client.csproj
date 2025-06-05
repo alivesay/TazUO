@@ -3,13 +3,18 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <ApplicationIcon>cuoicon.ico</ApplicationIcon>
-    <AssemblyName>ClassicUO</AssemblyName>
+    <AssemblyName>TazUO</AssemblyName>
     <RootNamespace>ClassicUO</RootNamespace>
     <AssemblyVersion>3.30.0</AssemblyVersion>
     <FileVersion>3.30.0</FileVersion>
     <PackageProjectUrl>https://github.com/bittiez/TazUO</PackageProjectUrl>
-    <PublishAot>false</PublishAot>
+    <PublishAot>true</PublishAot>
     <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(CustomAssemblyName)' != ''">
+    <AssemblyName>$(CustomAssemblyName)</AssemblyName>
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

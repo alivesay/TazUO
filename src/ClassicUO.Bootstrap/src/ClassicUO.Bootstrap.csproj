@@ -22,6 +22,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <MonockickstartPath Include="$(ProjectDir)..\..\..\tools\monokickstart\**\*.*" />
+  </ItemGroup>
+  
+  <Target Name="CopyMonoKickstart_build" AfterTargets="Build">
+    <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(OutputPath)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyMonoKickstart_publish" AfterTargets="Publish">
+    <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(PublishDir)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+  
+  <ItemGroup>
     <Reference Include="cuoapi">
       <HintPath>..\..\..\external\cuoapi\cuoapi.dll</HintPath>
     </Reference>

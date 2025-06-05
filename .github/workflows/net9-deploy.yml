@@ -2,19 +2,21 @@ name: TUO-Net9-Deploy
 
 on:
   workflow_dispatch:
-  workflow_run:
-    branches: [merge-cuo]
-    workflows: [Build-Test]
-    types:
-      - completed
+  # workflow_run:
+  #   branches: [merge-cuo]
+  #   workflows: [Build-Test]
+  #   types:
+  #     - completed
       
 concurrency:
-  group: maindeploy
+  group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   CUO_OUTPUT_PATH: '../../bin/dist'
   CUO_PROJECT_PATH: "src/ClassicUO.Client/ClassicUO.Client.csproj"
+  BOOTSTRAP: "src/ClassicUO.Bootstrap/src/ClassicUO.Bootstrap.csproj"
+  BOOT_OUTPUT_PATH: "../../bin/bootstrap"
   TAG_NAME: "TazUO-BleedingEdge"
 
   DOTNET_NOLOGO: false
@@ -24,16 +26,23 @@ env:
 
 jobs:
   build:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-       os: [  windows-latest, ubuntu-latest, macos-latest, macos-12 ]
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-latest
+            rid: osx-arm64
+          - os: macos-12
+            rid: osx-x64
 
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: 'merge-cuo'
+        ref: ${{ github.ref_name }}
 
     - name: Get submodules
       run: |
@@ -44,26 +53,51 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9
-            
-    - name: Build
-      run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }} -p:IS_DEV_BUILD=true
-      
-    - name: Create package
-      uses: thedoctor0/zip-release@master
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
       with:
-        type: 'zip'
-        directory: ${{ env.CUO_OUTPUT_PATH }}
-        filename: net9-${{ matrix.os }}.zip
-        exclusions: '*.zip'
-    
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          nuget-${{ runner.os }}-
+
+    - name: Build
+      run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }} -r ${{ matrix.rid }} -p:CustomAssemblyName=TazUO-${{ matrix.rid }}
+
+    - name: Build bootstrapper
+      if: matrix.os == 'windows-latest'
+      run: dotnet publish ${{ env.BOOTSTRAP }} -c Release -o ${{ env.BOOT_OUTPUT_PATH }}
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-${{ matrix.os }}
+        path: ${{ env.CUO_OUTPUT_PATH }}
+
+  package:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Download all build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: all-builds
+
+    - name: Zip all builds
+      run: |
+        mkdir flat
+        find all-builds -type f -exec cp {} flat/ \;
+        cd flat
+        zip -r ../TazUO-net9-all.zip .
+        cd ..
+
     - name: Upload Release
       uses: ncipollo/release-action@v1.16.0
       with:
-        artifacts: "${{ env.CUO_OUTPUT_PATH }}/net9-${{ matrix.os }}.zip"
+        artifacts: TazUO-net9-all.zip
         makeLatest: false
         allowUpdates: true
         prerelease: true
         tag: ${{ env.TAG_NAME }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        
-        

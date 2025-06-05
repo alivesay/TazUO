@@ -194,6 +194,9 @@ def CancelTarget():
 def SetSkillLock(skill: str, up_down_locked: str):
     pass
 
+def SetStatLock(stat: str, up_down_locked: str):
+    pass
+
 def Logout():
     pass
 

@@ -3,7 +3,7 @@ All methods, properties, enums, etc need to pre prefaced with `API.` for example
 If you download the [API.py](API.py) file, put it in the same folder as your python scripts and add `import API` to your script, that will enable some mild form of autocomplete in an editor like VS Code.  
 
 
-This was generated on `5/23/2025`.
+This was generated on `6/3/2025`.
 # API  
 
 ## Class Description
@@ -1333,6 +1333,28 @@ This was generated on `5/23/2025`.
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
 | skill | string | No | The skill name, can be partia; |
+| up_down_locked | string | No | up/down/locked |
+#### Does not return anything
+
+</details>
+
+***
+
+
+<details>
+<summary><h3>SetStatLock(stat, up_down_locked)</h3></summary>
+
+ Set a skills lock status.  
+ Example:  
+ ```py
+ API.SetStatLock("str", "locked")
+ ```
+
+
+**Parameters**  
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| stat | string | No | The stat name, str, dex, int; Defaults to str. |
 | up_down_locked | string | No | up/down/locked |
 #### Does not return anything
 

@@ -129,7 +129,7 @@ public class DiscordUserListItem : Control
     public override bool Draw(UltimaBatcher2D batcher, int x, int y)
     {
         base.Draw(batcher, x, y);
-        batcher.DrawRectangle(SolidColorTextureCache.GetTexture(Color.White),x + sx, y + sy, sh, sw, shue);
+        batcher.DrawRectangle(SolidColorTextureCache.GetTexture(Color.White),x + sx, y + sy, sw, sh, shue);
 
         return true;
     }

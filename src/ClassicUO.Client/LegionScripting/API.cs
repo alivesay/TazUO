@@ -1177,6 +1177,39 @@ namespace ClassicUO.LegionScripting
                 }
             }
         );
+        
+        /// <summary>
+        /// Set a skills lock status.  
+        /// Example:  
+        /// ```py
+        /// API.SetStatLock("str", "locked")
+        /// ```
+        /// </summary>
+        /// <param name="stat">The stat name, str, dex, int; Defaults to str.</param>
+        /// <param name="up_down_locked">up/down/locked</param>
+        public void SetStatLock(string stat, string up_down_locked) => InvokeOnMainThread
+        (() =>
+            {
+                stat = stat.ToLower();
+                Lock status = Lock.Up;
+
+                switch (up_down_locked)
+                {
+                    case "down": status = Lock.Down; break;
+                    case "locked": status = Lock.Locked; break;
+                }
+
+                byte statB = 0;
+
+                switch (stat)
+                {
+                    case "dex": statB = 1; break;
+                    case "int": statB = 2; break;
+                }
+                
+                GameActions.ChangeStatLock(statB, status);
+            }
+        );
 
         /// <summary>
         /// Logout of the game.  

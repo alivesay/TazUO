@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using ClassicUO.Assets;
 using ClassicUO.Game.Managers;
 using Discord.Sdk;
@@ -100,19 +101,20 @@ public class DiscordChatAreaControl : Control
                 if (isDM)
                     return false;
 
-                var members = DiscordManager.Instance.GetLobby(_selectedChannel).LobbyMembers();
+                var lobby = DiscordManager.Instance.GetLobby(_selectedChannel);
 
-                string onlineMembers = string.Empty;
-                
-                foreach (var member in members)
-                {
-                    if(member == null) continue;
+                if (lobby == null)
+                    return false;
 
-                    onlineMembers += $"[{member.User()?.DisplayName()}], ";
-                }
-                
+                var members = lobby?.LobbyMembers();
+
+                if (members == null)
+                    return false;
+
+                var onlineMembers = string.Join(", ", members.Where(m => m?.User() != null).Select(m => $"[{m.User().DisplayName()}]"));
+
                 AddMessageToChatBox(onlineMembers, Color.Goldenrod);
-                
+
                 return true;
         }
 

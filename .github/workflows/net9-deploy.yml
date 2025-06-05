@@ -83,14 +83,15 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: all-builds
-
+    
     - name: Zip all builds
       run: |
         mkdir flat
-        find all-builds -type f -exec cp {} flat/ \;
+        for d in all-builds/*; do
+          rsync -a "$d/" flat/
+        done
         cd flat
         zip -r ../TazUO-net9-all.zip .
-        cd ..
 
     - name: Upload Release
       uses: ncipollo/release-action@v1.16.0

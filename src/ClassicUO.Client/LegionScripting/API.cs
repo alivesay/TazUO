@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework;
 using Button = ClassicUO.Game.UI.Controls.Button;
 using Control = ClassicUO.Game.UI.Controls.Control;
 using Label = ClassicUO.Game.UI.Controls.Label;
+using Lock = ClassicUO.Game.Data.Lock;
 using RadioButton = ClassicUO.Game.UI.Controls.RadioButton;
 
 namespace ClassicUO.LegionScripting

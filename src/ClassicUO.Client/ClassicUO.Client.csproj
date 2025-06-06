@@ -14,7 +14,8 @@
 
   <PropertyGroup Condition="'$(CustomAssemblyName)' != ''">
     <AssemblyName>$(CustomAssemblyName)</AssemblyName>
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <EnableDebugging>false</EnableDebugging>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

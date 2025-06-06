@@ -78,7 +78,13 @@ jobs:
 
         for d in "${{ env.CUO_OUTPUT_PATH }}" "${{ env.CUO_OUTPUT_PATH }}-Lib" "${{ env.BOOT_OUTPUT_PATH }}"; do
           [ -d "$d" ] || continue
-          find "$d" -type f ! -name '*.dSYM' -exec cp --parents {} flat/ \;
+
+          find "$d" \( -name '*.dSYM' -o -name '*.dSYM/' \) -prune -o -type f -print |
+          while IFS= read -r file; do
+            dest="flat/${file#$d/}"
+            mkdir -p "$(dirname "$dest")"
+            cp "$file" "$dest"
+          done
         done
 
         cd flat

@@ -74,16 +74,11 @@ jobs:
     - name: Zip all builds
       shell: bash
       run: |
-        mkdir flat
+        mkdir -p flat
 
         for d in "${{ env.CUO_OUTPUT_PATH }}" "${{ env.CUO_OUTPUT_PATH }}-Lib" "${{ env.BOOT_OUTPUT_PATH }}"; do
-          # Ensure path exists
           [ -d "$d" ] || continue
-
-          rsync -a \
-            --exclude='*.dSYM/' \
-            --exclude='*.dSYM' \
-            "$d/" flat/
+          find "$d" -type f ! -name '*.dSYM' -exec cp --parents {} flat/ \;
         done
 
         cd flat

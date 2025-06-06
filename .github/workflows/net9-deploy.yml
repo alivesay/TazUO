@@ -66,7 +66,7 @@ jobs:
       run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }} -r ${{ matrix.rid }} -p:CustomAssemblyName=TazUO-${{ matrix.rid }}
 
     - name: Build library
-      run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }} -r ${{ matrix.rid }} -p:CustomAssemblyName=TazUO-${{ matrix.rid }} -p:NativeLib=Shared -p:OutputType=Library
+      run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }}-Lib -r ${{ matrix.rid }} -p:CustomAssemblyName=TazUO-${{ matrix.rid }} -p:NativeLib=Shared -p:OutputType=Library
 
     - name: Build bootstrapper
       if: matrix.os == 'windows-latest'
@@ -85,6 +85,12 @@ jobs:
         name: build-${{ matrix.os }}
         path: ${{ env.CUO_OUTPUT_PATH }}
 
+    - name: Upload library artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-${{ matrix.os }}-Lib
+        path: ${{ env.CUO_OUTPUT_PATH }}-Lib
+
   package:
     runs-on: ubuntu-latest
     needs: build
@@ -98,7 +104,7 @@ jobs:
       run: |
         mkdir flat
         for d in all-builds/*; do
-          rsync -a "$d/" flat/
+          rsync -a --exclude='*.dSYM/' "$d/" flat/
         done
         cd flat
         zip -r ../TazUO-net9-all.zip .

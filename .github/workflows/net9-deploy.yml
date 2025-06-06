@@ -72,6 +72,7 @@ jobs:
       run: dotnet publish ${{ env.BOOTSTRAP }} -c Release -o ${{ env.BOOT_OUTPUT_PATH }} -r win-x64
 
     - name: Zip all builds
+      shell: bash
       run: |
         mkdir flat
         for d in ${{ env.CUO_OUTPUT_PATH }}/*; do

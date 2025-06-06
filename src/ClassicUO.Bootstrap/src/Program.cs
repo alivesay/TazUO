@@ -172,22 +172,15 @@ sealed class ClassicUOHost : IPluginHandler
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
-            {
-                libName += "-arm64.dylib"; //  is
-            }
-            else if (RuntimeInformation.OSArchitecture == Architecture.X64)
-            {
-                libName += "-x64.dylib";
-            }
+            libName += ".dylib";
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            libName += "-linux-x64.so";
+            libName += ".so";
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            libName += "-win-x64.dll";
+            libName += ".dll";
         }
         else
         {

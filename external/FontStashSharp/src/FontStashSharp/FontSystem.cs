@@ -21,7 +21,7 @@ namespace FontStashSharp
 {
 	public class FontSystem : IDisposable
 	{
-		public const int GlyphPad = 2;
+		public const int GLYPH_PAD = 2;
 
 		private readonly List<IFontSource> _fontSources = new List<IFontSource>();
 		private readonly Int32Map<DynamicSpriteFont> _fonts = new Int32Map<DynamicSpriteFont>();
@@ -45,8 +45,8 @@ namespace FontStashSharp
 		public Texture2D ExistingTexture => _settings.ExistingTexture;
 		public Rectangle ExistingTextureUsedSpace => _settings.ExistingTextureUsedSpace;
 
-		public bool UseKernings { get; set; } = true;
-		public int? DefaultCharacter { get; set; } = ' ';
+		public bool UseKernings { get; set; }
+		public int? DefaultCharacter { get; set; }
 
 		internal List<IFontSource> FontSources => _fontSources;
 
@@ -127,8 +127,7 @@ namespace FontStashSharp
 
 			var fontSource = _fontSources[0];
 
-			int ascent, descent, lineHeight;
-			fontSource.GetMetricsForSize(fontSize, out ascent, out descent, out lineHeight);
+            fontSource.GetMetricsForSize(fontSize, out int _, out int _, out int lineHeight);
 
 			result = new DynamicSpriteFont(this, fontSize, lineHeight);
 			_fonts[intSize] = result;
@@ -212,8 +211,8 @@ namespace FontStashSharp
 			}
 
 			int gx = 0, gy = 0;
-			var gw = glyph.Size.X + GlyphPad * 2;
-			var gh = glyph.Size.Y + GlyphPad * 2;
+			var gw = glyph.Size.X + GLYPH_PAD * 2;
+			var gh = glyph.Size.Y + GLYPH_PAD * 2;
 
 			var currentAtlas = GetCurrentAtlas(device, textureSize.X, textureSize.Y);
 			if (!currentAtlas.AddRect(gw, gh, ref gx, ref gy))
@@ -231,8 +230,8 @@ namespace FontStashSharp
 				}
 			}
 
-			glyph.TextureOffset.X = gx + GlyphPad;
-			glyph.TextureOffset.Y = gy + GlyphPad;
+			glyph.TextureOffset.X = gx + GLYPH_PAD;
+			glyph.TextureOffset.Y = gy + GLYPH_PAD;
 
 			currentAtlas.RenderGlyph(device, glyph, FontSources[glyph.FontSourceIndex], PremultiplyAlpha, KernelWidth, KernelHeight);
 

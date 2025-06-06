@@ -194,7 +194,7 @@ namespace FontStashSharp
 			Array.Clear(buffer, 0, bufferSize);
 
 			var colorBuffer = _colorBuffer;
-			var colorBufferSize = (glyph.Size.X + FontSystem.GlyphPad * 2) * (glyph.Size.Y + FontSystem.GlyphPad * 2) * 4;
+			var colorBufferSize = (glyph.Size.X + FontSystem.GLYPH_PAD * 2) * (glyph.Size.Y + FontSystem.GLYPH_PAD * 2) * 4;
 			if ((colorBuffer == null) || (colorBuffer.Length < colorBufferSize))
 			{
 				colorBuffer = new byte[colorBufferSize * 4];
@@ -214,14 +214,14 @@ namespace FontStashSharp
 			// Erase an area where we are going to place a glyph
 			Array.Clear(colorBuffer, 0,colorBufferSize);
 			var eraseArea = glyph.TextureRectangle;
-			eraseArea.X = Math.Max(eraseArea.X - FontSystem.GlyphPad, 0);
-			eraseArea.Y = Math.Max(eraseArea.Y - FontSystem.GlyphPad, 0);
-			eraseArea.Width += FontSystem.GlyphPad * 2;
+			eraseArea.X = Math.Max(eraseArea.X - FontSystem.GLYPH_PAD, 0);
+			eraseArea.Y = Math.Max(eraseArea.Y - FontSystem.GLYPH_PAD, 0);
+			eraseArea.Width += FontSystem.GLYPH_PAD * 2;
 			if (eraseArea.Right > Width)
 			{
 				eraseArea.Width = Width - eraseArea.X;
 			}
-			eraseArea.Height += FontSystem.GlyphPad * 2;
+			eraseArea.Height += FontSystem.GLYPH_PAD * 2;
 			if (eraseArea.Bottom > Height)
 			{
 				eraseArea.Height = Height - eraseArea.Y;

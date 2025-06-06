@@ -10,14 +10,12 @@ namespace ClassicUO.Assets
         public static SoundOverrideLoader Instance { get; private set; } = new SoundOverrideLoader();
 
         private const string SOUND_OVERRIDE_FOLDER = "SoundOverrides";
-        private string exePath;
         private Dictionary<int, Tuple<string, byte[]>> soundCache = new Dictionary<int, Tuple<string, byte[]>>();
-        private bool loaded = false;
+        private bool loaded;
 
         private SoundOverrideLoader()
         {
-            string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            exePath = Path.GetDirectoryName(strExeFilePath);
+            var exePath = AppContext.BaseDirectory;
 
             Task.Factory.StartNew(() =>
             {

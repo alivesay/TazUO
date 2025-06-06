@@ -75,27 +75,17 @@ jobs:
       shell: bash
       run: |
         mkdir flat
-        for d in ${{ env.CUO_OUTPUT_PATH }}/*; do
-          if [ -d "$d" ]; then
-            rsync -a --exclude='*.dSYM/' "$d/" flat/
-          elif [ -f "$d" ] && [[ "$d" != *.dSYM ]]; then
-            rsync -a "$d" flat/
-          fi
+
+        for d in "${{ env.CUO_OUTPUT_PATH }}" "${{ env.CUO_OUTPUT_PATH }}-Lib" "${{ env.BOOT_OUTPUT_PATH }}"; do
+          # Ensure path exists
+          [ -d "$d" ] || continue
+
+          rsync -a \
+            --exclude='*.dSYM/' \
+            --exclude='*.dSYM' \
+            "$d/" flat/
         done
-        for d in ${{ env.CUO_OUTPUT_PATH }}-Lib/*; do
-          if [ -d "$d" ]; then
-            rsync -a --exclude='*.dSYM/' "$d/" flat/
-          elif [ -f "$d" ] && [[ "$d" != *.dSYM ]]; then
-            rsync -a "$d" flat/
-          fi
-        done
-        for d in ${{ env.BOOT_OUTPUT_PATH }}/*; do
-          if [ -d "$d" ]; then
-            rsync -a --exclude='*.dSYM/' "$d/" flat/
-          elif [ -f "$d" ] && [[ "$d" != *.dSYM ]]; then
-            rsync -a "$d" flat/
-          fi
-        done
+
         cd flat
         zip -r ../${{ matrix.rid }}.zip .
 

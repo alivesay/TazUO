@@ -30,6 +30,7 @@
 
 #endregion
 
+using System;
 using ClassicUO.Utility.Logging;
 using FontStashSharp;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace ClassicUO.Assets
     {
         public const string EMBEDDED_FONT = "Roboto-Regular";
 
-        private Dictionary<string, FontSystem> _fonts = new();
+        private readonly Dictionary<string, FontSystem> _fonts = new();
 
         private TrueTypeLoader()
         {
@@ -52,7 +53,7 @@ namespace ClassicUO.Assets
         private static TrueTypeLoader _instance;
         public static TrueTypeLoader Instance => _instance ??= new TrueTypeLoader();
 
-        public Task Load()
+        public void Load()
         {
             var settings = new FontSystemSettings
             {
@@ -61,12 +62,12 @@ namespace ClassicUO.Assets
                 KernelHeight = 2
             };
 
-            string _fontPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "Fonts");
+            string fontPath = Path.Combine(AppContext.BaseDirectory, "Fonts");
 
-            if (!Directory.Exists(_fontPath))
-                Directory.CreateDirectory(_fontPath);
+            if (!Directory.Exists(fontPath))
+                Directory.CreateDirectory(fontPath);
 
-            foreach (var ttf in Directory.GetFiles(_fontPath, "*.ttf"))
+            foreach (var ttf in Directory.GetFiles(fontPath, "*.ttf"))
             {
                 var fontSystem = new FontSystem(settings);
                 fontSystem.AddFont(File.ReadAllBytes(ttf));
@@ -75,8 +76,6 @@ namespace ClassicUO.Assets
             }
 
             LoadEmbeddedFonts();
-
-            return Task.CompletedTask;
         }
 
         private void LoadEmbeddedFonts()

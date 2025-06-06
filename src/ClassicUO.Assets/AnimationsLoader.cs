@@ -823,12 +823,8 @@ namespace ClassicUO.Assets
                 var reader = new StackDataReader(buf);
                 if (entry.CompressionFlag >= CompressionType.Zlib)
                 {
-                    if (dbuf.Length < entry.DecompressedLength)
-                        dbuf = new byte[entry.DecompressedLength];
-                    
-                    //For some unknown reason, the Zlib will error out and close the app without these info log lines here
-                    Log.Info($"Decompressing {entry.Length} bytes to {entry.DecompressedLength} bytes");
-                    Log.Info($"Buffers: {buf.Length} bytes to {dbuf} bytes");
+                    if (dbuf.Length <= entry.DecompressedLength)
+                        dbuf = new byte[entry.DecompressedLength*2];
 
                     var ok = ZLib.Decompress(buf.AsSpan(0, entry.Length), dbuf.AsSpan(0, entry.DecompressedLength));
                     if (ok != ZLib.ZLibError.Ok)

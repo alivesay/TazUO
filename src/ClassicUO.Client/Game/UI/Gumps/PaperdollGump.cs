@@ -55,28 +55,6 @@ namespace ClassicUO.Game.UI.Gumps
             BuildGump();
         }
 
-        private static Settings _settings;
-        private static Settings settings
-        {
-            get
-            {
-                if (_settings == null)
-                {
-                    _settings = (Settings)Settings.Load<Settings>(typeof(PaperDollGump).ToString());
-                    if (_settings == null)
-                    {
-                        _settings = new Settings();
-                        Settings.Save<Settings>(typeof(PaperDollGump).ToString(), _settings);
-                    }
-                    return _settings;
-                }
-                else
-                {
-                    return _settings;
-                }
-            }
-        }
-
         public override GumpType GumpType => GumpType.PaperDoll;
 
         public bool IsMinimized
@@ -89,7 +67,7 @@ namespace ClassicUO.Game.UI.Gumps
                     _isMinimized = value;
 
                     _picBase.Dispose();
-                    _picBase = new GumpPic(0, 0, value ? settings.Graphic_Button_Minimized : (LocalSerial == World.Player ? settings.Graphic_Background_Player : settings.Graphic_Background_Other), 0);
+                    _picBase = new GumpPic(0, 0, value ? Settings.Graphic_Button_Minimized : (LocalSerial == World.Player ? Settings.Graphic_Background_Player : Settings.Graphic_Background_Other), 0);
                     _picBase.ScaleWidthAndHeight(Scale).SetInternalScale(Scale);
                     _picBase.MouseDoubleClick += _picBase_MouseDoubleClick;
                     Insert(0, _picBase);
@@ -150,36 +128,36 @@ namespace ClassicUO.Game.UI.Gumps
 
             if (LocalSerial == World.Player)
             {
-                Add(_picBase = new GumpPic(0, 0, settings.Graphic_Background_Player, settings.Hue_Background_Player));
+                Add(_picBase = new GumpPic(0, 0, Settings.Graphic_Background_Player, Settings.Hue_Background_Player));
                 _picBase.ScaleWidthAndHeight(Scale).SetInternalScale(Scale);
                 _picBase.MouseDoubleClick += _picBase_MouseDoubleClick;
 
                 //HELP BUTTON
                 Add(
-                    new Button((int)Buttons.Help, settings.Graphic_Button_Help_Normal, settings.Graphic_Button_Help_Pressed, settings.Graphic_Button_Help_Hover)
+                    new Button((int)Buttons.Help, Settings.Graphic_Button_Help_Normal, Settings.Graphic_Button_Help_Pressed, Settings.Graphic_Button_Help_Hover)
                     {
-                        X = settings.Position_X_Help,
-                        Y = settings.Position_Y_Help,
+                        X = Settings.Position_X_Help,
+                        Y = Settings.Position_Y_Help,
                         ButtonAction = ButtonAction.Activate
                     }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale)
                 );
 
                 //OPTIONS BUTTON
                 Add(
-                    new Button((int)Buttons.Options, settings.Graphic_Button_Options_Normal, settings.Graphic_Button_Options_Pressed, settings.Graphic_Button_Options_Hover)
+                    new Button((int)Buttons.Options, Settings.Graphic_Button_Options_Normal, Settings.Graphic_Button_Options_Pressed, Settings.Graphic_Button_Options_Hover)
                     {
-                        X = settings.Position_X_Options,
-                        Y = settings.Position_Y_Options,
+                        X = Settings.Position_X_Options,
+                        Y = Settings.Position_Y_Options,
                         ButtonAction = ButtonAction.Activate
                     }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale)
                 );
 
                 // LOG OUT BUTTON
                 Add(
-                    new Button((int)Buttons.LogOut, settings.Graphic_Button_Logout_Normal, settings.Graphic_Button_Logout_Pressed, settings.Graphic_Button_Logout_Hover)
+                    new Button((int)Buttons.LogOut, Settings.Graphic_Button_Logout_Normal, Settings.Graphic_Button_Logout_Pressed, Settings.Graphic_Button_Logout_Hover)
                     {
-                        X = settings.Position_X_Logout,
-                        Y = settings.Position_Y_Logout,
+                        X = Settings.Position_X_Logout,
+                        Y = Settings.Position_Y_Logout,
                         ButtonAction = ButtonAction.Activate
                     }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale)
                 );
@@ -188,10 +166,10 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     // JOURNAL BUTTON
                     Add(
-                        new Button((int)Buttons.Journal, settings.Graphic_Button_Journal_Normal, settings.Graphic_Button_Journal_Pressed, settings.Graphic_Button_Journal_Hover)
+                        new Button((int)Buttons.Journal, Settings.Graphic_Button_Journal_Normal, Settings.Graphic_Button_Journal_Pressed, Settings.Graphic_Button_Journal_Hover)
                         {
-                            X = settings.Position_X_Journal,
-                            Y = settings.Position_Y_Journal,
+                            X = Settings.Position_X_Journal,
+                            Y = Settings.Position_Y_Journal,
                             ButtonAction = ButtonAction.Activate
                         }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale)
                     );
@@ -200,10 +178,10 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     // QUESTS BUTTON
                     Add(
-                        new Button((int)Buttons.Quests, settings.Graphic_Button_Quest_Normal, settings.Graphic_Button_Quest_Pressed, settings.Graphic_Button_Quest_Hover)
+                        new Button((int)Buttons.Quests, Settings.Graphic_Button_Quest_Normal, Settings.Graphic_Button_Quest_Pressed, Settings.Graphic_Button_Quest_Hover)
                         {
-                            X = settings.Position_X_Quest,
-                            Y = settings.Position_Y_Quest,
+                            X = Settings.Position_X_Quest,
+                            Y = Settings.Position_Y_Quest,
                             ButtonAction = ButtonAction.Activate
                         }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale)
                     );
@@ -211,20 +189,20 @@ namespace ClassicUO.Game.UI.Gumps
 
                 // SKILLS BUTTON
                 Add(
-                    new Button((int)Buttons.Skills, settings.Graphic_Button_Skills_Normal, settings.Graphic_Button_Skills_Pressed, settings.Graphic_Button_Skills_Hover)
+                    new Button((int)Buttons.Skills, Settings.Graphic_Button_Skills_Normal, Settings.Graphic_Button_Skills_Pressed, Settings.Graphic_Button_Skills_Hover)
                     {
-                        X = settings.Position_X_Skills,
-                        Y = settings.Position_Y_Skills,
+                        X = Settings.Position_X_Skills,
+                        Y = Settings.Position_Y_Skills,
                         ButtonAction = ButtonAction.Activate
                     }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale)
                 );
 
                 // GUILD BUTTON
                 Add(
-                    new Button((int)Buttons.Guild, settings.Graphic_Button_Guild_Normal, settings.Graphic_Button_Guild_Pressed, settings.Graphic_Button_Guild_Hover)
+                    new Button((int)Buttons.Guild, Settings.Graphic_Button_Guild_Normal, Settings.Graphic_Button_Guild_Pressed, Settings.Graphic_Button_Guild_Hover)
                     {
-                        X = settings.Position_X_Guild,
-                        Y = settings.Position_Y_Guild,
+                        X = Settings.Position_X_Guild,
+                        Y = Settings.Position_Y_Guild,
                         ButtonAction = ButtonAction.Activate
                     }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale)
                 );
@@ -239,13 +217,13 @@ namespace ClassicUO.Game.UI.Gumps
                     Add(
                         _warModeBtn = new Button(
                             (int)Buttons.PeaceWarToggle,
-                            settings.Graphic_Button_Warmode_Normal,
-                            settings.Graphic_Button_Warmode_Pressed,
-                            settings.Graphic_Button_Warmode_Hover
+                            Settings.Graphic_Button_Warmode_Normal,
+                            Settings.Graphic_Button_Warmode_Pressed,
+                            Settings.Graphic_Button_Warmode_Hover
                         )
                         {
-                            X = settings.Position_X_WarMode,
-                            Y = settings.Position_Y_Warmode,
+                            X = Settings.Position_X_WarMode,
+                            Y = Settings.Position_Y_Warmode,
                             ButtonAction = ButtonAction.Activate
                         }
                     );
@@ -255,36 +233,36 @@ namespace ClassicUO.Game.UI.Gumps
                     Add(
                         _warModeBtn = new Button(
                             (int)Buttons.PeaceWarToggle,
-                            settings.Graphic_Button_Peacemode_Normal,
-                            settings.Graphic_Button_Peacemode_Pressed,
-                            settings.Graphic_Button_Peacemode_Hover
+                            Settings.Graphic_Button_Peacemode_Normal,
+                            Settings.Graphic_Button_Peacemode_Pressed,
+                            Settings.Graphic_Button_Peacemode_Hover
                         )
                         {
-                            X = settings.Position_X_WarMode,
-                            Y = settings.Position_Y_Warmode,
+                            X = Settings.Position_X_WarMode,
+                            Y = Settings.Position_Y_Warmode,
                             ButtonAction = ButtonAction.Activate
                         }
                     );
                 }
                 _warModeBtn.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
 
-                int profileX = settings.Position_X_Profile;
+                int profileX = Settings.Position_X_Profile;
 
                 if (showRacialAbilitiesBook)
                 {
-                    profileX += settings.Racial_Abilities_Width;
+                    profileX += Settings.Racial_Abilities_Width;
                 }
 
-                Add(_profilePic = new GumpPic(profileX, settings.Position_Y_Profile, settings.Graphic_Button_Profile, 0));
+                Add(_profilePic = new GumpPic(profileX, Settings.Position_Y_Profile, Settings.Graphic_Button_Profile, 0));
                 profileX += _profilePic.Width;
                 _profilePic.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
                 _profilePic.MouseDoubleClick += Profile_MouseDoubleClickEvent;
 
-                Add(_partyManifestPic = new GumpPic(profileX, settings.Position_Y_Profile, settings.Graphic_Button_Party, 0));
+                Add(_partyManifestPic = new GumpPic(profileX, Settings.Position_Y_Profile, Settings.Graphic_Button_Party, 0));
                 _partyManifestPic.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
                 _partyManifestPic.MouseDoubleClick += PartyManifest_MouseDoubleClickEvent;
 
-                _hitBox = new HitBox(settings.Position_X_MinimizeButton, settings.Position_Y_MinimizeButton, settings.Size_Width_MinimizeButton, settings.Size_Height_MinimizeButton, alpha: 0f);
+                _hitBox = new HitBox(Settings.Position_X_MinimizeButton, Settings.Position_Y_MinimizeButton, Settings.Size_Width_MinimizeButton, Settings.Size_Height_MinimizeButton, alpha: 0f);
                 _hitBox.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
                 _hitBox.MouseUp += _hitBox_MouseUp;
 
@@ -292,57 +270,57 @@ namespace ClassicUO.Game.UI.Gumps
             }
             else
             {
-                Add(_picBase = new GumpPic(0, 0, settings.Graphic_Background_Other, settings.Hue_Background_Other));
+                Add(_picBase = new GumpPic(0, 0, Settings.Graphic_Background_Other, Settings.Hue_Background_Other));
                 _picBase.ScaleWidthAndHeight(Scale).SetInternalScale(Scale);
-                Add(_profilePic = new GumpPic(settings.Position_X_Profile, settings.Position_Y_Profile, settings.Graphic_Button_Profile, 0));
+                Add(_profilePic = new GumpPic(Settings.Position_X_Profile, Settings.Position_Y_Profile, Settings.Graphic_Button_Profile, 0));
                 _profilePic.ScaleWidthAndHeight(Scale).SetInternalScale(Scale);
                 _profilePic.MouseDoubleClick += Profile_MouseDoubleClickEvent;
             }
 
             // STATUS BUTTON
             Add(
-                new Button((int)Buttons.Status, settings.Graphic_Button_Status_Normal, settings.Graphic_Button_Status_Pressed, settings.Graphic_Button_Status_Hover)
+                new Button((int)Buttons.Status, Settings.Graphic_Button_Status_Normal, Settings.Graphic_Button_Status_Pressed, Settings.Graphic_Button_Status_Hover)
                 {
-                    X = settings.Position_X_Status,
-                    Y = settings.Position_Y_Status,
+                    X = Settings.Position_X_Status,
+                    Y = Settings.Position_Y_Status,
                     ButtonAction = ButtonAction.Activate
                 }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale)
             );
 
             // Virtue menu
-            Add(_virtueMenuPic = new GumpPic(settings.Position_X_Virtue, settings.Position_Y_Virtue, settings.Graphic_Button_Virtue, 0));
+            Add(_virtueMenuPic = new GumpPic(Settings.Position_X_Virtue, Settings.Position_Y_Virtue, Settings.Graphic_Button_Virtue, 0));
             _virtueMenuPic.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
             _virtueMenuPic.MouseDoubleClick += VirtueMenu_MouseDoubleClickEvent;
 
             if (LocalSerial == World.Player.Serial)
                 Add(new DurabilityGumpMinimized(World)
                 {
-                    X = settings.Position_X_Durability,
-                    Y = settings.Position_Y_Durability,
-                    Graphic = settings.Graphic_Button_Durability
+                    X = Settings.Position_X_Durability,
+                    Y = Settings.Position_Y_Durability,
+                    Graphic = Settings.Graphic_Button_Durability
                 }.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale));
 
             Mobile mobiles = World.Mobiles.Get(LocalSerial);
             Item twoHandedItem = mobiles.FindItemByLayer(Layer.TwoHanded);
 
             // Equipment slots for hat/earrings/neck/ring/bracelet
-            Add(_slots[0] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots, Layer.Helmet, this));
+            Add(_slots[0] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots, Layer.Helmet, this));
 
-            Add(_slots[1] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots + settings.Size_Height_LeftSlots, Layer.Earrings, this));
+            Add(_slots[1] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots + Settings.Size_Height_LeftSlots, Layer.Earrings, this));
 
-            Add(_slots[2] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots + settings.Size_Height_LeftSlots * 2, Layer.Necklace, this));
+            Add(_slots[2] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots + Settings.Size_Height_LeftSlots * 2, Layer.Necklace, this));
 
-            Add(_slots[3] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots + settings.Size_Height_LeftSlots * 3, Layer.Ring, this));
+            Add(_slots[3] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots + Settings.Size_Height_LeftSlots * 3, Layer.Ring, this));
 
-            Add(_slots[4] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots + settings.Size_Height_LeftSlots * 4, Layer.Bracelet, this));
+            Add(_slots[4] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots + Settings.Size_Height_LeftSlots * 4, Layer.Bracelet, this));
 
-            Add(_slots[5] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots + settings.Size_Height_LeftSlots * 5, Layer.Tunic, this));
+            Add(_slots[5] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots + Settings.Size_Height_LeftSlots * 5, Layer.Tunic, this));
 
-            Add(_slots[6] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots + settings.Size_Height_LeftSlots * 6, Layer.OneHanded, this));
+            Add(_slots[6] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots + Settings.Size_Height_LeftSlots * 6, Layer.OneHanded, this));
 
-            Add(_slots[7] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots + settings.Size_Height_LeftSlots * 7, Layer.TwoHanded, this));
+            Add(_slots[7] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots + Settings.Size_Height_LeftSlots * 7, Layer.TwoHanded, this));
 
-            Add(_slots[8] = new EquipmentSlot(0, settings.Position_X_LeftSlots, settings.Position_Y_LeftSlots + settings.Size_Height_LeftSlots * 8, Layer.Talisman, this));
+            Add(_slots[8] = new EquipmentSlot(0, Settings.Position_X_LeftSlots, Settings.Position_Y_LeftSlots + Settings.Size_Height_LeftSlots * 8, Layer.Talisman, this));
 
 
             foreach (var slot in _slots)
@@ -352,21 +330,21 @@ namespace ClassicUO.Game.UI.Gumps
 
             // Right side equip slots
 
-            Add(_slots_right[0] = new EquipmentSlot(0, settings.Position_X_RightSlots, settings.Position_Y_RightSlots, Layer.Robe, this));
+            Add(_slots_right[0] = new EquipmentSlot(0, Settings.Position_X_RightSlots, Settings.Position_Y_RightSlots, Layer.Robe, this));
 
-            Add(_slots_right[1] = new EquipmentSlot(0, settings.Position_X_RightSlots, settings.Position_Y_RightSlots + settings.Size_Height_RightSlots, Layer.Gloves, this));
+            Add(_slots_right[1] = new EquipmentSlot(0, Settings.Position_X_RightSlots, Settings.Position_Y_RightSlots + Settings.Size_Height_RightSlots, Layer.Gloves, this));
 
-            Add(_slots_right[2] = new EquipmentSlot(0, settings.Position_X_RightSlots, settings.Position_Y_RightSlots + settings.Size_Height_RightSlots * 2, Layer.Torso, this));
+            Add(_slots_right[2] = new EquipmentSlot(0, Settings.Position_X_RightSlots, Settings.Position_Y_RightSlots + Settings.Size_Height_RightSlots * 2, Layer.Torso, this));
 
-            Add(_slots_right[3] = new EquipmentSlot(0, settings.Position_X_RightSlots, settings.Position_Y_RightSlots + settings.Size_Height_RightSlots * 3, Layer.Arms, this));
+            Add(_slots_right[3] = new EquipmentSlot(0, Settings.Position_X_RightSlots, Settings.Position_Y_RightSlots + Settings.Size_Height_RightSlots * 3, Layer.Arms, this));
 
-            Add(_slots_right[4] = new EquipmentSlot(0, settings.Position_X_RightSlots, settings.Position_Y_RightSlots + settings.Size_Height_RightSlots * 4, Layer.Pants, this));
+            Add(_slots_right[4] = new EquipmentSlot(0, Settings.Position_X_RightSlots, Settings.Position_Y_RightSlots + Settings.Size_Height_RightSlots * 4, Layer.Pants, this));
 
-            Add(_slots_right[5] = new EquipmentSlot(0, settings.Position_X_RightSlots, settings.Position_Y_RightSlots + settings.Size_Height_RightSlots * 5, Layer.Cloak, this));
+            Add(_slots_right[5] = new EquipmentSlot(0, Settings.Position_X_RightSlots, Settings.Position_Y_RightSlots + Settings.Size_Height_RightSlots * 5, Layer.Cloak, this));
 
-            Add(_slots_right[6] = new EquipmentSlot(0, settings.Position_X_RightSlots, settings.Position_Y_RightSlots + settings.Size_Height_RightSlots * 6, Layer.Waist, this));
+            Add(_slots_right[6] = new EquipmentSlot(0, Settings.Position_X_RightSlots, Settings.Position_Y_RightSlots + Settings.Size_Height_RightSlots * 6, Layer.Waist, this));
 
-            Add(_slots_right[7] = new EquipmentSlot(0, settings.Position_X_RightSlots, settings.Position_Y_RightSlots + settings.Size_Height_RightSlots * 7, Layer.Shoes, this));
+            Add(_slots_right[7] = new EquipmentSlot(0, Settings.Position_X_RightSlots, Settings.Position_Y_RightSlots + Settings.Size_Height_RightSlots * 7, Layer.Shoes, this));
 
             foreach (var slot in _slots_right)
             {
@@ -374,19 +352,19 @@ namespace ClassicUO.Game.UI.Gumps
             }
 
             // Paperdoll control!
-            _paperDollInteractable = new PaperDollInteractable(settings.Position_X_Avatar, settings.Position_Y_Avatar, LocalSerial, this, Scale);
+            _paperDollInteractable = new PaperDollInteractable(Settings.Position_X_Avatar, Settings.Position_Y_Avatar, LocalSerial, this, Scale);
             _paperDollInteractable.ScaleXAndY(Scale);
             Add(_paperDollInteractable);
 
             if (showPaperdollBooks)
             {
-                Add(_combatBook = new GumpPic(settings.Position_X_CombatBook, settings.Position_Y_CombatBook, settings.Graphic_Button_Combat, 0));
+                Add(_combatBook = new GumpPic(Settings.Position_X_CombatBook, Settings.Position_Y_CombatBook, Settings.Graphic_Button_Combat, 0));
                 _combatBook.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
                 _combatBook.MouseDoubleClick += (sender, e) => GameActions.OpenAbilitiesBook(World);
 
                 if (showRacialAbilitiesBook)
                 {
-                    Add(_racialAbilitiesBook = new GumpPic(settings.Position_X_RacialAbilities, settings.Position_Y_RacialAbilities, settings.Graphic_Button_RacialAbilties, 0));
+                    Add(_racialAbilitiesBook = new GumpPic(Settings.Position_X_RacialAbilities, Settings.Position_Y_RacialAbilities, Settings.Graphic_Button_RacialAbilties, 0));
                     _racialAbilitiesBook.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
                     _racialAbilitiesBook.MouseDoubleClick += (sender, e) =>
                     {
@@ -399,7 +377,7 @@ namespace ClassicUO.Game.UI.Gumps
             }
 
             // Name and title
-            _titleLabel = new Label("", false, settings.Hue_Title, settings.Size_Width_Hue, font: 1) { X = settings.Position_X_Title, Y = settings.Position_Y_Title };
+            _titleLabel = new Label("", false, Settings.Hue_Title, Settings.Size_Width_Hue, font: 1) { X = Settings.Position_X_Title, Y = Settings.Position_Y_Title };
             _titleLabel.ScaleWidthAndHeight(Scale).ScaleXAndY(Scale).SetInternalScale(Scale);
 
             Add(_titleLabel);
@@ -1019,131 +997,131 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        public class Settings : UISettings
+        public static class Settings
         {
-            public ushort Graphic_Background_Player { get; set; } = 0x07d0;
-            public ushort Graphic_Background_Other { get; set; } = 0x07d1;
+            public static ushort Graphic_Background_Player { get; set; } = 0x07d0;
+            public static ushort Graphic_Background_Other { get; set; } = 0x07d1;
 
-            public ushort Graphic_Button_Help_Normal { get; set; } = 0x07ef;
-            public ushort Graphic_Button_Help_Pressed { get; set; } = 0x07f0;
-            public ushort Graphic_Button_Help_Hover { get; set; } = 0x07f1;
+            public static ushort Graphic_Button_Help_Normal { get; set; } = 0x07ef;
+            public static ushort Graphic_Button_Help_Pressed { get; set; } = 0x07f0;
+            public static ushort Graphic_Button_Help_Hover { get; set; } = 0x07f1;
 
-            public ushort Graphic_Button_Options_Normal { get; set; } = 2006;
-            public ushort Graphic_Button_Options_Pressed { get; set; } = 2007;
-            public ushort Graphic_Button_Options_Hover { get; set; } = 2008;
+            public static ushort Graphic_Button_Options_Normal { get; set; } = 2006;
+            public static ushort Graphic_Button_Options_Pressed { get; set; } = 2007;
+            public static ushort Graphic_Button_Options_Hover { get; set; } = 2008;
 
-            public ushort Graphic_Button_Logout_Normal { get; set; } = 2009;
-            public ushort Graphic_Button_Logout_Pressed { get; set; } = 2010;
-            public ushort Graphic_Button_Logout_Hover { get; set; } = 2011;
+            public static ushort Graphic_Button_Logout_Normal { get; set; } = 2009;
+            public static ushort Graphic_Button_Logout_Pressed { get; set; } = 2010;
+            public static ushort Graphic_Button_Logout_Hover { get; set; } = 2011;
 
-            public ushort Graphic_Button_Journal_Normal { get; set; } = 2012;
-            public ushort Graphic_Button_Journal_Pressed { get; set; } = 2013;
-            public ushort Graphic_Button_Journal_Hover { get; set; } = 2014;
+            public static ushort Graphic_Button_Journal_Normal { get; set; } = 2012;
+            public static ushort Graphic_Button_Journal_Pressed { get; set; } = 2013;
+            public static ushort Graphic_Button_Journal_Hover { get; set; } = 2014;
 
-            public ushort Graphic_Button_Quest_Normal { get; set; } = 22453;
-            public ushort Graphic_Button_Quest_Pressed { get; set; } = 22455;
-            public ushort Graphic_Button_Quest_Hover { get; set; } = 22454;
+            public static ushort Graphic_Button_Quest_Normal { get; set; } = 22453;
+            public static ushort Graphic_Button_Quest_Pressed { get; set; } = 22455;
+            public static ushort Graphic_Button_Quest_Hover { get; set; } = 22454;
 
-            public ushort Graphic_Button_Skills_Normal { get; set; } = 2015;
-            public ushort Graphic_Button_Skills_Pressed { get; set; } = 2016;
-            public ushort Graphic_Button_Skills_Hover { get; set; } = 2017;
+            public static ushort Graphic_Button_Skills_Normal { get; set; } = 2015;
+            public static ushort Graphic_Button_Skills_Pressed { get; set; } = 2016;
+            public static ushort Graphic_Button_Skills_Hover { get; set; } = 2017;
 
-            public ushort Graphic_Button_Guild_Normal { get; set; } = 22450;
-            public ushort Graphic_Button_Guild_Pressed { get; set; } = 22452;
-            public ushort Graphic_Button_Guild_Hover { get; set; } = 22451;
+            public static ushort Graphic_Button_Guild_Normal { get; set; } = 22450;
+            public static ushort Graphic_Button_Guild_Pressed { get; set; } = 22452;
+            public static ushort Graphic_Button_Guild_Hover { get; set; } = 22451;
 
-            public ushort Graphic_Button_Warmode_Normal { get; set; } = 0x07e8;
-            public ushort Graphic_Button_Warmode_Pressed { get; set; } = 0x07e9;
-            public ushort Graphic_Button_Warmode_Hover { get; set; } = 0x07ea;
+            public static ushort Graphic_Button_Warmode_Normal { get; set; } = 0x07e8;
+            public static ushort Graphic_Button_Warmode_Pressed { get; set; } = 0x07e9;
+            public static ushort Graphic_Button_Warmode_Hover { get; set; } = 0x07ea;
 
-            public ushort Graphic_Button_Peacemode_Normal { get; set; } = 0x07e5;
-            public ushort Graphic_Button_Peacemode_Pressed { get; set; } = 0x07e6;
-            public ushort Graphic_Button_Peacemode_Hover { get; set; } = 0x07e7;
+            public static ushort Graphic_Button_Peacemode_Normal { get; set; } = 0x07e5;
+            public static ushort Graphic_Button_Peacemode_Pressed { get; set; } = 0x07e6;
+            public static ushort Graphic_Button_Peacemode_Hover { get; set; } = 0x07e7;
 
-            public ushort Graphic_Button_Status_Normal { get; set; } = 2027;
-            public ushort Graphic_Button_Status_Pressed { get; set; } = 2028;
-            public ushort Graphic_Button_Status_Hover { get; set; } = 2029;
+            public static ushort Graphic_Button_Status_Normal { get; set; } = 2027;
+            public static ushort Graphic_Button_Status_Pressed { get; set; } = 2028;
+            public static ushort Graphic_Button_Status_Hover { get; set; } = 2029;
 
-            public ushort Graphic_Button_Profile { get; set; } = 0x07D2;
-            public ushort Graphic_Button_Party { get; set; } = 0x07D2;
+            public static ushort Graphic_Button_Profile { get; set; } = 0x07D2;
+            public static ushort Graphic_Button_Party { get; set; } = 0x07D2;
 
-            public ushort Graphic_Button_Virtue { get; set; } = 0x0071;
+            public static ushort Graphic_Button_Virtue { get; set; } = 0x0071;
 
-            public ushort Graphic_Button_Durability { get; set; } = 5587;
+            public static ushort Graphic_Button_Durability { get; set; } = 5587;
 
-            public ushort Graphic_Button_Combat { get; set; } = 0x2B34;
+            public static ushort Graphic_Button_Combat { get; set; } = 0x2B34;
 
-            public ushort Graphic_Button_RacialAbilties { get; set; } = 0x2B28;
+            public static ushort Graphic_Button_RacialAbilties { get; set; } = 0x2B28;
 
-            public ushort Graphic_Button_Minimized { get; set; } = 0x7EE;
+            public static ushort Graphic_Button_Minimized { get; set; } = 0x7EE;
 
-            public ushort Hue_Background_Player { get; set; } = 0;
-            public ushort Hue_Background_Other { get; set; } = 0;
+            public static ushort Hue_Background_Player { get; set; } = 0;
+            public static ushort Hue_Background_Other { get; set; } = 0;
 
-            public ushort Hue_Title { get; set; } = 0x0386;
-            public int Size_Width_Hue { get; set; } = 185;
+            public static ushort Hue_Title { get; set; } = 0x0386;
+            public static int Size_Width_Hue { get; set; } = 185;
 
-            public int Position_X_Help { get; set; } = 185;
-            public int Position_Y_Help { get; set; } = 44;
+            public static int Position_X_Help { get; set; } = 185;
+            public static int Position_Y_Help { get; set; } = 44;
 
-            public int Position_X_Options { get; set; } = 185;
-            public int Position_Y_Options { get; set; } = 44 + 27 * 1;
+            public static int Position_X_Options { get; set; } = 185;
+            public static int Position_Y_Options { get; set; } = 44 + 27 * 1;
 
-            public int Position_X_Logout { get; set; } = 185;
-            public int Position_Y_Logout { get; set; } = 44 + 27 * 2;
+            public static int Position_X_Logout { get; set; } = 185;
+            public static int Position_Y_Logout { get; set; } = 44 + 27 * 2;
 
-            public int Position_X_Journal { get; set; } = 185;
-            public int Position_Y_Journal { get; set; } = 44 + 27 * 3;
+            public static int Position_X_Journal { get; set; } = 185;
+            public static int Position_Y_Journal { get; set; } = 44 + 27 * 3;
 
-            public int Position_X_Quest { get; set; } = 185;
-            public int Position_Y_Quest { get; set; } = 44 + 27 * 3;
+            public static int Position_X_Quest { get; set; } = 185;
+            public static int Position_Y_Quest { get; set; } = 44 + 27 * 3;
 
-            public int Position_X_Skills { get; set; } = 185;
-            public int Position_Y_Skills { get; set; } = 44 + 27 * 4;
+            public static int Position_X_Skills { get; set; } = 185;
+            public static int Position_Y_Skills { get; set; } = 44 + 27 * 4;
 
-            public int Position_X_Guild { get; set; } = 185;
-            public int Position_Y_Guild { get; set; } = 44 + 27 * 5;
+            public static int Position_X_Guild { get; set; } = 185;
+            public static int Position_Y_Guild { get; set; } = 44 + 27 * 5;
 
-            public int Position_X_WarMode { get; set; } = 185;
-            public int Position_Y_Warmode { get; set; } = 44 + 27 * 6;
+            public static int Position_X_WarMode { get; set; } = 185;
+            public static int Position_Y_Warmode { get; set; } = 44 + 27 * 6;
 
-            public int Position_X_Status { get; set; } = 185;
-            public int Position_Y_Status { get; set; } = 44 + 27 * 7;
+            public static int Position_X_Status { get; set; } = 185;
+            public static int Position_Y_Status { get; set; } = 44 + 27 * 7;
 
-            public int Position_X_Profile { get; set; } = 25;
-            public int Position_Y_Profile { get; set; } = 196;
-            public int Racial_Abilities_Width { get; set; } = 14;
+            public static int Position_X_Profile { get; set; } = 25;
+            public static int Position_Y_Profile { get; set; } = 196;
+            public static int Racial_Abilities_Width { get; set; } = 14;
 
-            public int Position_X_RacialAbilities { get; set; } = 23;
-            public int Position_Y_RacialAbilities { get; set; } = 200;
+            public static int Position_X_RacialAbilities { get; set; } = 23;
+            public static int Position_Y_RacialAbilities { get; set; } = 200;
 
-            public int Position_X_Virtue { get; set; } = 80;
-            public int Position_Y_Virtue { get; set; } = 4;
+            public static int Position_X_Virtue { get; set; } = 80;
+            public static int Position_Y_Virtue { get; set; } = 4;
 
-            public int Position_X_Durability { get; set; } = 0;
-            public int Position_Y_Durability { get; set; } = 40;
+            public static int Position_X_Durability { get; set; } = 0;
+            public static int Position_Y_Durability { get; set; } = 40;
 
-            public int Position_X_LeftSlots { get; set; } = 2;
-            public int Position_Y_LeftSlots { get; set; } = 75;
-            public int Size_Height_LeftSlots { get; set; } = 21;
+            public static int Position_X_LeftSlots { get; set; } = 2;
+            public static int Position_Y_LeftSlots { get; set; } = 75;
+            public static int Size_Height_LeftSlots { get; set; } = 21;
 
-            public int Position_X_RightSlots { get; set; } = 166;
-            public int Position_Y_RightSlots { get; set; } = 75;
-            public int Size_Height_RightSlots { get; set; } = 21;
+            public static int Position_X_RightSlots { get; set; } = 166;
+            public static int Position_Y_RightSlots { get; set; } = 75;
+            public static int Size_Height_RightSlots { get; set; } = 21;
 
-            public int Position_X_Avatar { get; set; } = 8;
-            public int Position_Y_Avatar { get; set; } = 19;
+            public static int Position_X_Avatar { get; set; } = 8;
+            public static int Position_Y_Avatar { get; set; } = 19;
 
-            public int Position_X_CombatBook { get; set; } = 156;
-            public int Position_Y_CombatBook { get; set; } = 200;
+            public static int Position_X_CombatBook { get; set; } = 156;
+            public static int Position_Y_CombatBook { get; set; } = 200;
 
-            public int Position_X_Title { get; set; } = 39;
-            public int Position_Y_Title { get; set; } = 262;
+            public static int Position_X_Title { get; set; } = 39;
+            public static int Position_Y_Title { get; set; } = 262;
 
-            public int Position_X_MinimizeButton { get; set; } = 228;
-            public int Position_Y_MinimizeButton { get; set; } = 260;
-            public int Size_Width_MinimizeButton { get; set; } = 16;
-            public int Size_Height_MinimizeButton { get; set; } = 16;
+            public static int Position_X_MinimizeButton { get; set; } = 228;
+            public static int Position_Y_MinimizeButton { get; set; } = 260;
+            public static int Size_Width_MinimizeButton { get; set; } = 16;
+            public static int Size_Height_MinimizeButton { get; set; } = 16;
 
 
         }

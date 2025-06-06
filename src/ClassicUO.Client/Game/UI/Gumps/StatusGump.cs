@@ -579,35 +579,13 @@ namespace ClassicUO.Game.UI.Gumps
 
     public class StatusGumpModern : StatusGumpBase
     {
-        private static Settings _settings;
-        private static Settings settings
-        {
-            get
-            {
-                if (_settings == null)
-                {
-                    _settings = (Settings)Settings.Load<Settings>(typeof(StatusGumpModern).ToString());
-                    if (_settings == null)
-                    {
-                        _settings = new Settings();
-                        Settings.Save<Settings>(typeof(StatusGumpModern).ToString(), _settings);
-                    }
-                    return _settings;
-                }
-                else
-                {
-                    return _settings;
-                }
-            }
-        }
-
         public StatusGumpModern(World world) : base(world)
         {
             Point p = Point.Zero;
             int xOffset = 0;
             _labels = new Label[(int)MobileStats.NumStats];
 
-            Add(new GumpPic(0, 0, settings.Graphic_Background, settings.Hue_Background));
+            Add(new GumpPic(0, 0, Settings.Graphic_Background, Settings.Hue_Background));
 
             if (Client.Game.UO.Version >= ClientVersion.CV_308Z)
             {
@@ -622,7 +600,7 @@ namespace ClassicUO.Game.UI.Gumps
                     Client.Game.UO.FileManager.Gumps.UseUOPGumps ? 90 : 58,
                     50,
                     320,
-                    settings.Hue_CharacterName,
+                    Settings.Hue_CharacterName,
                     TEXT_ALIGN_TYPE.TS_CENTER
                 );
 
@@ -631,7 +609,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Add
                     (
-                        new Button((int)ButtonType.BuffIcon, settings.Graphic_BuffIcon_Normal, settings.Graphic_BuffIcon_Pressed, settings.Graphic_BuffIcon_Hover)
+                        new Button((int)ButtonType.BuffIcon, Settings.Graphic_BuffIcon_Normal, Settings.Graphic_BuffIcon_Pressed, Settings.Graphic_BuffIcon_Hover)
                         {
                             X = 40,
                             Y = 50,
@@ -1422,7 +1400,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             if (hue == 0x0386)
             {
-                hue = settings.Hue_Text;
+                hue = Settings.Hue_Text;
             }
 
             Label label = new Label
@@ -1447,11 +1425,11 @@ namespace ClassicUO.Game.UI.Gumps
         {
             switch (lockStatus)
             {
-                case Lock.Up: return settings.Graphic_LockIcon_Up;
+                case Lock.Up: return Settings.Graphic_LockIcon_Up;
 
-                case Lock.Down: return settings.Graphic_LockIcon_Down;
+                case Lock.Down: return Settings.Graphic_LockIcon_Down;
 
-                case Lock.Locked: return settings.Graphic_LockIcon_Locked;
+                case Lock.Locked: return Settings.Graphic_LockIcon_Locked;
 
                 default: return 0xFFFF;
             }
@@ -1561,19 +1539,19 @@ namespace ClassicUO.Game.UI.Gumps
             base.Update();
         }
 
-        public class Settings : UISettings
+        public static class Settings
         {
-            public ushort Graphic_Background { get; set; } = 0x2A6C;
-            public ushort Graphic_BuffIcon_Normal { get; set; } = 0x7538;
-            public ushort Graphic_BuffIcon_Pressed { get; set; } = 0x7539;
-            public ushort Graphic_BuffIcon_Hover { get; set; } = 0x7539;
-            public ushort Graphic_LockIcon_Up { get; set; } = 0x0984;
-            public ushort Graphic_LockIcon_Down { get; set; } = 0x0986;
-            public ushort Graphic_LockIcon_Locked { get; set; } = 0x082C;
+            public static ushort Graphic_Background { get; set; } = 0x2A6C;
+            public static ushort Graphic_BuffIcon_Normal { get; set; } = 0x7538;
+            public static ushort Graphic_BuffIcon_Pressed { get; set; } = 0x7539;
+            public static ushort Graphic_BuffIcon_Hover { get; set; } = 0x7539;
+            public static ushort Graphic_LockIcon_Up { get; set; } = 0x0984;
+            public static ushort Graphic_LockIcon_Down { get; set; } = 0x0986;
+            public static ushort Graphic_LockIcon_Locked { get; set; } = 0x082C;
 
-            public ushort Hue_Background { get; set; } = 0;
-            public ushort Hue_CharacterName { get; set; } = 0x0386;
-            public ushort Hue_Text { get; set; } = 0x0386;
+            public static ushort Hue_Background { get; set; } = 0;
+            public static ushort Hue_CharacterName { get; set; } = 0x0386;
+            public static ushort Hue_Text { get; set; } = 0x0386;
         }
 
         private enum MobileStats

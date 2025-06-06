@@ -44,7 +44,7 @@ namespace ClassicUO
             Language.Load();
             Log.Start(LogTypes.All);
 
-            //DllMap.Init();
+            DllMap.Init();
             
             CUOEnviroment.GameThread = Thread.CurrentThread;
             CUOEnviroment.GameThread.Name = "CUO_MAIN_THREAD";

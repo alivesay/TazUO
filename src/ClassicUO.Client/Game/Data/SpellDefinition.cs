@@ -7,7 +7,9 @@ using ClassicUO.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.Data
 {
@@ -138,8 +140,13 @@ namespace ClassicUO.Game.Data
         {
             try
             {
-                Console.WriteLine($"Loading custom spells from {path}");
-                if (Utility.JsonHelper.LoadJsonFile(path, out List<SpellJson> spells))
+                Log.Debug($"Loading custom spells from {path}");
+                
+                if (!File.Exists(path))
+                    return;
+
+                var spells = JsonSerializer.Deserialize(path, SpellJsonContext.Default.ListSpellJson);
+                if(spells != null)
                 {
                     foreach (SpellJson spell in spells)
                     {
@@ -571,15 +578,10 @@ namespace ClassicUO.Game.Data
 
                 list.Add(spellJson);
             }
+            
+            File.WriteAllText(Path.Combine(CUOEnviroment.ExecutablePath, "Data", "spelldef.json"),JsonSerializer.Serialize(list, SpellJsonContext.Default.ListSpellJson));
 
-            if (!JsonHelper.SaveJsonFile(list, Path.Combine(CUOEnviroment.ExecutablePath, "Data", "spelldef.json")))
-            {
-                GameActions.Print(world, "Failed to save all spells as a json file!", 32);
-            }
-            else
-            {
-                GameActions.Print(world, $"Saved all spells as a json file at {Path.Combine(CUOEnviroment.ExecutablePath, "Data", "spelldef.json")}");
-            }
+            GameActions.Print(world, $"Saved all spells as a json file at {Path.Combine(CUOEnviroment.ExecutablePath, "Data", "spelldef.json")}");
         }
 
         public static void FullIndexSetModifySpell
@@ -691,6 +693,11 @@ namespace ClassicUO.Game.Data
         }
     }
 
+    [JsonSerializable(typeof(List<SpellJson>))]
+    public partial class SpellJsonContext : JsonSerializerContext
+    {
+    }
+    
     public class SpellJson
     {
         public string School { get; set; } = "Magery";

@@ -113,9 +113,7 @@ namespace ClassicUO.Game.Scenes
         public override void Load()
         {
             base.Load();
-
-            UISettings.Preload();
-
+            
             Client.Game.Window.AllowUserResizing = true;
 
             Camera.Zoom = ProfileManager.CurrentProfile.DefaultScale;

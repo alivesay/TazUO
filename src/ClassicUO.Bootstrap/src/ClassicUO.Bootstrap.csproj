@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <MonockickstartPath Include="$(ProjectDir)..\..\..\tools\monokickstart\**\*.*" />
+    <MonockickstartPath Include="$(ProjectDir)..\..\..\tools\monokickstart\*.*" />
   </ItemGroup>
   
   <Target Name="CopyMonoKickstart_build" AfterTargets="Build">

@@ -76,6 +76,7 @@ jobs:
       run: |
         mkdir -p flat
 
+        # Copy files excluding *.dSYM (folders or files), preserving subfolders
         for d in "${{ env.CUO_OUTPUT_PATH }}" "${{ env.CUO_OUTPUT_PATH }}-Lib" "${{ env.BOOT_OUTPUT_PATH }}"; do
           [ -d "$d" ] || continue
 
@@ -88,7 +89,17 @@ jobs:
         done
 
         cd flat
-        zip -r ../${{ matrix.rid }}.zip .
+
+        echo "Runner OS: $RUNNER_OS"
+
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          # Use PowerShell Compress-Archive for Windows
+          pwsh -Command "Compress-Archive -Path * -DestinationPath ../${{ matrix.rid }}.zip -Force"
+        else
+          # Linux and macOS
+          zip -r ../${{ matrix.rid }}.zip .
+        fi
+
 
     - name: Upload Release
       uses: ncipollo/release-action@v1.16.0

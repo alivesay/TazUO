@@ -77,7 +77,7 @@ jobs:
         for d in ${{ env.CUO_OUTPUT_PATH }}/*; do
           rsync -a --exclude='*.dSYM/' "$d/" flat/
         done
-        for d in ${{ env.BOOT_OUTPUT_PATH }}-Lib/*; do
+        for d in ${{ env.CUO_OUTPUT_PATH }}-Lib/*; do
           rsync -a --exclude='*.dSYM/' "$d/" flat/
         done
         for d in ${{ env.BOOT_OUTPUT_PATH }}/*; do

@@ -8,7 +8,7 @@
     <AssemblyVersion>3.30.0</AssemblyVersion>
     <FileVersion>3.30.0</FileVersion>
     <PackageProjectUrl>https://github.com/bittiez/TazUO</PackageProjectUrl>
-    <PublishAot>true</PublishAot>
+    <PublishAot>false</PublishAot>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 

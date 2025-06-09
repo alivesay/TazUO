@@ -246,16 +246,14 @@ namespace ClassicUO.Game.Managers
                     //CreateAndLoadDataFile();
                     var assembly = GetType().Assembly;
 
-                    var resourceName = assembly.GetName().Name + $".Game.Managers.DefaultSpellIndicatorConfig.json";
+                    var resourceName = assembly.GetName().Name + ".Game.Managers.DefaultSpellIndicatorConfig.json";
                     try
                     {
-                        using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-                        {
-                            using (StreamReader reader = new StreamReader(stream))
-                            {
-                                LoadFromString(reader.ReadToEnd());
-                            }
-                        }
+                        using Stream stream = assembly.GetManifestResourceStream(resourceName);
+
+                        using StreamReader reader = new StreamReader(stream);
+
+                        LoadFromString(reader.ReadToEnd());
                     }
                     catch (Exception e)
                     {

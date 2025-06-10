@@ -2,11 +2,13 @@ name: TUO-Net9-Deploy
 
 on:
   workflow_dispatch:
-  # workflow_run:
-  #   branches: [merge-cuo]
-  #   workflows: [Build-Test]
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows: ["TUO-Dev-Deploy"]
+    types:
+      - completed
+  push:
+    branches:
+      - merge-cuo
       
 concurrency:
   group: deploy-${{ github.ref }}
@@ -67,11 +69,11 @@ jobs:
     - name: Build executable
       run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }} -r ${{ matrix.rid }}
 
-    - name: Build library
-      run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }}-Lib -r ${{ matrix.rid }} -p:NativeLib=Shared -p:OutputType=Library
+    #- name: Build library
+    #  run: dotnet publish ${{ env.CUO_PROJECT_PATH }} -c Release -o ${{ env.CUO_OUTPUT_PATH }}-Lib -r ${{ matrix.rid }} -p:NativeLib=Shared -p:OutputType=Library
 
-    - name: Build bootstrapper
-      run: dotnet publish ${{ env.BOOTSTRAP }} -c Release -o ${{ env.BOOT_OUTPUT_PATH }} -r win-x64
+    #- name: Build bootstrapper
+    #  run: dotnet publish ${{ env.BOOTSTRAP }} -c Release -o ${{ env.BOOT_OUTPUT_PATH }} -r win-x64
 
     - name: Zip all builds
       shell: bash

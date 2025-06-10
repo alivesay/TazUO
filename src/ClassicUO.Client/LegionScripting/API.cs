@@ -317,7 +317,7 @@ namespace ClassicUO.LegionScripting
         (() =>
             {
                 GameActions.PickUp(World, serial, 0, 0, 1);
-                GameActions.Equip(World, serial);
+                GameActions.Equip(World);
             }
         );
 

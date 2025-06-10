@@ -8,6 +8,10 @@ namespace ClassicUO.Game.UI.Gumps
     public class VersionHistory : Gump
     {
         private static string[] updateTexts = {
+            "/c[white][3.30.1]/cd\n" +
+            "- Fix for Python API EquipItem\n" +
+            "- Fix for legion scripting useability commands\n",
+            
             "/c[white][3.30.0]/cd\n" +
             "- Implementing Discord Social features\n" +
             "- Added more python API methods\n" +
@@ -240,27 +244,6 @@ namespace ClassicUO.Game.UI.Gumps
                 "- Added sound override feature\n" +
                 "- Added -radius command, see wiki for more details\n" +
                 "- Added an optional skill progress bar when a skill changes\n",
-
-            "/c[white][3.7.1]/cd\n" +
-                "- Added ability to sort advanced skills gump by lock status\n" +
-                "- Added import and export options for Grid Highlight settings\n" +
-                "- Added a simple account selector on the login screen\n" +
-                "- Added a toggle to auto sort grid containers\n" +
-                "- Trees/stumps will be slightly visible with circle of transparency on\n" +
-                "- Multi item move can now move items to the trade window\n" +
-                "- Added -marktile command, see wiki for more details\n" +
-                "- Updated TUO with CUO updates\n" +
-                "- Fixed mouse interactions with art replaced using the PNG replacement system\n" +
-                "- Advanced Skill Gump light support for groups added by Elderwyn\n" +
-                "- Fix for backpack not loading contents when logging in\n" +
-                "- Text width fix for old clients\n" +
-                "- Fix for a potential small memory leak - Lasheras\n" +
-                "- Fix for a bug when creating a new character\n" +
-                "- Potential fix for bug when processing messages\n" +
-                "- Fixed an issue on OSI where corpses would not open in grid containers\n" +
-                "- Fix for some SOS messages\n" +
-                "- Fix for text not being clickable\n" +
-                "- Added yellow highlighting for overhead text",
 
             "\n\n/c[white]For further history please visit our discord."
         };

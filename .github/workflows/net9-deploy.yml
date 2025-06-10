@@ -46,7 +46,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: ${{ github.ref_name }}
+        ref: merge-cuo
 
     - name: Get submodules
       run: |

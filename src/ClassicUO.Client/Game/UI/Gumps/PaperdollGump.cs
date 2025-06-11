@@ -42,16 +42,21 @@ namespace ClassicUO.Game.UI.Gumps
         {
             CanMove = true;
             CanCloseWithRightClick = true;
-            X = ProfileManager.CurrentProfile.PaperdollPosition.X;
-            Y = ProfileManager.CurrentProfile.PaperdollPosition.Y;
-            IsLocked = ProfileManager.CurrentProfile.PaperdollLocked;
+
+            if (ProfileManager.CurrentProfile != null)
+            {
+                X = ProfileManager.CurrentProfile.PaperdollPosition.X;
+                Y = ProfileManager.CurrentProfile.PaperdollPosition.Y;
+                IsLocked = ProfileManager.CurrentProfile.PaperdollLocked;
+            }
         }
 
         public PaperDollGump(World world, uint serial, bool canLift) : this(world)
         {
             LocalSerial = serial;
             CanLift = canLift;
-            Scale = InternalScale = ProfileManager.CurrentProfile.PaperdollScale;
+            if (ProfileManager.CurrentProfile != null)
+                Scale = InternalScale = ProfileManager.CurrentProfile.PaperdollScale;
             BuildGump();
         }
 
@@ -473,8 +478,9 @@ namespace ClassicUO.Game.UI.Gumps
                     _warModeBtn.ButtonGraphicOver = btngumps[2];
                 }
 
-                if (Location != ProfileManager.CurrentProfile.PaperdollPosition)
-                    ProfileManager.CurrentProfile.PaperdollPosition = Location;
+                if(ProfileManager.CurrentProfile != null)
+                    if (Location != ProfileManager.CurrentProfile.PaperdollPosition)
+                        ProfileManager.CurrentProfile.PaperdollPosition = Location;
             }
 
             base.Update();
@@ -602,7 +608,7 @@ namespace ClassicUO.Game.UI.Gumps
             base.Save(writer);
 
             writer.WriteAttributeString("isminimized", IsMinimized.ToString());
-            if (LocalSerial == World.Player.Serial)
+            if (LocalSerial == World.Player.Serial && ProfileManager.CurrentProfile != null)
                 ProfileManager.CurrentProfile.PaperdollPosition = Location;
         }
 
@@ -618,8 +624,11 @@ namespace ClassicUO.Game.UI.Gumps
                 Client.Game.GetScene<GameScene>()?.DoubleClickDelayed(LocalSerial);
 
                 IsMinimized = bool.Parse(xml.GetAttribute("isminimized"));
-                X = ProfileManager.CurrentProfile.PaperdollPosition.X;
-                Y = ProfileManager.CurrentProfile.PaperdollPosition.Y;
+                if (ProfileManager.CurrentProfile != null)
+                {
+                    X = ProfileManager.CurrentProfile.PaperdollPosition.X;
+                    Y = ProfileManager.CurrentProfile.PaperdollPosition.Y;
+                }
             }
             else
             {

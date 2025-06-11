@@ -12,6 +12,7 @@ using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Network;
+using Microsoft.Scripting.Hosting;
 using Microsoft.Xna.Framework;
 using Button = ClassicUO.Game.UI.Controls.Button;
 using Control = ClassicUO.Game.UI.Controls.Control;
@@ -26,8 +27,15 @@ namespace ClassicUO.LegionScripting
     /// </summary>
     public class API
     {
+        public API(ScriptEngine engine)
+        {
+            this.engine = engine;
+        }
+        
+        private ScriptEngine engine;
+        
+        #region Python C# Queue
         public static readonly ConcurrentQueue<Action> QueuedPythonActions = new();
-
         private static T InvokeOnMainThread<T>(Func<T> func)
         {
             var resultEvent = new ManualResetEvent(false);
@@ -44,7 +52,6 @@ namespace ClassicUO.LegionScripting
 
             return result;
         }
-
         private static void InvokeOnMainThread(Action action)
         {
             var resultEvent = new ManualResetEvent(false);
@@ -58,7 +65,53 @@ namespace ClassicUO.LegionScripting
             QueuedPythonActions.Enqueue(wrappedAction);
             resultEvent.WaitOne();
         }
+        #endregion
 
+        #region Python Callback Queue
+
+        private readonly Queue<Action> scheduledCallbacks = new();
+        private void ScheduleCallback(Action action)
+        {
+            lock (scheduledCallbacks)
+            {
+                scheduledCallbacks.Enqueue(action);
+
+                while (scheduledCallbacks.Count > 100)
+                {
+                    scheduledCallbacks.Dequeue(); //Limit callback counts
+                    GameActions.Print("Python Scripting Error: Too many callbacks registered!");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Use this when you need to wait for players to click buttons.
+        /// Example:
+        /// ```py
+        /// while True:
+        ///   API.ProcessCallbacks()
+        ///   API.Pause(0.1)
+        /// ```
+        /// </summary>
+        public void ProcessCallbacks()
+        {
+            while (true)
+            {
+                Action next = null;
+                lock (scheduledCallbacks)
+                {
+                    if (scheduledCallbacks.Count > 0)
+                        next = scheduledCallbacks.Dequeue();
+                }
+
+                if (next != null)
+                    next();
+                else
+                    break;
+            }
+        }
+        #endregion
+        
         private ConcurrentBag<uint> ignoreList = new();
         private ConcurrentQueue<JournalEntry> journalEntries = new();
         private World World = Client.Game.UO.World;
@@ -1726,7 +1779,7 @@ namespace ClassicUO.LegionScripting
         /// g.SetY(100)
         /// g.SetWidth(200)
         /// g.SetHeight(200)
-        /// g.AddControl(API.CreateGumpLabel("Hello World!"))
+        /// g.Add(API.CreateGumpLabel("Hello World!"))
         /// API.AddGump(g)
         /// ```
         /// </summary>
@@ -1754,7 +1807,7 @@ namespace ClassicUO.LegionScripting
         /// g.SetY(100)
         /// g.SetWidth(200)
         /// g.SetHeight(200)
-        /// g.AddControl(API.CreateGumpLabel("Hello World!"))
+        /// g.Add(API.CreateGumpLabel("Hello World!"))
         /// API.AddGump(g)
         /// ```
         /// </summary>
@@ -1771,7 +1824,7 @@ namespace ClassicUO.LegionScripting
         /// g.SetWidth(200)
         /// g.SetHeight(200)
         /// cb = API.CreateGumpCheckbox("Check me?!")
-        /// g.AddControl(cb)
+        /// g.Add(cb)
         /// API.AddGump(g)
         /// 
         /// API.SysMsg("Checkbox checked: " + str(cb.IsChecked))
@@ -1794,7 +1847,7 @@ namespace ClassicUO.LegionScripting
         /// g.SetY(100)
         /// g.SetWidth(200)
         /// g.SetHeight(200)
-        /// g.AddControl(API.CreateGumpLabel("Hello World!"))
+        /// g.Add(API.CreateGumpLabel("Hello World!"))
         /// API.AddGump(g)
         /// ```
         /// </summary>
@@ -1818,7 +1871,7 @@ namespace ClassicUO.LegionScripting
         /// cb = API.CreateGumpColorBox(0.5, "#000000")
         /// cb.SetWidth(200)
         /// cb.SetHeight(200)
-        /// g.AddControl(cb)
+        /// g.Add(cb)
         /// API.AddGump(g)
         /// ```
         /// </summary>
@@ -1854,7 +1907,7 @@ namespace ClassicUO.LegionScripting
         /// g.SetY(100)
         /// g.SetWidth(200)
         /// g.SetHeight(200)
-        /// g.AddControl(API.CreateGumpItemPic(0x0E78, 50, 50))
+        /// g.Add(API.CreateGumpItemPic(0x0E78, 50, 50))
         /// API.AddGump(g)
         /// ```
         /// </summary>
@@ -1876,26 +1929,54 @@ namespace ClassicUO.LegionScripting
         /// Create a button for gumps.  
         /// Example:  
         /// ```py
+        /// def onPressed:
+        ///   API.SysMsg("Button pressed!")
+        /// 
         /// g = API.CreateGump()
         /// g.SetX(100)
         /// g.SetY(100)
         /// g.SetWidth(200)
         /// g.SetHeight(200)
-        /// button = API.CreateGumpButton("Click Me!")
-        /// g.AddControl(button)
+        /// button = API.CreateGumpButton("Click Me!", onPressed=onPressed)
+        /// g.Add(button)
         /// API.AddGump(g)
-        /// API.SysMsg("Button clicked?: " + str(button.IsPressed))
+        ///
+        /// while True:
+        ///   API.SysMsg("Button currently clicked?: " + str(button.IsClicked))
+        ///   API.SysMsg("Button clicked since last check?: " + str(button.HasBeenClicked()))
+        ///   API.ProcessCallbacks()
+        ///   API.Pause(0.2)
         /// ```
         /// </summary>
         /// <param name="text"></param>
+        /// <param name="hue"></param>
         /// <param name="normal">Graphic when not clicked or hovering</param>
         /// <param name="pressed">Graphic when pressed</param>
         /// <param name="hover">Graphic on hover</param>
+        /// <param name="onPressed">A callback method when the button is clicked</param>
         /// <returns></returns>
-        public Button CreateGumpButton(string text = "", ushort hue = 996, ushort normal = 0x00EF, ushort pressed = 0x00F0, ushort hover = 0x00EE)
+        public Button CreateGumpButton(string text = "", ushort hue = 996, ushort normal = 0x00EF, ushort pressed = 0x00F0, ushort hover = 0x00EE, object onPressed = null)
         {
             Button b = new Button(0, normal, pressed, hover, caption: text, normalHue: hue, hoverHue: hue);
-
+            
+            if (onPressed != null && engine.Operations.IsCallable(onPressed))
+            {
+                b.MouseUp += (s, e) =>
+                {
+                    ScheduleCallback(() =>
+                    {
+                        try
+                        {
+                            engine.Operations.Invoke(onPressed);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Script callback error: {ex}");
+                        }
+                    });
+                };
+            }
+            
             return b;
         }
 
@@ -1909,7 +1990,7 @@ namespace ClassicUO.LegionScripting
         /// g.SetWidth(200)
         /// g.SetHeight(200)
         /// rb = API.CreateGumpRadioButton("Click Me!", 1)
-        /// g.AddControl(rb)
+        /// g.Add(rb)
         /// API.AddGump(g)
         /// API.SysMsg("Radio button checked?: " + str(rb.IsChecked))
         /// ```

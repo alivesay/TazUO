@@ -187,8 +187,14 @@ namespace ClassicUO.Game.GameObjects
         }
 
         public virtual bool IsWalking => LastStepTime > Time.Ticks - Constants.WALKING_DELAY;
-        public bool IsAttackable => (Flags & Flags.YellowBar) == 0; //Added for Python API
 
+        #region Python API accessors - Added for Python API
+        public bool IsAttackable => (Flags & Flags.YellowBar) == 0; 
+        public int HitsDiff => HitsMax - Hits;
+        public int StamDiff => StaminaMax - Stamina;
+        public int ManaDiff => ManaMax - Mana;
+        #endregion
+  
         public byte AnimationFrameCount;
         public bool AnimationFromServer;
         public bool IsFemale;

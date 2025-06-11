@@ -23,6 +23,9 @@ class Notoriety:
     Murderer = 1
     Invulnerable = 1
 
+def ProcessCallbacks():
+    pass
+
 def Attack(serial: int):
     pass
 
@@ -290,7 +293,7 @@ def CreateGumpColorBox(opacity: float = 0.7, color: str = "#000000"):
 def CreateGumpItemPic(graphic: int, width: int, height: int):
     pass
 
-def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, pressed: int = 0x00F0, hover: int = 0x00EE):
+def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, pressed: int = 0x00F0, hover: int = 0x00EE, onPressed: Any = None):
     pass
 
 def CreateGumpRadioButton(text: str = "", group: int = 0, inactive: int = 0x00D0, active: int = 0x00D1, hue: int = 0xFFFF):

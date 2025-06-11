@@ -21,6 +21,7 @@ namespace ClassicUO.Game.UI.Controls
     {
         private readonly string _caption;
         private bool _entered;
+        private bool _hasBeenClicked; //Use in python api
         private readonly RenderedText[] _fontTexture;
         private ushort _normal, _pressed, _over;
         private Vector3 hueVector;
@@ -244,6 +245,17 @@ namespace ClassicUO.Game.UI.Controls
             return base.Draw(batcher, x, y);
         }
 
+        /// <summary>
+        /// Used in python api to determine if a button was clicked or not.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasBeenClicked()
+        {
+            var status = _hasBeenClicked;
+            _hasBeenClicked = false;
+            return status;
+        }
+
         protected override void OnMouseDown(int x, int y, MouseButtonType button)
         {
             if (button == MouseButtonType.Left)
@@ -256,6 +268,8 @@ namespace ClassicUO.Game.UI.Controls
         {
             if (button == MouseButtonType.Left)
             {
+                _hasBeenClicked = true;
+                
                 IsClicked = false;
 
                 if (!MouseIsOver)

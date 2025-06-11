@@ -598,6 +598,8 @@ namespace ClassicUO.LegionScripting
             Interpreter.RegisterExpressionHandler("paralyzed", IsParalyzed);
             Interpreter.RegisterExpressionHandler("mounted", IsMounted);
             Interpreter.RegisterExpressionHandler("diffhits", DiffHits);
+            Interpreter.RegisterExpressionHandler("diffstam", DiffStam);
+            Interpreter.RegisterExpressionHandler("diffmana", DiffMana);
             Interpreter.RegisterExpressionHandler("str", GetStr);
             Interpreter.RegisterExpressionHandler("dex", GetDex);
             Interpreter.RegisterExpressionHandler("int", GetInt);
@@ -790,7 +792,7 @@ namespace ClassicUO.LegionScripting
         public void SetupPythonScope()
         {
             pythonScope = pythonEngine.CreateScope();
-            var api = new API();
+            var api = new API(pythonEngine);
             scopedAPI = api;
             pythonEngine.GetBuiltinModule().SetVariable("API", api);
         }

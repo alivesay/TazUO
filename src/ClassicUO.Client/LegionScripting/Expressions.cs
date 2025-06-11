@@ -411,7 +411,31 @@ namespace ClassicUO.LegionScripting
                 serial = args[0].AsSerial();
 
             if (World.Mobiles.TryGetValue(serial, out var m))
-                return m.HitsMax - m.Hits;
+                return m.HitsDiff;
+
+            return 0;
+        }
+        public static int DiffStam(string expression, Argument[] args, bool quiet)
+        {
+            uint serial = World.Player.Serial;
+
+            if (args.Length > 0)
+                serial = args[0].AsSerial();
+
+            if (World.Mobiles.TryGetValue(serial, out var m))
+                return m.StamDiff;
+
+            return 0;
+        }
+        public static int DiffMana(string expression, Argument[] args, bool quiet)
+        {
+            uint serial = World.Player.Serial;
+
+            if (args.Length > 0)
+                serial = args[0].AsSerial();
+
+            if (World.Mobiles.TryGetValue(serial, out var m))
+                return m.ManaDiff;
 
             return 0;
         }

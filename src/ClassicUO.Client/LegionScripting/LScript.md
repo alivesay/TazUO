@@ -751,8 +751,8 @@ Example: `if nearestcorpse`
 
 - `name` 
 - `hits`, `maxhits`, `diffhits` <-- These support a 'serial' parameter
-- `stam`, `maxstam`  
-- `mana`, `maxmana`  
+- `stam`, `maxstam`, `diffstam`  
+- `mana`, `maxmana`, `diffmana`  
 - `x`, `y`, `z`  
 - `str`, `dex`, `int`
 - `followers`, `maxfollowers`

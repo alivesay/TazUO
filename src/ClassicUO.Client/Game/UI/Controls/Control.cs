@@ -273,6 +273,19 @@ namespace ClassicUO.Game.UI.Controls
         public void SetY(int y){
             Y = y;
         }
+
+        /// <summary>
+        /// Used in python API
+        /// </summary>
+        /// <returns>int</returns>
+        public int GetX() => X;
+        
+        /// <summary>
+        /// Used in python API
+        /// </summary>
+        /// <returns>int</returns>
+        public int GetY() => Y;
+        
         public void UpdateOffset(int x, int y)
         {
             if (_offset.X != x || _offset.Y != y)

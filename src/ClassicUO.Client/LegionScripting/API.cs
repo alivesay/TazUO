@@ -79,7 +79,7 @@ namespace ClassicUO.LegionScripting
                 while (scheduledCallbacks.Count > 100)
                 {
                     scheduledCallbacks.Dequeue(); //Limit callback counts
-                    GameActions.Print("Python Scripting Error: Too many callbacks registered!");
+                    GameActions.Print(World, "Python Scripting Error: Too many callbacks registered!");
                 }
             }
         }

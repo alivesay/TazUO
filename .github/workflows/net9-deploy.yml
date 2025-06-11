@@ -2,10 +2,6 @@ name: TUO-Net9-Deploy
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["TUO-Dev-Deploy"]
-    types:
-      - completed
   push:
     branches:
       - merge-cuo
@@ -19,7 +15,7 @@ env:
   CUO_PROJECT_PATH: "src/ClassicUO.Client/ClassicUO.Client.csproj"
   BOOTSTRAP: "src/ClassicUO.Bootstrap/src/ClassicUO.Bootstrap.csproj"
   BOOT_OUTPUT_PATH: "build/bootstrap"
-  TAG_NAME: "TazUO-BleedingEdge"
+  TAG_NAME: "TazUO-Net9 Builds"
 
   DOTNET_NOLOGO: false
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -129,6 +125,10 @@ jobs:
         uses: ncipollo/release-action@v1.16.0
         with:
           artifacts: "all-zips/**/*.zip"
+          name: 'TazUO Net9 Builds'
+          body: |
+            These are built automatically on the merge-cuo branch.  
+            These are net9 builds of TazUO, they do not support plugins.
           makeLatest: false
           allowUpdates: true
           prerelease: true

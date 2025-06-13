@@ -158,7 +158,7 @@ namespace ClassicUO.Game.Managers
             EventSink.OnItemCreated += OnItemCreatedOrUpdated;
             EventSink.OnItemUpdated += OnItemCreatedOrUpdated;
             EventSink.OnOpenContainer += OnOpenContainer;
-
+            EventSink.OnPositionChanged += OnPositionChanged;
         }
 
         public void OnSceneUnload()
@@ -167,6 +167,7 @@ namespace ClassicUO.Game.Managers
             EventSink.OnItemCreated -= OnItemCreatedOrUpdated;
             EventSink.OnItemUpdated -= OnItemCreatedOrUpdated;
             EventSink.OnOpenContainer -= OnOpenContainer;
+            EventSink.OnPositionChanged -= OnPositionChanged;
             Save();
         }
 
@@ -187,6 +188,15 @@ namespace ClassicUO.Game.Managers
                 return;
             }
         }
+        
+        private void OnPositionChanged(object sender, PositionChangedArgs e)
+        {
+            if (!loaded || !IsEnabled) return;
+            
+            if(ProfileManager.CurrentProfile.EnableScavenger)
+                foreach(Item item in World.Items.Values.Where(i=> i!=null && i.OnGround && !i.IsCorpse && i.Distance < 3))
+                    CheckAndLoot(item);
+        }
 
         private void OnOpenContainer(object sender, uint e)
         {
@@ -197,6 +207,7 @@ namespace ClassicUO.Game.Managers
         private void OnItemCreatedOrUpdated(object sender, EventArgs e)
         {
             if (!loaded || !IsEnabled) return;
+            
             if (sender is Item i)
                 CheckItem(i);
         }

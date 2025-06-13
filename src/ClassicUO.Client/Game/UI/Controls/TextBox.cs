@@ -283,6 +283,15 @@ namespace ClassicUO.Game.UI.Controls
             }
         }
 
+        /// <summary>
+        /// Added in for Python API
+        /// </summary>
+        /// <param name="text"></param>
+        public void SetText(string text)
+        {
+            Text = text;
+        }
+
         public void Reset()
         {
             X = 0;

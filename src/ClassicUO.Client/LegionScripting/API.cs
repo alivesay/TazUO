@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using ClassicUO.Assets;
 using ClassicUO.Configuration;
 using ClassicUO.Game;
 using ClassicUO.Game.Data;
@@ -11,7 +12,9 @@ using ClassicUO.Game.Managers;
 using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
+using ClassicUO.Input;
 using ClassicUO.Network;
+using FontStashSharp.RichText;
 using Microsoft.Scripting.Hosting;
 using Microsoft.Xna.Framework;
 using Button = ClassicUO.Game.UI.Controls.Button;
@@ -1770,15 +1773,14 @@ namespace ClassicUO.LegionScripting
         /// <returns>A GameObject of that location.</returns>
         public GameObject GetTile(int x, int y) => InvokeOnMainThread(() => { return World.Map.GetTile(x, y); });
 
+        #region Gumps
+        
         /// <summary>
         /// Get a blank gump.  
         /// Example:  
         /// ```py
         /// g = API.CreateGump()
-        /// g.SetX(100)
-        /// g.SetY(100)
-        /// g.SetWidth(200)
-        /// g.SetHeight(200)
+        /// g.SetRect(100, 100, 200, 200)
         /// g.Add(API.CreateGumpLabel("Hello World!"))
         /// API.AddGump(g)
         /// ```
@@ -1803,10 +1805,7 @@ namespace ClassicUO.LegionScripting
         /// Example:  
         /// ```py
         /// g = API.CreateGump()
-        /// g.SetX(100)
-        /// g.SetY(100)
-        /// g.SetWidth(200)
-        /// g.SetHeight(200)
+        /// g.SetRect(100, 100, 200, 200)
         /// g.Add(API.CreateGumpLabel("Hello World!"))
         /// API.AddGump(g)
         /// ```
@@ -1819,10 +1818,7 @@ namespace ClassicUO.LegionScripting
         /// /// Example:
         /// ```py
         /// g = API.CreateGump()
-        /// g.SetX(100)
-        /// g.SetY(100)
-        /// g.SetWidth(200)
-        /// g.SetHeight(200)
+        /// g.SetRect(100, 100, 200, 200)
         /// cb = API.CreateGumpCheckbox("Check me?!")
         /// g.Add(cb)
         /// API.AddGump(g)
@@ -1843,10 +1839,7 @@ namespace ClassicUO.LegionScripting
         /// Example:  
         /// ```py
         /// g = API.CreateGump()
-        /// g.SetX(100)
-        /// g.SetY(100)
-        /// g.SetWidth(200)
-        /// g.SetHeight(200)
+        /// g.SetRect(100, 100, 200, 200)
         /// g.Add(API.CreateGumpLabel("Hello World!"))
         /// API.AddGump(g)
         /// ```
@@ -1864,10 +1857,7 @@ namespace ClassicUO.LegionScripting
         /// Example:  
         /// ```py
         /// g = API.CreateGump()
-        /// g.SetX(100)
-        /// g.SetY(100)
-        /// g.SetWidth(200)
-        /// g.SetHeight(200)
+        /// g.SetRect(100, 100, 200, 200)
         /// cb = API.CreateGumpColorBox(0.5, "#000000")
         /// cb.SetWidth(200)
         /// cb.SetHeight(200)
@@ -1881,20 +1871,7 @@ namespace ClassicUO.LegionScripting
         public AlphaBlendControl CreateGumpColorBox(float opacity = 0.7f, string color = "#000000")
         {
             AlphaBlendControl bc = new AlphaBlendControl(opacity);
-
-            if (color.StartsWith("#") && color.Length == 7)
-            {
-                byte r = Convert.ToByte(color.Substring(1, 2), 16);
-                byte g = Convert.ToByte(color.Substring(3, 2), 16);
-                byte b = Convert.ToByte(color.Substring(5, 2), 16);
-
-                bc.BaseColor = new Color(r, g, b);
-            }
-            else
-            {
-                bc.BaseColor = Color.Black;
-            }
-
+            bc.BaseColor = Utility.GetColorFromHex(color);
             return bc;
         }
 
@@ -1903,10 +1880,7 @@ namespace ClassicUO.LegionScripting
         /// Example:  
         /// ```py
         /// g = API.CreateGump()
-        /// g.SetX(100)
-        /// g.SetY(100)
-        /// g.SetWidth(200)
-        /// g.SetHeight(200)
+        /// g.SetRect(100, 100, 200, 200)
         /// g.Add(API.CreateGumpItemPic(0x0E78, 50, 50))
         /// API.AddGump(g)
         /// ```
@@ -1929,22 +1903,15 @@ namespace ClassicUO.LegionScripting
         /// Create a button for gumps.  
         /// Example:  
         /// ```py
-        /// def onPressed:
-        ///   API.SysMsg("Button pressed!")
-        /// 
         /// g = API.CreateGump()
-        /// g.SetX(100)
-        /// g.SetY(100)
-        /// g.SetWidth(200)
-        /// g.SetHeight(200)
-        /// button = API.CreateGumpButton("Click Me!", onPressed=onPressed)
+        /// g.SetRect(100, 100, 200, 200)
+        /// button = API.CreateGumpButton("Click Me!")
         /// g.Add(button)
         /// API.AddGump(g)
         ///
         /// while True:
         ///   API.SysMsg("Button currently clicked?: " + str(button.IsClicked))
         ///   API.SysMsg("Button clicked since last check?: " + str(button.HasBeenClicked()))
-        ///   API.ProcessCallbacks()
         ///   API.Pause(0.2)
         /// ```
         /// </summary>
@@ -1953,29 +1920,10 @@ namespace ClassicUO.LegionScripting
         /// <param name="normal">Graphic when not clicked or hovering</param>
         /// <param name="pressed">Graphic when pressed</param>
         /// <param name="hover">Graphic on hover</param>
-        /// <param name="onPressed">A callback method when the button is clicked</param>
         /// <returns></returns>
-        public Button CreateGumpButton(string text = "", ushort hue = 996, ushort normal = 0x00EF, ushort pressed = 0x00F0, ushort hover = 0x00EE, object onPressed = null)
+        public Button CreateGumpButton(string text = "", ushort hue = 996, ushort normal = 0x00EF, ushort pressed = 0x00F0, ushort hover = 0x00EE)
         {
             Button b = new Button(0, normal, pressed, hover, caption: text, normalHue: hue, hoverHue: hue);
-            
-            if (onPressed != null && engine.Operations.IsCallable(onPressed))
-            {
-                b.MouseUp += (s, e) =>
-                {
-                    ScheduleCallback(() =>
-                    {
-                        try
-                        {
-                            engine.Operations.Invoke(onPressed);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Script callback error: {ex}");
-                        }
-                    });
-                };
-            }
             
             return b;
         }
@@ -1985,10 +1933,7 @@ namespace ClassicUO.LegionScripting
         /// Example:  
         /// ```py
         /// g = API.CreateGump()
-        /// g.SetX(100)
-        /// g.SetY(100)
-        /// g.SetWidth(200)
-        /// g.SetHeight(200)
+        /// g.SetRect(100, 100, 200, 200)
         /// rb = API.CreateGumpRadioButton("Click Me!", 1)
         /// g.Add(rb)
         /// API.AddGump(g)
@@ -2046,6 +1991,94 @@ namespace ClassicUO.LegionScripting
                 CanMove = true
             };
         }
+
+        /// <summary>
+        /// Create a TTF label with advanced options.
+        /// Example:
+        /// ```py
+        /// gump = API.CreateGump()
+        /// gump.SetRect(100, 100, 200, 200)
+        /// 
+        /// ttflabel = API.CreateGumpTTFLabel("Example label", 25, "#F100DD", "alagard")
+        /// ttflabel.SetRect(10, 10, 180, 30)
+        /// gump.Add(ttflabel)
+        ///
+        /// API.AddGump(gump) #Add the gump to the players screen
+        /// ```
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="size">Font size</param>
+        /// <param name="color">Hex color: #FFFFFF. Must begin with #.</param>
+        /// <param name="font">Must have the font installed in TazUO</param>
+        /// <param name="aligned">left/center/right. Must set a max width for this to work.</param>
+        /// <param name="maxWidth">Max width before going to the next line</param>
+        /// <param name="applyStroke">Uses players stroke settings, this turns it on or off</param>
+        /// <returns></returns>
+        public TextBox CreateGumpTTFLabel(string text, float size, string color = "#FFFFFF", string font = TrueTypeLoader.EMBEDDED_FONT, string aligned = "left", int maxWidth = 0, bool applyStroke = false)
+        {
+            var opts = TextBox.RTLOptions.Default();
+
+            switch (aligned.ToLower())
+            {
+                case "left": opts.Align = TextHorizontalAlignment.Left; break;
+                case "middle":
+                case "center": opts.Align = TextHorizontalAlignment.Center; break;
+                case "right": opts.Align = TextHorizontalAlignment.Right; break;
+            }
+
+            if (applyStroke)
+                opts.StrokeEffect = true;
+            
+            if(maxWidth > 0)
+                opts.Width = maxWidth;
+            
+            return TextBox.GetOne(text, font, size, Utility.GetColorFromHex(color), opts);
+        }
+        
+        /// <summary>
+        /// Add an onClick callback to a control.
+        /// Example:  
+        /// ```py
+        /// def myfunc:
+        ///   API.SysMsg("Something clicked!")
+        /// bg = API.CreateGumpColorBox(0.7, "#D4202020")
+        /// API.AddControlOnClick(bg, myfunc)
+        /// while True:
+        ///   API.ProcessCallbacks()
+        /// ```
+        /// </summary>
+        /// <param name="control">The control listening for clicks</param>
+        /// <param name="onClick">The callback function</param>
+        /// <param name="leftOnly">Only accept left mouse clicks?</param>
+        public void AddControlOnClick(Control control, object onClick, bool leftOnly = true)
+        {
+            if (control == null)
+                return;
+            
+            if (onClick != null && engine.Operations.IsCallable(onClick))
+            {
+                control.AcceptMouseInput = true;
+                control.MouseUp += (s, e) =>
+                {
+                    if (leftOnly && e.Button != MouseButtonType.Left)
+                        return;
+                    
+                    this?.ScheduleCallback(() =>
+                    {
+                        try
+                        {
+                            engine.Operations.Invoke(onClick);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Script callback error: {ex}");
+                        }
+                    });
+                };
+            }
+        }
+        
+        #endregion
 
         /// <summary>
         /// Get a skill from the player. See the Skill class for what properties are available: https://github.com/bittiez/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs  

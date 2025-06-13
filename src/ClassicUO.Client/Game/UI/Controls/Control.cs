@@ -245,6 +245,21 @@ namespace ClassicUO.Game.UI.Controls
         /// <summary>
         /// Used in python API
         /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="w"></param>
+        /// <param name="h"></param>
+        public void SetRect(int x, int y, int w, int h)
+        {
+            X = x;
+            Y = y;
+            SetWidth(w);
+            SetHeight(h);
+        }
+
+        /// <summary>
+        /// Used in python API
+        /// </summary>
         /// <param name="width"></param>
         public void SetWidth(int width){
             Width = width < 0 ? 0 : width;

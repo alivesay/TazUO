@@ -10,7 +10,10 @@ namespace ClassicUO.Game.UI.Gumps
         private static string[] updateTexts = {
             "/c[white][3.30.1]/cd\n" +
             "- Fix for Python API EquipItem\n" +
-            "- Fix for legion scripting useability commands\n",
+            "- Fix for legion scripting useability commands\n" +
+            "- Added basic scavenger agent(Uses autoloot)\n" +
+            "- Nearby item gump and grid container quick loot now use move item queue\n" +
+            "- Various bug fixes\n",
             
             "/c[white][3.30.0]/cd\n" +
             "- Implementing Discord Social features\n" +

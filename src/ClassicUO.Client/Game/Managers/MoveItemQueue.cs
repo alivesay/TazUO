@@ -1,5 +1,8 @@
 using System.Collections.Concurrent;
 using ClassicUO.Configuration;
+using ClassicUO.Game.Data;
+using ClassicUO.Game.GameObjects;
+using ClassicUO.Game.Scenes;
 
 namespace ClassicUO.Game.Managers
 {
@@ -19,6 +22,23 @@ namespace ClassicUO.Game.Managers
         public void Enqueue(uint serial, uint destination, ushort amt = 0, int x = 0xFFFF, int y = 0xFFFF, int z = 0)
         {
             _queue.Enqueue(new MoveRequest(serial, destination, amt, x, y, z));
+        }
+
+        public void EnqueueQuick(Item item)
+        {
+            Item backpack = world.Player.FindItemByLayer(Layer.Backpack);
+
+            if (backpack == null)
+            {
+                return;
+            }
+
+            uint bag = backpack;
+                
+            if(ProfileManager.CurrentProfile.GrabBagSerial != 0)
+                bag = ProfileManager.CurrentProfile.GrabBagSerial;
+                
+            Enqueue(item.Serial, bag, 0, 0xFFFF, 0xFFFF);
         }
 
         public void ProcessQueue()

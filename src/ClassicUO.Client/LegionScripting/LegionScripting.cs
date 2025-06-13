@@ -781,8 +781,8 @@ namespace ClassicUO.LegionScripting
 
             string dir = System.IO.Path.GetDirectoryName(FullPath);                       
             ICollection<string> paths = pythonEngine.GetSearchPaths();
-            string path = System.IO.Path.Combine(CUOEnviroment.ExecutablePath, "iplib");
-            paths.Add(path);
+            paths.Add(System.IO.Path.Combine(CUOEnviroment.ExecutablePath, "iplib"));
+            paths.Add(System.IO.Path.Combine(CUOEnviroment.ExecutablePath, "LegionScripts"));
 
             paths.Add(!string.IsNullOrWhiteSpace(dir) ? dir : Environment.CurrentDirectory);
 

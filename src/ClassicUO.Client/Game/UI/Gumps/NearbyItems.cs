@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
+using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
+using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Input;
 using ClassicUO.Renderer;
@@ -56,6 +58,8 @@ namespace ClassicUO.Game.UI.Gumps
                 if (i.IsLocked && !i.ItemData.IsContainer) continue;
 
                 if(!i.IsLootable) continue;
+                
+                if(i.IsCorpse) continue;
 
                 items.Add(new NearbyItemDisplay(World, i));
             }
@@ -121,11 +125,10 @@ namespace ClassicUO.Game.UI.Gumps
 
             HitBox loot = new HitBox(0, 0, Width, Height / 2);
             loot.Add(TextBox.GetOne("Loot", TrueTypeLoader.EMBEDDED_FONT, 16, Color.White, TextBox.RTLOptions.DefaultCentered(Width)));
-            loot.MouseDown += (s, e) =>
+            loot.MouseUp += (s, e) =>
             {
                 if(e.Button != MouseButtonType.Left) return;
-
-                GameActions.GrabItem(world, item, item.Amount);
+                Client.Game.GetScene<GameScene>()?.MoveItemQueue.EnqueueQuick(item);
                 Dispose();
             };
             Add(loot);
@@ -134,7 +137,7 @@ namespace ClassicUO.Game.UI.Gumps
             TextBox tb;
             use.Add(tb = TextBox.GetOne("Use", TrueTypeLoader.EMBEDDED_FONT, 16, Color.White, TextBox.RTLOptions.DefaultCentered(Width)));
             tb.Y = use.Height - tb.MeasuredSize.Y;
-            use.MouseDown += (s, e) =>
+            use.MouseUp += (s, e) =>
             {
                 if (e.Button != MouseButtonType.Left) return;
                 GameActions.DoubleClick(world, item);

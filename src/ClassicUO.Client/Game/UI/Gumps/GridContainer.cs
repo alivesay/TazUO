@@ -47,6 +47,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using ClassicUO.Game.Scenes;
 using static ClassicUO.Game.UI.Gumps.GridHightlightMenu;
 
 namespace ClassicUO.Game.UI.Gumps
@@ -1006,7 +1007,7 @@ namespace ClassicUO.Game.UI.Gumps
                         {
                             if ((gridContainer.isCorpse && ProfileManager.CurrentProfile.CorpseSingleClickLoot) || gridContainer.quickLootThisContainer)
                             {
-                                GameActions.GrabItem(world, _item.Serial, _item.Amount);
+                                Client.Game.GetScene<GameScene>()?.MoveItemQueue.EnqueueQuick(_item);
                                 Mouse.CancelDoubleClick = true;
                             }
                             else

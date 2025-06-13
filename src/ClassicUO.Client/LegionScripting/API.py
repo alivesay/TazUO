@@ -293,13 +293,19 @@ def CreateGumpColorBox(opacity: float = 0.7, color: str = "#000000"):
 def CreateGumpItemPic(graphic: int, width: int, height: int):
     pass
 
-def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, pressed: int = 0x00F0, hover: int = 0x00EE, onPressed: Any = None):
+def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, pressed: int = 0x00F0, hover: int = 0x00EE):
     pass
 
 def CreateGumpRadioButton(text: str = "", group: int = 0, inactive: int = 0x00D0, active: int = 0x00D1, hue: int = 0xFFFF):
     pass
 
 def CreateGumpTextBox(text: str = "", width: int = 200, height: int = 30, multiline: bool = False):
+    pass
+
+def CreateGumpTTFLabel(text: str, size: float, color: str = "#FFFFFF", font: str = TrueTypeLoader.EMBEDDED_FONT, aligned: str = "let", maxWidth: int = 0, applyStroke: bool = False):
+    pass
+
+def AddControlOnClick(control: Any, onClick: Any, leftOnly: bool = True):
     pass
 
 def GetSkill(skill: str):

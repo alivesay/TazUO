@@ -588,6 +588,7 @@ namespace ClassicUO.Configuration
 
             public string AutoLoot { get; set; } = "Autoloot";
             public string AutoLootEnable { get; set; } = "Enable auto loot";
+            public string ScavengerEnable { get; set; } = "Enable scavenger";
             public string AutoLootProgessBarEnable { get; set; } = "Show progress bar while looting";
             public string AutoLootHumanCorpses { get; set; } = "Loot human corpses? (Potentially player corpses)";
 

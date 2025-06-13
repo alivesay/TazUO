@@ -576,6 +576,7 @@ namespace ClassicUO.Configuration
         public bool BuyAgentEnabled { get; set; }
         public bool DisableTargetingGridContainers { get; set; }
         public bool ControllerEnabled { get; set; } = true;
+        public bool EnableScavenger { get; set; } = true;
 
         internal void Save(World world, string path, bool saveGumps = true)
         {

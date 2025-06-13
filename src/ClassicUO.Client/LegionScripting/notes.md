@@ -12,6 +12,9 @@ TazUO includes several helper methods to simplify interaction with gumps and UI 
 - `control.SetY(5)` – Sets the control's Y position  
 - `control.SetWidth(50)` – Sets the control's width  
 - `control.SetHeight(50)` – Sets the control's height  
+- `control.SetRect(0, 0, 50, 50)` - Sets the controls x, y, width, height in that order
+- `gump.CenterXInViewPort()` - Center a GUMP X in the viewport
+- `gump.CenterYInViewPort()` - Center a GUMP Y in the viewport
 
 ### Buttons
 - `button.HasBeenClicked()` -> Will be true if the player clicked the button. When this method is checked, it sets the state to false to avoid registering double clicks.

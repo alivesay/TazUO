@@ -149,7 +149,7 @@ namespace ClassicUO.Configuration
         public bool PathfindSingleClick { get; set; }
         public bool AlwaysRun { get; set; } = true;
         public bool AlwaysRunUnlessHidden { get; set; } = true;
-        public bool HoldDownKeyTab { get; set; } = true;
+        public bool HoldDownKeyTab { get; set; }
         public bool HoldShiftForContext { get; set; } = false;
         public bool HoldShiftToSplitStack { get; set; } = false;
 
@@ -170,7 +170,7 @@ namespace ClassicUO.Configuration
         public int LightLevelType { get; set; } // 0 = absolute, 1 = minimum
         public bool UseColoredLights { get; set; } = true;
         public bool UseDarkNights { get; set; }
-        public int CloseHealthBarType { get; set; } // 0 = none, 1 == not exists, 2 == is dead
+        public int CloseHealthBarType { get; set; } = 2; // 0 = none, 1 == not exists, 2 == is dead
         public bool ActivateChatAfterEnter { get; set; }
         public bool ActivateChatAdditionalButtons { get; set; } = true;
         public bool ActivateChatShiftEnterSupport { get; set; } = true;
@@ -577,6 +577,8 @@ namespace ClassicUO.Configuration
         public bool DisableTargetingGridContainers { get; set; }
         public bool ControllerEnabled { get; set; } = true;
         public bool EnableScavenger { get; set; } = true;
+        
+        public bool CounterGumpLocked { get; set; }
 
         internal void Save(World world, string path, bool saveGumps = true)
         {

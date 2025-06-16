@@ -2,7 +2,6 @@
 
 <p align="center"><a href="https://discord.gg/QvqzkB95G4">Join our Discord</a></p>
 
-The wiki has been restored! And we have set up a new [Discord](https://discord.gg/QvqzkB95G4)
 
 ***
 
@@ -17,14 +16,14 @@ The wiki has been restored! And we have set up a new [Discord](https://discord.g
 **TazUO** was originally a fork from ClassicUO with the mindset of adding features requested by users to improve QOL. **TazUO** has since moved away from ClassicUO, we will keep an eye on ClassicUO updates and incorporate changes or fixes as they have a wider user base that provides bug reports, but **TazUO** will no longer be merging all changes from ClassicUO.
 
 # TazUO features
-Check out our [wiki](../../wiki) for details on all of the changes TazUO has made for players!  
+Check out our [wiki](../../wiki) for details on all the changes TazUO has made for players!  
 
 ***Most*** features can be disabled if you don't want to use said feature.  
 
 - [Launcher](../../wiki/TazUO.Updater-Launcher) - Managing profiles for multiple accounts/servers
-- [Grid containers](../../wiki/TazUO.Grid-Containers) - Easily find and move items with out fully customizable grid containers
+- [Grid containers](../../wiki/TazUO.Grid-Containers) - Easily find and move items with our fully customizable grid containers
 - [Journal](../../wiki/TazUO.Journal) - Vastly improved journal for readability and organization
-- [Alternative paperdoll](../../wiki/TazUO.Alternate-Paperdoll) - A new flavor a your paperdoll
+- [Alternative paperdoll](../../wiki/TazUO.Alternate-Paperdoll) - A new flavor of your paperdoll
 - [Improved buff bar](../../wiki/TazUO.Buff-Bars)
 - [Client commands](../../wiki/TazUO.Commands) - Several commands have been added for various features
 - [Controller support](../../wiki/TazUO.Controller-Support) - That's right, play with your controller!

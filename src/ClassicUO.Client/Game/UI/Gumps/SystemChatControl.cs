@@ -331,6 +331,15 @@ namespace ClassicUO.Game.UI.Gumps
                 lineToRemove.Value.Destroy();
                 _textEntries.Remove(lineToRemove);
             }
+            
+            
+            var last = _textEntries.Last?.Value;
+
+            if (last != null && last.Duplicate(text))
+            {
+                last.IncreaseCount();
+                return;
+            }
 
             _textEntries.AddLast(new ChatLineTime(text, font, isunicode, hue));
         }
@@ -867,8 +876,11 @@ namespace ClassicUO.Game.UI.Gumps
             private uint _createdTime;
             private TextBox textBox;
             private static TextBox.RTLOptions TextBoxOptions = new() { Width = 320, StrokeEffect = true };
+            private string text;
+            private int count = 0;
             public ChatLineTime(string text, byte font, bool isunicode, ushort hue)
             {
+                this.text = text;
                 textBox = TextBox.GetOne(text, ProfileManager.CurrentProfile.GameWindowSideChatFont, ProfileManager.CurrentProfile.GameWindowSideChatFontSize, hue, TextBoxOptions);
                 _createdTime = Time.Ticks + Constants.TIME_DISPLAY_SYSTEM_MESSAGE_TEXT;
             }
@@ -878,6 +890,14 @@ namespace ClassicUO.Game.UI.Gumps
             public bool IsDisposed => textBox == null || textBox.IsDisposed;
 
             public int TextHeight => textBox?.Height ?? 0;
+
+            public bool Duplicate(string text) => this.text == text;
+
+            public void IncreaseCount()
+            {
+                count++;
+                textBox.SetText($"{text} [x{count}]");
+            }
 
             public void Update()
             {

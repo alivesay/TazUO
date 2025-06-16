@@ -1181,23 +1181,34 @@ internal static class GameActions
 
         PickUp(world, serial, 0, 0, amount);
 
-        if (stack)
-            DropItem
-            (
-                serial,
-                0xFFFF,
-                0xFFFF,
-                0,
-                bag
-            );
-        else
-            DropItem
-            (
-                serial,
-                0,
-                0,
-                0,
-                bag
-            );
+            if (stack)
+                DropItem
+                (
+                    serial,
+                    0xFFFF,
+                    0xFFFF,
+                    0,
+                    bag
+                );
+            else
+                DropItem
+                (
+                    serial,
+                    0,
+                    0,
+                    0,
+                    bag
+                );
+        }
+
+        public static void RequestEquippedOPL(World world)
+        {
+            foreach (Layer layer in Enum.GetValues(typeof(Data.Layer)))
+            {
+                Item item = world.Player.FindItemByLayer(layer);
+                if(item == null) continue;
+
+                world.OPL.Contains(item); //Requests data if we don't have it
+            }
+        }
     }
-}

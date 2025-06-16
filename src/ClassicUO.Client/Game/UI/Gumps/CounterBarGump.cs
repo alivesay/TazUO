@@ -75,6 +75,8 @@ namespace ClassicUO.Game.UI.Gumps
             CurrentCounterBarGump = this;
 
             SetInScreen();
+            
+            IsLocked = ProfileManager.CurrentProfile.CounterGumpLocked;
         }
 
         public override GumpType GumpType => GumpType.CounterBar;
@@ -253,6 +255,19 @@ namespace ClassicUO.Game.UI.Gumps
             return null;
         }
 
+        protected override void OnMouseUp(int x, int y, MouseButtonType button)
+        {
+            base.OnMouseUp(x, y, button);
+
+            if (button == MouseButtonType.Left)
+            {
+                if (Keyboard.Alt && Keyboard.Ctrl)
+                {
+                    IsLocked = ProfileManager.CurrentProfile.CounterGumpLocked = !IsLocked;
+                }
+            }
+        }
+
         public override void Save(XmlTextWriter writer)
         {
             base.Save(writer);
@@ -321,6 +336,7 @@ namespace ClassicUO.Game.UI.Gumps
             }
 
             IsEnabled = IsVisible = ProfileManager.CurrentProfile.CounterBarEnabled;
+            IsLocked = ProfileManager.CurrentProfile.CounterGumpLocked;
         }
 
         public override void Dispose()
@@ -527,6 +543,12 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (button == MouseButtonType.Left)
                 {
+                    if (Keyboard.Alt && Keyboard.Ctrl)
+                        if(Parent is Gump pg)
+                        {
+                            Log.Trace(pg.GetType().ToString());
+                            pg.IsLocked = ProfileManager.CurrentProfile.CounterGumpLocked = !pg.IsLocked;
+                        }                                        
                     if (Client.Game.UO.GameCursor.ItemHold.Enabled)
                     {
                         SetGraphic(
@@ -546,12 +568,6 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         Use();
                         return;
-                    }
-
-                    if (Keyboard.Alt && Keyboard.Ctrl)
-                    {
-                        if(Parent is Gump pg)
-                            pg.IsLocked = !pg.IsLocked;
                     }
                 }
                 else if (button == MouseButtonType.Right && Keyboard.Alt && Graphic != 0)
@@ -716,7 +732,8 @@ namespace ClassicUO.Game.UI.Gumps
                     _label = new Label("", true, 0x35, 0, 1, FontStyle.BlackBorder)
                     {
                         X = 2,
-                        Y = Height - 15
+                        Y = Height - 15,
+                        AcceptMouseInput = false
                     };
 
                     Add(_label);

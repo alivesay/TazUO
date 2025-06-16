@@ -8,11 +8,17 @@ namespace ClassicUO.Game.UI.Gumps
     public class VersionHistory : Gump
     {
         private static string[] updateTexts = {
-            "/c[white][3.30.1]/cd\n" +
+            "/c[white][3.32.0]/cd\n" +
+            "- Added simple progress bar control for Python API gumps.\n" +
+            "- Generate user friendly html crash logs and open them on crash\n",
+            
+            "/c[white][3.31.0]/cd\n" +
             "- Fix for Python API EquipItem\n" +
             "- Fix for legion scripting useability commands\n" +
             "- Added basic scavenger agent(Uses autoloot)\n" +
             "- Nearby item gump and grid container quick loot now use move item queue\n" +
+            "- Combine duplicate system messages\n" +
+            "- Default visual spell indicator setup embedded now\n" +
             "- Various bug fixes\n",
             
             "/c[white][3.30.0]/cd\n" +

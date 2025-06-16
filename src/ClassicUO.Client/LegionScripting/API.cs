@@ -2034,6 +2034,44 @@ namespace ClassicUO.LegionScripting
             
             return TextBox.GetOne(text, font, size, Utility.GetColorFromHex(color), opts);
         }
+
+        /// <summary>
+        /// Create a progress bar. Can be updated as needed with `bar.SetProgress(current, max)`.
+        /// Example:
+        /// ```py
+        /// gump = API.CreateGump()
+        ///     gump.SetRect(100, 100, 400, 200)
+        ///
+        /// pb = API.CreateGumpSimpleProgressBar(400, 200)
+        ///     gump.Add(pb)
+        ///
+        /// API.AddGump(gump)
+        ///
+        ///     cur = 0
+        /// max = 100
+        ///
+        /// while True:
+        /// pb.SetProgress(cur, max)    
+        /// if cur >= max:
+        /// break
+        /// cur += 1
+        /// API.Pause(0.5)
+        /// ```
+        /// </summary>
+        /// <param name="width">The width of the bar</param>
+        /// <param name="height">The height of the bar</param>
+        /// <param name="backgroundColor">The background color(Hex color like #616161)</param>
+        /// <param name="foregroundColor">The foreground color(Hex color like #212121)</param>
+        /// <param name="value">The current value, for example 70</param>
+        /// <param name="max">The max value(or what would be 100%), for example 100</param>
+        /// <returns></returns>
+        public SimpleProgressBar CreateGumpSimpleProgressBar(int width, int height, string backgroundColor="#616161", string foregroundColor = "#212121", int value=100, int max = 100)
+        {
+            SimpleProgressBar bar = new(backgroundColor, foregroundColor, width, height);
+            bar.SetProgress(value, max);
+            return bar;
+        }
+        
         
         /// <summary>
         /// Add an onClick callback to a control.

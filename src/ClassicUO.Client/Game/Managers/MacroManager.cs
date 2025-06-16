@@ -211,58 +211,34 @@ namespace ClassicUO.Game.Managers
                     }
                 }
             );
-
+            
             PushToBack
             (
                 new Macro
                 (
-                    ResGeneral.Radar,
-                    (SDL.SDL_Keycode)114,
-                    true,
+                    "Use last object",
+                    SDL.SDL_Keycode.SDLK_F5,
+                    false,
                     false,
                     false
                 )
                 {
-                    Items = new MacroObject((MacroType)8, (MacroSubType)17)
-                    {
-                        SubMenuType = 1
-                    }
+                    Items = new MacroObject(MacroType.LastObject, MacroSubType.Overview)
                 }
             );
-
+            
             PushToBack
             (
                 new Macro
                 (
-                    ResGeneral.Bow,
-                    (SDL.SDL_Keycode)98,
+                    "Last target",
+                    SDL.SDL_Keycode.SDLK_F6,
                     false,
-                    true,
+                    false,
                     false
                 )
                 {
-                    Items = new MacroObject((MacroType)18, 0)
-                    {
-                        SubMenuType = 0
-                    }
-                }
-            );
-
-            PushToBack
-            (
-                new Macro
-                (
-                    ResGeneral.Salute,
-                    (SDL.SDL_Keycode)115,
-                    false,
-                    true,
-                    false
-                )
-                {
-                    Items = new MacroObject((MacroType)19, 0)
-                    {
-                        SubMenuType = 0
-                    }
+                    Items = new MacroObject(MacroType.LastTarget, MacroSubType.Overview)
                 }
             );
         }

@@ -22,7 +22,7 @@ namespace ClassicUO.Game.Managers
     public partial class SpellVisualRangeJsonContext : JsonSerializerContext
     {
     }
-
+    
     public class SpellVisualRangeManager
     {
         public static SpellVisualRangeManager Instance => instance ??= new SpellVisualRangeManager();
@@ -263,6 +263,7 @@ namespace ClassicUO.Game.Managers
 
                     AfterLoad();
                     loaded = true;
+                    Save();
                 }
                 else
                 {
@@ -283,6 +284,7 @@ namespace ClassicUO.Game.Managers
                         CreateAndLoadDataFile();
                         AfterLoad();
                         loaded = true;
+                        Save();
                     }
 
                 }

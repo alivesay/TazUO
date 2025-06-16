@@ -85,10 +85,10 @@ jobs:
       run: |
         if [ -z "$LAST_COMMIT" ]; then
           echo "No previous release found. Listing 10 latest commits."
-          RELEASE_NOTES=$(git log -10 --pretty=format:"- %s")
+          RELEASE_NOTES=$(git log -10 --pretty=format:%B)
         else
           echo "Generating release notes from commit $LAST_COMMIT to HEAD."
-          RELEASE_NOTES=$(git log ${LAST_COMMIT}..HEAD --pretty=format:"- %s")
+          RELEASE_NOTES=$(git log ${LAST_COMMIT}..HEAD --pretty=format:%B)
         fi
     
         printf "RELEASE_NOTES<<EOF\n%s\nEOF\n" "$RELEASE_NOTES" >> $GITHUB_OUTPUT

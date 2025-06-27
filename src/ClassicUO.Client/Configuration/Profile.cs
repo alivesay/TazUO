@@ -782,7 +782,7 @@ namespace ClassicUO.Configuration
 
                             switch (type)
                             {
-                                case GumpType.NearbyCorpseLoot: gump = new NearbyLootGump(); break;
+                                case GumpType.NearbyCorpseLoot: gump = new NearbyLootGump(world); break;
                                 case GumpType.Buff:
                                     if (ProfileManager.CurrentProfile.UseImprovedBuffBar)
                                         gump = new ImprovedBuffGump(world);

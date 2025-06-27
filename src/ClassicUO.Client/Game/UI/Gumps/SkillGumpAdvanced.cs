@@ -359,7 +359,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                     foreach (var s in skills)
                     {
-                        skillEntries.Add(new SkillListEntry(this, s));
+                        skillEntries.Add(new SkillListEntry(World, this, s));
                     }
                     a.Add
                     (
@@ -440,7 +440,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     _totalReal += skill.Base;
                     _totalValue += skill.Value;
-                    _skillListEntries.Add(new SkillListEntry(this, skill));
+                    _skillListEntries.Add(new SkillListEntry(World, this, skill));
                 }
                 foreach (var entry in _skillListEntries)
                 {
@@ -541,7 +541,7 @@ namespace ClassicUO.Game.UI.Gumps
         private readonly SkillGumpAdvanced _gump;
         private readonly Button _activeUse;
         private readonly Skill _skill;
-        public SkillListEntry(SkillGumpAdvanced gump, Skill skill)
+        public SkillListEntry(World world, SkillGumpAdvanced gump, Skill skill)
         {
             _gump = gump;
             Height = 20;
@@ -554,9 +554,10 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     GetSpellFloatingButton(_skill.Index)?.Dispose();
 
-                    ref readonly var gumpInfo = ref Client.Game.Gumps.GetGump(0x24B8);
+                    ref readonly var gumpInfo = ref Client.Game.UO.Gumps.GetGump(0x24B8);
 
                     SkillButtonGump skillButtonGump = new SkillButtonGump(
+                        world,
                         _skill,
                         Mouse.LClickPosition.X - (gumpInfo.UV.Width >> 1),
                         Mouse.LClickPosition.Y - (gumpInfo.UV.Height >> 1)

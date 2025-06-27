@@ -46,7 +46,7 @@ namespace ClassicUO.Game.Managers
             if (Time.Ticks < nextMove)
                 return;
             
-            if (Client.Game.GameCursor.ItemHold.Enabled)
+            if (Client.Game.UO.GameCursor.ItemHold.Enabled)
                 return;
 
             if (!_queue.TryDequeue(out var request))

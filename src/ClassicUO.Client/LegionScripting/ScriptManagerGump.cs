@@ -502,7 +502,7 @@ while True:
                 ContextMenu.Add(new ContextMenuItemEntry("Autostart", () => { GenAutostartContext().Show(); }));
                 ContextMenu.Add(new ContextMenuItemEntry("Create macro button", () =>
                 {
-                    var mm = MacroManager.TryGetMacroManager();
+                    var mm = MacroManager.TryGetMacroManager(World);
 
                     if (mm != null)
                     {
@@ -510,7 +510,7 @@ while True:
                         mac.Items = new MacroObjectString(MacroType.ClientCommand, MacroSubType.MSC_NONE, "togglelscript " + script.FileName);
                         mm.PushToBack(mac);
                         
-                        MacroButtonGump bg = new(mac, Mouse.Position.X, Mouse.Position.Y);
+                        MacroButtonGump bg = new(World, mac, Mouse.Position.X, Mouse.Position.Y);
                         UIManager.Add(bg);
                     }
                 }));

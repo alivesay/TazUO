@@ -16,7 +16,7 @@ public class SpellQuickSearch : Gump
     
     private Action<SpellDefinition>  onClick;
     
-    public SpellQuickSearch(int x, int y, Action<SpellDefinition> onClick = null) : base(0, 0)
+    public SpellQuickSearch(World world, int x, int y, Action<SpellDefinition> onClick = null) : base(world, 0, 0)
     {
         Width = 200;
         Height = 69;

@@ -10,7 +10,7 @@ public class AssistantGump : BaseOptionsGump
     private ModernOptionsGumpLanguage lang = Language.Instance.GetModernOptionsGumpLanguage;
     private Profile profile;
 
-    public AssistantGump() : base(900, 700, "Assistant Features")
+    public AssistantGump(World world) : base(world, 900, 700, "Assistant Features")
     {
         profile = ProfileManager.CurrentProfile;
 
@@ -65,7 +65,7 @@ public class AssistantGump : BaseOptionsGump
 
         PositionHelper.BlankLine();
 
-        scroll.Add(PositionHelper.PositionControl(new AutoLootConfigs(MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
+        scroll.Add(PositionHelper.PositionControl(new AutoLootConfigs(World, MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
     }
 
     private void BuildAutoSell()
@@ -84,7 +84,7 @@ public class AssistantGump : BaseOptionsGump
         scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel(lang.GetTazUO.AutoSellEnable, 0, profile.SellAgentEnabled, b => profile.SellAgentEnabled = b)));
         PositionHelper.BlankLine();
 
-        scroll.Add(PositionHelper.PositionControl(new SellAgentConfigs(MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
+        scroll.Add(PositionHelper.PositionControl(new SellAgentConfigs(World, MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
     }
 
     private void BuildAutoBuy()
@@ -103,7 +103,7 @@ public class AssistantGump : BaseOptionsGump
         scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel(lang.GetTazUO.AutoBuyEnable, 0, profile.BuyAgentEnabled, b => profile.BuyAgentEnabled = b)));
         PositionHelper.BlankLine();
 
-        scroll.Add(PositionHelper.PositionControl(new BuyAgentConfigs(MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
+        scroll.Add(PositionHelper.PositionControl(new BuyAgentConfigs(World, MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
     }
 
     private void BuildMobileGraphicFilter()
@@ -118,7 +118,7 @@ public class AssistantGump : BaseOptionsGump
         
         scroll.Add(PositionHelper.PositionControl(TextBox.GetOne("This can be used to replace graphics of mobiles with other graphics(For example if dragons are too big, replace them with wyverns).", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(MainContent.RightWidth - 20))));;
         PositionHelper.BlankLine();
-        scroll.Add(PositionHelper.PositionControl(new GraphicFilterConfigs(MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
+        scroll.Add(PositionHelper.PositionControl(new GraphicFilterConfigs(World, MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
     }
 
     private enum PAGE
@@ -136,7 +136,7 @@ public class AssistantGump : BaseOptionsGump
     {
         private DataBox _dataBox;
 
-        public AutoLootConfigs(int width)
+        public AutoLootConfigs(World world, int width)
         {
             AcceptMouseInput = true;
             CanMove = true;
@@ -159,7 +159,7 @@ public class AssistantGump : BaseOptionsGump
             b.MouseUp += (s, e) =>
             {
                 TargetHelper.TargetObject
-                ((o) =>
+                (world, (o) =>
                     {
                         if (o != null)
                         {
@@ -324,7 +324,7 @@ public class AssistantGump : BaseOptionsGump
     {
         private DataBox _dataBox;
 
-        public SellAgentConfigs(int width)
+        public SellAgentConfigs(World world, int width)
         {
             AcceptMouseInput = true;
             CanMove = true;
@@ -346,7 +346,7 @@ public class AssistantGump : BaseOptionsGump
             b.MouseUp += (s, e) =>
             {
                 TargetHelper.TargetObject
-                ((e) =>
+                (world, (e) =>
                     {
                         if (e == null)
                             return;
@@ -529,7 +529,7 @@ public class AssistantGump : BaseOptionsGump
     {
         private DataBox _dataBox;
 
-        public BuyAgentConfigs(int width)
+        public BuyAgentConfigs(World world, int width)
         {
             AcceptMouseInput = true;
             CanMove = true;
@@ -551,7 +551,7 @@ public class AssistantGump : BaseOptionsGump
             b.MouseUp += (s, e) =>
             {
                 TargetHelper.TargetObject
-                ((e) =>
+                (world, (e) =>
                     {
                         if (e == null)
                             return;
@@ -735,7 +735,7 @@ public class AssistantGump : BaseOptionsGump
         {
             private DataBox _dataBox;
 
-            public GraphicFilterConfigs(int width)
+            public GraphicFilterConfigs(World world, int width)
             {
                 AcceptMouseInput = true;
                 CanMove = true;
@@ -762,7 +762,7 @@ public class AssistantGump : BaseOptionsGump
                 b.MouseUp += (s, e) =>
                 {
                     TargetHelper.TargetObject
-                    ((e) =>
+                    (world, (e) =>
                         {
                             if (e == null)
                                 return;

@@ -181,7 +181,7 @@ namespace ClassicUO.Game.UI.Gumps
             moreMenu.MouseUp += (s, e) => { moreMenu.ContextMenu?.Show(); };
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Assistant", () =>
             {
-                UIManager.Add(new AssistantGump());
+                UIManager.Add(new AssistantGump(World));
             }));
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry(Language.Instance.TopBarGump.CommandsEntry, () =>
             {
@@ -235,7 +235,7 @@ namespace ClassicUO.Game.UI.Gumps
             moreMenu.ContextMenu.Add(new ContextMenuItemEntry("Discord", () => { UIManager.Add(new DiscordGump(World)); }));
 
             var submenu = new ContextMenuItemEntry("Tools");
-            submenu.Add(new ContextMenuItemEntry("Spell quick cast", () => { UIManager.Add(new SpellQuickSearch(200, 200, (sp) => {GameActions.CastSpell(sp.ID);})); }));
+            submenu.Add(new ContextMenuItemEntry("Spell quick cast", () => { UIManager.Add(new SpellQuickSearch(World, 200, 200, (sp) => {GameActions.CastSpell(sp.ID);})); }));
             submenu.Add(new ContextMenuItemEntry("Open boat control", () => { UIManager.Add(new BoatControl(World) { X = 200, Y = 200 }); }));
             submenu.Add(new ContextMenuItemEntry("Nearby Loot Gump", () => { UIManager.Add(new NearbyLootGump(World)); }));
             moreMenu.ContextMenu.Add(submenu);

@@ -10,6 +10,7 @@ TazUO includes several helper methods to simplify interaction with gumps and UI 
 - `control.GetY()`  – Returns the control's Y position  
 - `control.SetX(5)` – Sets the control's X position  
 - `control.SetY(5)` – Sets the control's Y position  
+- `control.SetPos(5, 5)` - Sets the controls x,y positions
 - `control.SetWidth(50)` – Sets the control's width  
 - `control.SetHeight(50)` – Sets the control's height  
 - `control.SetRect(0, 0, 50, 50)` - Sets the controls x, y, width, height in that order

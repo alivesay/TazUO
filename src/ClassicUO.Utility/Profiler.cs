@@ -16,6 +16,8 @@ namespace ClassicUO.Utility
         private static readonly ProfileData m_TotalTimeData;
         private static readonly Stopwatch _timer;
         private static long m_BeginFrameTicks;
+        
+        public static List<ProfileData> AllFrameData => m_AllFrameData;
 
         static Profiler()
         {

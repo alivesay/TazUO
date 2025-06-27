@@ -6,14 +6,14 @@ namespace ClassicUO;
 
 public static class HtmlCrashLogGen
 {
-    public static void Generate(string stackTrace)
+    public static void Generate(string stackTrace, string title = "TazUO Crash Report", string description = "Oh no! TazUO crashed.")
     {
         const string TEMPLATE = """
                                 <!DOCTYPE html>
                                 <html lang="en">
                                 <head>
                                   <meta charset="UTF-8" />
-                                  <title>TazUO Crash Report</title>
+                                  <title>[TITLE]</title>
                                   <style>
                                     body {
                                       margin: 0;
@@ -71,9 +71,13 @@ public static class HtmlCrashLogGen
                                   </style>
                                 </head>
                                 <body>
-                                  <h1>TazUO Crash Report</h1>
-                                  <p>Oh no! TazUO crashed. If you'd like support for this please copy and send this to our <a href="https://github.com/bittiez/TazUO/issues">GitHub</a> or <a href="https://discord.gg/QvqzkB95G4">Discord</a>:</p>
-                                  <pre id="stackTrace">[STACK TRACE]</pre>
+                                  <h1>[TITLE]</h1>
+                                  <p>[DESCRIPTION]<br>If you'd like support for this please copy and send this to our <a href="https://github.com/bittiez/TazUO/issues">GitHub</a> or <a href="https://discord.gg/QvqzkB95G4">Discord</a>:</p>
+                                  <pre id="stackTrace">
+                                ```
+                                [STACK TRACE]
+                                ```
+                                  </pre>
                                   <button onclick="copyStack()">Copy to Clipboard</button>
                                 
                                   <script>
@@ -89,6 +93,8 @@ public static class HtmlCrashLogGen
                                 """;
         
         string html = TEMPLATE.Replace("[STACK TRACE]", System.Net.WebUtility.HtmlEncode(stackTrace));
+        html = html.Replace("[TITLE]", title);
+        html = html.Replace("[DESCRIPTION]", description);
 
         try
         {

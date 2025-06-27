@@ -290,6 +290,17 @@ namespace ClassicUO.Game.UI.Controls
         }
 
         /// <summary>
+        /// Use int python API
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void SetPos(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        /// <summary>
         /// Used in python API
         /// </summary>
         /// <returns>int</returns>

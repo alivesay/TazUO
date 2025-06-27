@@ -205,8 +205,9 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 X = 1,
                 Y = area.Height + area.Y - 1,
-                //AcceptMouseInput = true,
+                AcceptMouseInput = true,
                 WantUpdateSize = false,
+                CanMove = true,
                 Width = Width,
                 Height = 20
             };
@@ -452,8 +453,8 @@ namespace ClassicUO.Game.UI.Gumps
             _databox.WantUpdateSize = true;
             _databox.ReArrangeChildren();
 
-            Add(real = new Label(_totalReal.ToString("F1"), true, 1153) { X = 205, Y = Height - 20 });
-            Add(value = new Label(_totalValue.ToString("F1"), true, 1153) { X = 255, Y = Height - 20 });
+            Add(real = new Label(_totalReal.ToString("F1"), true, 1153) { X = 205, Y = Height - 20, AcceptMouseInput = false});
+            Add(value = new Label(_totalValue.ToString("F1"), true, 1153) { X = 255, Y = Height - 20, AcceptMouseInput = false});
         }
 
 
@@ -544,13 +545,35 @@ namespace ClassicUO.Game.UI.Gumps
         {
             _gump = gump;
             Height = 20;
-            Label skillName = new Label(skill.Name, true, 1153, font: 3);
+            Label skillName = new Label(skill.Name, true, 1153, font: 3) {AcceptMouseInput = skill.IsClickable, CanMove = true};
+            if(skill.IsClickable)
+            {
+                skillName.MouseDoubleClick += skillDoubleClick;
+
+                void skillDoubleClick(object sender, MouseDoubleClickEventArgs e)
+                {
+                    GetSpellFloatingButton(_skill.Index)?.Dispose();
+
+                    ref readonly var gumpInfo = ref Client.Game.Gumps.GetGump(0x24B8);
+
+                    SkillButtonGump skillButtonGump = new SkillButtonGump(
+                        _skill,
+                        Mouse.LClickPosition.X - (gumpInfo.UV.Width >> 1),
+                        Mouse.LClickPosition.Y - (gumpInfo.UV.Height >> 1)
+                    );
+
+                    UIManager.Add(skillButtonGump);
+                    UIManager.AttemptDragControl(skillButtonGump, true);
+                }
+            }
+
             Label skillValueBase = new Label(skill.Base.ToString(), true, 1153, font: 3);
             Label skillValue = new Label(skill.Value.ToString(), true, 1153, font: 3);
             Label skillCap = new Label(skill.Cap.ToString(), true, 1153, font: 3);
 
             _skill = skill;
-            CanMove = !_skill.IsClickable;
+            CanMove = true;
+            AcceptMouseInput = true;
 
             if (skill.IsClickable)
             {
@@ -607,30 +630,6 @@ namespace ClassicUO.Game.UI.Gumps
                         break;
                 }
             };
-        }
-
-        protected override void OnDragBegin(int x, int y)
-        {
-            if (_skill.IsClickable && Mouse.LButtonPressed && !SkillGumpAdvanced.Dragging && !Keyboard.Ctrl)
-            {
-                GetSpellFloatingButton(_skill.Index)?.Dispose();
-
-                ref readonly var gumpInfo = ref Client.Game.UO.Gumps.GetGump(0x24B8);
-
-                SkillButtonGump skillButtonGump = new SkillButtonGump(
-                    _gump.World,
-                    _skill,
-                    Mouse.LClickPosition.X + (gumpInfo.UV.Width >> 1),
-                    Mouse.LClickPosition.Y + (gumpInfo.UV.Height >> 1)
-                );
-
-                UIManager.Add(skillButtonGump);
-                UIManager.AttemptDragControl(skillButtonGump, true);
-            }
-            else
-            {
-                base.OnDragBegin(x, y);
-            }
         }
 
         protected override void OnDragEnd(int x, int y)

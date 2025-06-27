@@ -16,9 +16,7 @@ namespace ClassicUO.Game.GameObjects
     public class PlayerMobile : Mobile
     {
         private readonly Dictionary<BuffIconType, BuffIcon> _buffIcons = new Dictionary<BuffIconType, BuffIcon>();
-
-        private static SpellVisualRangeManager.CastTimerProgressBar castTimer;
-
+        
         public PlayerMobile(World world, uint serial) : base(world, serial)
         {
             Skills = new Skill[Client.Game.UO.FileManager.Skills.SkillsCount];
@@ -40,7 +38,8 @@ namespace ClassicUO.Game.GameObjects
                 }
             };
 
-            UIManager.Add(castTimer = new SpellVisualRangeManager.CastTimerProgressBar(world));
+            if(ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.EnableSpellIndicators)
+                UIManager.Add(new SpellVisualRangeManager.CastTimerProgressBar(world));
         }
 
         public Skill[] Skills { get; }

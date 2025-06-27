@@ -51,16 +51,16 @@ internal static class Utility
             if (parentContainer != uint.MaxValue && item.Container != parentContainer)
                 continue;
 
-            if (rootContainer != uint.MaxValue && item.RootContainer != rootContainer)
-                continue;
+                if (rootContainer != uint.MaxValue && item.BackpackOrRootContainer != rootContainer)
+                    continue;
 
-            if (parOrRootContainer != uint.MaxValue && (item.Container != parOrRootContainer && item.RootContainer != parOrRootContainer))
-                continue;
+                if (parOrRootContainer != uint.MaxValue && (item.Container != parOrRootContainer && item.BackpackOrRootContainer != parOrRootContainer))
+                    continue;
 
             if (hue != ushort.MaxValue && item.Hue != hue)
                 continue;
 
-            var root = World.Items.Get(item.RootContainer);
+                var root = World.Items.Get(item.BackpackOrRootContainer);
 
             if (groundRange != int.MaxValue && ((item.Distance > groundRange && root == null) || (root != null && root.Distance > groundRange)))
                 continue;

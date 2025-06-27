@@ -75,7 +75,7 @@ namespace ClassicUO.Game
         public const int MAX_ABILITIES_COUNT = 32;
 
         public const int DRAG_ITEMS_DISTANCE = 3;
-        public const int MIN_GUMP_DRAG_DISTANCE = 0;
+        public const int MIN_GUMP_DRAG_DISTANCE = 5;
         public const int MIN_PICKUP_DRAG_DISTANCE_PIXELS = 5;
 
         public const int MIN_VIEW_RANGE = 5;

@@ -1,6 +1,7 @@
 using System;
 using ClassicUO.Assets;
 using ClassicUO.Utility;
+using ClassicUO.Utility.Logging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDL2;
@@ -45,6 +46,15 @@ namespace ClassicUO.Renderer.Arts
                 if (artInfo.Pixels.IsEmpty)
                 {
                     artInfo = _artLoader.GetArt(idx);
+                }
+                if (artInfo.Pixels.IsEmpty && idx > 0)
+                {
+                    // Trying to load a texture that does not exist in the client MULs
+                    // Degrading gracefully and only crash if not even the fallback ItemID exists
+                    Log.Error(
+                        $"Texture not found for sprite: idx: {idx}; itemid: {(idx > 0x4000 ? idx - 0x4000 : '-')}"
+                    );
+                    return ref Get(0); // ItemID of "UNUSED" placeholder
                 }
                 if (!artInfo.Pixels.IsEmpty)
                 {

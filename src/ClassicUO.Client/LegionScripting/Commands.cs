@@ -15,6 +15,31 @@ namespace ClassicUO.LegionScripting
     {
         private static World _world;
         public static World World { get { if (_world == null) _world = Client.Game.UO.World; return _world; } }
+        
+        public static bool ToggleScript(string command, Argument[] args, bool quiet, bool force)
+        {
+            if (args.Length < 2)
+                throw new RunTimeError(null, "Usage: togglescript 'script'");
+
+            string text = args[0].AsString();
+            if (string.IsNullOrEmpty(text))
+                throw new RunTimeError(null, "Script name can't be empty.");
+
+            foreach (var script in LegionScripting.LoadedScripts)
+            {
+                if (script.FileName == text)
+                {
+                    if (script.IsPlaying)
+                        LegionScripting.StopScript(script);
+                    else
+                        LegionScripting.PlayScript(script);
+
+                    return true;
+                }
+            }
+
+            throw new RunTimeError(null, "Script could not be found.");
+        }
         public static bool AddCoolDown(string command, Argument[] args, bool quiet, bool force)
         {
             if (args.Length < 2)

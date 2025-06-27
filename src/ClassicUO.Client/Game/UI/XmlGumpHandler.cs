@@ -820,15 +820,13 @@ namespace ClassicUO.Game.UI
         /// The frequency of UI updates for Xml Gumps for text/progress bar changes. This affects all xml gumps, it is not set individually.
         /// </summary>
         public static uint UpdateFrequency { get; set; } = 250;
-
         public List<Tuple<TextBox, Tuple<string, int>>> TextBoxUpdates { get; set; } = new List<Tuple<TextBox, Tuple<string, int>>>();
         public List<XmlProgressBarInfo> ProgressBarUpdates { get; set; } = new List<XmlProgressBarInfo>();
         public List<XmlProgressBarInfo> VerticalProgressBarUpdates { get; set; } = new List<XmlProgressBarInfo>();
-        public bool SavePosition { get; set; } = false;
+        public bool SavePosition { get; set; }
         public string FilePath { get; set; }
 
         private uint nextUpdate = 0;
-
         private bool savingFile = false;
         private uint saveFileAfter = uint.MaxValue;
 
@@ -915,8 +913,14 @@ namespace ClassicUO.Game.UI
 
             if (SavePosition)
             {
-                saveFileAfter = Time.Ticks + 10000;
+                saveFileAfter = Time.Ticks + 5000;
             }
+        }
+
+        protected override void OnLockedChanged()
+        {
+            base.OnLockedChanged();
+            saveFileAfter = Time.Ticks + 5000;
         }
 
         private void SaveFile()
@@ -937,6 +941,7 @@ namespace ClassicUO.Game.UI
                             XmlElement root = xmlDoc.DocumentElement;
                             root.SetAttribute("x", X.ToString());
                             root.SetAttribute("y", Y.ToString());
+                            root.SetAttribute("locked", IsLocked.ToString());
 
                             xmlDoc.Save(FilePath);
                         }

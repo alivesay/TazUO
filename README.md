@@ -1,7 +1,4 @@
-<p align="center"><a href="https://github.com/bittiez/TazUO/discussions">Join our discussions page</a></p>
-
-<p align="center"><a href="https://discord.gg/QvqzkB95G4">Join our Discord</a></p>
-
+<p align="center"><a href="https://discord.gg/QvqzkB95G4"><img src="https://discord.com/api/guilds/1344851225538986064/widget.png?style=banner3" alt="Discord Banner 3"/></a></p>
 
 ***
 

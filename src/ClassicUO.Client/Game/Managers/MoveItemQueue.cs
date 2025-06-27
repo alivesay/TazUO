@@ -8,6 +8,8 @@ namespace ClassicUO.Game.Managers
 {
     public class MoveItemQueue
     {
+        public static MoveItemQueue Instance { get; private set; }
+        
         private static long delay = 1000;
         private readonly ConcurrentQueue<MoveRequest> _queue = new();
         private long nextMove;
@@ -17,6 +19,7 @@ namespace ClassicUO.Game.Managers
         {
             this.world = world;
             delay = ProfileManager.CurrentProfile.MoveMultiObjectDelay;
+            Instance = this;
         }
 
         public void Enqueue(uint serial, uint destination, ushort amt = 0, int x = 0xFFFF, int y = 0xFFFF, int z = 0)
@@ -33,10 +36,7 @@ namespace ClassicUO.Game.Managers
                 return;
             }
 
-            uint bag = backpack;
-                
-            if(ProfileManager.CurrentProfile.GrabBagSerial != 0)
-                bag = ProfileManager.CurrentProfile.GrabBagSerial;
+            uint bag = ProfileManager.CurrentProfile.GrabBagSerial == 0 ? backpack.Serial : ProfileManager.CurrentProfile.GrabBagSerial;
                 
             Enqueue(item.Serial, bag, 0, 0xFFFF, 0xFFFF);
         }
@@ -44,6 +44,9 @@ namespace ClassicUO.Game.Managers
         public void ProcessQueue()
         {
             if (Time.Ticks < nextMove)
+                return;
+            
+            if (Client.Game.GameCursor.ItemHold.Enabled)
                 return;
 
             if (!_queue.TryDequeue(out var request))

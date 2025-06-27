@@ -52,6 +52,8 @@ namespace ClassicUO.Game.UI.Gumps
             AcceptMouseInput = true;
             CanCloseWithRightClick = true;
 
+            LayerOrder = UILayer.Under;
+
             Entity entity = World.Get(serial);
 
             if (entity == null)

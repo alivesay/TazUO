@@ -500,6 +500,20 @@ while True:
                 ContextMenu.Add(new ContextMenuItemEntry("Edit", () => { UIManager.Add(new ScriptEditor(World, Script)); }));
                 ContextMenu.Add(new ContextMenuItemEntry("Edit Externally", () => { OpenFileWithDefaultApp(Script.FullPath); }));
                 ContextMenu.Add(new ContextMenuItemEntry("Autostart", () => { GenAutostartContext().Show(); }));
+                ContextMenu.Add(new ContextMenuItemEntry("Create macro button", () =>
+                {
+                    var mm = MacroManager.TryGetMacroManager();
+
+                    if (mm != null)
+                    {
+                        Macro mac = new (script.FileName);
+                        mac.Items = new MacroObjectString(MacroType.ClientCommand, MacroSubType.MSC_NONE, "togglelscript " + script.FileName);
+                        mm.PushToBack(mac);
+                        
+                        MacroButtonGump bg = new(mac, Mouse.Position.X, Mouse.Position.Y);
+                        UIManager.Add(bg);
+                    }
+                }));
                 ContextMenu.Add(new ContextMenuItemEntry("Delete", () =>
                 {
                     QuestionGump g = new QuestionGump(World, "Are you sure?", (r) =>

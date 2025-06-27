@@ -271,13 +271,15 @@ public class BaseOptionsGump : Gump
             X -= ThemeSettings.INDENT_SPACE;
         }
 
-        public static void PositionControl(Control c)
+        public static Control PositionControl(Control c)
         {
             c.X = X;
             c.Y = Y;
 
             LAST_Y = Y;
             Y += c.Height + ThemeSettings.TOP_PADDING;
+
+            return c;
         }
 
         public static void PositionExact(Control c, int x, int y)
@@ -494,6 +496,9 @@ public class BaseOptionsGump : Gump
             }
         }
 
+        /// <summary>
+        /// Resets x and y positions of the right side content. Use this for each new page.
+        /// </summary>
         public void ResetRightSide()
         {
             rightY = ThemeSettings.TOP_PADDING;

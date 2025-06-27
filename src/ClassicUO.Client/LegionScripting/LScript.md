@@ -5,6 +5,11 @@
 
 # Commands
 
+## `togglescript`  
+Toggle another script playing  
+Example:  
+`togglescript 'myscript.lscript'` or `togglescript myscript.py`
+
 ## `msg`
 
 `msg` *text*  

@@ -45,6 +45,7 @@ namespace ClassicUO.Game.UI
         private static int selectedIndex;
         private static Point lastLocation;
         private World world;
+        private long nextClean = 0;
 
         public NearbyLootGump(World world) : base(world, 0, 0)
         {
@@ -118,6 +119,8 @@ namespace ClassicUO.Game.UI
             EventSink.OPLOnReceive += EventSink_OPLOnReceive;
             RequestUpdateContents();
         }
+
+        public override GumpType GumpType => GumpType.NearbyCorpseLoot;
 
         private void EventSink_OPLOnReceive(object sender, OPLEventArgs e)
         {
@@ -194,6 +197,8 @@ namespace ClassicUO.Game.UI
 
             dataBox.ReArrangeChildren(1);
             dataBox.ForceSizeUpdate(false);
+            scrollArea.SlowUpdate(); //Recalculate scrollbar
+            scrollArea.KeepScrollPositionInBounds();
 
             if (SelectedIndex >= itemCount)
                 SelectedIndex = itemCount - 1;
@@ -205,6 +210,8 @@ namespace ClassicUO.Game.UI
 
             if (corpse.Items != null)
             {
+                corpse.Hue = 53;
+                
                 if (_corpsesRequested.Contains(corpse))
                     _corpsesRequested.Remove(corpse);
 
@@ -227,7 +234,7 @@ namespace ClassicUO.Game.UI
         }
         private void TryRequestOpenCorpse(Item corpse)
         {
-            if (_corpsesRequested.Contains(corpse))
+            if (_openedCorpses.Contains(corpse))
                 return;
             if (corpse.Distance > ProfileManager.CurrentProfile.AutoOpenCorpseRange)
                 return;
@@ -342,6 +349,13 @@ namespace ClassicUO.Game.UI
                 alphaBG.Height = Height;
                 resizeDrag.Y = Height - 10;
                 scrollArea.SlowUpdate();//Recalculate scrollbar
+            }
+
+            if (Time.Ticks > nextClean)
+            {
+                _openedCorpses.Clear();
+                _corpsesRequested.Clear();
+                nextClean = Time.Ticks + 60000;
             }
         }
         protected override void UpdateContents()

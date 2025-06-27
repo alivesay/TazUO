@@ -21,13 +21,13 @@ namespace ClassicUO.Game.Managers
 
     public class AutoLootManager
     {
-        public static AutoLootManager Instance { get; private set; } = new AutoLootManager();
+        public static AutoLootManager Instance { get; private set; } = new ();
         public bool IsLoaded { get { return loaded; } }
         public List<AutoLootConfigEntry> AutoLootList { get => autoLootItems; set => autoLootItems = value; }
 
-        private HashSet<uint> quickContainsLookup = new HashSet<uint>();
-        private static Queue<uint> lootItems = new Queue<uint>();
-        private List<AutoLootConfigEntry> autoLootItems = new List<AutoLootConfigEntry>();
+        private HashSet<uint> quickContainsLookup = new ();
+        private static Queue<uint> lootItems = new ();
+        private List<AutoLootConfigEntry> autoLootItems = new ();
         private bool loaded = false;
         private readonly string savePath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Profiles", "AutoLoot.json");
         private long nextLootTime = Time.Ticks;
@@ -43,27 +43,42 @@ namespace ClassicUO.Game.Managers
         }
 
 
-        public bool IsBeingLooted(uint serial)
-        {
-            return quickContainsLookup.Contains(serial);
-        }
+        public bool IsBeingLooted(uint serial) => quickContainsLookup.Contains(serial);
 
         public void LootItem(uint serial)
         {
-            LootItem(World.Items.Get(serial));
+            var item = World.Items.Get(serial);
+            if (item != null)
+            {
+                LootItem(item);
+            }
         }
-        public void LootItem(Item i)
-        {
-            if (i == null || quickContainsLookup.Contains(i.Serial)) return;
 
-            lootItems.Enqueue(i);
-            quickContainsLookup.Add(i.Serial);
+        public void LootItem(Item item)
+        {
+            if (item == null || !quickContainsLookup.Add(item.Serial)) return;
+
+            lootItems.Enqueue(item);
             currentLootTotalCount++;
+        }
+
+        public void ForceLootContainer(uint serial)
+        {
+            Item cont = World.Items.Get(serial);
+            
+            if (cont == null) return;
+            
+            if (cont.Distance <= ProfileManager.CurrentProfile.AutoOpenCorpseRange && (!cont.IsHumanCorpse || ProfileManager.CurrentProfile.AutoLootHumanCorpses))
+            {
+                for (LinkedObject i = cont.Items; i != null; i = i.Next)
+                {
+                    CheckAndLoot((Item)i);
+                }
+            }
         }
 
         /// <summary>
         /// Check an item against the loot list, if it needs to be auto looted it will be.
-        /// I reccomend running this method in a seperate thread if it's a lot of items.
         /// </summary>
         private void CheckAndLoot(Item i)
         {
@@ -93,6 +108,7 @@ namespace ClassicUO.Game.Managers
             }
             return false;
         }
+        
         /// <summary>
         /// Add an entry for auto looting to match against when opening corpses.
         /// </summary>
@@ -150,7 +166,29 @@ namespace ClassicUO.Game.Managers
                 autoLootItems.RemoveAt(removeAt);
             }
         }
+       
+        /// <summary>
+        /// Checks if item is a corpse, or if its root container is corpse and handles them appropriately.
+        /// </summary>
+        /// <param name="i"></param>
+        private void CheckCorpse(Item i)
+        {
+            if (i == null) return;
 
+            if (i.IsCorpse)
+            {
+                HandleCorpse(i);
+                return;
+            }
+
+            var root = World.Items.Get(i.RootContainer);
+            if (root != null && root.IsCorpse)
+            {
+                HandleCorpse(root);
+                return;
+            }
+        }
+        
         public void OnSceneLoad()
         {
             Load();
@@ -170,56 +208,41 @@ namespace ClassicUO.Game.Managers
             EventSink.OnPositionChanged -= OnPositionChanged;
             Save();
         }
-
-        private void CheckItem(Item i)
-        {
-            if (i == null) return;
-
-            if (i.IsCorpse)
-            {
-                HandleCorpse(i);
-                return;
-            }
-
-            var root = World.Items.Get(i.RootContainer);
-            if (root != null && root.IsCorpse)
-            {
-                HandleCorpse(root);
-                return;
-            }
-        }
-        
+ 
         private void OnPositionChanged(object sender, PositionChangedArgs e)
         {
-            if (!loaded || !IsEnabled) return;
+            if (!loaded) return;
 
-            foreach (Item item in World.Items.Values)
-            {
-                if (item == null || !item.OnGround || item.IsCorpse) continue;
-                if (item.Distance >= 3) continue;
-                CheckAndLoot(item);
-            }
+            if(ProfileManager.CurrentProfile.EnableScavenger)
+                foreach (Item item in World.Items.Values)
+                {
+                    if (item == null || !item.OnGround || item.IsCorpse) continue;
+                    if (item.Distance >= 3) continue;
+                    CheckAndLoot(item);
+                }
         }
 
         private void OnOpenContainer(object sender, uint e)
         {
             if (!loaded || !IsEnabled) return;
 
-            HandleCorpse((Item)sender);
+            CheckCorpse((Item)sender);
         }
+        
         private void OnItemCreatedOrUpdated(object sender, EventArgs e)
         {
             if (!loaded || !IsEnabled) return;
             
             if (sender is Item i)
-                CheckItem(i);
+                CheckCorpse(i);
         }
+        
         private void OnOPLReceived(object sender, OPLEventArgs e)
         {
             if (!loaded || !IsEnabled) return;
             var item = World.Items.Get(e.Serial);
             if (item != null)
-                CheckItem(item);
+                CheckCorpse(item);
         }
 
         public void Update()
@@ -234,6 +257,8 @@ namespace ClassicUO.Game.Managers
 
             if (nextLootTime > Time.Ticks) return;
 
+            if (Client.Game.GameCursor.ItemHold.Enabled)
+                return; //Prevent moving stuff while holding an item.
 
             var moveItem = lootItems.Dequeue();
             if (moveItem != 0)
@@ -260,7 +285,10 @@ namespace ClassicUO.Game.Managers
                         if (rc != null && rc.Distance > ProfileManager.CurrentProfile.AutoOpenCorpseRange)
                             return;
                     }
-                    GameActions.GrabItem(World, m, m.Amount);
+                    
+                    MoveItemQueue.Instance?.EnqueueQuick(m);
+                    
+                    //GameActions.GrabItem(m, m.Amount);
                     nextLootTime = Time.Ticks + ProfileManager.CurrentProfile.MoveMultiObjectDelay;
                 }
             }
@@ -375,7 +403,7 @@ namespace ClassicUO.Game.Managers
 
             public bool Equals(AutoLootConfigEntry other)
             {
-                return other.Graphic == Graphic && other.Hue == Hue;
+                return other.Graphic == Graphic && other.Hue == Hue && RegexSearch == other.RegexSearch;
             }
         }
     }

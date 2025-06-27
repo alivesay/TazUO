@@ -91,6 +91,8 @@ namespace ClassicUO.Game.UI.Controls
             }
         }
 
+        public bool AlwaysShowBackground;
+        
         internal static NiceButton GetSelected(Control p, int group)
         {
             IEnumerable<NiceButton> list = p.FindControls<NiceButton>();
@@ -123,11 +125,21 @@ namespace ClassicUO.Game.UI.Controls
             }
         }
 
+        public void SetBackgroundHue(ushort hue)
+        {
+            Hue = hue;
+        }
+
+        public void SetText(string text)
+        {
+            TextLabel.Text = text;
+        }
+
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)
         {
-            if (IsSelected)
+            if (IsSelected || AlwaysShowBackground)
             {
-                Vector3 hueVector = ShaderHueTranslator.GetHueVector(0, false, Alpha);
+                Vector3 hueVector = ShaderHueTranslator.GetHueVector(Hue, false, Alpha);
 
                 batcher.Draw
                 (

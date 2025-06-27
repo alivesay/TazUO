@@ -160,6 +160,28 @@ namespace ClassicUO.Game.GameObjects
             }
         }
 
+        public uint BackpackOrRootContainer
+        {
+            get
+            {
+                Item last;
+                Item item = last = this;
+
+                while (SerialHelper.IsItem(item.Container))
+                {
+                    last = item;
+                    item = World.Items.Get(item.Container);
+
+                    if (item == null)
+                    {
+                        return 0;
+                    }
+                }
+
+                return last;
+            }
+        }
+
         public ref StaticTiles ItemData =>
             ref Client.Game.UO.FileManager.TileData.StaticData[IsMulti ? MultiGraphic : Graphic];
 

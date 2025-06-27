@@ -109,33 +109,12 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (Profiler.Enabled)
                     {
-                        double timeDraw = Profiler.GetContext("RenderFrame").TimeInContext;
-
-                        double timeUpdate = Profiler.GetContext("Update").TimeInContext;
-
-                        double timeFixedUpdate = Profiler.GetContext("FixedUpdate").TimeInContext;
-
-                        double timeOutOfContext = Profiler.GetContext("OutOfContext").TimeInContext;
-
-                        //double timeTotalCheck = timeOutOfContext + timeDraw + timeUpdate;
                         double timeTotal = Profiler.TrackedTime;
-
-                        double avgDrawMs = Profiler.GetContext("RenderFrame").AverageTime;
-
-                        sb.Append("- Profiling\n");
-
-                        sb.Append
-                        (
-                            string.Format
-                            (
-                                "    Draw:{0:0.0}% Update:{1:0.0}% FixedUpd:{2:0.0} AvgDraw:{3:0.0}ms {4}\n",
-                                100d * (timeDraw / timeTotal),
-                                100d * (timeUpdate / timeTotal),
-                                100d * (timeFixedUpdate / timeTotal),
-                                avgDrawMs,
-                                CUOEnviroment.CurrentRefreshRate
-                            )
-                        );
+                        
+                        foreach (var pd in Profiler.AllFrameData)
+                        {
+                            sb.Append($"\n[{pd.Context[pd.Context.Length - 1]}] [Last: {pd.LastTime:0.0}ms] [Total %: {100d * (pd.TimeInContext / timeTotal):0.00}]");
+                        }
                     }
                 }
                 else

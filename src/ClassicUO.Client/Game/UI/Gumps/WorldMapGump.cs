@@ -1929,13 +1929,22 @@ public class WorldMapGump : ResizableGump
             return;
         }
 
-        var markerCsv = $"{x},{y},{map},{markerName}, ,{color},{3}";
-        using (var fileStream = File.Open(UserMarkersFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write))
-        using (var streamWriter = new StreamWriter(fileStream))
-        {
-            streamWriter.BaseStream.Seek(0, SeekOrigin.End);
-            streamWriter.WriteLine(markerCsv);
-        }
+            try
+            {
+                var markerCsv = $"{x},{y},{map},{markerName}, ,{color},4";
+
+                using (var fileStream = File.Open(UserMarkersFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write))
+                using (var streamWriter = new StreamWriter(fileStream))
+                {
+                    streamWriter.BaseStream.Seek(0, SeekOrigin.End);
+                    streamWriter.WriteLine(markerCsv);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Error saving user marker: {e}");
+                GameActions.Print(_world, "Failed to save user markers", 32);
+            }
 
         var mapMarker = new WMapMarker
         {
@@ -1956,8 +1965,49 @@ public class WorldMapGump : ResizableGump
 
         var mapMarkerFile = _markerFiles.FirstOrDefault(x => x.FullPath == UserMarkersFilePath);
 
-        mapMarkerFile?.Markers.Add(mapMarker);
-    }
+            mapMarkerFile?.Markers.Add(mapMarker);
+        }
+
+        public void RemoveUserMarker(string markerName)
+        {
+            if (!World.InGame)
+            {
+                return;
+            }
+            
+            var mapMarkerFile = _markerFiles.FirstOrDefault(x => x.FullPath == UserMarkersFilePath);
+
+            if (mapMarkerFile == null)
+                return;
+            
+            var markersToRemove = mapMarkerFile.Markers.Where(m => m.Name.Equals(markerName, StringComparison.Ordinal)).ToList();
+                             
+             if (markersToRemove.Count == 0)
+                 return;
+             
+             foreach (var marker in markersToRemove)
+             {
+                 mapMarkerFile.Markers.Remove(marker);
+             }
+
+             try
+             {
+                 using (StreamWriter writer = new StreamWriter(UserMarkersFilePath, false))
+                 {
+                     foreach (var m in mapMarkerFile.Markers)
+                     {
+                         var newLine = $"{m.X},{m.Y},{m.MapId},{m.Name},{m.MarkerIconName},{m.ColorName},4";
+
+                         writer.WriteLine(newLine);
+                     }
+                 }
+             }
+             catch (Exception e)
+             {
+                 Log.Error($"Error saving user marker: {e}");
+                 GameActions.Print(_world, "Failed to save user markers", 32);
+             }
+        }
 
     /// <summary>
     /// Reload User Markers File after Changes
@@ -2700,7 +2750,7 @@ public class WorldMapGump : ResizableGump
             return false;
         }
 
-        Vector3 hueVector = ShaderHueTranslator.GetHueVector(0);
+            Vector3 hueVector = ShaderHueTranslator.GetHueVector(0, false, 1f);
 
         int sx = marker.X - _center.X;
         int sy = marker.Y - _center.Y;

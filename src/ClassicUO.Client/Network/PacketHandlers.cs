@@ -20,7 +20,6 @@ using ClassicUO.Utility.Platforms;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -5513,7 +5512,10 @@ sealed class PacketHandlers
         uint clen = p.ReadUInt32BE() - 4;
         int dlen = (int)p.ReadUInt32BE();
         if (dlen < 1)
-            dlen = 1;
+        {
+            Log.Error("[Initial]A bad compressed gump packet was received. Unable to process.");
+            return;
+        }
         byte[] decData = System.Buffers.ArrayPool<byte>.Shared.Rent(dlen);
         string layout;
 
@@ -5539,6 +5541,14 @@ sealed class PacketHandlers
             {
                 clen = p.ReadUInt32BE() - 4;
                 dlen = (int)p.ReadUInt32BE();
+
+                if (dlen < 1)
+                {
+                    Log.Error("A bad compressed gump packet was received. Unable to process.");
+
+                    return;
+                }
+
                 decData = System.Buffers.ArrayPool<byte>.Shared.Rent(dlen);
 
                 try
@@ -5599,13 +5609,17 @@ sealed class PacketHandlers
                 }
             }
 
-            CreateGump(world, sender, gumpID, (int)x, (int)y, layout, lines);
+                CreateGump(world, sender, gumpID, (int)x, (int)y, layout, lines);
+            }
+            catch (Exception e)
+            {
+                HtmlCrashLogGen.Generate($"DLEN: {dlen}\nSENDER: {sender}\nGUMPID: {gumpID}\n" + e.ToString(), description:"TazUO almost crashed, it was prevented but this was put in place for debugging, please post this on our discord.");
+            }
+            finally
+            {
+                //System.Buffers.ArrayPool<string>.Shared.Return(lines);
+            }
         }
-        finally
-        {
-            //System.Buffers.ArrayPool<string>.Shared.Return(lines);
-        }
-    }
 
     private static void UpdateMobileStatus(World world, ref StackDataReader p)
     {
@@ -6248,7 +6262,8 @@ sealed class PacketHandlers
             Log.Warn("AddItemToContainer function adds mobile as Item");
         }
 
-        if (item != null && (container.Graphic != 0x2006 || item.Layer == Layer.Invalid))
+            //Added item.Container != containerSerial to prevent closing containers when changing facets
+        if (item != null && item.Container != containerSerial && (container.Graphic != 0x2006 || item.Layer == Layer.Invalid))
         {
             world.RemoveItem(item, true);
         }
@@ -6262,8 +6277,14 @@ sealed class PacketHandlers
         item.Y = y;
         item.Z = 0;
 
-        world.RemoveItemFromContainer(item);
-        item.Container = containerSerial;
+        //Added item.Container != containerSerial to prevent closing containers when changing facets
+        //Shouldn't need to remove it just to add it back in
+        if (item.Container != containerSerial)
+        {
+            world.RemoveItemFromContainer(item);
+            item.Container = containerSerial;
+        }
+            
         container.PushToBack(item);
 
         if (SerialHelper.IsMobile(containerSerial))
@@ -6773,7 +6794,7 @@ sealed class PacketHandlers
             };
         }
             
-            gump.PacketGumpText += string.Join("\n", lines);
+            gump.PacketGumpText = string.Join("\n", lines);
 
         int group = 0;
         int page = 0;
@@ -6832,6 +6853,7 @@ sealed class PacketHandlers
                 gump.Add(new CroppedText(gparams, lines), page);
             }
             else if (
+                string.Equals(entry, "tilepicasgumppic", StringComparison.InvariantCultureIgnoreCase) ||
                 string.Equals(entry, "gumppic", StringComparison.InvariantCultureIgnoreCase)
             )
             {
@@ -7265,9 +7287,10 @@ sealed class PacketHandlers
             {
                 gump.MasterGumpSerial = gparams.Count > 0 ? SerialHelper.Parse(gparams[1]) : 0;
             }
-            else if (
-                string.Equals(entry, "picinpic", StringComparison.InvariantCultureIgnoreCase)
-            )
+            else if (string.Equals(entry, "picinpichued", StringComparison.InvariantCultureIgnoreCase) ||
+                     string.Equals(entry, "picinpicphued", StringComparison.InvariantCultureIgnoreCase) ||
+                     string.Equals(entry, "picinpic", StringComparison.InvariantCultureIgnoreCase)
+                    )
             {
                 if (gparams.Count > 7)
                 {

@@ -94,6 +94,19 @@ namespace ClassicUO.Game.UI.Controls
                 _scrollBar.X = Width - 19;
         }
 
+        public void KeepScrollPositionInBounds()
+        {
+            if(_scrollBar.Value < _scrollBar.MinValue)
+                _scrollBar.Value = _scrollBar.MinValue;
+            else if(_scrollBar.Value > _scrollBar.MaxValue)
+                _scrollBar.Value = _scrollBar.MaxValue;
+        }
+
+        public void ResetScrollbarPosition()
+        {
+            _scrollBar?.ResetScrollPosition();
+        }
+
         public int ScrollBarWidth()
         {
             if (_scrollBar == null)

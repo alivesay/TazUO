@@ -8,9 +8,23 @@ namespace ClassicUO.Game.UI.Gumps
     public class VersionHistory : Gump
     {
         private static string[] updateTexts = {
+            "/c[white][3.33.0]/cd\n" +
+            "- Prevent autoloot, move item queue from moving items while you are holding something.\n" +
+            "- Change multi item move to use shared move item queue\n" +
+            "- Prevent closing containers when changing facets\n" +
+            "- Added Create macro button for legion scripts\n" +
+            "- Potential Crash fix from CUO\n",
+            
             "/c[white][3.32.0]/cd\n" +
             "- Added simple progress bar control for Python API gumps.\n" +
-            "- Generate user friendly html crash logs and open them on crash\n",
+            "- Generate user friendly html crash logs and open them on crash\n" +
+            "- Some fixes for nearby corpse loot gump\n" +
+            "- Very slightly increased minimum distance to start dragging a gump. Hopefully it should prevent accidental drags instead of clicks\n" +
+            "- Nearby loot gump now stays open after relogging\n" +
+            "- Moved some assistant-like options to their own menu.\n" +
+            "- XML Gumps save locked status now(Ctrl + Alt + Click to lock)\n" +
+            "- Python API created gumps will automatically close when the script stops, unless marked keep open." +
+            "- Various bug fixes\n",
             
             "/c[white][3.31.0]/cd\n" +
             "- Fix for Python API EquipItem\n" +
@@ -248,11 +262,6 @@ namespace ClassicUO.Game.UI.Gumps
                 "- The 'Items Only' option for nameplates will no longer include corpses\n" +
                 "- Bug fix for object highlighting\n" +
                 "- Bug fix for <BR> tag in tooltips",
-
-            "/c[white][3.8.0]/cd\n" +
-                "- Added sound override feature\n" +
-                "- Added -radius command, see wiki for more details\n" +
-                "- Added an optional skill progress bar when a skill changes\n",
 
             "\n\n/c[white]For further history please visit our discord."
         };

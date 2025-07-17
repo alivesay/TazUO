@@ -76,7 +76,8 @@ namespace ClassicUO.Game.UI.Gumps
                 X = CHAT_X_OFFSET,
                 Y = Height - CHAT_HEIGHT,
                 Width = Width - CHAT_X_OFFSET,
-                Height = CHAT_HEIGHT
+                Height = CHAT_HEIGHT,
+                LoseFocusOnEscapeKey = false
             };
 
             float gradientTransparency = ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.HideChatGradient ? 0.0f : 0.5f;
@@ -877,7 +878,7 @@ namespace ClassicUO.Game.UI.Gumps
             private TextBox textBox;
             private static TextBox.RTLOptions TextBoxOptions = new() { Width = 320, StrokeEffect = true };
             private string text;
-            private int count = 0;
+            private int count = 1;
             public ChatLineTime(string text, byte font, bool isunicode, ushort hue)
             {
                 this.text = text;

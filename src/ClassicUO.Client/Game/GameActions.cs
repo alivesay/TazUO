@@ -13,7 +13,8 @@ using ClassicUO.Network;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
-using static ClassicUO.Network.NetClient;
+using System;
+using static ClassicUO.Network.AsyncNetClient;
 
 namespace ClassicUO.Game;
 
@@ -370,7 +371,7 @@ internal static class GameActions
         Item bandage = world.Player.FindBandage();
         if (bandage != null)
         {
-            NetClient.Socket.Send_TargetSelectedObject(bandage.Serial, world.Player.Serial);
+            Socket.Send_TargetSelectedObject(bandage.Serial, world.Player.Serial);
             return true;
         }
         return false;
@@ -986,19 +987,20 @@ internal static class GameActions
         Socket.Send_RenameRequest(serial, name);
     }
 
-    internal static void Logout(World world)
-    {
-        if ((world.ClientFeatures.Flags & CharacterListFlags.CLF_OWERWRITE_CONFIGURATION_BUTTON) != 0)
+        public static void Logout(World world)
         {
-            Client.Game.GetScene<GameScene>().DisconnectionRequested = true;
-            Socket.Send_LogoutNotification();
+            if ((world.ClientFeatures.Flags & CharacterListFlags.CLF_OWERWRITE_CONFIGURATION_BUTTON) != 0)
+            {
+                Client.Game.GetScene<GameScene>().DisconnectionRequested = true;
+                Socket.Send_LogoutNotification();
+            }
+            else
+            {
+                Client.Game.GetScene<GameScene>().DisconnectionRequested = true;
+                Socket.Disconnect().Wait();
+                Client.Game.SetScene(new LoginScene(world));
+            }
         }
-        else
-        {
-            Socket.Disconnect();
-            Client.Game.SetScene(new LoginScene(world));
-        }
-    }
 
     internal static void UseSkill(int index)
     {

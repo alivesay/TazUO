@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using static SDL2.SDL;
@@ -83,6 +84,7 @@ namespace ClassicUO
 
         protected override void Initialize()
         {
+            AsyncNetClient.MessageReceived += SocketOnMessageReceived;
             if (GraphicManager.GraphicsDevice.Adapter.IsProfileSupported(GraphicsProfile.HiDef))
             {
                 GraphicManager.GraphicsProfile = GraphicsProfile.HiDef;
@@ -97,6 +99,12 @@ namespace ClassicUO
             SDL_SetEventFilter(_filter, IntPtr.Zero);
 
             base.Initialize();
+        }
+
+        private void SocketOnMessageReceived(object sender, byte[] e)
+        {
+            var c = PacketHandlers.Handler.ParsePackets(Client.Game.UO.World, e);
+            AsyncNetClient.Socket.Statistics.TotalPacketsReceived += (uint)c;
         }
 
         protected override void LoadContent()
@@ -119,10 +127,10 @@ namespace ClassicUO
 
             PNGLoader.Instance.GraphicsDevice = GraphicsDevice;
             System.Threading.Tasks.Task loadResourceAssets = PNGLoader.Instance.LoadResourceAssets(Client.Game.UO.Gumps.GetGumpsLoader);
-
+            
             Audio.Initialize();
             // TODO: temporary fix to avoid crash when laoding plugins
-            Settings.GlobalSettings.Encryption = (byte)NetClient.Socket.Load(UO.FileManager.Version, (EncryptionType)Settings.GlobalSettings.Encryption);
+            Settings.GlobalSettings.Encryption = (byte)NetClient.Load(UO.FileManager.Version, (EncryptionType)Settings.GlobalSettings.Encryption);
 
             Log.Trace("Loading plugins...");
             PluginHost?.Initialize();
@@ -361,21 +369,17 @@ namespace ClassicUO
             Profiler.ExitContext("Mouse");
             
             Profiler.EnterContext("Packets");
-            var data = NetClient.Socket.CollectAvailableData();
-            var packetsCount = PacketHandlers.Handler.ParsePackets(NetClient.Socket, UO.World, data);
-
-            NetClient.Socket.Statistics.TotalPacketsReceived += (uint)packetsCount;
-            NetClient.Socket.Flush();
+            // var data = NetClient.Socket.CollectAvailableData();
+            // var packetsCount = PacketHandlers.Handler.ParsePackets(data);
+            // NetClient.Socket.Statistics.TotalPacketsReceived += (uint)packetsCount;
+            // NetClient.Socket.Flush();
+            AsyncNetClient.Socket.ProcessIncomingMessages();
             Profiler.ExitContext("Packets");
 
             Plugin.Tick();
 
             if (Scene != null && Scene.IsLoaded && !Scene.IsDestroyed)
             {
-                if (EventSink.GameUpdate != null)
-                {
-                    EventSink.GameUpdate();
-                }
                 Profiler.EnterContext("Update");
                 Scene.Update();
                 Profiler.ExitContext("Update");

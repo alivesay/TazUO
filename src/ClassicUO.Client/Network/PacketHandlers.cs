@@ -56,14 +56,14 @@ sealed class PacketHandlers
     private readonly CircularBuffer _buffer = new CircularBuffer();
     private readonly CircularBuffer _pluginsBuffer = new CircularBuffer();
 
-    public int ParsePackets(NetClient socket, World world, Span<byte> data)
+    public int ParsePackets(World world, Span<byte> data)
     {
         Append(data, false);
 
-        return ParsePackets(socket, world, _buffer, true) + ParsePackets(socket, world, _pluginsBuffer, false);
+        return ParsePackets(world, _buffer, true) + ParsePackets(world, _pluginsBuffer, false);
     }
 
-    private int ParsePackets(NetClient socket, World world, CircularBuffer stream, bool allowPlugins)
+    private int ParsePackets(World world, CircularBuffer stream, bool allowPlugins)
     {
         var packetsCount = 0;
 
@@ -75,7 +75,6 @@ sealed class PacketHandlers
             {
                 if (
                     !GetPacketInfo(
-                        socket,
                         stream,
                         stream.Length,
                         out var packetID,
@@ -150,7 +149,6 @@ sealed class PacketHandlers
     }
 
     private static bool GetPacketInfo(
-        NetClient socket,
         CircularBuffer buffer,
         int bufferLen,
         out byte packetID,
@@ -167,7 +165,7 @@ sealed class PacketHandlers
             return false;
         }
 
-        packetLen = socket.PacketsTable.GetPacketLength(packetID = buffer[0]);
+        packetLen = NetClient.PacketsTable.GetPacketLength(packetID = buffer[0]);
         packetOffset = 1;
 
         if (packetLen == -1)
@@ -300,6 +298,7 @@ sealed class PacketHandlers
         Handler.Add(0xF5, DisplayMap);
         Handler.Add(0xF6, BoatMoving);
         Handler.Add(0xF7, PacketList);
+            Handler.Add(EnhancedPacketHandler.EPID, EnhancedPacketHandler.Handle); //For handling custom packets
 
         // login
         Handler.Add(0xA8, ServerListReceived);
@@ -2086,39 +2085,42 @@ sealed class PacketHandlers
                 {
                     Skill skill = world.Player.Skills[id];
 
-                    if (skill != null)
-                    {
-                        if (isSingleUpdate)
+                        if (skill != null)
                         {
-                            float change = realVal / 10.0f - skill.Value;
-
-                            if (
-                                change != 0.0f
-                                && !float.IsNaN(change)
-                                && ProfileManager.CurrentProfile != null
-                                && ProfileManager.CurrentProfile.ShowSkillsChangedMessage
-                                && Math.Abs(change * 10)
-                                    >= ProfileManager.CurrentProfile.ShowSkillsChangedDeltaValue
-                            )
+                            if (isSingleUpdate)
                             {
-                                GameActions.Print(
-                                    world,
-                                    string.Format(
-                                        ResGeneral.YourSkillIn0Has1By2ItIsNow3,
-                                        skill.Name,
-                                        change < 0
-                                            ? ResGeneral.Decreased
-                                            : ResGeneral.Increased,
-                                        Math.Abs(change),
-                                        skill.Value + change
-                                    ),
-                                    0x58,
-                                    MessageType.System,
-                                    3,
-                                    false
-                                );
+                                float change = realVal / 10.0f - skill.Value;
+                                int deltaThreshold = ProfileManager.CurrentProfile?.ShowSkillsChangedDeltaValue ?? 0;
+
+                                if (
+                                    change != 0.0f
+                                    && !float.IsNaN(change)
+                                    && ProfileManager.CurrentProfile != null
+                                    && ProfileManager.CurrentProfile.ShowSkillsChangedMessage
+                                    && (
+                                        deltaThreshold <= 0
+                                        || skill.ValueFixed / deltaThreshold != realVal / deltaThreshold
+                                    )
+                                )
+                                {
+                                    GameActions.Print(
+                                        world,
+                                        string.Format(
+                                            ResGeneral.YourSkillIn0Has1By2ItIsNow3,
+                                            skill.Name,
+                                            change < 0
+                                                ? ResGeneral.Decreased
+                                                : ResGeneral.Increased,
+                                            Math.Abs(change),
+                                            skill.Value + change
+                                        ),
+                                        0x58,
+                                        MessageType.System,
+                                        3,
+                                        false
+                                    );
+                                }
                             }
-                        }
 
                         ushort lastBase = skill.BaseFixed;
                         ushort lastValue = skill.ValueFixed;
@@ -5022,26 +5024,26 @@ sealed class PacketHandlers
     {
         // http://docs.polserver.com/packets/index.php?Packet=0xD1
 
-        if (
-            Client.Game.GetScene<GameScene>().DisconnectionRequested
-            && (
-                world.ClientFeatures.Flags
-                & CharacterListFlags.CLF_OWERWRITE_CONFIGURATION_BUTTON
-            ) != 0
-        )
-        {
-            if (p.ReadBool())
+            if (
+                Client.Game.GetScene<GameScene>().DisconnectionRequested
+                && (
+                    world.ClientFeatures.Flags
+                    & CharacterListFlags.CLF_OWERWRITE_CONFIGURATION_BUTTON
+                ) != 0
+            )
             {
-                // client can disconnect
-                NetClient.Socket.Disconnect();
-                Client.Game.SetScene(new LoginScene(world));
-            }
-            else
-            {
-                Log.Warn("0x1D - client asked to disconnect but server answered 'NO!'");
+                if (p.ReadBool())
+                {
+                    // client can disconnect
+                    NetClient.Socket.Disconnect().Wait();
+                    Client.Game.SetScene(new LoginScene(world));
+                }
+                else
+                {
+                    Log.Warn("0x1D - client asked to disconnect but server answered 'NO!'");
+                }
             }
         }
-    }
 
     private static void MegaCliloc(World world, ref StackDataReader p)
     {

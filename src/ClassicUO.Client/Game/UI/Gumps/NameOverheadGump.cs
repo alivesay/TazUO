@@ -45,15 +45,24 @@ namespace ClassicUO.Game.UI.Gumps
                 currentHeight = value;
             }
         }
+        
+        public new UILayer LayerOrder {
+            get
+            {
+                if (IsFocused)
+                    return UILayer.Default;
+
+                return UILayer.Under;
+            }
+            set { }
+        }
 
         public NameOverheadGump(World world, uint serial) : base(world, serial, 0)
         {
             CanMove = false;
             AcceptMouseInput = true;
             CanCloseWithRightClick = true;
-
-            LayerOrder = UILayer.Under;
-
+            
             Entity entity = World.Get(serial);
 
             if (entity == null)
@@ -824,7 +833,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         public override void Dispose()
         {
-            _text.Dispose();
+            _text?.Dispose();
             base.Dispose();
         }
     }

@@ -15,6 +15,7 @@ using ClassicUO.Game.UI.Gumps.CharCreation;
 using ClassicUO.Game.UI.Gumps.Login;
 using ClassicUO.IO;
 using ClassicUO.Network;
+using ClassicUO.Network.Encryption;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
 using ClassicUO.Utility.Logging;
@@ -535,7 +536,7 @@ namespace ClassicUO.Game.Scenes
 
             uint address = NetClient.Socket.LocalIP;
 
-            NetClient.Socket.Encryption?.Initialize(true, address);
+            NetClient.Encryption?.Initialize(true, address);
 
             if (Client.Game.UO.Version >= ClientVersion.CV_6040)
             {
@@ -566,26 +567,28 @@ namespace ClassicUO.Game.Scenes
                 return;
             }
 
-            if (e != 0)
+            if (e == SocketError.Success)
             {
-                Characters = null;
-                DisposeAllServerEntries();
-
-                if (Settings.GlobalSettings.Reconnect)
-                {
-                    Reconnect = true;
-
-                    PopupMessage = string.Format(ResGeneral.ReconnectPleaseWait01, _reconnectTryCounter, StringHelper.AddSpaceBeforeCapital(e.ToString()));
-
-                    UIManager.GetGump<LoadingGump>()?.SetText(PopupMessage);
-                }
-                else
-                {
-                    PopupMessage = string.Format(ResGeneral.ConnectionLost0, StringHelper.AddSpaceBeforeCapital(e.ToString()));
-                }
-
-                CurrentLoginStep = LoginSteps.PopUpMessage;
+                return;
             }
+
+            Characters = null;
+            DisposeAllServerEntries();
+
+            if (Settings.GlobalSettings.Reconnect)
+            {
+                Reconnect = true;
+
+                PopupMessage = string.Format(ResGeneral.ReconnectPleaseWait01, _reconnectTryCounter, StringHelper.AddSpaceBeforeCapital(e.ToString()));
+
+                UIManager.GetGump<LoadingGump>()?.SetText(PopupMessage);
+            }
+            else
+            {
+                PopupMessage = string.Format(ResGeneral.ConnectionLost0, StringHelper.AddSpaceBeforeCapital(e.ToString()));
+            }
+
+            CurrentLoginStep = LoginSteps.PopUpMessage;
         }
 
         public void ServerListReceived(ref StackDataReader p)
@@ -701,37 +704,30 @@ namespace ClassicUO.Game.Scenes
             long ip = p.ReadUInt32LE(); // use LittleEndian here
             ushort port = p.ReadUInt16BE();
             uint seed = p.ReadUInt32BE();
-
-            NetClient.Socket.Disconnect();
-            NetClient.Socket.Connected -= OnNetClientConnected;
-
-            try
+        
+            NetClient.Socket.Disconnect().Wait();
+            AsyncNetClient.Socket = new AsyncNetClient();
+            EncryptionHelper.Instance.Initialize(false, seed);
+            
+            if (Settings.GlobalSettings.IgnoreRelayIp || ip == 0)
             {
-                // Ignore the packet, connect with the original IP regardless (i.e. websocket proxying)
-                if (Settings.GlobalSettings.IgnoreRelayIp || ip == 0)
-                {
-                    Log.Trace("Ignoring relay server packet IP address");
-                    NetClient.Socket.Connect(Settings.GlobalSettings.IP, Settings.GlobalSettings.Port);
-                }
-                else
-                    NetClient.Socket.Connect(new IPAddress(ip).ToString(), port);
-
-                if (NetClient.Socket.IsConnected)
-                {
-                    NetClient.Socket.Encryption?.Initialize(false, seed);
-                    NetClient.Socket.EnableCompression();
-                    unsafe
-                    {
-                        Span<byte> b = stackalloc byte[4] { (byte)(seed >> 24), (byte)(seed >> 16), (byte)(seed >> 8), (byte)seed };
-                        NetClient.Socket.Send(b, true, true);
-                    }
-
-                    NetClient.Socket.Send_SecondLogin(Account, Password, seed);
-                }
+                Log.Trace("Ignoring relay server packet IP address");
+                ip = long.Parse(Settings.GlobalSettings.IP);
+                port = Settings.GlobalSettings.Port;
             }
-            finally
+
+            NetClient.Socket.Connect(new IPAddress(ip).ToString(), port).Wait();
+
+            if (NetClient.Socket.IsConnected)
             {
-                NetClient.Socket.Connected += OnNetClientConnected;
+                NetClient.Socket.EnableCompression();
+                unsafe
+                {
+                    Span<byte> b = stackalloc byte[4] { (byte)(seed >> 24), (byte)(seed >> 16), (byte)(seed >> 8), (byte)seed };
+                    NetClient.Socket.Send(b, true, true);
+                }
+
+                NetClient.Socket.Send_SecondLogin(Account, Password, seed);
             }
         }
 

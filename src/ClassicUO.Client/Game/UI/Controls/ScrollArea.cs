@@ -94,14 +94,6 @@ namespace ClassicUO.Game.UI.Controls
                 _scrollBar.X = Width - 19;
         }
 
-        public void KeepScrollPositionInBounds()
-        {
-            if(_scrollBar.Value < _scrollBar.MinValue)
-                _scrollBar.Value = _scrollBar.MinValue;
-            else if(_scrollBar.Value > _scrollBar.MaxValue)
-                _scrollBar.Value = _scrollBar.MaxValue;
-        }
-
         public void ResetScrollbarPosition()
         {
             _scrollBar?.ResetScrollPosition();
@@ -143,7 +135,7 @@ namespace ClassicUO.Game.UI.Controls
                     }
 
                     int finalY = y + child.Y - scrollbar.Value + ScissorRectangle.Y;
-
+                    
                     child.Draw(batcher, x + child.X, finalY);
                 }
 
@@ -181,7 +173,7 @@ namespace ClassicUO.Game.UI.Controls
         {
             _scrollBar.Height = ScrollMaxHeight >= 0 ? ScrollMaxHeight : Height;
             bool maxValue = _scrollBar.Value == _scrollBar.MaxValue && _scrollBar.MaxValue != 0;
-
+            
             int startX = 0, startY = 0, endX = 0, endY = 0;
 
             for (int i = 1; i < Children.Count; i++)
@@ -212,7 +204,6 @@ namespace ClassicUO.Game.UI.Controls
                 }
             }
 
-            int width = Math.Abs(startX) + Math.Abs(endX);
             int height = Math.Abs(startY) + Math.Abs(endY) - _scrollBar.Height;
             height = Math.Max(0, height - (-ScissorRectangle.Y + ScissorRectangle.Height));
 
@@ -229,7 +220,7 @@ namespace ClassicUO.Game.UI.Controls
             {
                 _scrollBar.Value = _scrollBar.MaxValue = 0;
             }
-
+            
             _scrollBar.UpdateOffset(0, Offset.Y);
 
             for (int i = 1; i < Children.Count; i++)

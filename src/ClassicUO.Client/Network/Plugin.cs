@@ -755,7 +755,7 @@ namespace ClassicUO.Network
 
         internal static short OnGetPacketLength(int id)
         {
-            return NetClient.Socket.PacketsTable.GetPacketLength(id);
+            return NetClient.PacketsTable.GetPacketLength(id);
         }
 
         internal static bool OnPluginRecv(ref byte[] data, ref int length)

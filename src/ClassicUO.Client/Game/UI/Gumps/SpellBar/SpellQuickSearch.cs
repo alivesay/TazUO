@@ -11,19 +11,18 @@ namespace ClassicUO.Game.UI.Gumps.SpellBar;
 public class SpellQuickSearch : Gump
 {
     private TTFTextInputField searchField;
-
     private SpellDisplay spellDisplay;
-    
     private Action<SpellDefinition>  onClick;
+    private bool disposeOnReturn;
     
-    public SpellQuickSearch(World world, int x, int y, Action<SpellDefinition> onClick = null) : base(world, 0, 0)
+    public SpellQuickSearch(World world, int x, int y, Action<SpellDefinition> onClick = null, bool disposeOnReturn = false) : base(world, 0, 0)
     {
         Width = 200;
         Height = 69;
         CanMove = true;
         X = x;
         Y = y;
-        
+        this.disposeOnReturn = disposeOnReturn;
         this.onClick = onClick;
 
         Build();
@@ -37,24 +36,34 @@ public class SpellQuickSearch : Gump
         
         Add(searchField = new TTFTextInputField(Width, 25, Width){Y = Height - 25});
         searchField.SetPlaceholder("Search..");
+        searchField.SetFocus();
         
         searchField.TextChanged += SearchTextChanged;
         searchField.EnterPressed += SearchEnterPressed;
         
-        Add(spellDisplay = new(Width, onClick){Y = Height - 25 - 44});
+        Add(spellDisplay = new(Width, onClick, disposeOnReturn){Y = Height - 25 - 44});
     }
 
     private void SearchEnterPressed(object sender, EventArgs e)
     {
+        if (IsDisposed)
+            return;
+
+        searchField.OnFocusLost();
+        UIManager.KeyboardFocusControl = null;
         spellDisplay.InvokeAction();
-        searchField.IsFocused = false;
+        if(disposeOnReturn)
+            Dispose();
     }
 
     private void SearchTextChanged(object sender, EventArgs e)
     {
-        if(searchField.Text.Length > 0)
+        if (IsDisposed)
+            return;
+        
+        if(searchField?.Text.Length > 0)
         {
-            if (SpellDefinition.TryGetSpellFromName(searchField.Text, out var spell))
+            if (SpellDefinition.TryGetSpellFromName(searchField?.Text, out var spell))
                 spellDisplay.SetSpell(spell);
         }
         else
@@ -68,14 +77,16 @@ public class SpellQuickSearch : Gump
         private GumpPic icon;
         private TextBox text;
         private Action<SpellDefinition> onClick;
-
+        private bool disposeOnReturn;
+        
         public SpellDefinition Spell;
-        public SpellDisplay(int width, Action<SpellDefinition> onClick)
+        public SpellDisplay(int width, Action<SpellDefinition> onClick, bool disposeOnReturn)
         {
             Width = width;
             Height = 44;
             CanMove = true;
             this.onClick = onClick;
+            this.disposeOnReturn = disposeOnReturn;
         }
         
         public override bool AcceptMouseInput { get; set; } = true;
@@ -85,12 +96,14 @@ public class SpellQuickSearch : Gump
             base.OnMouseUp(x, y, button);
             
             InvokeAction();
+            
+            if(disposeOnReturn)
+                Parent?.Dispose();
         }
 
         public void InvokeAction()
         {
-            if(Spell != null)
-                onClick?.Invoke(Spell);
+            onClick?.Invoke(Spell);
         }
 
         public void ClearSpell()

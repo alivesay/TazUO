@@ -22,13 +22,15 @@ namespace ClassicUO.LegionScripting
         private TextBox title;
         internal const int GROUPINDENT = 10;
         internal const int V_SPACING = 2;
+        private const int MIN_WIDTH = 200;
+        private const int REFRESH_BUTTON_WIDTH = 75;
         private HashSet<string> groups = new HashSet<string>();
         private static int lastX = -1, lastY = -1;
         private static int lastWidth = 300, lastHeight = 400;
         public override GumpType GumpType => GumpType.ScriptManager;
         public static bool RefreshContent = false;
         public const string NOGROUPTEXT = "No group";
-        public ScriptManagerGump(World world) : base(world, lastWidth, lastHeight, 300, 200, 0, 0)
+        public ScriptManagerGump(World world) : base(world, lastWidth, lastHeight, MIN_WIDTH, 200, 0, 0)
         {
             X = lastX;
             Y = lastY;
@@ -40,12 +42,13 @@ namespace ClassicUO.LegionScripting
 
             Add(background = new AlphaBlendControl(0.77f) { X = BorderControl.BorderSize, Y = BorderControl.BorderSize });
 
-            title = TextBox.GetOne("Script Manager", TrueTypeLoader.EMBEDDED_FONT, 18, Color.DarkOrange, TextBox.RTLOptions.DefaultCentered(Width));
+            title = TextBox.GetOne("Script Manager", TrueTypeLoader.EMBEDDED_FONT, 18, Color.DarkOrange, TextBox.RTLOptions.Default(Width - 2 * BorderControl.BorderSize));
+            title.X = BorderControl.BorderSize;
             title.Y = BorderControl.BorderSize;
             title.AcceptMouseInput = false;
             Add(title);
 
-            Add(refresh = new NiceButton(Width - 75 - BorderControl.BorderSize, BorderControl.BorderSize, 75, 25, ButtonAction.Default, "Refresh")
+            Add(refresh = new NiceButton(Width - REFRESH_BUTTON_WIDTH - BorderControl.BorderSize, BorderControl.BorderSize, REFRESH_BUTTON_WIDTH, 25, ButtonAction.Default, "Refresh")
             {
                 IsSelectable = false
             });
@@ -154,7 +157,7 @@ namespace ClassicUO.LegionScripting
                 background.Width = Width - (BorderControl.BorderSize * 2);
                 background.Height = Height - (BorderControl.BorderSize * 2);
 
-                title.Width = Width - (BorderControl.BorderSize * 2);
+                title.Width = Width - REFRESH_BUTTON_WIDTH - (BorderControl.BorderSize * 2);
 
                 refresh.X = Width - BorderControl.BorderSize - refresh.Width;
 

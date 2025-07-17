@@ -74,11 +74,11 @@ namespace ClassicUO.Game.UI.Controls
             IsSelected = defaultValue;
         }
 
-        public readonly Action Action;
+        public Action Action;
         public readonly bool CanBeSelected;
         public bool IsSelected;
         public List<ContextMenuItemEntry> Items = new List<ContextMenuItemEntry>();
-        public readonly string Text;
+        public string Text;
 
         public void Add(ContextMenuItemEntry subEntry)
         {
@@ -159,7 +159,7 @@ namespace ClassicUO.Game.UI.Controls
                 Y = 0;
             }
 
-            foreach (ContextMenuItem mitem in FindControls<ContextMenuItem>())
+            foreach (ContextMenuItem mitem in _scroll.FindControls<ContextMenuItem>())
             {
                 if (mitem.Width < _background.Width)
                 {

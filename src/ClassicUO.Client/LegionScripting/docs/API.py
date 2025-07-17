@@ -1,11 +1,86 @@
+class Buff:
+    Graphic: int = None
+    Text: str = None
+    Timer: int = None
+    Type = None
+    Title: str = None
+
+class PyControl:
+
+    def SetRect(x: int, y: int, w: int, h: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetWidth(width: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetHeight(height: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetX(x: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetY(y: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetPos(x: int, y: int) -> "PyControl":
+        """
+         Use int python API
+        
+        """
+        pass
+
+    def GetX() -> int:
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def GetY() -> int:
+        """
+         Used in python API
+        
+        """
+        pass
+
+class PyProfile:
+    CharacterName: str = None
+    ServerName: str = None
+    LootBagSerial: int = None
+    FavoriteBagSerial: int = None
+    MoveItemDelay: int = None
+    AutoLootEnabled: bool = None
+
 JournalEntries = None
-Backpack = None
+Backpack: int = None
 Player = None
+Bank: int = None
 Random = None
-LastTargetSerial = None
+LastTargetSerial: int = None
 LastTargetPos = None
-LastTargetGraphic = None
-Found = None
+LastTargetGraphic: int = None
+Found: int = None
+PyProfile: PyProfile = None
 
 class ScanType:
     Hostile = 0
@@ -24,6 +99,12 @@ class Notoriety:
     Murderer = 1
     Invulnerable = 1
 
+class PersistentVar:
+    Char = 1
+    Account = 2
+    Server = 3
+    Global = 4
+
 def ProcessCallbacks() -> None:
     """
      Use this when you need to wait for players to click buttons.
@@ -32,6 +113,52 @@ def ProcessCallbacks() -> None:
      while True:
        API.ProcessCallbacks()
        API.Pause(0.1)
+     ```
+    
+    """
+    pass
+
+def SetSharedVar(name: str, value: Any) -> None:
+    """
+     Set a variable that is shared between scripts.
+     Example:
+     ```py
+     API.SetSharedVar("myVar", 10)
+     ```
+    
+    """
+    pass
+
+def GetSharedVar(name: str) -> Any:
+    """
+     Get the value of a shared variable.
+     Example:
+     ```py
+     myVar = API.GetSharedVar("myVar")
+     if myVar:
+      API.SysMsg(f"myVar is {myVar}")
+     ```
+    
+    """
+    pass
+
+def RemoveSharedVar(name: str) -> None:
+    """
+     Try to remove a shared variable.
+     Example:
+     ```py
+     API.RemoveSharedVar("myVar")
+     ```
+    
+    """
+    pass
+
+def ClearSharedVars() -> None:
+    """
+     Clear all shared vars.
+     Example:
+     ```py
+     API.ClearSharedVars()
      ```
     
     """
@@ -74,7 +201,7 @@ def BandageSelf() -> bool:
     """
     pass
 
-def ClearLeftHand() -> Item:
+def ClearLeftHand() -> int:
     """
      If you have an item in your left hand, move it to your backpack
      Sets API.Found to the item's serial.
@@ -88,7 +215,7 @@ def ClearLeftHand() -> Item:
     """
     pass
 
-def ClearRightHand() -> Item:
+def ClearRightHand() -> int:
     """
      If you have an item in your right hand, move it to your backpack
      Sets API.Found to the item's serial.
@@ -214,7 +341,7 @@ def MoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: in
     """
     pass
 
-def QueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0) -> None:
+def QueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0, OSI: bool = False) -> None:
     """
      Move an item to the ground near you.
      Example:
@@ -227,7 +354,7 @@ def QueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int 
     """
     pass
 
-def MoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0) -> None:
+def MoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0, OSI: bool = False) -> None:
     """
      Move an item to the ground near you.
      Example:
@@ -273,6 +400,21 @@ def BuffExists(buffName: str) -> bool:
      ```py
      if API.BuffExists("Bless"):
        API.SysMsg("You are blessed!")
+     ```
+    
+    """
+    pass
+
+def ActiveBuffs() -> list[Buff]:
+    """
+     Get a list of all buffs that are active.
+     See [Buff](Buff.md) to see what attributes are available.
+     Buff does not get updated after you access it in python, you will need to call this again to get the latest buff data.
+     Example:
+     ```py
+     buffs = API.ActiveBuffs()
+     for buff in buffs:
+         API.SysMsg(buff.Title)
      ```
     
     """
@@ -512,7 +654,7 @@ def OnIgnoreList(serial: int) -> bool:
     """
     pass
 
-def Pathfind(x: int, y: int, z: int = 1337, distance: int = 0) -> None:
+def Pathfind(x: int, y: int, z: int = 1337, distance: int = 1, wait: bool = False, timeout: int = 10) -> bool:
     """
      Attempt to pathfind to a location.  This will fail with large distances.
      Example:
@@ -523,14 +665,14 @@ def Pathfind(x: int, y: int, z: int = 1337, distance: int = 0) -> None:
     """
     pass
 
-def Pathfind(entity: int, distance: int = 0) -> None:
+def PathfindEntity(entity: int, distance: int = 1, wait: bool = False, timeout: int = 10) -> bool:
     """
      Attempt to pathfind to a mobile or item.
      Example:
      ```py
      mob = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)
      if mob:
-       API.Pathfind(mob)
+       API.PathfindEntity(mob)
      ```
     
     """
@@ -630,14 +772,12 @@ def Rename(serial: int, name: str) -> None:
     """
     pass
 
-def Dismount() -> Item:
+def Dismount() -> None:
     """
      Attempt to dismount if mounted.
      Example:
      ```py
-     mount = API.Dismount()
-     if mount:
-       API.UseObject(mount)
+     API.Dismount()
      ```
     
     """
@@ -696,7 +836,7 @@ def RequestTarget(timeout: float = 5) -> int:
      ```py
      target = API.RequestTarget()
      if target:
-       API.SysMsg("Targeted: " + str(target.Name))
+       API.SysMsg("Targeted serial: " + str(target))
      ```
     
     """
@@ -716,6 +856,7 @@ def TargetSelf() -> None:
 def TargetLandRel(xOffset: int, yOffset: int) -> None:
     """
      Target a land tile relative to your position.
+     If this doesn't work, try TargetTileRel instead.
      Example:
      ```py
      API.TargetLand(1, 1)
@@ -727,6 +868,7 @@ def TargetLandRel(xOffset: int, yOffset: int) -> None:
 def TargetTileRel(xOffset: int, yOffset: int, graphic: int = 1337) -> None:
     """
      Target a tile relative to your location.
+     If this doesn't work, try TargetLandRel instead.'
      Example:
      ```py
      API.TargetTileRel(1, 1)
@@ -756,6 +898,20 @@ def HasTarget(targetType: str = "any") -> bool:
      if API.HasTarget():
          API.CancelTarget()
      ```
+    
+    """
+    pass
+
+def GetMap() -> int:
+    """
+     Get the current map index.
+     Standard maps are:
+     0 = Fel
+     1 = Tram
+     2 = Ilshenar
+     3 = Malas
+     4 = Tokuno
+     5 = TerMur
     
     """
     pass
@@ -931,7 +1087,7 @@ def InJournal(msg: str) -> bool:
 def InJournalAny(msgs: list[str]) -> bool:
     """
      Check if the journal contains *any* of the strings in this list.
-     Can be regex, prepend your msgs with $  .
+     Can be regex, prepend your msgs with $
      Example:
      ```py
      if API.InJournalAny(["You have been slain", "You are dead"]):
@@ -1009,7 +1165,7 @@ def Virtue(virtue: str) -> None:
     """
     pass
 
-def NearestEntity(scanType: Any, maxDistance: int = 10) -> Any:
+def NearestEntity(scanType: ScanType, maxDistance: int = 10) -> Any:
     """
      Find the nearest item/mobile based on scan type.
      Sets API.Found to the serial of the item/mobile.
@@ -1025,7 +1181,7 @@ def NearestEntity(scanType: Any, maxDistance: int = 10) -> Any:
     """
     pass
 
-def NearestMobile(notoriety: list[Any], maxDistance: int = 10) -> Mobile:
+def NearestMobile(notoriety: list[Notoriety], maxDistance: int = 10) -> Mobile:
     """
      Get the nearest mobile by Notoriety.
      Sets API.Found to the serial of the mobile.
@@ -1056,7 +1212,7 @@ def NearestCorpse(distance: int = 3) -> Item:
     """
     pass
 
-def NearestMobiles(notoriety: list[Any], maxDistance: int = 10) -> list[Mobile]:
+def NearestMobiles(notoriety: list[Notoriety], maxDistance: int = 10) -> list[Mobile]:
     """
      Get all mobiles matching Notoriety and distance.
      Example:
@@ -1102,7 +1258,7 @@ def GetAllMobiles() -> list[Mobile]:
     """
     pass
 
-def GetTile(x: int, y: int) -> Any:
+def GetTile(x: int, y: int) -> GameObject:
     """
      Get the tile at a location.
      Example:
@@ -1143,7 +1299,7 @@ def AddGump(g: Gump) -> None:
     """
     pass
 
-def CreateGumpCheckbox(text: str = "", hue: int = 0) -> Control:
+def CreateGumpCheckbox(text: str = "", hue: int = 0, isChecked: bool = False) -> PyControl:
     """
      Create a checkbox for gumps.
       Example:
@@ -1160,7 +1316,7 @@ def CreateGumpCheckbox(text: str = "", hue: int = 0) -> Control:
     """
     pass
 
-def CreateGumpLabel(text: str, hue: int = 996) -> Control:
+def CreateGumpLabel(text: str, hue: int = 996) -> PyControl:
     """
      Create a label for a gump.
      Example:
@@ -1174,7 +1330,7 @@ def CreateGumpLabel(text: str, hue: int = 996) -> Control:
     """
     pass
 
-def CreateGumpColorBox(opacity: float = 0.7, color: str = "#000000") -> Control:
+def CreateGumpColorBox(opacity: float = 0.7, color: str = "#000000") -> PyControl:
     """
      Get a transparent color box for gumps.
      Example:
@@ -1191,7 +1347,7 @@ def CreateGumpColorBox(opacity: float = 0.7, color: str = "#000000") -> Control:
     """
     pass
 
-def CreateGumpItemPic(graphic: int, width: int, height: int) -> Control:
+def CreateGumpItemPic(graphic: int, width: int, height: int) -> PyControl:
     """
      Create a picture of an item.
      Example:
@@ -1205,7 +1361,7 @@ def CreateGumpItemPic(graphic: int, width: int, height: int) -> Control:
     """
     pass
 
-def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, pressed: int = 0x00F0, hover: int = 0x00EE) -> Control:
+def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, pressed: int = 0x00F0, hover: int = 0x00EE) -> PyControl:
     """
      Create a button for gumps.
      Example:
@@ -1225,7 +1381,7 @@ def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, press
     """
     pass
 
-def CreateSimpleButton(text: str, width: int, height: int) -> Control:
+def CreateSimpleButton(text: str, width: int, height: int) -> PyControl:
     """
      Create a simple button, does not use graphics.
      Example:
@@ -1240,7 +1396,7 @@ def CreateSimpleButton(text: str, width: int, height: int) -> Control:
     """
     pass
 
-def CreateGumpRadioButton(text: str = "", group: int = 0, inactive: int = 0x00D0, active: int = 0x00D1, hue: int = 0xFFFF) -> Control:
+def CreateGumpRadioButton(text: str = "", group: int = 0, inactive: int = 0x00D0, active: int = 0x00D1, hue: int = 0xFFFF, isChecked: bool = False) -> PyControl:
     """
      Create a radio button for gumps, use group numbers to only allow one item to be checked at a time.
      Example:
@@ -1256,7 +1412,7 @@ def CreateGumpRadioButton(text: str = "", group: int = 0, inactive: int = 0x00D0
     """
     pass
 
-def CreateGumpTextBox(text: str = "", width: int = 200, height: int = 30, multiline: bool = False) -> Control:
+def CreateGumpTextBox(text: str = "", width: int = 200, height: int = 30, multiline: bool = False) -> PyControl:
     """
      Create a text area control.
      Example:
@@ -1286,7 +1442,7 @@ def CreateGumpTextBox(text: str = "", width: int = 200, height: int = 30, multil
     """
     pass
 
-def CreateGumpTTFLabel(text: str, size: float, color: str = "#FFFFFF", font: str = TrueTypeLoader.EMBEDDED_FONT, aligned: str = "let", maxWidth: int = 0, applyStroke: bool = False) -> Control:
+def CreateGumpTTFLabel(text: str, size: float, color: str = "#FFFFFF", font: str = TrueTypeLoader.EMBEDDED_FONT, aligned: str = "let", maxWidth: int = 0, applyStroke: bool = False) -> PyControl:
     """
      Create a TTF label with advanced options.
      Example:
@@ -1304,7 +1460,7 @@ def CreateGumpTTFLabel(text: str, size: float, color: str = "#FFFFFF", font: str
     """
     pass
 
-def CreateGumpSimpleProgressBar(width: int, height: int, backgroundColor: str = "#616161", foregroundColor: str = "#212121", value: int = 100, max: int = 100) -> Control:
+def CreateGumpSimpleProgressBar(width: int, height: int, backgroundColor: str = "#616161", foregroundColor: str = "#212121", value: int = 100, max: int = 100) -> PyControl:
     """
      Create a progress bar. Can be updated as needed with `bar.SetProgress(current, max)`.
      Example:
@@ -1331,7 +1487,7 @@ def CreateGumpSimpleProgressBar(width: int, height: int, backgroundColor: str = 
     """
     pass
 
-def CreateGumpScrollArea(x: int, y: int, width: int, height: int) -> Control:
+def CreateGumpScrollArea(x: int, y: int, width: int, height: int) -> PyControl:
     """
      Create a scrolling area, add and position controls to it directly.
      Example:
@@ -1348,7 +1504,18 @@ def CreateGumpScrollArea(x: int, y: int, width: int, height: int) -> Control:
     """
     pass
 
-def AddControlOnClick(control: Control, onClick: Any, leftOnly: bool = True) -> None:
+def CreateGumpPic(graphic: int, x: int = 0, y: int = 0, hue: int = 0) -> PyControl:
+    """
+     Create a gump pic(Use this for gump art, not item art)
+     Example:
+     ```py
+     gumpPic = API.CreateGumpPic(0xafb)
+     gump.Add(gumpPic)
+    
+    """
+    pass
+
+def AddControlOnClick(control: PyControl, onClick: Any, leftOnly: bool = True) -> PyControl:
     """
      Add an onClick callback to a control.
      Example:
@@ -1359,6 +1526,26 @@ def AddControlOnClick(control: Control, onClick: Any, leftOnly: bool = True) -> 
      API.AddControlOnClick(bg, myfunc)
      while True:
        API.ProcessCallbacks()
+     ```
+    
+    """
+    pass
+
+def AddControlOnDisposed(control: PyControl, onDispose: Any) -> PyControl:
+    """
+     Add onDispose(Closed) callback to a control.
+     Example:
+     ```py
+     def onClose():
+         API.Stop()
+    
+     gump = API.CreateGump()
+     gump.SetRect(100, 100, 200, 200)
+    
+     bg = API.CreateGumpColorBox(opacity=0.7, color="#000000")
+     gump.Add(bg.SetRect(0, 0, 200, 200))
+    
+     API.AddControlOnDisposed(gump, onClose)
      ```
     
     """
@@ -1402,6 +1589,20 @@ def ToggleScript(scriptName: str) -> None:
     """
     pass
 
+def PlayScript(scriptName: str) -> None:
+    """
+     Play a legion script.
+    
+    """
+    pass
+
+def StopScript(scriptName: str) -> None:
+    """
+     Stop a legion script.
+    
+    """
+    pass
+
 def AddMapMarker(name: str, x: int = int.MaxValue, y: int = int.MaxValue, map: int = int.MaxValue, color: str = "purple") -> None:
     """
      Add a marker to the current World Map (If one is open)
@@ -1419,6 +1620,51 @@ def RemoveMapMarker(name: str) -> None:
      Example:
      ```py
      API.RemoveMapMarker("Death")
+     ```
+    
+    """
+    pass
+
+def IsProcessingMoveQue() -> bool:
+    """
+     Check if the move item queue is being processed. You can use this to prevent actions if the queue is being processed.
+     Example:
+     ```py
+     if API.IsProcessingMoveQue():
+       API.Pause(0.5)
+     ```
+    
+    """
+    pass
+
+def SavePersistentVar(name: str, value: str, scope: Any) -> None:
+    """
+     Save a variable that persists between sessions and scripts.
+     Example:
+     ```py
+     API.SavePersistentVar("TotalKills", "5", API.PersistentVar.Char)
+     ```
+    
+    """
+    pass
+
+def RemovePersistentVar(name: str, scope: Any) -> None:
+    """
+     Delete/remove a persistent variable.
+     Example:
+     ```py
+     API.RemovePersistentVar("TotalKills", API.PersistentVar.Char)
+     ```
+    
+    """
+    pass
+
+def GetPersistentVar(name: str, defaultValue: str, scope: Any) -> str:
+    """
+     Get a persistent variable.
+     Example:
+     ```py
+     API.GetPersistentVar("TotalKills", "0", API.PersistentVar.Char)
      ```
     
     """

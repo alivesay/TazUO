@@ -5,8 +5,8 @@
     <ApplicationIcon>cuoicon.ico</ApplicationIcon>
     <AssemblyName>TazUO</AssemblyName>
     <RootNamespace>ClassicUO</RootNamespace>
-    <AssemblyVersion>3.33.3</AssemblyVersion>
-    <FileVersion>3.33.3</FileVersion>
+    <AssemblyVersion>3.33.40</AssemblyVersion>
+    <FileVersion>3.33.40</FileVersion>
     <PackageProjectUrl>https://github.com/bittiez/TazUO</PackageProjectUrl>
     <PublishAot>false</PublishAot>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -138,25 +138,48 @@
      $(RuntimeIdentifier.StartsWith('linux')) )
   ">true</_IsLinux>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <DocSourceFiles Include="$(ProjectDir)/LegionScripting/PyClasses/*.cs" />
+    <DocSourceFiles Include="$(ProjectDir)/LegionScripting/API.cs" />
+  </ItemGroup>
 
+  <PropertyGroup>
+    <!-- Create a string of quoted paths -->
+    <DocFileArgs>@(DocSourceFiles->'"%(FullPath)"', ' ')</DocFileArgs>
+  </PropertyGroup>
+
+  <Target Name="GenerateDocs" AfterTargets="Build">
+    <Message Text="Running: dotnet run --project ../APIToMarkdown/APIToMarkdown.csproj $(DocFileArgs)" />
+    <Exec Command='dotnet run --project ../APIToMarkdown/APIToMarkdown.csproj "$(ProjectDir)/LegionScripting/docs" $(DocFileArgs)' />
+  </Target>
+  
   <Target Name="CopyExternalDeps_build" AfterTargets="Build">
-    <Copy SourceFiles="@(DataFiles_iplib)"
-          DestinationFiles="@(DataFiles_iplib -> '$(OutputPath)\iplib\%(RecursiveDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(DataFiles_x64)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" Condition="'$(_IsWindows)' == 'true'" />
-    <Copy SourceFiles="@(DataFiles_lib64)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" Condition="'$(_IsLinux)' == 'true'" />
-    <Copy SourceFiles="@(DataFiles_osx)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" Condition="'$(_IsMacOS)' == 'true'" />
-    <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(OutputPath)\vulkan\icd.d\" SkipUnchangedFiles="true" Condition="'$(_IsMacOS)' == 'true'" />
+    <ItemGroup>
+      <MonockickstartPath Include="$(ProjectDir)..\..\tools\monokickstart\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(DataFiles_iplib)" DestinationFiles="@(DataFiles_iplib -> '$(TargetDir)\iplib\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_x64)" DestinationFolder="$(TargetDir)\x64\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_lib64)" DestinationFolder="$(TargetDir)\lib64\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_osx)" DestinationFolder="$(TargetDir)\osx\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(TargetDir)\vulkan\icd.d\" SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(TargetDir)\" SkipUnchangedFiles="true" Condition="$(TargetFramework.StartsWith('net4'))" />
   </Target>
 
-  <Target Name="CopyExternalDeps_publish" AfterTargets="Publish">    
-    <Copy SourceFiles="@(DataFiles_iplib)"
-          DestinationFiles="@(DataFiles_iplib -> '$(PublishDir)\iplib\%(RecursiveDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(DataFiles_x64)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" Condition="'$(_IsWindows)' == 'true'" />
-    <Copy SourceFiles="@(DataFiles_lib64)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" Condition="'$(_IsLinux)' == 'true'" />
-    <Copy SourceFiles="@(DataFiles_osx)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" Condition="'$(_IsMacOS)' == 'true'" />
-    <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(PublishDir)\vulkan\icd.d\" SkipUnchangedFiles="true" Condition="'$(_IsMacOS)' == 'true'" />
+  <Target Name="CopyExternalDeps_publish" AfterTargets="Publish">
+    <ItemGroup>
+      <MonockickstartPath Include="$(ProjectDir)..\..\tools\monokickstart\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(DataFiles_iplib)" DestinationFiles="@(DataFiles_iplib -> '$(PublishDir)\iplib\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_x64)" DestinationFolder="$(PublishDir)\x64\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_lib64)" DestinationFolder="$(PublishDir)\lib64\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_osx)" DestinationFolder="$(PublishDir)\osx\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(PublishDir)\vulkan\icd.d\" SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(PublishDir)\" SkipUnchangedFiles="true" Condition="$(TargetFramework.StartsWith('net4'))" />
   </Target>
 
 </Project>

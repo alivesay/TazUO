@@ -972,6 +972,7 @@ namespace ClassicUO.Game.UI.Controls
             {
                 _rendererText?.Dispose();
                 _rendererCaret?.Dispose();
+                _placeHolder?.Dispose();
 
                 base.Dispose();
             }

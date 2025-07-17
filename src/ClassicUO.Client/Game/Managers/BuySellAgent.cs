@@ -106,7 +106,9 @@ namespace ClassicUO.Game.Managers
             if (buyItems == null) return;
 
             List<Tuple<uint, ushort>> buyList = new List<Tuple<uint, ushort>>();
-
+            long val = 0;
+            ushort total_count = 0;
+            
             foreach (var buyConfigEntry in buyItems)
             {
                 if (!buyConfigEntry.Enabled) continue;
@@ -124,6 +126,7 @@ namespace ClassicUO.Game.Managers
                     {
                         buyList.Add(new Tuple<uint, ushort>(item.Serial, item.Amount));
                         current_count += item.Amount;
+                        val += item.Price * item.Amount;
                     }
                     else
                     {
@@ -132,14 +135,17 @@ namespace ClassicUO.Game.Managers
                         {
                             buyList.Add(new Tuple<uint, ushort>(item.Serial, remainingAmount));
                             current_count += remainingAmount;
+                            val += item.Price * remainingAmount;
                         }
                     }
                 }
+                total_count += current_count;
             }
 
             if (buyList.Count == 0) return;
 
             NetClient.Socket.Send_BuyRequest(shopSerial, buyList.ToArray());
+            GameActions.Print(Client.Game.UO.World, $"Purchased {total_count} items for {val} gold.");
             UIManager.GetGump(shopSerial)?.Dispose();
         }
 
@@ -164,6 +170,9 @@ namespace ClassicUO.Game.Managers
             }
 
             List<Tuple<uint, ushort>> sellList = new List<Tuple<uint, ushort>>();
+            long val = 0;
+            ushort total_count = 0;
+            ushort unique_items = 0;
 
             foreach (var sellConfig in sellItems)
             {
@@ -181,6 +190,8 @@ namespace ClassicUO.Game.Managers
                     {
                         sellList.Add(new Tuple<uint, ushort>(item.Serial, item.Amount));
                         current_count += item.Amount;
+                        val += item.Price * item.Amount;
+                        unique_items++;
                     }
                     else
                     {
@@ -189,15 +200,22 @@ namespace ClassicUO.Game.Managers
                         {
                             sellList.Add(new Tuple<uint, ushort>(item.Serial, remainingAmount));
                             current_count += remainingAmount;
+                            val += item.Price * remainingAmount;
+                            unique_items++;
                         }
                     }
                 }
+                total_count += current_count;
+
+                if (unique_items >= 50)
+                    break;
             }
             sellPackets.Remove(vendorSerial);
 
             if (sellList.Count == 0) return;
 
             NetClient.Socket.Send_SellRequest(vendorSerial, sellList.ToArray());
+            GameActions.Print(Client.Game.UO.World, $"Sold {total_count} items for {val} gold.");
             UIManager.GetGump(vendorSerial)?.Dispose();
         }
     }

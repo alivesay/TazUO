@@ -71,6 +71,8 @@ namespace ClassicUO.Game.GameObjects
 
         public bool IsCoin => Graphic == 0x0EEA || Graphic == 0x0EED || Graphic == 0x0EF0;
 
+        public bool MatchesHighlightData;
+        public ushort HighlightHue;
         public ushort DisplayedGraphic
         {
             get

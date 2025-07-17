@@ -10,6 +10,8 @@ namespace ClassicUO.Game.Managers
     {
         public static MoveItemQueue Instance { get; private set; }
         
+        public bool IsEmpty => _queue.IsEmpty;
+        
         private static long delay = 1000;
         private readonly ConcurrentQueue<MoveRequest> _queue = new();
         private long nextMove;
@@ -39,6 +41,13 @@ namespace ClassicUO.Game.Managers
             uint bag = ProfileManager.CurrentProfile.GrabBagSerial == 0 ? backpack.Serial : ProfileManager.CurrentProfile.GrabBagSerial;
                 
             Enqueue(item.Serial, bag, 0, 0xFFFF, 0xFFFF);
+        }
+        
+        public void EnqueueQuick(uint serial)
+        {
+            Item i = world.Items.Get(serial);
+            if(i != null)
+                EnqueueQuick(i);
         }
 
         public void ProcessQueue()

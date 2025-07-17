@@ -15,6 +15,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
+using System.IO;
+using System.Collections.Generic;
 
 namespace ClassicUO.Game.Managers
 {
@@ -30,7 +32,8 @@ namespace ClassicUO.Game.Managers
         HueCommandTarget,
         IgnorePlayerTarget,
         MoveItemContainer,
-        Internal
+        Internal,
+        SetFavoriteMoveBag,
     }
 
     public class CursorType
@@ -216,7 +219,6 @@ namespace ClassicUO.Game.Managers
 
             _targetCursorId = cursorID;
         }
-
 
         public void CancelTarget()
         {
@@ -422,6 +424,28 @@ namespace ClassicUO.Game.Managers
 
                         ClearTargetingWithoutTargetCancelPacket();
 
+                        return;
+                    case CursorTarget.SetFavoriteMoveBag:
+                        if (SerialHelper.IsItem(serial))
+                        {
+                            Item item = _world.Items.Get(serial);
+
+                            if (item != null && item.ItemData.IsContainer)
+                            {
+                                ProfileManager.CurrentProfile.SetFavoriteMoveBagSerial = serial;
+                                GameActions.Print(_world, "Favorite move bag set.");
+                            }
+                            else
+                            {
+                                GameActions.Print(_world, "That doesn't appear to be a valid container.");
+                            }
+                        }
+                        else
+                        {
+                            GameActions.Print(_world,"That is not a valid item.");
+                        }
+
+                        ClearTargetingWithoutTargetCancelPacket();
                         return;
                     case CursorTarget.IgnorePlayerTarget:
                         if (SelectedObject.Object is Entity pmEntity)

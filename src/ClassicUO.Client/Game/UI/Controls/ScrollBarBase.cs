@@ -84,7 +84,7 @@ namespace ClassicUO.Game.UI.Controls
 
                 if (_value > _maxValue)
                 {
-                    _value = _maxValue;
+                    Value = _maxValue;
                 }
             }
         }

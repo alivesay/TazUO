@@ -6,8 +6,8 @@ using ClassicUO.Utility.Logging;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Net.WebSockets;
 using ClassicUO.Network.Socket;
+using SDL2;
 
 namespace ClassicUO.Network
 {
@@ -25,40 +25,13 @@ namespace ClassicUO.Network
         private SocketWrapper _socket = null;
         private SocketWrapperType? _socketType;
 
-
-        public NetClient()
-        {
-            Statistics = new NetStatistics(this);
-            _sendStream = new CircularBuffer();
-        }
-
-        public static NetClient Socket { get; private set; } = new();
-
-        public EncryptionType Load(ClientVersion clientVersion, EncryptionType encryption)
-        {
-            PacketsTable = new PacketsTable(clientVersion);
-
-            if (encryption != 0)
-            {
-                Encryption = new EncryptionHelper(clientVersion);
-                Log.Trace("Calculating encryption by client version...");
-                Log.Trace($"encryption: {Encryption.EncryptionType}");
-
-                if (Encryption.EncryptionType != encryption)
-                {
-                    Log.Warn($"Encryption found: {Encryption.EncryptionType}");
-                    encryption = Encryption.EncryptionType;
-                }
-            }
-
-            return encryption;
-        }
-
+        public static AsyncNetClient Socket => AsyncNetClient.Socket;
+       
 
         public bool IsConnected => _socket != null && _socket.IsConnected;
         public NetStatistics Statistics { get; }
-        public EncryptionHelper? Encryption { get; private set; }
-        public PacketsTable PacketsTable { get; private set; }
+        public static EncryptionHelper? Encryption { get; private set; }
+        public static PacketsTable PacketsTable { get; private set; }
 
         public uint LocalIP
         {
@@ -90,6 +63,26 @@ namespace ClassicUO.Network
 
                 return _localIP.Value;
             }
+        }
+        
+        public static EncryptionType Load(ClientVersion clientVersion, EncryptionType encryption)
+        {
+            PacketsTable = new PacketsTable(clientVersion);
+
+            if (encryption != 0)
+            {
+                Encryption = new EncryptionHelper(clientVersion);
+                Log.Trace("Calculating encryption by client version...");
+                Log.Trace($"encryption: {Encryption.EncryptionType}");
+
+                if (Encryption.EncryptionType != encryption)
+                {
+                    Log.Warn($"Encryption found: {Encryption.EncryptionType}");
+                    encryption = Encryption.EncryptionType;
+                }
+            }
+
+            return encryption;
         }
 
 
@@ -142,6 +135,7 @@ namespace ClassicUO.Network
 
         public void Disconnect()
         {
+            SDL.SDL_CaptureMouse(SDL.SDL_bool.SDL_FALSE);
             _isCompressionEnabled = false;
             Statistics.Reset();
             _socket.Disconnect();

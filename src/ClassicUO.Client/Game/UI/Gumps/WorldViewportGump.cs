@@ -1,14 +1,20 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
+using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Input;
+using ClassicUO.LegionScripting;
 using ClassicUO.Network;
 using ClassicUO.Renderer;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
+using ClassicUO.Utility.Logging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -92,6 +98,8 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 UIManager.Add(new VersionHistory(world));
                 ProfileManager.CurrentProfile.LastVersionHistoryShown = CUOEnviroment.Version.ToString();
+                
+                LegionScripting.LegionScripting.DownloadAPIPy();
             }
         }
 

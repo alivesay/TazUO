@@ -35,6 +35,8 @@ namespace ClassicUO.Game.UI.Gumps
         private readonly List<SkillsGroupControl> _skillsControl = new List<SkillsGroupControl>();
         private readonly Label _skillsLabelSum;
         private readonly NiceButton _resetGroups;
+        
+        private static int last_x = 100, last_y = 100;
 
         public StandardSkillsGump(World world) : base(world, 0, 0)
         {
@@ -154,6 +156,16 @@ namespace ClassicUO.Game.UI.Gumps
             RepositionElements();
 
             _container.ReArrangeChildren();
+
+            X = last_x;
+            Y = last_y;
+        }
+
+        protected override void OnMove(int x, int y)
+        {
+            base.OnMove(x, y);
+            last_x = X;
+            last_y = Y;
         }
 
         private void OnScrollSizeChanged(object sender, EventArgs e)
@@ -871,7 +883,7 @@ namespace ClassicUO.Game.UI.Gumps
                         newStatus = 0;
                     }
 
-                    NetClient.Socket.Send_SkillStatusChangeRequest((ushort)Index, newStatus);
+                    AsyncNetClient.Socket.Send_SkillStatusChangeRequest((ushort)Index, newStatus);
 
                     skill.Lock = (Lock) newStatus;
                     SetStatus((Lock) newStatus);

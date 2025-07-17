@@ -266,17 +266,18 @@ namespace ClassicUO.Game.UI.Gumps
 
         private void AddJournalEntry(object sender, JournalEntry entry)
         {
-            var usrSend = entry.Name != string.Empty ? $"{entry.Name}" : string.Empty;
-
             // Check if ignored person
-            if (!string.IsNullOrEmpty(usrSend) && World.IgnoreManager.IgnoredCharsList.Contains(usrSend))
+            if (!string.IsNullOrEmpty(entry.Name) && World.IgnoreManager.IgnoredCharsList.Contains(entry.Name))
                 return;
 
-            string text = $"{usrSend}: {entry.Text}";
-
-            if (string.IsNullOrEmpty(usrSend))
+            string text;
+            if (string.IsNullOrEmpty(entry.Name))
             {
                 text = entry.Text;
+            }
+            else
+            {
+                text = $"{entry.Name}: {entry.Text}";
             }
 
             _journalEntries.AddEntry

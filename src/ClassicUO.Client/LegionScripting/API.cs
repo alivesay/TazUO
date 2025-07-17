@@ -14,6 +14,7 @@ using ClassicUO.Game.Scenes;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Input;
+using ClassicUO.LegionScripting.PyClasses;
 using ClassicUO.Network;
 using FontStashSharp.RichText;
 using Microsoft.Scripting.Hosting;
@@ -80,6 +81,7 @@ namespace ClassicUO.LegionScripting
         #region Python Callback Queue
 
         private readonly Queue<Action> scheduledCallbacks = new();
+        private static readonly ConcurrentDictionary<string, object> sharedVars = new();
 
         private void ScheduleCallback(Action action)
         {
@@ -137,24 +139,24 @@ namespace ClassicUO.LegionScripting
         }
 
         #region Properties
-
+        
         /// <summary>
-        /// Get the players backpack
+        /// Get the player's backpack serial
         /// </summary>
-        public Item Backpack
+        public uint Backpack
         {
             get
             {
                 if (backpack == null)
                     backpack = InvokeOnMainThread(() => World.Player.FindItemByLayer(Game.Data.Layer.Backpack));
-
+                
                 return backpack;
             }
         }
 
 
         /// <summary>
-        /// Returns the player character
+        /// Returns the player character object
         /// </summary>
         public PlayerMobile Player
         {
@@ -166,6 +168,19 @@ namespace ClassicUO.LegionScripting
                 return player;
             }
         }
+
+        /// <summary>
+        /// Return the player's bank container serial if open, otherwise 0
+        /// </summary>
+        public uint Bank {
+            get
+            {
+                var i = World.Player.FindItemByLayer(Layer.Bank);
+                if(i != null)
+                    return i.Serial;
+                return 0;
+            }
+        } 
 
         /// <summary>
         /// Can be used for random numbers.
@@ -194,6 +209,11 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         public uint Found { get; set; }
 
+        /// <summary>
+        /// Access useful player settings.
+        /// </summary>
+        public static PyProfile PyProfile => new();
+
         #endregion
 
         #region Enum
@@ -219,10 +239,75 @@ namespace ClassicUO.LegionScripting
             Invulnerable = 0x07
         }
 
+        public enum PersistentVar
+        {
+            Char,
+            Account,
+            Server,
+            Global
+        }
+
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Set a variable that is shared between scripts.
+        /// Example:
+        /// ```py
+        /// API.SetSharedVar("myVar", 10)
+        /// ```
+        /// </summary>
+        /// <param name="name">Name of the var</param>
+        /// <param name="value">Value, can be a number, text, or *most* other objects too.</param>
+        public void SetSharedVar(string name, object value)
+        {
+            sharedVars[name] = value;
+        }
+
+        /// <summary>
+        /// Get the value of a shared variable.
+        /// Example:
+        /// ```py
+        /// myVar = API.GetSharedVar("myVar")
+        /// if myVar:
+        ///  API.SysMsg(f"myVar is {myVar}")
+        /// ```
+        /// </summary>
+        /// <param name="name">Name of the var</param>
+        /// <returns></returns>
+        public object GetSharedVar(string name)
+        {
+            if (sharedVars.TryGetValue(name, out var v))
+                return v;
+            return null;
+        }
+
+        /// <summary>
+        /// Try to remove a shared variable.
+        /// Example:
+        /// ```py
+        /// API.RemoveSharedVar("myVar")
+        /// ```
+        /// </summary>
+        /// <param name="name">Name of the var</param>
+        public void RemoveSharedVar(string name)
+        {
+            sharedVars.TryRemove(name, out _);
+        }
+
+        /// <summary>
+        /// Clear all shared vars.
+        /// Example:
+        /// ```py
+        /// API.ClearSharedVars()
+        /// ```
+        /// </summary>
+        public void ClearSharedVars()
+        {
+            sharedVars.Clear();
+        }
+        
         /// <summary>
         /// Close all gumps created by the API unless marked to remain open.
         /// </summary>
@@ -279,8 +364,8 @@ namespace ClassicUO.LegionScripting
         ///   API.SysMsg("Cleared left hand: " + leftHand.Name)
         /// ```  
         /// </summary>
-        /// <returns>The item that was in your hand</returns>
-        public Item ClearLeftHand() => InvokeOnMainThread
+        /// <returns>The item serial that was in your hand</returns>
+        public uint ClearLeftHand() => InvokeOnMainThread<uint>
         (() =>
             {
                 Item i = World.Player.FindItemByLayer(Layer.OneHanded);
@@ -294,7 +379,7 @@ namespace ClassicUO.LegionScripting
                 }
 
                 Found = 0;
-                return null;
+                return 0;
             }
         );
 
@@ -308,8 +393,8 @@ namespace ClassicUO.LegionScripting
         ///   API.SysMsg("Cleared right hand: " + rightHand.Name)
         ///  ```  
         /// </summary>
-        /// <returns>The item that was in your hand</returns>
-        public Item ClearRightHand() => InvokeOnMainThread
+        /// <returns>The item serial that was in your hand</returns>
+        public uint ClearRightHand() => InvokeOnMainThread<uint>
         (() =>
             {
                 Item i = World.Player.FindItemByLayer(Layer.TwoHanded);
@@ -323,7 +408,7 @@ namespace ClassicUO.LegionScripting
                 }
 
                 Found = 0;
-                return null;
+                return 0;
             }
         );
 
@@ -496,11 +581,30 @@ namespace ClassicUO.LegionScripting
         /// <param name="amt">0 to grab entire stack</param>
         /// <param name="x">Offset from your location</param>
         /// <param name="y">Offset from your location</param>
-        /// <param name="z">Offset from your location</param>
-        public void QueMoveItemOffset(uint serial, ushort amt = 0, int x = 0, int y = 0, int z = 0) => InvokeOnMainThread
+        /// <param name="z">Offset from your location. Leave blank in most cases</param>
+        /// <param name="OSI">True if you are playing OSI</param>
+        public void QueMoveItemOffset(uint serial, ushort amt = 0, int x = 0, int y = 0, int z = 0, bool OSI = false) => InvokeOnMainThread
         (() =>
             {
-                Client.Game.GetScene<GameScene>()?.MoveItemQueue.Enqueue(serial, 0, amt, World.Player.X + x, World.Player.Y + y, World.Player.Z + z);
+                World.Map.GetMapZ(World.Player.X + x, World.Player.Y + y, out sbyte gz, out sbyte gz2);
+
+                bool useCalculatedZ = false;
+                
+                if (gz > z)
+                {
+                    z = gz;
+                    useCalculatedZ = true;
+                }
+                if(gz2 > z)
+                {
+                    z = gz2;
+                    useCalculatedZ = true;
+                }
+
+                if (!useCalculatedZ)
+                    z = World.Player.Z + z;
+
+                Client.Game.GetScene<GameScene>()?.MoveItemQueue.Enqueue(serial, OSI ? uint.MaxValue : 0, amt, World.Player.X + x, World.Player.Y + y, z);
             }
         );
 
@@ -518,12 +622,31 @@ namespace ClassicUO.LegionScripting
         /// <param name="amt">0 to grab entire stack</param>
         /// <param name="x">Offset from your location</param>
         /// <param name="y">Offset from your location</param>
-        /// <param name="z">Offset from your location</param>
-        public void MoveItemOffset(uint serial, int amt = 0, int x = 0, int y = 0, int z = 0) => InvokeOnMainThread
+        /// <param name="z">Offset from your location. Leave blank in most cases</param>
+        /// <param name="OSI">True if you are playing OSI</param>
+        public void MoveItemOffset(uint serial, int amt = 0, int x = 0, int y = 0, int z = 0, bool OSI = false) => InvokeOnMainThread
         (() =>
             {
+                World.Map.GetMapZ(World.Player.X + x, World.Player.Y + y, out sbyte gz, out sbyte gz2);
+
+                bool useCalculatedZ = false;
+                
+                if (gz > z)
+                {
+                    z = gz;
+                    useCalculatedZ = true;
+                }
+                if(gz2 > z)
+                {
+                    z = gz2;
+                    useCalculatedZ = true;
+                }
+
+                if (!useCalculatedZ)
+                    z = World.Player.Z + z;
+                
                 GameActions.PickUp(World, serial, 0, 0, amt);
-                GameActions.DropItem(serial, World.Player.X + x, World.Player.Y + y, World.Player.Z + z, 0);
+                GameActions.DropItem(serial, World.Player.X + x, World.Player.Y + y, z, OSI ? uint.MaxValue : 0);
             }
         );
 
@@ -588,6 +711,30 @@ namespace ClassicUO.LegionScripting
                 return false;
             }
         );
+
+        /// <summary>
+        /// Get a list of all buffs that are active.
+        /// See [Buff](Buff.md) to see what attributes are available.
+        /// Buff does not get updated after you access it in python, you will need to call this again to get the latest buff data.
+        /// Example:
+        /// ```py
+        /// buffs = API.ActiveBuffs()
+        /// for buff in buffs:
+        ///     API.SysMsg(buff.Title)
+        /// ```
+        /// </summary>
+        /// <returns></returns>
+        public Buff[] ActiveBuffs() => InvokeOnMainThread(() =>
+        {
+            List<Buff> buffs = new();
+
+            foreach (BuffIcon buff in World.Player.BuffIcons.Values)
+            {
+                buffs.Add(new Buff(buff));
+            }
+
+            return buffs.ToArray();
+        });
 
         /// <summary>
         /// Show a system message(Left side of screen).  
@@ -708,7 +855,7 @@ namespace ClassicUO.LegionScripting
         /// ```  
         /// </summary>
         /// <param name="serial">The serial</param>
-        /// <returns></returns>
+        /// <returns>The item object</returns>
         public Item FindItem(uint serial) => InvokeOnMainThread(() =>
         {
             Item i = World.Items.Get(serial);
@@ -937,15 +1084,42 @@ namespace ClassicUO.LegionScripting
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="distance">Distance away from goal to stop.</param>
-        public void Pathfind(int x, int y, int z = int.MinValue, int distance = 0) => InvokeOnMainThread
-        (() =>
-            {
-                if (z == int.MinValue)
-                    z = World.Player.Z;
+        /// <param name="wait">True/False if you want to wait for pathfinding to complete or time out</param>
+        /// <param name="timeout">Seconds to wait before cancelling waiting</param>
+        /// <returns>true/false if a path was generated</returns>
+        public bool Pathfind(int x, int y, int z = int.MinValue, int distance = 1, bool wait = false, int timeout = 10)
+        {
+            var pathFindStatus = InvokeOnMainThread
+            (() =>
+                {
+                    if (z == int.MinValue)
+                        z = World.Player.Z;
 
-                World.Player.Pathfinder.WalkTo(x, y, z, distance);
+                    return World.Player.Pathfinder.WalkTo(x, y, z, distance);
+                }
+            );
+
+            if (!wait)
+                return pathFindStatus;
+            
+            if(timeout > 30)
+                timeout = 30;
+            
+            var expire = DateTime.Now.AddSeconds(timeout);
+            
+            while (InvokeOnMainThread(()=>World.Player.Pathfinder.AutoWalking))
+            {
+                if (DateTime.Now >= expire)
+                {
+                    InvokeOnMainThread(World.Player.Pathfinder.StopAutoWalk);
+                    return false;
+                }
             }
-        );
+
+            InvokeOnMainThread(World.Player.Pathfinder.StopAutoWalk);
+
+            return InvokeOnMainThread(()=>World.Player.DistanceFrom(new Vector2(x, y)) <= distance);
+        }
 
         /// <summary>
         /// Attempt to pathfind to a mobile or item.  
@@ -953,25 +1127,54 @@ namespace ClassicUO.LegionScripting
         /// ```py
         /// mob = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)
         /// if mob:
-        ///   API.Pathfind(mob)
+        ///   API.PathfindEntity(mob)
         /// ```
         /// </summary>
         /// <param name="entity">The mobile or item</param>
         /// <param name="distance">Distance to stop from goal</param>
-        public void Pathfind(uint entity, int distance = 0) => InvokeOnMainThread
-        (() =>
-            {
-                var mob = World.Get(entity);
-
-                if (mob != null)
+        /// <param name="wait">True/False if you want to wait for pathfinding to complete or time out</param>
+        /// <param name="timeout">Seconds to wait before cancelling waiting</param>
+        /// <returns>true/false if a path was generated</returns>
+        public bool PathfindEntity(uint entity, int distance = 1, bool wait = false, int timeout = 10)
+        {
+            int x = 0, y = 0, z = 0;
+            var pathFindStatus = InvokeOnMainThread
+            (() =>
                 {
-                    if (mob is Mobile)
-                        World.Player.Pathfinder.WalkTo(mob.X, mob.Y, mob.Z, distance);
-                    else if (mob is Item i && i.OnGround)
-                        World.Player.Pathfinder.WalkTo(i.X, i.Y, i.Z, distance);
+                    var mob = World.Get(entity);
+                    if (mob != null)
+                    {
+                        x = mob.X;
+                        y = mob.Y;
+                        z = mob.Z;
+                        return World.Player.Pathfinder.WalkTo(x, y, z, distance);
+                    }
+
+                    return false;
+                }
+            );
+            
+            if(!wait || (x == 0 && y == 0))
+                return pathFindStatus;
+
+            if(timeout > 30)
+                timeout = 30;
+            
+            var expire = DateTime.Now.AddSeconds(timeout);
+            
+            while (InvokeOnMainThread(()=>World.Player.Pathfinder.AutoWalking))
+            {
+                if (DateTime.Now >= expire)
+                {
+                    InvokeOnMainThread(World.Player.Pathfinder.StopAutoWalk);
+                    return false;
                 }
             }
-        );
+
+            InvokeOnMainThread(World.Player.Pathfinder.StopAutoWalk);
+
+            return InvokeOnMainThread(()=>World.Player.DistanceFrom(new Vector2(x, y)) <= distance);
+        }
 
         /// <summary>
         /// Check if you are already pathfinding.
@@ -1081,28 +1284,18 @@ namespace ClassicUO.LegionScripting
         public void Rename(uint serial, string name) => InvokeOnMainThread(() => { GameActions.Rename(serial, name); });
 
         /// <summary>
-        /// Attempt to dismount if mounted.  
+        /// Attempt to dismount if mounted.
         /// Example:  
         /// ```py
-        /// mount = API.Dismount()
-        /// if mount:
-        ///   API.UseObject(mount)
+        /// API.Dismount()
         /// ```
         /// </summary>
-        /// <returns>Returns your mount</returns>
-        public Item Dismount() => InvokeOnMainThread
+        public void Dismount() => InvokeOnMainThread
         (() =>
             {
-                Item mount = World.Player.FindItemByLayer(Layer.Mount);
-
-                if (mount != null)
-                {
+                if (World.Player.FindItemByLayer(Layer.Mount) != null)
                     GameActions.DoubleClick(World, World.Player);
-
-                    return mount;
-                }
-
-                return null;
+                
             }
         );
 
@@ -1192,7 +1385,7 @@ namespace ClassicUO.LegionScripting
         /// ```py
         /// target = API.RequestTarget()
         /// if target:
-        ///   API.SysMsg("Targeted: " + str(target.Name))
+        ///   API.SysMsg("Targeted serial: " + str(target))
         /// ```
         /// </summary>
         /// <param name="timeout">Mac duration to wait for them to target something.</param>
@@ -1221,7 +1414,8 @@ namespace ClassicUO.LegionScripting
         public void TargetSelf() => InvokeOnMainThread(() => World.TargetManager.Target(World.Player.Serial));
 
         /// <summary>
-        /// Target a land tile relative to your position.  
+        /// Target a land tile relative to your position.
+        /// If this doesn't work, try TargetTileRel instead.
         /// Example:  
         /// ```py
         /// API.TargetLand(1, 1)
@@ -1244,7 +1438,8 @@ namespace ClassicUO.LegionScripting
         );
 
         /// <summary>
-        /// Target a tile relative to your location.  
+        /// Target a tile relative to your location.
+        /// If this doesn't work, try TargetLandRel instead.'
         /// Example:  
         /// ```py
         /// API.TargetTileRel(1, 1)
@@ -1252,8 +1447,8 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         /// <param name="xOffset">X Offset from your position</param>
         /// <param name="yOffset">Y Offset from your position</param>
-        /// <param name="graphic">Optional graphic, will only target if tile matches this</param>
-        public void TargetTileRel(int xOffset, int yOffset, uint graphic = uint.MaxValue) => InvokeOnMainThread
+        /// <param name="graphic">Optional graphic, will try to use the graphic of the tile at that location if left empty.</param>
+        public void TargetTileRel(int xOffset, int yOffset, ushort graphic = ushort.MaxValue) => InvokeOnMainThread
         (() =>
             {
                 if (!World.TargetManager.IsTargeting)
@@ -1261,13 +1456,16 @@ namespace ClassicUO.LegionScripting
 
                 ushort x = (ushort)(World.Player.X + xOffset);
                 ushort y = (ushort)(World.Player.Y + yOffset);
-
+                short z = World.Player.Z;
                 GameObject g = World.Map.GetTile(x, y);
 
-                if (graphic != uint.MaxValue && g.Graphic != graphic)
-                    return;
+                if (graphic == ushort.MaxValue && g != null)
+                {
+                    graphic = g.Graphic;
+                    z = g.Z;
+                }
 
-                World.TargetManager.Target(g.Graphic, x, y, g.Z);
+                World.TargetManager.Target(graphic, x, y, z);
             }
         );
 
@@ -1306,6 +1504,19 @@ namespace ClassicUO.LegionScripting
                 return World.TargetManager.IsTargeting && (World.TargetManager.TargetingType == targetT || targetType.ToLower() == "any");
             }
         );
+
+        /// <summary>
+        /// Get the current map index.
+        /// Standard maps are:
+        /// 0 = Fel
+        /// 1 = Tram
+        /// 2 = Ilshenar
+        /// 3 = Malas
+        /// 4 = Tokuno
+        /// 5 = TerMur
+        /// </summary>
+        /// <returns></returns>
+        public int GetMap() => InvokeOnMainThread(() => World.MapIndex);
 
         /// <summary>
         /// Set a skills lock status.  
@@ -1642,7 +1853,7 @@ namespace ClassicUO.LegionScripting
 
         /// <summary>
         /// Check if the journal contains *any* of the strings in this list.
-        /// Can be regex, prepend your msgs with $  .
+        /// Can be regex, prepend your msgs with $
         /// Example:  
         /// ```py
         /// if API.InJournalAny(["You have been slain", "You are dead"]):
@@ -1932,7 +2143,7 @@ namespace ClassicUO.LegionScripting
         /// <param name="y"></param>
         /// <returns>A GameObject of that location.</returns>
         public GameObject GetTile(int x, int y) => InvokeOnMainThread(() => { return World.Map.GetTile(x, y); });
-
+        
         #region Gumps
 
         /// <summary>
@@ -1992,10 +2203,12 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         /// <param name="text">Optional text label</param>
         /// <param name="hue">Optional hue</param>
+        /// <param name="isChecked">Default false, set to true if you want this checkbox checked on creation</param>
         /// <returns>The checkbox</returns>
-        public Checkbox CreateGumpCheckbox(string text = "", ushort hue = 0) => new Checkbox(0x00D2, 0x00D3, text, color: hue)
+        public Checkbox CreateGumpCheckbox(string text = "", ushort hue = 0, bool isChecked = false) => new Checkbox(0x00D2, 0x00D3, text, color: hue)
         {
-            CanMove = true
+            CanMove = true,
+            IsChecked = isChecked
         };
 
         /// <summary>
@@ -2133,11 +2346,12 @@ namespace ClassicUO.LegionScripting
         /// <param name="inactive">Unchecked graphic</param>
         /// <param name="active">Checked graphic</param>
         /// <param name="hue">Text color</param>
+        /// <param name="isChecked">Defaults false, set to true if you want this button checked by default.</param>
         /// <returns></returns>
-        public RadioButton CreateGumpRadioButton(string text = "", int group = 0, ushort inactive = 0x00D0, ushort active = 0x00D1, ushort hue = 0xFFFF)
+        public RadioButton CreateGumpRadioButton(string text = "", int group = 0, ushort inactive = 0x00D0, ushort active = 0x00D1, ushort hue = 0xFFFF, bool isChecked = false)
         {
             RadioButton rb = new RadioButton(group, inactive, active, text, color: hue);
-
+            rb.IsChecked = isChecked;
             return rb;
         }
 
@@ -2289,6 +2503,23 @@ namespace ClassicUO.LegionScripting
         }
 
         /// <summary>
+        /// Create a gump pic(Use this for gump art, not item art)
+        /// Example:
+        /// ```py
+        /// gumpPic = API.CreateGumpPic(0xafb)
+        /// gump.Add(gumpPic)
+        /// </summary>
+        /// <param name="graphic"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="hue"></param>
+        /// <returns></returns>
+        public GumpPic CreateGumpPic(ushort graphic, int x = 0, int y = 0, ushort hue = 0)
+        {
+            return new GumpPic(x, y, graphic, hue);
+        }
+
+        /// <summary>
         /// Add an onClick callback to a control.  
         /// Example:  
         /// ```py
@@ -2303,35 +2534,78 @@ namespace ClassicUO.LegionScripting
         /// <param name="control">The control listening for clicks</param>
         /// <param name="onClick">The callback function</param>
         /// <param name="leftOnly">Only accept left mouse clicks?</param>
-        public void AddControlOnClick(Control control, object onClick, bool leftOnly = true)
+        /// <returns>Returns the control so methods can be chained.</returns>
+        public Control AddControlOnClick(Control control, object onClick, bool leftOnly = true)
         {
-            if (control == null)
-                return;
+            if (control == null || onClick == null || !engine.Operations.IsCallable(onClick))
+                return control;
 
-            if (onClick != null && engine.Operations.IsCallable(onClick))
+            control.AcceptMouseInput = true;
+
+            control.MouseUp += (s, e) =>
             {
-                control.AcceptMouseInput = true;
+                if (leftOnly && e.Button != MouseButtonType.Left)
+                    return;
 
-                control.MouseUp += (s, e) =>
-                {
-                    if (leftOnly && e.Button != MouseButtonType.Left)
-                        return;
-
-                    this?.ScheduleCallback
-                    (() =>
+                this?.ScheduleCallback
+                (() =>
+                    {
+                        try
                         {
-                            try
-                            {
-                                engine.Operations.Invoke(onClick);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Script callback error: {ex}");
-                            }
+                            engine.Operations.Invoke(onClick);
                         }
-                    );
-                };
-            }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Script callback error: {ex}");
+                        }
+                    }
+                );
+            };
+
+            return control;
+        }
+        
+        /// <summary>
+        /// Add onDispose(Closed) callback to a control.
+        /// Example:
+        /// ```py
+        /// def onClose():
+        ///     API.Stop()
+        ///
+        /// gump = API.CreateGump()
+        /// gump.SetRect(100, 100, 200, 200)
+        ///
+        /// bg = API.CreateGumpColorBox(opacity=0.7, color="#000000")
+        /// gump.Add(bg.SetRect(0, 0, 200, 200))
+        ///
+        /// API.AddControlOnDisposed(gump, onClose)
+        /// ```
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="onDispose"></param>
+        /// <returns></returns>
+        public Control AddControlOnDisposed(Control control, object onDispose)
+        {
+            if (control == null || onDispose == null || !engine.Operations.IsCallable(onDispose))
+                return control;
+            
+            control.Disposed += (s, e) =>
+            {
+                this?.ScheduleCallback
+                (() =>
+                    {
+                        try
+                        {
+                            engine.Operations.Invoke(onDispose);
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }
+                );
+            };
+
+            return control;
         }
 
         #endregion
@@ -2420,6 +2694,48 @@ namespace ClassicUO.LegionScripting
                 }
             }
         );
+        
+        /// <summary>
+        /// Play a legion script.
+        /// </summary>
+        /// <param name="scriptName">This is the file name including extension.</param>
+        public void PlayScript(string scriptName) => InvokeOnMainThread
+        (() =>
+            {
+                if (string.IsNullOrEmpty(scriptName))
+                    GameActions.Print(World, "[PlayScript] Script name can't be empty.");
+
+                foreach (var script in LegionScripting.LoadedScripts)
+                {
+                    if (script.FileName == scriptName)
+                    {
+                        LegionScripting.PlayScript(script);
+                        return;
+                    }
+                }
+            }
+        );
+        
+        /// <summary>
+        /// Stop a legion script. 
+        /// </summary>
+        /// <param name="scriptName">This is the file name including extension.</param>
+        public void StopScript(string scriptName) => InvokeOnMainThread
+        (() =>
+            {
+                if (string.IsNullOrEmpty(scriptName))
+                    GameActions.Print(World, "[StopScript] Script name can't be empty.");
+
+                foreach (var script in LegionScripting.LoadedScripts)
+                {
+                    if (script.FileName == scriptName)
+                    {
+                        LegionScripting.StopScript(script);
+                        return;
+                    }
+                }
+            }
+        );
 
         /// <summary>
         /// Add a marker to the current World Map (If one is open)  
@@ -2472,6 +2788,78 @@ namespace ClassicUO.LegionScripting
             wmap.RemoveUserMarker(name);
         });
 
-    #endregion
-}
+        /// <summary>
+        /// Check if the move item queue is being processed. You can use this to prevent actions if the queue is being processed.
+        /// Example:
+        /// ```py
+        /// if API.IsProcessingMoveQue():
+        ///   API.Pause(0.5)
+        /// ```
+        /// </summary>
+        /// <returns></returns>
+        public bool IsProcessingMoveQue() => InvokeOnMainThread(() => !MoveItemQueue.Instance.IsEmpty);
+
+        /// <summary>
+        /// Save a variable that persists between sessions and scripts.
+        /// Example:
+        /// ```py
+        /// API.SavePersistentVar("TotalKills", "5", API.PersistentVar.Char)
+        /// ```
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="scope"></param>
+        public void SavePersistentVar(string name, string value, PersistentVar scope)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                GameActions.Print(World, "Var's must have a name.", 32);
+                return;
+            }
+            
+            PersistentVars.SaveVar(scope, name, value);
+        }
+
+        /// <summary>
+        /// Delete/remove a persistent variable.
+        /// Example:
+        /// ```py
+        /// API.RemovePersistentVar("TotalKills", API.PersistentVar.Char)
+        /// ```
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="scope"></param>
+        public void RemovePersistentVar(string name, PersistentVar scope)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                GameActions.Print(World, "Var's must have a name.", 32);
+                return;
+            }
+            
+            PersistentVars.DeleteVar(scope, name);
+        }
+
+        /// <summary>
+        /// Get a persistent variable.
+        /// Example:
+        /// ```py
+        /// API.GetPersistentVar("TotalKills", "0", API.PersistentVar.Char)
+        /// ```
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="defaultValue">The value returned if no value was saved</param>
+        /// <param name="scope"></param>
+        public string GetPersistentVar(string name, string defaultValue, PersistentVar scope)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                GameActions.Print(World, "Var's must have a name.", 32);
+                return defaultValue;
+            }
+            
+            return PersistentVars.GetVar(scope, name, defaultValue);
+        }
+        #endregion
+    }
 }

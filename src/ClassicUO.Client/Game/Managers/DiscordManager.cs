@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
+using System.Threading.Tasks;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Utility;
@@ -69,6 +70,7 @@ public class DiscordManager
     private static Dictionary<ulong, Color> userHueMemory = new();
     private Dictionary<ulong, LobbyHandle> currentLobbies = new();
     private World World;
+    private Timer richPresenceTimer;
 
     private int disconnectAttempts = 0;
     int pendingDisconnectLeaves;
@@ -254,17 +256,16 @@ public class DiscordManager
 
     private void OnUOConnected(object sender, EventArgs e)
     {
-        client.CreateOrJoinLobbyWithMetadata(GenServerSecret(), GenServerMeta(), new Dictionary<string, string>(), (_, _) => { });
+        RunLater(JoinGameLobby);
     }
 
     private void OnPlayerCreated(object sender, EventArgs e)
     {
-        UpdateRichPresence(true);
+        RunLater(()=>UpdateRichPresence(true));
     }
 
     private void OnUODisconnected(object sender, EventArgs e)
     {
-        //TODO: Save activity from before and change it instead of resetting
         client.UpdateRichPresence(new Activity(), OnUpdateRichPresence); //Reset presence
     }
 
@@ -275,7 +276,9 @@ public class DiscordManager
         connected = true;
         OnConnected?.Invoke();
 
-        client.CreateOrJoinLobbyWithMetadata(TUOLOBBY, TUOMETA, new Dictionary<string, string>(), (_, _) => { });
+        RunLater(JoinGlobalLobby);
+        
+        richPresenceTimer = new Timer(_=>PeriodicChecks(), null, TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
     }
 
     private string GenServerSecret()
@@ -291,14 +294,40 @@ public class DiscordManager
         };
     }
 
-    private void UpdateRichPresence(bool includeParty = false)
+    private void PeriodicChecks()
+    {
+        RunLater(JoinGlobalLobby);
+        RunLater(JoinGameLobby);
+        RunLater(()=>UpdateRichPresence());
+    }
+
+    private static long furthestAction;
+
+    private static async void RunLater(Action action)
+    {
+        long now = Time.Ticks;
+
+        // Schedule at least 1s after the last one, or now if no pending delay
+        if (now > furthestAction)
+            furthestAction = now;
+
+        furthestAction += 2000; // push it forward by 1 second per action
+
+        int delayMs = (int)(furthestAction - now);
+        await Task.Delay(delayMs);
+
+        action();
+    }
+
+    private static ulong unixStart = (ulong)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    private void UpdateRichPresence(bool includeParty = true)
     {
         Log.Debug("Updating rich presence.");
         Activity activity = new Activity();
         activity.SetName("Ultima Online");
         activity.SetType(ActivityTypes.Playing);
 
-        if (includeParty)
+        if (includeParty && World.InGame)
         {
             var party = new ActivityParty();
             party.SetPrivacy(ActivityPartyPrivacy.Public);
@@ -312,7 +341,7 @@ public class DiscordManager
         }
 
         var ts = new ActivityTimestamps();
-        ts.SetStart(0);
+        ts.SetStart(unixStart);
         activity.SetTimestamps(ts);
 
         client.UpdateRichPresence(activity, OnUpdateRichPresence);
@@ -422,9 +451,50 @@ public class DiscordManager
         OnLobbyCreated?.Invoke(currentLobbies[lobbyId]);
     }
 
+    private void JoinGlobalLobby()
+    { 
+        client.CreateOrJoinLobbyWithMetadata(TUOLOBBY, TUOMETA, new Dictionary<string, string>(), GameGameJoinCallback);
+    }
+    private void JoinGameLobby()
+    {
+        if (World.InGame)
+            client.CreateOrJoinLobbyWithMetadata(GenServerSecret(), GenServerMeta(), new Dictionary<string, string>(), GameLobbyJoinCallback);
+    }
+
+    private void GameGameJoinCallback(ClientResult result, ulong lobbyId)
+    {
+        if (!result.Successful())
+        {
+            long now = Time.Ticks;
+            furthestAction = Math.Max(furthestAction, now);
+            furthestAction += 500 + (long)(result.RetryAfter()*1000);
+            RunLater(JoinGameLobby);
+        }
+    }
+    private void GameLobbyJoinCallback(ClientResult result, ulong lobbyId)
+    {
+        if (!result.Successful())
+        {
+            long now = Time.Ticks;
+            furthestAction = Math.Max(furthestAction, now);
+            furthestAction += 500 + (long)(result.RetryAfter()*1000);
+            RunLater(JoinGameLobby);
+        }
+    }
+
     private void OnLobbyDeletedCallback(ulong lobbyId)
     {
         currentLobbies.Remove(lobbyId);
+        
+        if(!noreconnect)
+        {
+            if(connected)
+            { 
+                RunLater(JoinGlobalLobby);
+                RunLater(JoinGameLobby);
+            }
+        }
+        
         OnLobbyDeleted?.Invoke(lobbyId);
     }
 

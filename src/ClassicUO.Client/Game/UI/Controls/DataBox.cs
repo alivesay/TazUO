@@ -20,6 +20,13 @@ namespace ClassicUO.Game.UI.Controls
 
         public bool ContainsByBounds { get; set; }
 
+        public override T Add<T>(T c, int page = 0)
+        {
+            base.Add(c, page);
+            c.UpdateOffset(0, Offset.Y);
+            return c;
+        }
+
         public void ReArrangeChildrenGridStyle(int vspacing = 0, int hspacing = 0)
         {
             // Grid layout: left to right, top to bottom

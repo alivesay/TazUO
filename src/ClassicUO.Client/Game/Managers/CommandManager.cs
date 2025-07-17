@@ -18,6 +18,7 @@ using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Configuration;
 using ClassicUO.LegionScripting;
 using ClassicUO.Game.UI.Gumps.SpellBar;
+using ClassicUO.LegionScripting;
 
 namespace ClassicUO.Game.Managers
 {
@@ -35,20 +36,11 @@ namespace ClassicUO.Game.Managers
 
         public void Initialize()
         {
+            Register("sb", (s)=>UIManager.Add(new SpellBar(_world)));
+            
             Register("updateapi", (s) =>
             {
-                try
-                {
-                    var client = new WebClient();
-                    var api = client.DownloadString(new Uri("https://raw.githubusercontent.com/bittiez/TazUO/refs/heads/dev/src/ClassicUO.Client/LegionScripting/API.py"));
-                    File.WriteAllText(Path.Combine(CUOEnviroment.ExecutablePath, "LegionScripts", "API.py"), api);
-                    GameActions.Print(_world, "Updated API!");
-                }
-                catch (Exception ex)
-                {
-                    GameActions.Print(_world, "Failed to update the API..", 32);
-                    Log.Error(ex.ToString());
-                }
+                LegionScripting.LegionScripting.DownloadAPIPy();
             });
             
             Register

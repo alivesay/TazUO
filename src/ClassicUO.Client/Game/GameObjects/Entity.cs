@@ -152,7 +152,7 @@ namespace ClassicUO.Game.GameObjects
                     Socket.Send_NameRequest(Serial);
                 }
 
-                UIManager.Add(new NameOverheadGump(World, this));
+                UIManager.Add(new NameOverheadGump(World, this), false);
             }
 
 

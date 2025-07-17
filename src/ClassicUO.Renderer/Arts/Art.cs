@@ -47,6 +47,7 @@ namespace ClassicUO.Renderer.Arts
                 {
                     artInfo = _artLoader.GetArt(idx);
                 }
+                
                 if (artInfo.Pixels.IsEmpty && idx > 0)
                 {
                     // Trying to load a texture that does not exist in the client MULs
@@ -56,6 +57,7 @@ namespace ClassicUO.Renderer.Arts
                     );
                     return ref Get(0); // ItemID of "UNUSED" placeholder
                 }
+                
                 if (!artInfo.Pixels.IsEmpty)
                 {
                     spriteInfo.Texture = _atlas.AddSprite(

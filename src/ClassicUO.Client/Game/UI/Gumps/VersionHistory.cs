@@ -13,7 +13,14 @@ namespace ClassicUO.Game.UI.Gumps
             "- Change multi item move to use shared move item queue\n" +
             "- Prevent closing containers when changing facets\n" +
             "- Added Create macro button for legion scripts\n" +
-            "- Potential Crash fix from CUO\n",
+            "- Potential Crash fix from CUO\n" +
+            "- Python API changes\n" +
+            "- Change how skill message frequency option works - fuzzlecutter\n" +
+            "- Added an option to default to old container style with the option to switch to grid container style\n" +
+            "- Added option to remove System prefix in journal\n" +
+            "- Minor bug fixes\n" +
+            "- Spellbar!\n" +
+            "- Implemented Async networking\n",
             
             "/c[white][3.32.0]/cd\n" +
             "- Added simple progress bar control for Python API gumps.\n" +
@@ -334,8 +341,8 @@ namespace ClassicUO.Game.UI.Gumps
                 Utility.Platforms.PlatformHelper.LaunchBrowser("https://discord.gg/QvqzkB95G4");
             };
 
-            CenterXInScreen();
-            CenterYInScreen();
+            CenterXInViewPort();
+            CenterYInViewPort();
         }
     }
 }

@@ -65,7 +65,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 {
                     if (e.Button == Input.MouseButtonType.Left)
                     {
-                        ExportGridHighlightSettings();
+                        ExportGridHighlightSettings(World);
                     }
                 };
 

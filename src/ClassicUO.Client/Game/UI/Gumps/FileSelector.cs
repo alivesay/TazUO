@@ -30,8 +30,8 @@ namespace ClassicUO.Game.UI.Gumps
         private string _title;
         private FileSelectorType _type;
 
-        public FileSelector(FileSelectorType type, string initialPath = null, string[] fileExtensions = null, Action<string> onFileSelected = null, string title = "File Browser") 
-            : base(0, 0)
+        public FileSelector(World world, FileSelectorType type, string initialPath = null, string[] fileExtensions = null, Action<string> onFileSelected = null, string title = "File Browser") 
+            : base(world, 0, 0)
         {
             _type = type;
             _title = title;
@@ -322,9 +322,9 @@ namespace ClassicUO.Game.UI.Gumps
         }
 
         // Static helper method to create and show the file browser
-        public static void ShowFileBrowser(FileSelectorType type, string initialPath = null, string[] fileExtensions = null, Action<string> onFileSelected = null, string title = "File Browser")
+        public static void ShowFileBrowser(World world, FileSelectorType type, string initialPath = null, string[] fileExtensions = null, Action<string> onFileSelected = null, string title = "File Browser")
         {
-            var gump = new FileSelector(type, initialPath, fileExtensions, onFileSelected, title);
+            var gump = new FileSelector(world, type, initialPath, fileExtensions, onFileSelected, title);
             UIManager.Add(gump);
         }
     }

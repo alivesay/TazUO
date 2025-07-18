@@ -138,7 +138,7 @@ namespace ClassicUO.LegionScripting
             {
                 RefreshContent = false;
                 Dispose();
-                ScriptManagerGump g = new ScriptManagerGump() { X = X, Y = Y };
+                ScriptManagerGump g = new ScriptManagerGump(World) { X = X, Y = Y };
                 g.ResizeWindow(new Point(Width, Height));
                 UIManager.Add(g);
             }

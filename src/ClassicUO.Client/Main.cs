@@ -40,6 +40,7 @@ namespace ClassicUO
 
         public static void Boot(UnmanagedAssistantHost pluginHost, string[] args)
         {
+            CopyRequiredLibs();
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             Language.Load();
             Log.Start(LogTypes.All);
@@ -502,5 +503,27 @@ namespace ClassicUO
                 }
             }
         }
+
+        private static void CopyRequiredLibs()
+        {
+            string nativePath = Path.Combine(AppContext.BaseDirectory, GetPlatformFolder());
+            foreach (var file in Directory.GetFiles(nativePath))
+                File.Copy(file, AppContext.BaseDirectory + Path.GetFileName(file), overwrite: true);
+
+        }
+        private static string GetPlatformFolder()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return "x64";
+                // return RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "win-arm" : "x64";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return "lib64";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return "osx";
+                //return RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "osx-arm" : "osx";
+
+            throw new PlatformNotSupportedException();
+        }
+
     }
 }

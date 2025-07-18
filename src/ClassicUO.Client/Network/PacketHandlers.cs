@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using ClassicUO.Game.UI.Gumps.Login;
 
 namespace ClassicUO.Network;
 sealed class PacketHandlers
@@ -2320,6 +2321,8 @@ sealed class PacketHandlers
         {
             var scene = new GameScene(world);
             Client.Game.SetScene(scene);
+            LoginScene.Instance?.Dispose();
+            LoginGump.Instance?.Dispose();
 
             //GameActions.OpenPaperdoll(world.Player);
             GameActions.RequestMobileStatus(world, world.Player);

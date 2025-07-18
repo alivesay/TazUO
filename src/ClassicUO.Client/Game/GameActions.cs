@@ -997,8 +997,10 @@ internal static class GameActions
             else
             {
                 Client.Game.GetScene<GameScene>().DisconnectionRequested = true;
-                Socket.Disconnect().Wait();
                 Client.Game.SetScene(new LoginScene(world));
+                
+                Socket?.Disconnect();
+                Socket = new AsyncNetClient();
             }
         }
 

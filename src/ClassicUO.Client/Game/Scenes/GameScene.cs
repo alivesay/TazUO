@@ -417,7 +417,7 @@ namespace ClassicUO.Game.Scenes
             if (DisconnectionRequested)
             {
                 Client.Game.SetScene(new LoginScene(_world));
-
+                
                 return;
             }
             if (Settings.GlobalSettings.Reconnect)

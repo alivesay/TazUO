@@ -87,8 +87,10 @@
   <ItemGroup>
     <DataFiles_iplib Include="$(ProjectDir)..\..\external\iplib\**\*.*" />
     <DataFiles_x64 Include="$(ProjectDir)..\..\external\x64\*.*" />
+    <DataFiles_win-arm Include="$(ProjectDir)..\..\external\win-arm\*.*" />
     <DataFiles_lib64 Include="$(ProjectDir)..\..\external\lib64\*.*" />
     <DataFiles_osx Include="$(ProjectDir)..\..\external\osx\*.*" />
+    <DataFiles_osx-arm Include="$(ProjectDir)..\..\external\osx-arm\*.*" />
     <DataFiles_vulkan Include="$(ProjectDir)..\..\external\vulkan\icd.d\*.*" />
   </ItemGroup>
 
@@ -161,8 +163,10 @@
 
     <Copy SourceFiles="@(DataFiles_iplib)" DestinationFiles="@(DataFiles_iplib -> '$(TargetDir)\iplib\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_x64)" DestinationFolder="$(TargetDir)\x64\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_win-arm)" DestinationFolder="$(TargetDir)\win-arm\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_lib64)" DestinationFolder="$(TargetDir)\lib64\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_osx)" DestinationFolder="$(TargetDir)\osx\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_osx-arm)" DestinationFolder="$(TargetDir)\osx-arm\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(TargetDir)\vulkan\icd.d\" SkipUnchangedFiles="true" />
 
     <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(TargetDir)\" SkipUnchangedFiles="true" Condition="$(TargetFramework.StartsWith('net4'))" />
@@ -175,9 +179,11 @@
 
     <Copy SourceFiles="@(DataFiles_iplib)" DestinationFiles="@(DataFiles_iplib -> '$(PublishDir)\iplib\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_x64)" DestinationFolder="$(PublishDir)\x64\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_win-arm)" DestinationFolder="$(PublishDir)\win-arm\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_lib64)" DestinationFolder="$(PublishDir)\lib64\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_osx)" DestinationFolder="$(PublishDir)\osx\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(PublishDir)\vulkan\icd.d\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DataFiles_osx-arm)" DestinationFolder="$(PublishDir)\osx-arm\" SkipUnchangedFiles="true" />
 
     <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(PublishDir)\" SkipUnchangedFiles="true" Condition="$(TargetFramework.StartsWith('net4'))" />
   </Target>

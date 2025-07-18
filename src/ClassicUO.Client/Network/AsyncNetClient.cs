@@ -25,7 +25,7 @@ namespace ClassicUO.Network
         public event EventHandler<SocketError> OnError;
         public event EventHandler<byte[]> OnDataReceived;
 
-        public async Task<bool> ConnectAsync(string ip, int port, CancellationToken cancellationToken = default)
+        public async Task<bool> ConnectAsync(string ip, int port, CancellationToken cancellationToken = default, int timeoutS = 2)
         {
             if (IsConnected)
                 return true;
@@ -35,8 +35,18 @@ namespace ClassicUO.Network
                 _socket = new TcpClient();
                 _socket.NoDelay = true;
                 _cancellationTokenSource = new CancellationTokenSource();
+                
+                var connectTask = _socket.ConnectAsync(ip, port);
+                var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutS), _cancellationTokenSource.Token); // set your timeout here
 
-                await _socket.ConnectAsync(ip, port);
+                var completedTask = await Task.WhenAny(connectTask, timeoutTask);
+
+                if (completedTask == timeoutTask)
+                {
+                    _socket.Close(); // optional: cleanup
+
+                    return false;
+                }
 
                 if (!IsConnected)
                 {
@@ -254,6 +264,10 @@ namespace ClassicUO.Network
                 _cancellationTokenSource = new CancellationTokenSource();
                 _networkTask = Task.Run(() => NetworkLoopAsync(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
             }
+            else
+            {
+                Disconnected?.Invoke(this, SocketError.NotConnected);
+            }
 
             return success;
         }
@@ -382,7 +396,7 @@ namespace ClassicUO.Network
 
             if (!skipEncryption)
             {
-                EncryptionHelper.Instance.Encrypt(!_isCompressionEnabled, message, message, message.Length);
+                EncryptionHelper.Instance?.Encrypt(!_isCompressionEnabled, message, message, message.Length);
             }
 
             lock (_sendStream)
@@ -399,7 +413,7 @@ namespace ClassicUO.Network
             if (!_isCompressionEnabled)
                 return;
 
-            EncryptionHelper.Instance.Decrypt(buffer, buffer, buffer.Length);
+            EncryptionHelper.Instance?.Decrypt(buffer, buffer, buffer.Length);
         }
 
         //Not really async, but sends data async inside

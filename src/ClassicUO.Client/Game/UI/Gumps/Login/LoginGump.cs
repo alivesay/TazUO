@@ -26,9 +26,14 @@ namespace ClassicUO.Game.UI.Gumps.Login
         private readonly StbTextBox _textboxAccount;
 
         private float _time;
+        
+        public static LoginGump Instance { get; private set; }
 
         public LoginGump(World world, LoginScene scene) : base(world, 0, 0)
         {
+            Instance?.Dispose();
+            Instance = this;
+            
             CanCloseWithRightClick = false;
 
             AcceptKeyboardInput = false;

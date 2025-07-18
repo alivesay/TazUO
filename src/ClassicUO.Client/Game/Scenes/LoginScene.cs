@@ -39,6 +39,8 @@ namespace ClassicUO.Game.Scenes
 
     public sealed class LoginScene : Scene
     {
+        public static LoginScene Instance { get; private set; }
+        
         private Gump _currentGump;
         private LoginSteps _lastLoginStep;
         private uint _pingTime;
@@ -47,8 +49,12 @@ namespace ClassicUO.Game.Scenes
         private bool _autoLogin;
         private readonly World _world;
 
-        public LoginScene(World world) => _world = world;
-
+        public LoginScene(World world)
+        {
+            Instance?.Dispose();
+            _world = world;
+            Instance = this;
+        }
 
         public bool Reconnect { get; set; }
         public LoginSteps CurrentLoginStep { get; set; } = LoginSteps.Main;
@@ -359,7 +365,7 @@ namespace ClassicUO.Game.Scenes
             NetClient.Socket.Disconnected -= OnNetClientDisconnected;
             NetClient.Socket.Connected += OnNetClientConnected;
             NetClient.Socket.Disconnected += OnNetClientDisconnected;
-            NetClient.Socket.Connect(Settings.GlobalSettings.IP, Settings.GlobalSettings.Port);
+            var status = NetClient.Socket.Connect(Settings.GlobalSettings.IP, Settings.GlobalSettings.Port);
         }
 
 
@@ -704,10 +710,6 @@ namespace ClassicUO.Game.Scenes
             long ip = p.ReadUInt32LE(); // use LittleEndian here
             ushort port = p.ReadUInt16BE();
             uint seed = p.ReadUInt32BE();
-        
-            NetClient.Socket.Disconnect().Wait();
-            AsyncNetClient.Socket = new AsyncNetClient();
-            EncryptionHelper.Instance.Initialize(false, seed);
             
             if (Settings.GlobalSettings.IgnoreRelayIp || ip == 0)
             {
@@ -715,19 +717,42 @@ namespace ClassicUO.Game.Scenes
                 ip = long.Parse(Settings.GlobalSettings.IP);
                 port = Settings.GlobalSettings.Port;
             }
+            
+            AfterRelayConnect(ip, port, seed);
+        }
 
-            NetClient.Socket.Connect(new IPAddress(ip).ToString(), port).Wait();
+        private ushort retries = 0;
+        private void AfterRelayConnect(long ip, ushort port, uint seed)
+        {
+            AsyncNetClient.Socket.Connected -= OnNetClientConnected;
+            AsyncNetClient.Socket.Disconnect().Wait();
+            AsyncNetClient.Socket = new AsyncNetClient();
+
+            retries++;
+            AsyncNetClient.Socket.Connect(new IPAddress(ip).ToString(), port).Wait(3000);
 
             if (NetClient.Socket.IsConnected)
             {
-                NetClient.Socket.EnableCompression();
+                EncryptionHelper.Instance?.Initialize(false, seed);
+                AsyncNetClient.Socket.EnableCompression();
                 unsafe
                 {
                     Span<byte> b = stackalloc byte[4] { (byte)(seed >> 24), (byte)(seed >> 16), (byte)(seed >> 8), (byte)seed };
-                    NetClient.Socket.Send(b, true, true);
+                    AsyncNetClient.Socket.Send(b, true, true);
                 }
 
-                NetClient.Socket.Send_SecondLogin(Account, Password, seed);
+                AsyncNetClient.Socket.Send_SecondLogin(Account, Password, seed);
+            }
+            else
+            {
+                if(retries > 5)
+                {
+                    retries = 0;
+                    StepBack();
+                    return;
+                }
+                
+                AfterRelayConnect(ip, port, seed);
             }
         }
 
@@ -945,6 +970,13 @@ namespace ClassicUO.Game.Scenes
 
                 Servers = null;
             }
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            AsyncNetClient.Socket.Disconnected -= OnNetClientDisconnected;
+            AsyncNetClient.Socket.Connected -= OnNetClientConnected;
         }
     }
 

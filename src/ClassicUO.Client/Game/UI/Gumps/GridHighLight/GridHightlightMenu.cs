@@ -193,30 +193,47 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             UIManager.Add(new GridHighlightMenu(world));
         }
 
-        private static void ExportGridHighlightSettings()
+        private static void ExportGridHighlightSettings(World world)
         {
             var data = ProfileManager.CurrentProfile.GridHighlightSetup;
-            RunFileDialog(true, "Save grid highlight settings", file =>
+
+            RunFileDialog(world, true, "Save grid highlight settings", file =>
             {
+                if (Directory.Exists(file))
+                {
+                    // If the path is a directory, append default filename
+                    file = Path.Combine(file, "highlights.json");
+                }
+                else if (!Path.HasExtension(file))
+                {
+                    // If it's not a directory and has no extension, assume they meant a file name
+                    file += ".json";
+                }
+
                 var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(file, json);
+                GameActions.Print(world, $"Saved highlight export to: {file}");
             });
         }
 
         private static void ImportGridHighlightSettings(World world)
         {
-            RunFileDialog(false, "Import grid highlight settings", file =>
+            RunFileDialog(world, false, "Import grid highlight settings", file =>
             {
                 try
                 {
+                    if (!File.Exists(file))
+                        return;
+                    
                     string json = File.ReadAllText(file);
                     var imported = JsonSerializer.Deserialize<List<GridHighlightSetupEntry>>(json);
                     if (imported != null)
                     {
-                        ProfileManager.CurrentProfile.GridHighlightSetup = imported;
+                        ProfileManager.CurrentProfile.GridHighlightSetup.AddRange(imported);;
                         SaveProfile();
                         UIManager.GetGump<GridHighlightMenu>()?.Dispose();
                         UIManager.Add(new GridHighlightMenu(world));
+                        GameActions.Print(world, $"Imported highlight config from: {file}");
                     }
                 }
                 catch (Exception ex)
@@ -227,10 +244,9 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             });
         }
 
-        private static void RunFileDialog(bool save, string title, Action<string> onResult)
+        private static void RunFileDialog(World world, bool save, string title, Action<string> onResult)
         {
-            return;
-            //TODO: Create built in file selector dialog for cross-platform support
+            FileSelector.ShowFileBrowser(world, save ? FileSelectorType.Directory : FileSelectorType.File, null, save ? null : ["*.json"], onResult, title);
         }
 
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)

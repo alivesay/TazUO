@@ -137,7 +137,10 @@ namespace ClassicUO.LegionScripting
             if (RefreshContent)
             {
                 RefreshContent = false;
-                refresh.InvokeMouseDown(Point.Zero, MouseButtonType.Left);
+                Dispose();
+                ScriptManagerGump g = new ScriptManagerGump() { X = X, Y = Y };
+                g.ResizeWindow(new Point(Width, Height));
+                UIManager.Add(g);
             }
         }
         public override void Restore(XmlElement xml)

@@ -7421,6 +7421,12 @@ sealed class PacketHandlers
             world.Player.LastGumpID = gumpID;
         }
 
+        if (gump.X == 0 && gump.Y == 0)
+        {
+            gump.CenterXInViewPort();
+            gump.CenterYInViewPort();
+        }
+
         return gump;
     }
 

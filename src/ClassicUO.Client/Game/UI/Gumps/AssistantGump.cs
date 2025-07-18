@@ -72,6 +72,7 @@ public class AssistantGump : BaseOptionsGump
     private void BuildAutoSell()
     {
         var page = (int)PAGE.AutoSell;
+        Control c;
         MainContent.AddToLeft(CategoryButton("Auto sell", page, MainContent.LeftWidth));
         MainContent.ResetRightSide();
 
@@ -83,6 +84,22 @@ public class AssistantGump : BaseOptionsGump
         PositionHelper.BlankLine();
 
         scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel(lang.GetTazUO.AutoSellEnable, 0, profile.SellAgentEnabled, b => profile.SellAgentEnabled = b)));
+        PositionHelper.BlankLine();
+
+        scroll.Add(c = PositionHelper.PositionControl(new SliderWithLabel(lang.GetTazUO.AutoSellMaxItems, 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.SellAgentMaxItems, (r) => { profile.SellAgentMaxItems = r; })));
+        c.SetTooltip(lang.GetTazUO.AutoSellMaxItemsTooltip);
+        PositionHelper.BlankLine();
+
+        scroll.Add(c = PositionHelper.PositionControl(new SliderWithLabel(lang.GetTazUO.AutoSellMaxUniques, 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.SellAgentMaxUniques, (r) => { profile.SellAgentMaxUniques = r; })));
+        c.SetTooltip(lang.GetTazUO.AutoSellMaxUniquesTooltip);
+        PositionHelper.BlankLine();
+
+        scroll.Add(c = PositionHelper.PositionControl(new SliderWithLabel(lang.GetTazUO.AutoSellMaxItems, 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.SellAgentMaxItems, (r) => { profile.SellAgentMaxItems = r; })));
+        c.SetTooltip(lang.GetTazUO.AutoSellMaxItemsTooltip);
+        PositionHelper.BlankLine();
+
+        scroll.Add(c = PositionHelper.PositionControl(new SliderWithLabel(lang.GetTazUO.AutoSellMaxUniques, 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.SellAgentMaxUniques, (r) => { profile.SellAgentMaxUniques = r; })));
+        c.SetTooltip(lang.GetTazUO.AutoSellMaxUniquesTooltip);
         PositionHelper.BlankLine();
 
         scroll.Add(PositionHelper.PositionControl(new SellAgentConfigs(World, MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));

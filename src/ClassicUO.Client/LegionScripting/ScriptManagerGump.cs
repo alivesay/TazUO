@@ -48,19 +48,27 @@ namespace ClassicUO.LegionScripting
             title.AcceptMouseInput = false;
             Add(title);
 
-            Add(refresh = new NiceButton(Width - REFRESH_BUTTON_WIDTH - BorderControl.BorderSize, BorderControl.BorderSize, REFRESH_BUTTON_WIDTH, 25, ButtonAction.Default, "Refresh")
+            Add(refresh = new NiceButton(Width - REFRESH_BUTTON_WIDTH - BorderControl.BorderSize, BorderControl.BorderSize, REFRESH_BUTTON_WIDTH, 25, ButtonAction.Default, "Menu")
             {
                 IsSelectable = false
             });
 
-            refresh.MouseDown += (s, e) =>
+            refresh.ContextMenu = new ContextMenuControl(this);
+            refresh.ContextMenu.Add(new ContextMenuItemEntry("Refresh", () =>
             {
-                if (e.Button != MouseButtonType.Left) return;
-
                 Dispose();
                 ScriptManagerGump g = new ScriptManagerGump(world) { X = X, Y = Y };
                 g.ResizeWindow(new Point(Width, Height));
                 UIManager.Add(g);
+            }));
+            refresh.ContextMenu.Add(new ContextMenuItemEntry("Public Script Browser", () =>
+            {
+                UIManager.Add(new ScriptBrowser(World));
+            }));
+
+            refresh.MouseDown += (s, e) =>
+            {
+                refresh.ContextMenu?.Show();
             };
 
             Add(scrollArea = new ScrollArea(BorderControl.BorderSize, refresh.Height + refresh.Y, Width - (BorderControl.BorderSize * 2), Height - (BorderControl.BorderSize * 2) - 25, true));

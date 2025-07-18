@@ -1733,6 +1733,9 @@ namespace ClassicUO.Network
 
             socket.Send(writer.BufferWritten);
             writer.Dispose();
+
+            if (CUOEnviroment.Debug)
+                GameActions.Print(Client.Game.UO.World, $"Target: Object {entity} at ({x}, {y}, {z})");
         }
 
         public static void Send_TargetXYZ
@@ -1780,6 +1783,18 @@ namespace ClassicUO.Network
 
             socket.Send(writer.BufferWritten);
             writer.Dispose();
+
+            if (CUOEnviroment.Debug)
+            {
+                if (graphic == 0)
+                {
+                    GameActions.Print(Client.Game.UO.World, $"Target: Land at ({x}, {y}, {z})");
+                }
+                else
+                {
+                    GameActions.Print(Client.Game.UO.World, $"Target: Static {graphic} at ({x}, {y}, {z})");
+                }
+            }
         }
 
         public static void Send_TargetCancel(this AsyncNetClient socket, CursorTarget type, uint cursorID, byte cursorType)
@@ -3531,6 +3546,9 @@ namespace ClassicUO.Network
 
             socket.Send(writer.BufferWritten);
             writer.Dispose();
+
+            if (CUOEnviroment.Debug)
+                GameActions.Print(Client.Game.UO.World, $"Target: Using object {serial} on target {targetSerial}");
         }
 
         public static void Send_ToggleGargoyleFlying(this AsyncNetClient socket)

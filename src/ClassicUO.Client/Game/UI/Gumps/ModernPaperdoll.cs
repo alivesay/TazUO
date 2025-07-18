@@ -359,6 +359,7 @@ this.world = world;
             {
                 if (IsDisposed || durablityBar.IsDisposed || item == null)
                 {
+                    durablityBar.IsVisible = false;
                     return;
                 }
 

@@ -295,6 +295,7 @@ namespace ClassicUO.Game.Scenes
                     case LoginSteps.LoginInToServer:
                         labelText = Client.Game.UO.FileManager.Clilocs.GetString(3000053, ResGeneral.LoggingIntoShard); // logging into shard
 
+                        showButtons = LoginButtons.Cancel;
                         break;
 
                     case LoginSteps.EnteringBritania:
@@ -363,6 +364,8 @@ namespace ClassicUO.Game.Scenes
 
             NetClient.Socket.Connected -= OnNetClientConnected;
             NetClient.Socket.Disconnected -= OnNetClientDisconnected;
+            NetClient.Socket?.Disconnect();
+            AsyncNetClient.Socket = new AsyncNetClient();
             NetClient.Socket.Connected += OnNetClientConnected;
             NetClient.Socket.Disconnected += OnNetClientDisconnected;
             var status = NetClient.Socket.Connect(Settings.GlobalSettings.IP, Settings.GlobalSettings.Port);

@@ -2268,7 +2268,10 @@ public class BaseOptionsGump : Gump
             private readonly string[] _items;
             private readonly int _maxHeight;
             private TextBox _label;
-            private int _selectedIndex;
+            private int _selectedIndex = 0;
+            private readonly int[] _originalIndices;
+            private readonly string[] _sortedItems;
+            
             private World world;
 
             public Combobox(World world, int width, string[] items, int selected = -1, int maxHeight = 400, Action<int, string> onOptionSelected = null)
@@ -2276,13 +2279,23 @@ public class BaseOptionsGump : Gump
                 this.world = world;
                 Width = width;
                 Height = 25;
-                SelectedIndex = selected;
                 _items = items;
                 _maxHeight = maxHeight;
                 OnOptionSelected = onOptionSelected;
                 AcceptMouseInput = true;
 
-                string initialText = selected > -1 ? items[selected] : string.Empty;
+                // Create sorted items with original index mapping
+                _originalIndices = Enumerable.Range(0, items.Length).ToArray();
+                _sortedItems = new string[items.Length];
+                Array.Copy(items, _sortedItems, items.Length);
+    
+                // Sort both arrays together
+                Array.Sort(_sortedItems, _originalIndices);
+    
+                // Find the display index for the selected original index
+                int displayIndex = selected > -1 ? Array.IndexOf(_originalIndices, selected) : -1;
+
+                string initialText = displayIndex > -1 ? _sortedItems[displayIndex] : _sortedItems[_originalIndices[0]];
 
                 Add(new ColorBox(Width, Height, ThemeSettings.SEARCH_BACKGROUND));
 
@@ -2290,20 +2303,27 @@ public class BaseOptionsGump : Gump
                 _label.X = 2;
                 _label.Y = (Height >> 1) - (_label.Height >> 1);
                 Add(_label);
+                
+                _selectedIndex = displayIndex;
             }
 
             public int SelectedIndex
             {
-                get => _selectedIndex;
+                get => _selectedIndex > -1 ? _originalIndices[_selectedIndex] : _originalIndices[0]; // Return original index
                 set
                 {
-                    _selectedIndex = value;
+                    // Find display index from original index
+                    int displayIndex = value > -1 ? Array.IndexOf(_originalIndices, value) : _originalIndices[0];
+                    _selectedIndex = displayIndex;
 
-                    if (_items != null)
+                    if (_sortedItems != null && displayIndex > -1)
                     {
-                        _label.Text = _items[value];
-
-                        OnOptionSelected?.Invoke(value, _items[value]);
+                        _label.Text = _sortedItems[displayIndex];
+                        OnOptionSelected?.Invoke(value, _sortedItems[displayIndex]); // Pass original index
+                    }
+                    else if (_label != null)
+                    {
+                        _label.Text = string.Empty;
                     }
                 }
             }
@@ -2328,7 +2348,7 @@ public class BaseOptionsGump : Gump
                     comboY = Client.Game.Window.ClientBounds.Height - _maxHeight;
                 }
 
-                UIManager.Add(new ComboboxGump(world, ScreenCoordinateX, comboY, Width, _maxHeight, _items, this));
+                UIManager.Add(new ComboboxGump(world, ScreenCoordinateX, comboY, Width, _maxHeight, _sortedItems, _originalIndices, this));
 
                 base.OnMouseUp(x, y, button);
             }
@@ -2337,7 +2357,7 @@ public class BaseOptionsGump : Gump
             {
                 private readonly Combobox _combobox;
 
-                public ComboboxGump(World world, int x, int y, int width, int maxHeight, string[] items, Combobox combobox) : base(world, 0, 0)
+                public ComboboxGump(World world, int x, int y, int width, int maxHeight, string[] items, int[] originalIndices, Combobox combobox) : base(world, 0, 0)
                 {
                     CanMove = false;
                     AcceptMouseInput = true;
@@ -2368,8 +2388,8 @@ public class BaseOptionsGump : Gump
                             (item, ThemeSettings.DROPDOWN_OPTION_NORMAL_HUE, ThemeSettings.DROPDOWN_OPTION_HOVER_HUE, ThemeSettings.DROPDOWN_OPTION_SELECTED_HUE, width)
                             {
                                 X = 2,
-                                Tag = i,
-                                IsSelected = combobox.SelectedIndex == i ? true : false
+                                Tag = originalIndices[i],
+                                IsSelected = combobox.SelectedIndex == originalIndices[i] ? true : false
                             };
 
                         label.Y = i * label.Height + 5;

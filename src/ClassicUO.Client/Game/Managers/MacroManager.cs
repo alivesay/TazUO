@@ -1070,7 +1070,7 @@ namespace ClassicUO.Game.Managers
                     }
                     else
                     {
-                        GameActions.Print("That is not a valid row.", 32);
+                        GameActions.Print(_world, "That is not a valid row.", 32);
                     }
                     break;
 

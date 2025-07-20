@@ -272,15 +272,10 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             mainScrollArea.Add(propCombobox = new Combobox(0, lastYitem, 175, values, 0, 200, true) { });
             propCombobox.OnOptionSelected += (s, e) =>
             {
-                Task.Factory.StartNew(() =>
-                {
-                    var tVal = propCombobox.SelectedIndex;
-                    if (propCombobox.SelectedIndex == tVal)
-                    {
-                        string v = values[tVal];
-                        propInput.SetText(v);
-                    }
-                });
+                var tVal = propCombobox.SelectedIndex;
+
+                string v = values[tVal];
+                propInput.SetText(v);
             };
 
             mainScrollArea.Add(propInput);
@@ -324,15 +319,10 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             mainScrollArea.Add(propCombobox = new Combobox(0, lastYitem, 175, values, 0, 200, true) { });
             propCombobox.OnOptionSelected += (s, e) =>
             {
-                Task.Factory.StartNew(() =>
-                {
-                    var tVal = propCombobox.SelectedIndex;
-                    if (propCombobox.SelectedIndex == tVal)
-                    {
-                        string v = values[tVal];
-                        propInput.SetText(v);
-                    }
-                });
+                var tVal = propCombobox.SelectedIndex;
+
+                string v = values[tVal];
+                propInput.SetText(v);
             };
 
             mainScrollArea.Add(propInput);

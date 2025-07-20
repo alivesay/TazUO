@@ -98,6 +98,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
         public void Delete()
         {
             ProfileManager.CurrentProfile.GridHighlightSetup.Remove(_entry);
+            allConfigs = null;
         }
 
         public static void ProcessItemOpl(uint value)

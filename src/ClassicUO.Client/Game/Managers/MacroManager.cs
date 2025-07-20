@@ -212,7 +212,7 @@ namespace ClassicUO.Game.Managers
                     }
                 }
             );
-            
+
             PushToBack
             (
                 new Macro
@@ -227,7 +227,7 @@ namespace ClassicUO.Game.Managers
                     Items = new MacroObject(MacroType.LastObject, MacroSubType.Overview)
                 }
             );
-            
+
             PushToBack
             (
                 new Macro
@@ -1050,26 +1050,30 @@ namespace ClassicUO.Game.Managers
                         GameActions.OpenLegionScriptingGump(_world);
 
                     break;
-                
+
                 case MacroType.SpellBarRowUp:
                     SpellBar.Instance?.ChangeRow(true);
 
                     break;
-                
+
                 case MacroType.SpellBarRowDown:
                     SpellBar.Instance?.ChangeRow(false);
 
                     break;
-                
-                case MacroType.SetSpellBarRow: 
+
+                case MacroType.SetSpellBarRow:
                     string spellRow = ((MacroObjectString)macro).Text;
 
                     if (int.TryParse(spellRow, out int row))
                     {
                         SpellBar.Instance?.SetRow(row);
                     }
+                    else
+                    {
+                        GameActions.Print("That is not a valid row.", 32);
+                    }
                     break;
-                
+
                 case MacroType.Dismount:
                     var m = _world.Player.FindItemByLayer(Layer.Mount);
                     if (m != null)

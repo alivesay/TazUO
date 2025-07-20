@@ -471,10 +471,10 @@ namespace ClassicUO.Configuration
 
         public string NamePlateFont { get; set; } = "avadonian";
         public int NamePlateFontSize { get; set; } = 20;
-        
+
         public string OptionsFont { get; set; } = "Roboto-Regular";
         public int OptionsFontSize { get; set; } = 18;
-        
+
         public int TextBorderSize { get; set; } = 1;
 
         public bool UseModernShopGump { get; set; } = false;
@@ -604,13 +604,14 @@ namespace ClassicUO.Configuration
         public bool EnableScavenger { get; set; } = true;
         public bool CounterGumpLocked { get; set; }
         public bool NearbyLootConcealsContainerOnOpen { get; set; } = true;
+        public bool SpellBar_ShowHotkeys { get; set; } = true;
 
         private long lastSave;
         internal void Save(World world, string path, bool saveGumps = true)
         {
             if (Time.Ticks - lastSave < 10) //Don't save if saved in the last 10 ms, prevent duplcate saving when exiting game with options menu open
                 return;
-            
+
             Log.Trace($"Saving path:\t\t{path}");
 
             // Save profile settings

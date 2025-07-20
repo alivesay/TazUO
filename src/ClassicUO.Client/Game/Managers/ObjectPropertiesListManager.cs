@@ -36,7 +36,9 @@ using System.Text.RegularExpressions;
 using ClassicUO.Configuration;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.UI.Controls;
+using ClassicUO.Game.UI.Gumps.GridHighLight;
 using ClassicUO.Network;
+using ClassicUO.Utility;
 
 namespace ClassicUO.Game.Managers
 {
@@ -59,6 +61,8 @@ namespace ClassicUO.Game.Managers
             prop.NameCliloc = namecliloc;
 
             EventSink.InvokeOPLOnReceive(null, new OPLEventArgs(serial, name, data));
+            
+            GridHighlightData.ProcessItemOpl(serial);
         }
 
         public bool Contains(uint serial)
@@ -271,7 +275,7 @@ namespace ClassicUO.Game.Managers
                 bool foundMatch = false;
                 foreach (SinglePropertyData secondItem in comparedTo.singlePropertyData)
                 {
-                    if (String.Equals(thisItem.Name, secondItem.Name, StringComparison.InvariantCultureIgnoreCase))
+                    if (string.Equals(thisItem.Name, secondItem.Name, StringComparison.InvariantCultureIgnoreCase))
                     {
                         foundMatch = true;
                         finalTooltip += thisItem.Name;
@@ -332,28 +336,25 @@ namespace ClassicUO.Game.Managers
             {
                 OriginalString = line;
 
-                string pattern = @"(-?\d+(\.)?(\d+)?)";
-                MatchCollection matches = Regex.Matches(line, pattern, RegexOptions.CultureInvariant);
-
-                Match nameMatch = Regex.Match(line, @"(\D+)");
-                if (nameMatch.Success)
-                {
-                    Name = nameMatch.Value;
-                    //Name = Regex.Replace(Name, "/c[\"?'?(?<color>.*?)\"?'?]", "", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-                    Name = Name.Replace("/cd", "");
-                }
-
-                if (Name.Length < 1)
-                    Name = line;
+                // Remove any color tags like /c[#...]
+                string cleaned = RegexHelper.GetRegex(@"/c\[[#a-zA-Z0-9]+\]", RegexOptions.IgnoreCase).Replace(line, "").Replace("/cd", "").Trim();
+                
+                // Extract numbers
+                MatchCollection matches = RegexHelper.GetRegex(@"-?\d+(\.\d+)?").Matches(cleaned);
 
                 if (matches.Count > 0)
                 {
                     double.TryParse(matches[0].Value, out FirstValue);
                     if (matches.Count > 1)
-                    {
                         double.TryParse(matches[1].Value, out SecondValue);
-                    }
                 }
+
+                // Remove all numbers and symbols from the cleaned string to isolate the name
+                Name = RegexHelper.GetRegex(@"[-+]?\d+(\.\d+)?[%]?(/[ ]*\d+)?", RegexOptions.IgnoreCase).Replace(cleaned, "").Trim();
+
+                // Fallback if something went wrong
+                if (string.IsNullOrWhiteSpace(Name))
+                    Name = line;
             }
 
             public override string ToString()

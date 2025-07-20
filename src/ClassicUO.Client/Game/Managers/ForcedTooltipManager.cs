@@ -8,7 +8,7 @@ namespace ClassicUO.Game.Managers
         //This class is inteded to help generate tooltips for server before tooltips existed.
 
         private static Dictionary<uint, long> _requestedSingleClick = new Dictionary<uint, long>();
-        private const long DELAY = 500;
+        private static long DELAY = 500;
         private const uint UPDATE_DELAY = 1500;
         public static void RequestName(uint serial)
         {

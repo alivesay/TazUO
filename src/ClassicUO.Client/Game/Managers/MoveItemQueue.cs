@@ -10,6 +10,8 @@ namespace ClassicUO.Game.Managers
     {
         public static MoveItemQueue Instance { get; private set; }
         
+        public bool IsEmpty => _queue.IsEmpty;
+        
         private static long delay = 1000;
         private readonly ConcurrentQueue<MoveRequest> _queue = new();
         private long nextMove;
@@ -38,10 +40,20 @@ namespace ClassicUO.Game.Managers
                 
             Enqueue(item.Serial, bag, 0, 0xFFFF, 0xFFFF);
         }
+        
+        public void EnqueueQuick(uint serial)
+        {
+            Item i = World.Items.Get(serial);
+            if(i != null)
+                EnqueueQuick(i);
+        }
 
         public void ProcessQueue()
         {
             if (Time.Ticks < nextMove)
+                return;
+            
+            if (Client.Game.GameCursor.ItemHold.Enabled)
                 return;
 
             if (!_queue.TryDequeue(out var request))

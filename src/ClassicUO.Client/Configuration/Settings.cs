@@ -65,7 +65,7 @@ namespace ClassicUO.Configuration
 
         [JsonPropertyName("ip")] public string IP { get; set; } = "";
 
-        [JsonPropertyName("port"), JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)] public ushort Port { get; set; } = 0;
+        [JsonPropertyName("port"), JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)] public ushort Port { get; set; } = 2593;
 
         [JsonPropertyName("ultimaonlinedirectory")]
         public string UltimaOnlineDirectory { get; set; } = "";
@@ -116,6 +116,19 @@ namespace ClassicUO.Configuration
 
         [JsonPropertyName("plugins")] public string[] Plugins { get; set; } = { @"./Assistant/Razor.dll" };
 
+        public bool EnhancedPacketsEnabled = PacketsEnabled();
+
+        private static bool PacketsEnabled()
+        {
+            //Disable enhanced packets if the file exists
+            //Can't put it in user profile folder because we need it's value before we load profiles
+            //Can't put in this global settings JSON because it may mess up launchers
+            if (File.Exists(Path.Combine(CUOEnviroment.ExecutablePath, "Data", "DISABLE_ENHANCED_PACKETS")))
+                return false;
+
+            return true;
+        }
+        
         public static string GetSettingsFilepath()
         {
             if (CustomSettingsFilepath != null)

@@ -2,7 +2,7 @@
 
 // Copyright (c) 2024, andreakarasho
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 1. Redistributions of source code must retain the above copyright
@@ -16,7 +16,7 @@
 // 4. Neither the name of the copyright holder nor the
 //    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -47,6 +47,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using ClassicUO.Game.UI.Gumps.SpellBar;
 using static SDL2.SDL;
 
 namespace ClassicUO.Game.Managers
@@ -242,7 +243,7 @@ namespace ClassicUO.Game.Managers
                     }
                 }
             );
-            
+
             PushToBack
             (
                 new Macro
@@ -257,7 +258,7 @@ namespace ClassicUO.Game.Managers
                     Items = new MacroObject(MacroType.LastObject, MacroSubType.Overview)
                 }
             );
-            
+
             PushToBack
             (
                 new Macro
@@ -615,7 +616,7 @@ namespace ClassicUO.Game.Managers
                                             break;
                                     }
 
-                                    NetClient.Socket.Send_OpenSpellBook((byte)type);
+                                    AsyncNetClient.Socket.Send_OpenSpellBook((byte)type);
 
                                     break;
 
@@ -1011,7 +1012,7 @@ namespace ClassicUO.Game.Managers
                                     }
 
                                     if (!GameActions.CloseSpellBook(type))
-                                        NetClient.Socket.Send_OpenSpellBook((byte)type);
+                                        AsyncNetClient.Socket.Send_OpenSpellBook((byte)type);
 
                                     break;
 
@@ -1088,11 +1089,42 @@ namespace ClassicUO.Game.Managers
                         GameActions.OpenNearbyLootGump();
 
                     break;
-                
+
                 case MacroType.ToggleLegionScripting:
                     if (!GameActions.CloseLegionScriptingGump())
                         GameActions.OpenLegionScriptingGump();
 
+                    break;
+
+                case MacroType.SpellBarRowUp:
+                    SpellBar.Instance?.ChangeRow(true);
+
+                    break;
+
+                case MacroType.SpellBarRowDown:
+                    SpellBar.Instance?.ChangeRow(false);
+
+                    break;
+
+                case MacroType.SetSpellBarRow:
+                    string spellRow = ((MacroObjectString)macro).Text;
+
+                    if (int.TryParse(spellRow, out int row))
+                    {
+                        SpellBar.Instance?.SetRow(row);
+                    }
+                    else
+                    {
+                        GameActions.Print("That is not a valid row.", 32);
+                    }
+                    break;
+
+                case MacroType.Dismount:
+                    var m = World.Player.FindItemByLayer(Layer.Mount);
+                    if (m != null)
+                    {
+                        GameActions.DoubleClick(World.Player);
+                    }
                     break;
 
                 case MacroType.OpenDoor:
@@ -1225,7 +1257,7 @@ namespace ClassicUO.Game.Managers
                         //{
                         //    TargetManager.TargetGameObject(TargetManager.LastGameObject);
                         //}
-                        //else 
+                        //else
 
                         if (TargetManager.TargetingState != CursorTarget.Object && !TargetManager.LastTargetInfo.IsEntity)
                         {
@@ -1515,11 +1547,11 @@ namespace ClassicUO.Game.Managers
                         {
                             if (macro.Code == MacroType.BandageSelf)
                             {
-                                NetClient.Socket.Send_TargetSelectedObject(bandage.Serial, World.Player.Serial);
+                                AsyncNetClient.Socket.Send_TargetSelectedObject(bandage.Serial, World.Player.Serial);
                             }
                             else if (SerialHelper.IsMobile(TargetManager.SelectedTarget))
                             {
-                                NetClient.Socket.Send_TargetSelectedObject(bandage.Serial, TargetManager.SelectedTarget);
+                                AsyncNetClient.Socket.Send_TargetSelectedObject(bandage.Serial, TargetManager.SelectedTarget);
                             }
                         }
                     }
@@ -1647,7 +1679,7 @@ namespace ClassicUO.Game.Managers
 
                 case MacroType.InvokeVirtue:
                     byte id = (byte)(macro.SubCode - MacroSubType.Honor + 1);
-                    NetClient.Socket.Send_InvokeVirtueRequest(id);
+                    AsyncNetClient.Socket.Send_InvokeVirtueRequest(id);
 
                     break;
 
@@ -1665,13 +1697,13 @@ namespace ClassicUO.Game.Managers
 
                     if (World.Player.Race == RaceType.GARGOYLE)
                     {
-                        NetClient.Socket.Send_ToggleGargoyleFlying();
+                        AsyncNetClient.Socket.Send_ToggleGargoyleFlying();
                     }
 
                     break;
 
                 case MacroType.EquipLastWeapon:
-                    NetClient.Socket.Send_EquipLastWeapon();
+                    AsyncNetClient.Socket.Send_EquipLastWeapon();
 
                     break;
 
@@ -2008,12 +2040,12 @@ namespace ClassicUO.Game.Managers
                     }
                     break;
                 case MacroType.DisarmAbility:
-                    NetClient.Socket.Send_DisarmRequest();
+                    AsyncNetClient.Socket.Send_DisarmRequest();
 
                     break;
 
                 case MacroType.StunAbility:
-                    NetClient.Socket.Send_StunRequest();
+                    AsyncNetClient.Socket.Send_StunRequest();
 
                     break;
 
@@ -2333,6 +2365,7 @@ namespace ClassicUO.Game.Managers
                 case MacroType.ModifyUpdateRange:
                 case MacroType.RazorMacro:
                 case MacroType.UseCounterBar:
+                case MacroType.SetSpellBarRow:
                 case MacroType.ClientCommand:
                     obj = new MacroObjectString(code, MacroSubType.MSC_NONE);
 
@@ -2512,6 +2545,7 @@ namespace ClassicUO.Game.Managers
                 case MacroType.ModifyUpdateRange:
                 case MacroType.RazorMacro:
                 case MacroType.UseCounterBar:
+                case MacroType.SetSpellBarRow:
                 case MacroType.ClientCommand:
                     SubMenuType = 2;
 
@@ -2638,7 +2672,11 @@ namespace ClassicUO.Game.Managers
         ToggleDurabilityGump,
         ShowNearbyItems,
         ToggleNearbyLootGump,
-        ToggleLegionScripting
+        ToggleLegionScripting,
+        SetSpellBarRow,
+        SpellBarRowUp,
+        SpellBarRowDown,
+        Dismount,
     }
 
     public enum MacroSubType

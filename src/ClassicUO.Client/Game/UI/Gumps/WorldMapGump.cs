@@ -2158,12 +2158,21 @@ namespace ClassicUO.Game.UI.Gumps
                 return;
             }
 
-            var markerCsv = $"{x},{y},{map},{markerName}, ,{color},4";
-            using (var fileStream = File.Open(UserMarkersFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write))
-            using (var streamWriter = new StreamWriter(fileStream))
+            try
             {
-                streamWriter.BaseStream.Seek(0, SeekOrigin.End);
-                streamWriter.WriteLine(markerCsv);
+                var markerCsv = $"{x},{y},{map},{markerName}, ,{color},4";
+
+                using (var fileStream = File.Open(UserMarkersFilePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write))
+                using (var streamWriter = new StreamWriter(fileStream))
+                {
+                    streamWriter.BaseStream.Seek(0, SeekOrigin.End);
+                    streamWriter.WriteLine(markerCsv);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Error saving user marker: {e}");
+                GameActions.Print("Failed to save user markers", 32);
             }
 
             var mapMarker = new WMapMarker
@@ -2209,16 +2218,24 @@ namespace ClassicUO.Game.UI.Gumps
              {
                  mapMarkerFile.Markers.Remove(marker);
              }
-             
-            using (StreamWriter writer = new StreamWriter(UserMarkersFilePath, false))
-            {
-                foreach (var m in mapMarkerFile.Markers)
-                {
-                    var newLine = $"{m.X},{m.Y},{m.MapId},{m.Name},{m.MarkerIconName},{m.ColorName},4";
 
-                    writer.WriteLine(newLine);
-                }
-            }
+             try
+             {
+                 using (StreamWriter writer = new StreamWriter(UserMarkersFilePath, false))
+                 {
+                     foreach (var m in mapMarkerFile.Markers)
+                     {
+                         var newLine = $"{m.X},{m.Y},{m.MapId},{m.Name},{m.MarkerIconName},{m.ColorName},4";
+
+                         writer.WriteLine(newLine);
+                     }
+                 }
+             }
+             catch (Exception e)
+             {
+                 Log.Error($"Error saving user marker: {e}");
+                 GameActions.Print("Failed to save user markers", 32);
+             }
         }
 
         /// <summary>

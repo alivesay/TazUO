@@ -357,6 +357,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (IsDisposed || durablityBar.IsDisposed || item == null)
                 {
+                    durablityBar.IsVisible = false;
                     return;
                 }
 

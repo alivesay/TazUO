@@ -88,6 +88,8 @@ namespace ClassicUO.Game.Managers
             Serial = serial;
 
             InitializeHouse();
+            
+            GenerateFloorPlace(); //# HOUSE FIXES
         }
 
         public int Category = -1, MaxPage = 1, CurrentFloor = 1, FloorCount = 4, RoofZ = 1, MinHouseZ = -120, Components, Fixtures, MaxComponets, MaxFixtures;
@@ -266,7 +268,7 @@ namespace ClassicUO.Game.Managers
                 {
                     for (int y = StartPos.Y + 1; y < EndPos.Y; y++)
                     {
-                        IEnumerable<Multi> multi = house.Components.Where(s => s.X == x && s.Y == y);
+                        IEnumerable<Multi> multi = house.GetMultiAt(x, y); //HOUSE FIXES house.Components.Where(s => s.X == x && s.Y == y);
 
                         if (multi == null)
                         {
@@ -576,7 +578,9 @@ namespace ClassicUO.Game.Managers
                         for (int y = StartPos.Y; y < EndPos.Y; y++)
                         {
                             ushort tempColor = color;
-
+                            
+                            bool isOuter = (x == StartPos.X) || (y == StartPos.Y); //HOUSE FIXES
+                            
                             if (x == StartPos.X || y == StartPos.Y)
                             {
                                 tempColor++;
@@ -585,7 +589,7 @@ namespace ClassicUO.Game.Managers
                             Multi mo = house.Add
                             (
                                 0x0496,
-                                tempColor,
+                                isOuter ? (ushort)161 : tempColor, //HOUSE FIXES
                                 (ushort)(foundationItem.X + (x - foundationItem.X)),
                                 (ushort)(foundationItem.Y + (y - foundationItem.Y)),
                                 (sbyte) z,
@@ -668,7 +672,16 @@ namespace ClassicUO.Game.Managers
                                 NetClient.Socket.Send_CustomHouseDeleteItem(place.Graphic, place.X - foundationItem.X, place.Y - foundationItem.Y, z);
                             }
 
-                            place.Destroy();
+                            foreach (Multi multiObject in multi.ToList())
+                            {
+                                if (multiObject == place)
+                                {
+                                    multiObject.Destroy();
+                                    if(house.Components.Contains(multiObject))
+                                        house.Components.Remove(multiObject);
+                                }
+                            }
+                            //place.Destroy(); HOUSE FIXES
                         }
                     }
                     else if (SelectedGraphic != 0)
@@ -1412,7 +1425,7 @@ namespace ClassicUO.Game.Managers
 
                         //if (multi != null)
                         {
-                            foreach (Multi multiObject in house.Components.Where(s => s.X == gobj.X + item.X && s.Y == gobj.Y + item.Y))
+                            foreach (Multi multiObject in house.GetMultiAt(gobj.X + item.X, gobj.Y + item.Y)) //HOUSE FIXES Multi multiObject in house.Components.Where(s => s.X == gobj.X + item.X && s.Y == gobj.Y + item.Y))
                             {
                                 if (multiObject.IsCustom && (multiObject.State & CUSTOM_HOUSE_MULTI_OBJECT_FLAGS.CHMOF_GENERIC_INTERNAL) == 0 && multiObject.Z >= minZ && multiObject.Z < maxZ)
                                 {

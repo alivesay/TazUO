@@ -50,6 +50,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Threading.Tasks;
 using System.Net.Http;
+using ClassicUO.Game.UI.Gumps.GridHighLight;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -192,7 +193,7 @@ namespace ClassicUO.Game.UI.Gumps
         private Checkbox _hideJournalBorder, _hideJournalTimestamp, _gridHideBorder, _skillProgressBarOnChange, _displaySpellIndicators, _uselastCooldownPosition, _closeHPBarWhenAnchored;
         private InputField _healthIndicatorPercentage, _healthIndicatorWidth, _tooltipHeaderFormat, _skillProgressBarFormat;
         private ModernColorPicker.HueDisplay _mainWindowHuePicker, _spellIconHotkeyHue, _tooltipBGHue;
-        private HSliderBar _spellIconScale, _journalFontSize, _tooltipFontSize, _gameWindowSideChatFontSize, _overheadFontSize, _overheadTextWidth, _textStrokeSize, _gridHightlightLineSize, _maxJournalEntries;
+        private HSliderBar _spellIconScale, _journalFontSize, _tooltipFontSize, _gameWindowSideChatFontSize, _overheadFontSize, _overheadTextWidth, _textStrokeSize, _gridHighlightLineSize, _maxJournalEntries;
         private HSliderBar _healthLineSizeMultiplier, _regularPlayerAlpha, _infoBarFontSize, _nameplateBorderOpacity;
         private Combobox _journalFontSelection, _tooltipFontSelect, _gameWindowSideChatFont, _overheadFont, _infoBarFont;
 
@@ -4010,12 +4011,12 @@ namespace ClassicUO.Game.UI.Gumps
                     _.IsSelectable = false;
                     _.MouseUp += (s, e) =>
                     {
-                        UIManager.GetGump<GridHightlightMenu>()?.Dispose();
-                        UIManager.Add(new GridHightlightMenu());
+                        UIManager.GetGump<GridHighlightMenu>()?.Dispose();
+                        UIManager.Add(new GridHighlightMenu());
                     };
 
                     gridSection.Add(AddLabel(null, "Grid highlight line size", 0, 0));
-                    gridSection.AddRight(_gridHightlightLineSize = AddHSlider(null, 1, 10, _currentProfile.GridHightlightSize, 0, 0, 150));
+                    gridSection.AddRight(_gridHighlightLineSize = AddHSlider(null, 1, 10, _currentProfile.GridHighlightSize, 0, 0, 150));
                 } //Grid highlight settings
 
                 rightArea.Add(gridSection);
@@ -5245,7 +5246,7 @@ namespace ClassicUO.Game.UI.Gumps
             _currentProfile.Grid_DefaultColumns = int.Parse(_gridDefaultColumns.Text);
             _currentProfile.Grid_DefaultRows = int.Parse(_gridDefaultRows.Text);
             _currentProfile.Grid_UseContainerHue = _gridOverrideWithContainerHue.IsChecked;
-            _currentProfile.GridHightlightSize = _gridHightlightLineSize.Value;
+            _currentProfile.GridHighlightSize = _gridHighlightLineSize.Value;
 
             {
                 _currentProfile.CoolDownX = int.Parse(_coolDownX.Text);

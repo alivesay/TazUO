@@ -44,6 +44,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
+using System.IO;
+using System.Collections.Generic;
 
 namespace ClassicUO.Game.Managers
 {
@@ -59,7 +61,8 @@ namespace ClassicUO.Game.Managers
         HueCommandTarget,
         IgnorePlayerTarget,
         MoveItemContainer,
-        Internal
+        Internal,
+        SetFavoriteMoveBag,
     }
 
     public class CursorType
@@ -184,7 +187,6 @@ namespace ClassicUO.Game.Managers
 
         public static readonly LastTargetInfo LastTargetInfo = new LastTargetInfo();
 
-
         public static MultiTargetInfo MultiTargetInfo { get; private set; }
 
         public static CursorTarget TargetingState { get; private set; } = CursorTarget.Invalid;
@@ -242,7 +244,6 @@ namespace ClassicUO.Game.Managers
 
             _targetCursorId = cursorID;
         }
-
 
         public static void CancelTarget()
         {
@@ -448,6 +449,28 @@ namespace ClassicUO.Game.Managers
 
                         ClearTargetingWithoutTargetCancelPacket();
 
+                        return;
+                    case CursorTarget.SetFavoriteMoveBag:
+                        if (SerialHelper.IsItem(serial))
+                        {
+                            Item item = World.Items.Get(serial);
+
+                            if (item != null && item.ItemData.IsContainer)
+                            {
+                                ProfileManager.CurrentProfile.SetFavoriteMoveBagSerial = serial;
+                                GameActions.Print("Favorite move bag set.");
+                            }
+                            else
+                            {
+                                GameActions.Print("That doesn't appear to be a valid container.");
+                            }
+                        }
+                        else
+                        {
+                            GameActions.Print("That is not a valid item.");
+                        }
+
+                        ClearTargetingWithoutTargetCancelPacket();
                         return;
                     case CursorTarget.IgnorePlayerTarget:
                         if (SelectedObject.Object is Entity pmEntity)

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
+using ClassicUO.Input;
 using static ClassicUO.Game.UI.XmlGumpHandler;
 
 namespace ClassicUO.Game.UI
@@ -914,6 +915,17 @@ namespace ClassicUO.Game.UI
             if (SavePosition)
             {
                 saveFileAfter = Time.Ticks + 5000;
+            }
+        }
+
+        protected override void OnMouseUp(int x, int y, MouseButtonType button)
+        {
+            base.OnMouseUp(x, y, button);
+
+            if (TargetManager.IsTargeting)
+            {
+                TargetManager.Target(World.Player);
+                Mouse.LastLeftButtonClickTime = 0;
             }
         }
 

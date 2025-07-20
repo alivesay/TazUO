@@ -20,6 +20,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using ClassicUO.Utility.Logging;
 using static ClassicUO.Game.Managers.AutoLootManager;
+using ClassicUO.Game.UI.Gumps.GridHighLight;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -1927,6 +1928,7 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             PositionHelper.PositionControl(s.FullControl);
+            PositionHelper.BlankLine();
             PositionHelper.RemoveIndent();
 
             options.Add
@@ -2008,6 +2010,7 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             PositionHelper.PositionControl(s.FullControl);
+            PositionHelper.BlankLine();
             SettingsOption ss = s;
 
             options.Add
@@ -2028,7 +2031,7 @@ namespace ClassicUO.Game.UI.Gumps
                 )
             );
 
-            PositionHelper.PositionExact(s.FullControl, ss.FullControl.X + ss.FullControl.Width + 30, ss.FullControl.Y);
+            PositionHelper.PositionControl(s.FullControl);
         }
 
 
@@ -2462,6 +2465,7 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             PositionHelper.PositionControl(s.FullControl);
+            PositionHelper.BlankLine();
 
             options.Add
             (
@@ -2481,7 +2485,8 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             PositionHelper.PositionControl(s.FullControl);
-
+            PositionHelper.BlankLine();
+            
             options.Add
             (
                 s = new SettingsOption
@@ -2581,6 +2586,13 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new CheckboxWithLabel(lang.GetTazUO.EnableGridContainers, 0, profile.UseGridLayoutContainerGumps, (b) => { profile.UseGridLayoutContainerGumps = b; }), true, page
+            );
+
+            content.BlankLine();
+
+            content.AddToRight
+            (
+                new CheckboxWithLabel(lang.GetTazUO.GridContainersDefaultToOldStyleView, 0, profile.GridContainersDefaultToOldStyleView, (b) => { profile.GridContainersDefaultToOldStyleView = b; }), true, page
             );
 
             content.BlankLine();
@@ -2745,11 +2757,11 @@ namespace ClassicUO.Game.UI.Gumps
                 }, true, page
             );
 
-            c.MouseUp += (s, e) => { GridHightlightMenu.Open(); };
+            c.MouseUp += (s, e) => { GridHighlightMenu.Open(); };
 
             content.AddToRight
             (
-                new SliderWithLabel(lang.GetTazUO.GridHighlightSize, 0, ThemeSettings.SLIDER_WIDTH, 1, 5, profile.GridHightlightSize, (i) => { profile.GridHightlightSize = i; }),
+                new SliderWithLabel(lang.GetTazUO.GridHighlightSize, 0, ThemeSettings.SLIDER_WIDTH, 1, 5, profile.GridHighlightSize, (i) => { profile.GridHighlightSize = i; }),
                 true, page
             );
 
@@ -2838,6 +2850,8 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.BlankLine();
             content.AddToRight(c = new CheckboxWithLabel(lang.GetTazUO.HideTimestamp, 0, profile.HideJournalTimestamp, (b) => { profile.HideJournalTimestamp = b; }), true, page);
+            content.BlankLine();
+            content.AddToRight(c = new CheckboxWithLabel(lang.GetTazUO.JournalHideSystemPrefix, 0, profile.HideJournalSystemPrefix, (b) => { profile.HideJournalSystemPrefix = b; }), true, page);
             content.BlankLine();
 
             content.AddToRight
@@ -3282,7 +3296,7 @@ namespace ClassicUO.Game.UI.Gumps
                                         );
                                     }
                                 }
-                            }, "https://gist.githubusercontent.com/bittiez/c70ddcb58fc59f74a0c4d2c5b4fc6478/raw/SpellVisualRange.json"
+                            }, "https://github.com/bittiez/TazUO/raw/refs/heads/dev/src/ClassicUO.Client/Game/Managers/DefaultSpellIndicatorConfig.json"
                         )
                         {
                             X = (Client.Game.Window.ClientBounds.Width >> 1) - 50,
@@ -3408,6 +3422,8 @@ namespace ClassicUO.Game.UI.Gumps
 
             #region Font settings
 
+            const int minFontSize = 5;
+            const int maxFontSize = 50;
             page = ((int)PAGE.TUOOptions + 1007);
             content.AddToLeft(SubCategoryButton(lang.GetTazUO.FontSettings, page, content.LeftWidth));
             content.ResetRightSide();
@@ -3439,7 +3455,7 @@ namespace ClassicUO.Game.UI.Gumps
             (
                 new SliderWithLabel
                 (
-                    lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, 5, 40, profile.InfoBarFontSize, (i) =>
+                    lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, minFontSize, maxFontSize, profile.InfoBarFontSize, (i) =>
                     {
                         profile.InfoBarFontSize = i;
                         InfoBarGump.UpdateAllOptions();
@@ -3462,7 +3478,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new SliderWithLabel
-                    (lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, 5, 40, profile.GameWindowSideChatFontSize, (i) => { profile.GameWindowSideChatFontSize = i; }), true,
+                    (lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, minFontSize, maxFontSize, profile.GameWindowSideChatFontSize, (i) => { profile.GameWindowSideChatFontSize = i; }), true,
                 page
             );
 
@@ -3480,7 +3496,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new SliderWithLabel
-                    (lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, 5, 40, profile.SelectedToolTipFontSize, (i) => { profile.SelectedToolTipFontSize = i; }), true, page
+                    (lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, minFontSize, maxFontSize, profile.SelectedToolTipFontSize, (i) => { profile.SelectedToolTipFontSize = i; }), true, page
             );
 
             content.RemoveIndent();
@@ -3496,7 +3512,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.AddToRight
             (
-                new SliderWithLabel(lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, 5, 40, profile.OverheadChatFontSize, (i) => { profile.OverheadChatFontSize = i; }),
+                new SliderWithLabel(lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, minFontSize, maxFontSize, profile.OverheadChatFontSize, (i) => { profile.OverheadChatFontSize = i; }),
                 true, page
             );
 
@@ -3515,7 +3531,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new SliderWithLabel
-                    (lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, 5, 40, profile.SelectedJournalFontSize, (i) => { profile.SelectedJournalFontSize = i; }), true, page
+                    (lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, minFontSize, maxFontSize, profile.SelectedJournalFontSize, (i) => { profile.SelectedJournalFontSize = i; }), true, page
             );
 
             content.RemoveIndent();
@@ -3531,7 +3547,24 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.AddToRight
             (
-                new SliderWithLabel(lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, 5, 40, profile.NamePlateFontSize, (i) => { profile.NamePlateFontSize = i; }), true,
+                new SliderWithLabel(lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, minFontSize, maxFontSize, profile.NamePlateFontSize, (i) => { profile.NamePlateFontSize = i; }), true,
+                page
+            );
+
+            content.RemoveIndent();
+            content.BlankLine();
+            
+            content.AddToRight
+            (
+                GenerateFontSelector(lang.GetTazUO.Optionsfont, ProfileManager.CurrentProfile.OptionsFont, (i, s) => { ProfileManager.CurrentProfile.OptionsFont = s; }),
+                true, page
+            );
+
+            content.Indent();
+
+            content.AddToRight
+            (
+                new SliderWithLabel(lang.GetTazUO.SharedSize, 0, ThemeSettings.SLIDER_WIDTH, minFontSize, maxFontSize, profile.OptionsFontSize, (i) => { profile.OptionsFontSize = i; }), true,
                 page
             );
 
@@ -3875,6 +3908,12 @@ namespace ClassicUO.Game.UI.Gumps
             #endregion
 
             options.Add(new SettingsOption("", content, MainContent.RightWidth, (int)PAGE.TUOOptions));
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            ProfileManager.CurrentProfile?.Save(ProfileManager.ProfilePath);
         }
 
         private void OverrideAllProfiles(List<ProfileLocationData> allProfiles)
@@ -5354,258 +5393,6 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        private class HotkeyBox : Control
-        {
-            private bool _actived;
-            private readonly ModernButton _buttonOK, _buttonCancel;
-            private readonly TextBox _label;
-
-            public HotkeyBox()
-            {
-                CanMove = false;
-                AcceptMouseInput = true;
-                AcceptKeyboardInput = true;
-
-                Width = 300;
-                Height = 40;
-
-                AlphaBlendControl bg = new AlphaBlendControl()
-                {
-                    Width = 150,
-                    Height = 40,
-                    AcceptMouseInput = true
-                };
-
-                Add(bg);
-                bg.MouseUp += LabelOnMouseUp;
-
-                Add(_label = TextBox.GetOne("None", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.DefaultCentered(150)));
-                _label.Y = (bg.Height >> 1) - (_label.Height >> 1);
-
-                _label.MouseUp += LabelOnMouseUp;
-
-                Add
-                (
-                    _buttonOK = new ModernButton(152, 0, 75, 40, ButtonAction.Activate, "Save", ThemeSettings.BUTTON_FONT_COLOR)
-                    {
-                        ButtonParameter = (int)ButtonState.Ok
-                    }
-                );
-
-                Add
-                (
-                    _buttonCancel = new ModernButton(_buttonOK.Bounds.Right + 5, 0, 75, 40, ButtonAction.Activate, "Cancel", ThemeSettings.BUTTON_FONT_COLOR)
-                    {
-                        ButtonParameter = (int)ButtonState.Cancel
-                    }
-                );
-
-                WantUpdateSize = false;
-                IsActive = false;
-            }
-
-            public SDL.SDL_Keycode Key { get; private set; }
-            public SDL.SDL_GameControllerButton[] Buttons { get; private set; }
-            public MouseButtonType MouseButton { get; private set; }
-            public bool WheelScroll { get; private set; }
-            public bool WheelUp { get; private set; }
-            public SDL.SDL_Keymod Mod { get; private set; }
-
-            public bool IsActive
-            {
-                get => _actived;
-                set
-                {
-                    _actived = value;
-
-                    if (value)
-                    {
-                        _buttonOK.IsVisible = _buttonCancel.IsVisible = true;
-                        _buttonOK.IsEnabled = _buttonCancel.IsEnabled = true;
-                    }
-                    else
-                    {
-                        _buttonOK.IsVisible = _buttonCancel.IsVisible = false;
-                        _buttonOK.IsEnabled = _buttonCancel.IsEnabled = false;
-                    }
-                }
-            }
-
-            public event EventHandler HotkeyChanged, HotkeyCancelled;
-
-            protected override void OnControllerButtonDown(SDL.SDL_GameControllerButton button)
-            {
-                if (IsActive)
-                {
-                    SetButtons(Controller.PressedButtons());
-                }
-            }
-
-            protected override void OnKeyDown(SDL.SDL_Keycode key, SDL.SDL_Keymod mod)
-            {
-                if (IsActive)
-                {
-                    SetKey(key, mod);
-                }
-            }
-
-            public void SetButtons(SDL.SDL_GameControllerButton[] buttons)
-            {
-                ResetBinding();
-                Buttons = buttons;
-                _label.Text = Controller.GetButtonNames(buttons);
-            }
-
-            public void SetKey(SDL.SDL_Keycode key, SDL.SDL_Keymod mod)
-            {
-                if (key == SDL.SDL_Keycode.SDLK_UNKNOWN && mod == SDL.SDL_Keymod.KMOD_NONE)
-                {
-                    ResetBinding();
-
-                    Key = key;
-                    Mod = mod;
-                }
-                else
-                {
-                    string newvalue = KeysTranslator.TryGetKey(key, mod);
-
-                    if (!string.IsNullOrEmpty(newvalue) && key != SDL.SDL_Keycode.SDLK_UNKNOWN)
-                    {
-                        ResetBinding();
-
-                        Key = key;
-                        Mod = mod;
-                        _label.Text = newvalue;
-                    }
-                }
-            }
-
-            protected override void OnMouseDown(int x, int y, MouseButtonType button)
-            {
-                if (button == MouseButtonType.Middle || button == MouseButtonType.XButton1 || button == MouseButtonType.XButton2)
-                {
-                    SDL.SDL_Keymod mod = SDL.SDL_Keymod.KMOD_NONE;
-
-                    if (Keyboard.Alt)
-                    {
-                        mod |= SDL.SDL_Keymod.KMOD_ALT;
-                    }
-
-                    if (Keyboard.Shift)
-                    {
-                        mod |= SDL.SDL_Keymod.KMOD_SHIFT;
-                    }
-
-                    if (Keyboard.Ctrl)
-                    {
-                        mod |= SDL.SDL_Keymod.KMOD_CTRL;
-                    }
-
-                    SetMouseButton(button, mod);
-                }
-            }
-
-            public void SetMouseButton(MouseButtonType button, SDL.SDL_Keymod mod)
-            {
-                string newvalue = KeysTranslator.GetMouseButton(button, mod);
-
-                if (!string.IsNullOrEmpty(newvalue) && button != MouseButtonType.None)
-                {
-                    ResetBinding();
-
-                    MouseButton = button;
-                    Mod = mod;
-                    _label.Text = newvalue;
-                }
-            }
-
-            protected override void OnMouseWheel(MouseEventType delta)
-            {
-                SDL.SDL_Keymod mod = SDL.SDL_Keymod.KMOD_NONE;
-
-                if (Keyboard.Alt)
-                {
-                    mod |= SDL.SDL_Keymod.KMOD_ALT;
-                }
-
-                if (Keyboard.Shift)
-                {
-                    mod |= SDL.SDL_Keymod.KMOD_SHIFT;
-                }
-
-                if (Keyboard.Ctrl)
-                {
-                    mod |= SDL.SDL_Keymod.KMOD_CTRL;
-                }
-
-                if (delta == MouseEventType.WheelScrollUp)
-                {
-                    SetMouseWheel(true, mod);
-                }
-                else if (delta == MouseEventType.WheelScrollDown)
-                {
-                    SetMouseWheel(false, mod);
-                }
-            }
-
-            public void SetMouseWheel(bool wheelUp, SDL.SDL_Keymod mod)
-            {
-                string newvalue = KeysTranslator.GetMouseWheel(wheelUp, mod);
-
-                if (!string.IsNullOrEmpty(newvalue))
-                {
-                    ResetBinding();
-
-                    WheelScroll = true;
-                    WheelUp = wheelUp;
-                    Mod = mod;
-                    _label.Text = newvalue;
-                }
-            }
-
-            private void ResetBinding()
-            {
-                Key = 0;
-                MouseButton = MouseButtonType.None;
-                WheelScroll = false;
-                Mod = 0;
-                _label.Text = "None";
-                Buttons = null;
-            }
-
-            private void LabelOnMouseUp(object sender, MouseEventArgs e)
-            {
-                IsActive = true;
-                SetKeyboardFocus();
-            }
-
-            public override void OnButtonClick(int buttonID)
-            {
-                switch ((ButtonState)buttonID)
-                {
-                    case ButtonState.Ok: HotkeyChanged.Raise(this); break;
-
-                    case ButtonState.Cancel:
-                        _label.Text = "None";
-
-                        HotkeyCancelled.Raise(this);
-
-                        Key = SDL.SDL_Keycode.SDLK_UNKNOWN;
-                        Mod = SDL.SDL_Keymod.KMOD_NONE;
-
-                        break;
-                }
-
-                IsActive = false;
-            }
-
-            private enum ButtonState
-            {
-                Ok,
-                Cancel
-            }
-        }
-
         private class NameOverheadAssignControl : Control
         {
             private readonly HotkeyBox _hotkeyBox;
@@ -5679,6 +5466,9 @@ namespace ClassicUO.Game.UI.Gumps
 
                 PositionHelper.PositionControl(AddCheckbox("Stackable", NameOverheadOptions.Stackable));
                 PositionHelper.PositionExact(AddCheckbox("Locked down", NameOverheadOptions.LockedDown), rightPosX, PositionHelper.LAST_Y);
+
+                PositionHelper.PositionControl(AddCheckbox("Moveable", NameOverheadOptions.Moveable));
+                PositionHelper.PositionExact(AddCheckbox("Immoveable", NameOverheadOptions.Immoveable), rightPosX, PositionHelper.LAST_Y);
 
                 PositionHelper.PositionControl(AddCheckbox("Other items", NameOverheadOptions.Other));
 

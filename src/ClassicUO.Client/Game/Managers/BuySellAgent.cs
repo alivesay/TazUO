@@ -99,7 +99,9 @@ namespace ClassicUO.Game.Managers
             if (buyItems == null) return;
 
             List<Tuple<uint, ushort>> buyList = new List<Tuple<uint, ushort>>();
-
+            long val = 0;
+            ushort total_count = 0;
+            
             foreach (var buyConfigEntry in buyItems)
             {
                 if (!buyConfigEntry.Enabled) continue;
@@ -117,6 +119,7 @@ namespace ClassicUO.Game.Managers
                     {
                         buyList.Add(new Tuple<uint, ushort>(item.Serial, item.Amount));
                         current_count += item.Amount;
+                        val += item.Price * item.Amount;
                     }
                     else
                     {
@@ -125,14 +128,17 @@ namespace ClassicUO.Game.Managers
                         {
                             buyList.Add(new Tuple<uint, ushort>(item.Serial, remainingAmount));
                             current_count += remainingAmount;
+                            val += item.Price * remainingAmount;
                         }
                     }
                 }
+                total_count += current_count;
             }
 
             if (buyList.Count == 0) return;
 
             NetClient.Socket.Send_BuyRequest(shopSerial, buyList.ToArray());
+            GameActions.Print($"Purchased {total_count} items for {val} gold.");
             UIManager.GetGump(shopSerial)?.Dispose();
         }
 
@@ -157,6 +163,13 @@ namespace ClassicUO.Game.Managers
             }
 
             List<Tuple<uint, ushort>> sellList = new List<Tuple<uint, ushort>>();
+            long val = 0;
+            ushort total_count = 0;
+            ushort unique_items = 0;
+            int max_total_items = ProfileManager.CurrentProfile.SellAgentMaxItems;
+            bool limit_total_items = max_total_items > 0;
+            int max_unique_items = ProfileManager.CurrentProfile.SellAgentMaxUniques;
+            bool limit_unique_items = max_unique_items > 0;
 
             foreach (var sellConfig in sellItems)
             {
@@ -169,28 +182,32 @@ namespace ClassicUO.Game.Managers
 
                     if (current_count >= sellConfig.MaxAmount) continue;
 
-                    //Made it here, add to sell list
-                    if (current_count + item.Amount < sellConfig.MaxAmount)
+                    if (limit_unique_items && unique_items >= max_unique_items) break;
+
+                    if (limit_total_items && current_count + total_count >= max_total_items) break;
+
+                    int amount_sellable = Math.Min(item.Amount, sellConfig.MaxAmount - current_count);
+                    if (limit_total_items)
                     {
-                        sellList.Add(new Tuple<uint, ushort>(item.Serial, item.Amount));
-                        current_count += item.Amount;
+                        amount_sellable = Math.Min(amount_sellable, max_total_items - total_count - current_count);
                     }
-                    else
+
+                    if (amount_sellable > 0)
                     {
-                        ushort remainingAmount = (ushort)(sellConfig.MaxAmount - current_count);
-                        if (remainingAmount > 0)
-                        {
-                            sellList.Add(new Tuple<uint, ushort>(item.Serial, remainingAmount));
-                            current_count += remainingAmount;
-                        }
+                        sellList.Add(new Tuple<uint, ushort>(item.Serial, (ushort)amount_sellable));
+                        current_count += (ushort)amount_sellable;
+                        val += item.Price * (ushort)amount_sellable;
+                        unique_items++;
                     }
                 }
+                total_count += current_count;
             }
             sellPackets.Remove(vendorSerial);
 
             if (sellList.Count == 0) return;
 
             NetClient.Socket.Send_SellRequest(vendorSerial, sellList.ToArray());
+            GameActions.Print($"Sold {total_count} items for {val} gold.");
             UIManager.GetGump(vendorSerial)?.Dispose();
         }
     }

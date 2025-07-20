@@ -44,7 +44,7 @@ using ClassicUO.Resources;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using System;
-using static ClassicUO.Network.NetClient;
+using static ClassicUO.Network.AsyncNetClient;
 
 namespace ClassicUO.Game
 {
@@ -400,7 +400,7 @@ namespace ClassicUO.Game
             Item bandage = World.Player.FindBandage();
             if (bandage != null)
             {
-                NetClient.Socket.Send_TargetSelectedObject(bandage.Serial, World.Player.Serial);
+                Socket.Send_TargetSelectedObject(bandage.Serial, World.Player.Serial);
                 return true;
             }
             return false;
@@ -1015,11 +1015,12 @@ namespace ClassicUO.Game
             if ((World.ClientFeatures.Flags & CharacterListFlags.CLF_OWERWRITE_CONFIGURATION_BUTTON) != 0)
             {
                 Client.Game.GetScene<GameScene>().DisconnectionRequested = true;
-                NetClient.Socket.Send_LogoutNotification();
+                Socket.Send_LogoutNotification();
             }
             else
             {
-                NetClient.Socket.Disconnect();
+                Client.Game.GetScene<GameScene>().DisconnectionRequested = true;
+                Socket.Disconnect().Wait();
                 Client.Game.SetScene(new LoginScene());
             }
         }

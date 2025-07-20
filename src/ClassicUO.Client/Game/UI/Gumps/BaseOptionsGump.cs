@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ClassicUO.Assets;
+using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Input;
@@ -228,7 +229,16 @@ public class BaseOptionsGump : Gump
         public static int INDENT_SPACE { get; set; } = 40;
         public static int BLANK_LINE { get; set; } = 20;
         public static int HORIZONTAL_SPACING_CONTROLS { get; set; } = 20;
-        public static int STANDARD_TEXT_SIZE { get; set; } = 20;
+        public static int STANDARD_TEXT_SIZE
+        {
+            get
+            {
+                if (ProfileManager.CurrentProfile != null)
+                    return ProfileManager.CurrentProfile.OptionsFontSize;
+
+                return 20;
+            }
+        }
         public static float NO_MATCH_SEARCH { get; set; } = 0.5f;
         public static ushort BACKGROUND { get; set; } = 897;
         public static ushort SEARCH_BACKGROUND { get; set; } = 899;
@@ -240,7 +250,15 @@ public class BaseOptionsGump : Gump
         public static Color DROPDOWN_OPTION_SELECTED_HUE { get; set; } = Color.CadetBlue;
         public static Color BUTTON_FONT_COLOR { get; set; } = Color.White;
         public static Color TEXT_FONT_COLOR { get; set; } = Color.White;
-        public static string FONT { get; set; } = TrueTypeLoader.EMBEDDED_FONT;
+        public static string FONT {
+            get
+            {
+                if (ProfileManager.CurrentProfile != null)
+                    return ProfileManager.CurrentProfile.OptionsFont;
+
+                return TrueTypeLoader.EMBEDDED_FONT;
+            }
+        }
     }
 
 
@@ -282,6 +300,14 @@ public class BaseOptionsGump : Gump
             return c;
         }
 
+        public static Control ToRightOf(Control c, Control other, int padding = 5)
+        {
+            c.Y = other.Y;
+            c.X = other.X + other.Width + padding;
+
+            return c;
+        }
+
         public static void PositionExact(Control c, int x, int y)
         {
             c.X = x;
@@ -313,7 +339,7 @@ public class BaseOptionsGump : Gump
 
             if (!string.IsNullOrEmpty(OptionLabel))
             {
-                Control labelTextBox = TextBox.GetOne(OptionLabel, ThemeSettings.FONT, 20, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default());
+                Control labelTextBox = TextBox.GetOne(OptionLabel, ThemeSettings.FONT, 20, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(maxTotalWidth));
                 FullControl.Add(labelTextBox, optionsPage);
 
                 if (labelTextBox.Width > maxTotalWidth)
@@ -516,6 +542,258 @@ public class BaseOptionsGump : Gump
                     SetParentsForMatchingSearch(this, p);
                 }
             }
+        }
+    }
+    
+    protected class HotkeyBox : Control
+    {
+        private bool _actived;
+        private readonly ModernButton _buttonOK, _buttonCancel;
+        private readonly TextBox _label;
+
+        public HotkeyBox()
+        {
+            CanMove = false;
+            AcceptMouseInput = true;
+            AcceptKeyboardInput = true;
+
+            Width = 300;
+            Height = 40;
+
+            AlphaBlendControl bg = new AlphaBlendControl()
+            {
+                Width = 150,
+                Height = 40,
+                AcceptMouseInput = true
+            };
+
+            Add(bg);
+            bg.MouseUp += LabelOnMouseUp;
+
+            Add(_label = TextBox.GetOne("None", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.DefaultCentered(150)));
+            _label.Y = (bg.Height >> 1) - (_label.Height >> 1);
+
+            _label.MouseUp += LabelOnMouseUp;
+
+            Add
+            (
+                _buttonOK = new ModernButton(152, 0, 75, 40, ButtonAction.Activate, "Save", ThemeSettings.BUTTON_FONT_COLOR)
+                {
+                    ButtonParameter = (int)ButtonState.Ok
+                }
+            );
+
+            Add
+            (
+                _buttonCancel = new ModernButton(_buttonOK.Bounds.Right + 5, 0, 75, 40, ButtonAction.Activate, "Cancel", ThemeSettings.BUTTON_FONT_COLOR)
+                {
+                    ButtonParameter = (int)ButtonState.Cancel
+                }
+            );
+
+            WantUpdateSize = false;
+            IsActive = false;
+        }
+
+        public SDL.SDL_Keycode Key { get; private set; }
+        public SDL.SDL_GameControllerButton[] Buttons { get; private set; }
+        public MouseButtonType MouseButton { get; private set; }
+        public bool WheelScroll { get; private set; }
+        public bool WheelUp { get; private set; }
+        public SDL.SDL_Keymod Mod { get; private set; }
+
+        public bool IsActive
+        {
+            get => _actived;
+            set
+            {
+                _actived = value;
+
+                if (value)
+                {
+                    _buttonOK.IsVisible = _buttonCancel.IsVisible = true;
+                    _buttonOK.IsEnabled = _buttonCancel.IsEnabled = true;
+                }
+                else
+                {
+                    _buttonOK.IsVisible = _buttonCancel.IsVisible = false;
+                    _buttonOK.IsEnabled = _buttonCancel.IsEnabled = false;
+                }
+            }
+        }
+
+        public event EventHandler HotkeyChanged, HotkeyCancelled;
+
+        protected override void OnControllerButtonDown(SDL.SDL_GameControllerButton button)
+        {
+            if (IsActive)
+            {
+                SetButtons(Controller.PressedButtons());
+            }
+        }
+
+        protected override void OnKeyDown(SDL.SDL_Keycode key, SDL.SDL_Keymod mod)
+        {
+            if (IsActive)
+            {
+                SetKey(key, mod);
+            }
+        }
+
+        public void SetButtons(SDL.SDL_GameControllerButton[] buttons)
+        {
+            ResetBinding();
+            Buttons = buttons;
+            _label.Text = Controller.GetButtonNames(buttons);
+        }
+
+        public void SetKey(SDL.SDL_Keycode key, SDL.SDL_Keymod mod)
+        {
+            if (key == SDL.SDL_Keycode.SDLK_UNKNOWN && mod == SDL.SDL_Keymod.KMOD_NONE)
+            {
+                ResetBinding();
+
+                Key = key;
+                Mod = mod;
+            }
+            else
+            {
+                string newvalue = KeysTranslator.TryGetKey(key, mod);
+
+                if (!string.IsNullOrEmpty(newvalue) && key != SDL.SDL_Keycode.SDLK_UNKNOWN)
+                {
+                    ResetBinding();
+
+                    Key = key;
+                    Mod = mod;
+                    _label.Text = newvalue;
+                }
+            }
+        }
+
+        protected override void OnMouseDown(int x, int y, MouseButtonType button)
+        {
+            if (button == MouseButtonType.Middle || button == MouseButtonType.XButton1 || button == MouseButtonType.XButton2)
+            {
+                SDL.SDL_Keymod mod = SDL.SDL_Keymod.KMOD_NONE;
+
+                if (Keyboard.Alt)
+                {
+                    mod |= SDL.SDL_Keymod.KMOD_ALT;
+                }
+
+                if (Keyboard.Shift)
+                {
+                    mod |= SDL.SDL_Keymod.KMOD_SHIFT;
+                }
+
+                if (Keyboard.Ctrl)
+                {
+                    mod |= SDL.SDL_Keymod.KMOD_CTRL;
+                }
+
+                SetMouseButton(button, mod);
+            }
+        }
+
+        public void SetMouseButton(MouseButtonType button, SDL.SDL_Keymod mod)
+        {
+            string newvalue = KeysTranslator.GetMouseButton(button, mod);
+
+            if (!string.IsNullOrEmpty(newvalue) && button != MouseButtonType.None)
+            {
+                ResetBinding();
+
+                MouseButton = button;
+                Mod = mod;
+                _label.Text = newvalue;
+            }
+        }
+
+        protected override void OnMouseWheel(MouseEventType delta)
+        {
+            SDL.SDL_Keymod mod = SDL.SDL_Keymod.KMOD_NONE;
+
+            if (Keyboard.Alt)
+            {
+                mod |= SDL.SDL_Keymod.KMOD_ALT;
+            }
+
+            if (Keyboard.Shift)
+            {
+                mod |= SDL.SDL_Keymod.KMOD_SHIFT;
+            }
+
+            if (Keyboard.Ctrl)
+            {
+                mod |= SDL.SDL_Keymod.KMOD_CTRL;
+            }
+
+            if (delta == MouseEventType.WheelScrollUp)
+            {
+                SetMouseWheel(true, mod);
+            }
+            else if (delta == MouseEventType.WheelScrollDown)
+            {
+                SetMouseWheel(false, mod);
+            }
+        }
+
+        public void SetMouseWheel(bool wheelUp, SDL.SDL_Keymod mod)
+        {
+            string newvalue = KeysTranslator.GetMouseWheel(wheelUp, mod);
+
+            if (!string.IsNullOrEmpty(newvalue))
+            {
+                ResetBinding();
+
+                WheelScroll = true;
+                WheelUp = wheelUp;
+                Mod = mod;
+                _label.Text = newvalue;
+            }
+        }
+
+        private void ResetBinding()
+        {
+            Key = 0;
+            MouseButton = MouseButtonType.None;
+            WheelScroll = false;
+            Mod = 0;
+            _label.Text = "None";
+            Buttons = null;
+        }
+
+        private void LabelOnMouseUp(object sender, MouseEventArgs e)
+        {
+            IsActive = true;
+            SetKeyboardFocus();
+        }
+
+        public override void OnButtonClick(int buttonID)
+        {
+            switch ((ButtonState)buttonID)
+            {
+                case ButtonState.Ok: HotkeyChanged.Raise(this); break;
+
+                case ButtonState.Cancel:
+                    _label.Text = "None";
+
+                    HotkeyCancelled.Raise(this);
+
+                    Key = SDL.SDL_Keycode.SDLK_UNKNOWN;
+                    Mod = SDL.SDL_Keymod.KMOD_NONE;
+
+                    break;
+            }
+
+            IsActive = false;
+        }
+
+        private enum ButtonState
+        {
+            Ok,
+            Cancel
         }
     }
 
@@ -1990,19 +2268,32 @@ public class BaseOptionsGump : Gump
             private readonly string[] _items;
             private readonly int _maxHeight;
             private TextBox _label;
-            private int _selectedIndex;
+            private int _selectedIndex = 0;
+            private readonly int[] _originalIndices;
+            private readonly string[] _sortedItems;
+            
 
-            public Combobox(int width, string[] items, int selected = -1, int maxHeight = 200, Action<int, string> onOptionSelected = null)
+            public Combobox(int width, string[] items, int selected = -1, int maxHeight = 400, Action<int, string> onOptionSelected = null)
             {
                 Width = width;
                 Height = 25;
-                SelectedIndex = selected;
                 _items = items;
                 _maxHeight = maxHeight;
                 OnOptionSelected = onOptionSelected;
                 AcceptMouseInput = true;
 
-                string initialText = selected > -1 ? items[selected] : string.Empty;
+                // Create sorted items with original index mapping
+                _originalIndices = Enumerable.Range(0, items.Length).ToArray();
+                _sortedItems = new string[items.Length];
+                Array.Copy(items, _sortedItems, items.Length);
+    
+                // Sort both arrays together
+                Array.Sort(_sortedItems, _originalIndices);
+    
+                // Find the display index for the selected original index
+                int displayIndex = selected > -1 ? Array.IndexOf(_originalIndices, selected) : -1;
+
+                string initialText = displayIndex > -1 ? _sortedItems[displayIndex] : _sortedItems[_originalIndices[0]];
 
                 Add(new ColorBox(Width, Height, ThemeSettings.SEARCH_BACKGROUND));
 
@@ -2010,20 +2301,27 @@ public class BaseOptionsGump : Gump
                 _label.X = 2;
                 _label.Y = (Height >> 1) - (_label.Height >> 1);
                 Add(_label);
+                
+                _selectedIndex = displayIndex;
             }
 
             public int SelectedIndex
             {
-                get => _selectedIndex;
+                get => _selectedIndex > -1 ? _originalIndices[_selectedIndex] : _originalIndices[0]; // Return original index
                 set
                 {
-                    _selectedIndex = value;
+                    // Find display index from original index
+                    int displayIndex = value > -1 ? Array.IndexOf(_originalIndices, value) : _originalIndices[0];
+                    _selectedIndex = displayIndex;
 
-                    if (_items != null)
+                    if (_sortedItems != null && displayIndex > -1)
                     {
-                        _label.Text = _items[value];
-
-                        OnOptionSelected?.Invoke(value, _items[value]);
+                        _label.Text = _sortedItems[displayIndex];
+                        OnOptionSelected?.Invoke(value, _sortedItems[displayIndex]); // Pass original index
+                    }
+                    else if (_label != null)
+                    {
+                        _label.Text = string.Empty;
                     }
                 }
             }
@@ -2048,7 +2346,7 @@ public class BaseOptionsGump : Gump
                     comboY = Client.Game.Window.ClientBounds.Height - _maxHeight;
                 }
 
-                UIManager.Add(new ComboboxGump(ScreenCoordinateX, comboY, Width, _maxHeight, _items, this));
+                UIManager.Add(new ComboboxGump(ScreenCoordinateX, comboY, Width, _maxHeight, _sortedItems, _originalIndices, this));
 
                 base.OnMouseUp(x, y, button);
             }
@@ -2057,7 +2355,7 @@ public class BaseOptionsGump : Gump
             {
                 private readonly Combobox _combobox;
 
-                public ComboboxGump(int x, int y, int width, int maxHeight, string[] items, Combobox combobox) : base(0, 0)
+                public ComboboxGump(int x, int y, int width, int maxHeight, string[] items, int[] originalIndices, Combobox combobox) : base(0, 0)
                 {
                     CanMove = false;
                     AcceptMouseInput = true;
@@ -2088,8 +2386,8 @@ public class BaseOptionsGump : Gump
                             (item, ThemeSettings.DROPDOWN_OPTION_NORMAL_HUE, ThemeSettings.DROPDOWN_OPTION_HOVER_HUE, ThemeSettings.DROPDOWN_OPTION_SELECTED_HUE, width)
                             {
                                 X = 2,
-                                Tag = i,
-                                IsSelected = combobox.SelectedIndex == i ? true : false
+                                Tag = originalIndices[i],
+                                IsSelected = combobox.SelectedIndex == originalIndices[i] ? true : false
                             };
 
                         label.Y = i * label.Height + 5;

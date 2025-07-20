@@ -51,6 +51,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using static SDL2.SDL;
@@ -112,6 +113,7 @@ namespace ClassicUO
 
         protected override void Initialize()
         {
+            AsyncNetClient.MessageReceived += SocketOnMessageReceived;
             if (GraphicManager.GraphicsDevice.Adapter.IsProfileSupported(GraphicsProfile.HiDef))
             {
                 GraphicManager.GraphicsProfile = GraphicsProfile.HiDef;
@@ -126,6 +128,12 @@ namespace ClassicUO
             SDL_SetEventFilter(_filter, IntPtr.Zero);
 
             base.Initialize();
+        }
+
+        private void SocketOnMessageReceived(object sender, byte[] e)
+        {
+            var c = PacketHandlers.Handler.ParsePackets(e);
+            AsyncNetClient.Socket.Statistics.TotalPacketsReceived += (uint)c;
         }
 
         protected override void LoadContent()
@@ -449,20 +457,17 @@ namespace ClassicUO
             Profiler.ExitContext("Mouse");
             
             Profiler.EnterContext("Packets");
-            var data = NetClient.Socket.CollectAvailableData();
-            var packetsCount = PacketHandlers.Handler.ParsePackets(data);
-            NetClient.Socket.Statistics.TotalPacketsReceived += (uint)packetsCount;
-            NetClient.Socket.Flush();
+            // var data = NetClient.Socket.CollectAvailableData();
+            // var packetsCount = PacketHandlers.Handler.ParsePackets(data);
+            // NetClient.Socket.Statistics.TotalPacketsReceived += (uint)packetsCount;
+            // NetClient.Socket.Flush();
+            AsyncNetClient.Socket.ProcessIncomingMessages();
             Profiler.ExitContext("Packets");
 
             Plugin.Tick();
 
             if (Scene != null && Scene.IsLoaded && !Scene.IsDestroyed)
             {
-                if (EventSink.GameUpdate != null)
-                {
-                    EventSink.GameUpdate();
-                }
                 Profiler.EnterContext("Update");
                 Scene.Update();
                 Profiler.ExitContext("Update");

@@ -8,6 +8,20 @@ namespace ClassicUO.Game.UI.Gumps
     internal class VersionHistory : Gump
     {
         private static string[] updateTexts = {
+            "/c[white][3.33.0]/cd\n" +
+            "- Prevent autoloot, move item queue from moving items while you are holding something.\n" +
+            "- Change multi item move to use shared move item queue\n" +
+            "- Prevent closing containers when changing facets\n" +
+            "- Added Create macro button for legion scripts\n" +
+            "- Potential Crash fix from CUO\n" +
+            "- Python API changes\n" +
+            "- Change how skill message frequency option works - fuzzlecutter\n" +
+            "- Added an option to default to old container style with the option to switch to grid container style\n" +
+            "- Added option to remove System prefix in journal\n" +
+            "- Minor bug fixes\n" +
+            "- Spellbar!\n" +
+            "- Implemented Async networking\n",
+            
             "/c[white][3.32.0]/cd\n" +
             "- Added simple progress bar control for Python API gumps.\n" +
             "- Generate user friendly html crash logs and open them on crash\n" +
@@ -256,11 +270,6 @@ namespace ClassicUO.Game.UI.Gumps
                 "- Bug fix for object highlighting\n" +
                 "- Bug fix for <BR> tag in tooltips",
 
-            "/c[white][3.8.0]/cd\n" +
-                "- Added sound override feature\n" +
-                "- Added -radius command, see wiki for more details\n" +
-                "- Added an optional skill progress bar when a skill changes\n",
-
             "\n\n/c[white]For further history please visit our discord."
         };
 
@@ -332,8 +341,8 @@ namespace ClassicUO.Game.UI.Gumps
                 Utility.Platforms.PlatformHelper.LaunchBrowser("https://discord.gg/QvqzkB95G4");
             };
 
-            CenterXInScreen();
-            CenterYInScreen();
+            CenterXInViewPort();
+            CenterYInViewPort();
         }
     }
 }

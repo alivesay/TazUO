@@ -141,10 +141,10 @@ namespace ClassicUO.Game.Managers
         public delegate void PostProcessTooltipDelegate(ref string e);
 
         /// <summary>
-        /// This event occurs every game update, essentially the game tick. Be careful with this, it happens many many times per second.
+        /// Called when the visual spell manager detects a spell being cast.
         /// </summary>
-        public static GameUpdateDelegate GameUpdate;
-        public delegate void GameUpdateDelegate();
+        public static event EventHandler<int> SpellCastBegin;
+        public static void InvokeSpellCastBegin(int spell) => SpellCastBegin?.Invoke(null, spell);
     }
 
     public class OPLEventArgs : EventArgs

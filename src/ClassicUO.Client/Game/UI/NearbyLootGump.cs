@@ -5,13 +5,14 @@ using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
+using ClassicUO.Game.UI.Gumps.GridHighLight;
 using ClassicUO.Input;
 using ClassicUO.Renderer;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDL2;
-using static ClassicUO.Game.UI.Gumps.GridHightlightMenu;
+using static ClassicUO.Game.UI.Gumps.GridHighLight.GridHighlightMenu;
 
 namespace ClassicUO.Game.UI
 {
@@ -21,30 +22,30 @@ namespace ClassicUO.Game.UI
 
         public static int SelectedIndex
         {
-            get => selectedIndex; set
+            get => _selectedIndex; set
             {
                 if (value < -1)
-                    selectedIndex = -1;
+                    _selectedIndex = -1;
                 else
-                    selectedIndex = value;
+                    _selectedIndex = value;
             }
         }
 
-        private ScrollArea scrollArea;
-        private DataBox dataBox;
-        private NiceButton lootButton;
-        private AlphaBlendControl alphaBG;
-        private int itemCount = 0;
+        private readonly ScrollArea _scrollArea;
+        private readonly VBoxContainer _dataBox;
+        private readonly NiceButton _lootButton;
+        private readonly AlphaBlendControl _alphaBg;
+        private int _itemCount = 0;
 
-        private HitBox resizeDrag;
-        private bool dragging = false;
-        private int dragStartH = 0;
+        private readonly HitBox _resizeDrag;
+        private bool _dragging = false;
+        private int _dragStartH = 0;
 
-        private static HashSet<uint> _corpsesRequested = new HashSet<uint>();
-        private static HashSet<uint> _openedCorpses = new HashSet<uint>();
-        private static int selectedIndex;
-        private static Point lastLocation;
-        private long nextClean = 0;
+        private static readonly HashSet<uint> _corpsesRequested = new HashSet<uint>();
+        private static readonly HashSet<uint> _openedCorpses = new HashSet<uint>();
+        private static int _selectedIndex;
+        private static Point _lastLocation;
+        private long _nextClean = 0;
 
         public NearbyLootGump() : base(0, 0)
         {
@@ -57,15 +58,15 @@ namespace ClassicUO.Game.UI
             Width = WIDTH;
             Height = ProfileManager.CurrentProfile.NearbyLootGumpHeight;
 
-            if (lastLocation == default)
+            if (_lastLocation == default)
             {
                 CenterXInViewPort();
                 CenterYInViewPort();
             }
             else
-                Location = lastLocation;
+                Location = _lastLocation;
 
-            Add(alphaBG = new AlphaBlendControl() { Width = Width, Height = Height });
+            Add(_alphaBg = new AlphaBlendControl() { Width = Width, Height = Height });
 
             Control c;
             c = TextBox.GetOne("Nearby corpse loot", Assets.TrueTypeLoader.EMBEDDED_FONT, 24, Color.OrangeRed, TextBox.RTLOptions.DefaultCentered(WIDTH));
@@ -80,12 +81,12 @@ namespace ClassicUO.Game.UI
                     GenOptionsContext().Show();
             };
 
-            Add(lootButton = new NiceButton(0, c.Height, WIDTH >> 1, 20, ButtonAction.Default, "Loot All"));
-            lootButton.MouseUp += (sender, e) =>
+            Add(_lootButton = new NiceButton(0, c.Height, WIDTH >> 1, 20, ButtonAction.Default, "Loot All"));
+            _lootButton.MouseUp += (sender, e) =>
             {
                 if (e.Button == MouseButtonType.Left)
                 {
-                    foreach (Control control in dataBox.Children)
+                    foreach (Control control in _dataBox.Children)
                     {
                         if (control is NearbyItemDisplay display)
                         {
@@ -104,14 +105,14 @@ namespace ClassicUO.Game.UI
                 TargetManager.SetTargeting(CursorTarget.SetGrabBag, 0, TargetType.Neutral);
             };
 
-            Add(scrollArea = new ScrollArea(0, lootButton.Y + lootButton.Height, Width, Height - lootButton.Y - lootButton.Height, true) { ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways });
+            Add(_scrollArea = new ScrollArea(0, _lootButton.Y + _lootButton.Height, Width, Height - _lootButton.Y - _lootButton.Height, true) { ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways });
 
-            scrollArea.Add(dataBox = new DataBox(0, 0, Width, scrollArea.Height));
+            _scrollArea.Add(_dataBox = new(Width - 18));//(0, 0, Width, scrollArea.Height));
 
-            Add(resizeDrag = new HitBox(Width / 2 - 10, Height - 10, 20, 10, "Drag to resize", 0.50f));
-            resizeDrag.Add(new AlphaBlendControl(0.25f) { Width = 20, Height = 10, BaseColor = Color.OrangeRed });
-            resizeDrag.MouseDown += ResizeDrag_MouseDown;
-            resizeDrag.MouseUp += ResizeDrag_MouseUp;
+            Add(_resizeDrag = new HitBox(Width / 2 - 10, Height - 10, 20, 10, "Drag to resize", 0.50f));
+            _resizeDrag.Add(new AlphaBlendControl(0.25f) { Width = 20, Height = 10, BaseColor = Color.OrangeRed });
+            _resizeDrag.MouseDown += ResizeDrag_MouseDown;
+            _resizeDrag.MouseUp += ResizeDrag_MouseUp;
 
             EventSink.OnCorpseCreated += EventSink_OnCorpseCreated;
             EventSink.OnPositionChanged += EventSink_OnPositionChanged;
@@ -136,13 +137,13 @@ namespace ClassicUO.Game.UI
 
         private void ResizeDrag_MouseUp(object sender, MouseEventArgs e)
         {
-            dragging = false;
+            _dragging = false;
         }
 
         private void ResizeDrag_MouseDown(object sender, MouseEventArgs e)
         {
-            dragStartH = Height;
-            dragging = true;
+            _dragStartH = Height;
+            _dragging = true;
         }
 
         private void EventSink_OnCorpseCreated(object sender, System.EventArgs e)
@@ -159,17 +160,22 @@ namespace ClassicUO.Game.UI
             var c = new ContextMenuControl();
             c.Add(new ContextMenuItemEntry("Open human corpses?", () =>
             {
-                ProfileManager.CurrentProfile.NearbyLootOpensHumanCorpses ^= true;
+                ProfileManager.CurrentProfile.NearbyLootOpensHumanCorpses = !ProfileManager.CurrentProfile.NearbyLootOpensHumanCorpses;
                 RequestUpdateContents();
             }, true, ProfileManager.CurrentProfile.NearbyLootOpensHumanCorpses));
+
+            c.Add(new ContextMenuItemEntry("Hide containers when opening corpses?", () =>
+            {
+               ProfileManager.CurrentProfile.NearbyLootConcealsContainerOnOpen = !ProfileManager.CurrentProfile.NearbyLootConcealsContainerOnOpen;
+            }, true, ProfileManager.CurrentProfile.NearbyLootConcealsContainerOnOpen));
 
             return c;
         }
         private void UpdateNearbyLoot()
         {
-            itemCount = 0;
+            _itemCount = 0;
 
-            ClearDataBox();
+            _dataBox.Clear();
             _openedCorpses.Clear();
 
             List<Item> finalItemList = new List<Item>();
@@ -190,17 +196,12 @@ namespace ClassicUO.Game.UI
 
             foreach (Item lootItem in finalItemList)
             {
-                dataBox.Add(NearbyItemDisplay.GetOne(lootItem, itemCount));
-                itemCount++;
+                _dataBox.Add(new NearbyItemDisplay(lootItem, _itemCount));
+                _itemCount++;
             }
 
-            dataBox.ReArrangeChildren(1);
-            dataBox.ForceSizeUpdate(false);
-            scrollArea.SlowUpdate(); //Recalculate scrollbar
-            scrollArea.KeepScrollPositionInBounds();
-
-            if (SelectedIndex >= itemCount)
-                SelectedIndex = itemCount - 1;
+            if (SelectedIndex >= _itemCount)
+                SelectedIndex = _itemCount - 1;
         }
         private void ProcessCorpse(Item corpse, ref List<Item> itemList)
         {
@@ -210,16 +211,19 @@ namespace ClassicUO.Game.UI
             if (corpse.Items != null)
             {
                 corpse.Hue = 53;
-                
+
                 if (_corpsesRequested.Contains(corpse))
                     _corpsesRequested.Remove(corpse);
 
                 _openedCorpses.Add(corpse);
                 for (LinkedObject i = corpse.Items; i != null; i = i.Next)
                 {
-
                     Item item = (Item)i;
-                    if (item == null || item.Graphic == default(ushort) || !item.IsLootable)
+
+                    if (item.IsCorpse)
+                        ProcessCorpse(item, ref itemList);
+
+                    if (item.Graphic == 0 || !item.IsLootable)
                         continue;
 
                     itemList.Add(item);
@@ -237,37 +241,17 @@ namespace ClassicUO.Game.UI
                 return;
             if (corpse.Distance > ProfileManager.CurrentProfile.AutoOpenCorpseRange)
                 return;
-
-            _corpsesRequested.Add(corpse.Serial);
+            if(ProfileManager.CurrentProfile.NearbyLootConcealsContainerOnOpen)
+                _corpsesRequested.Add(corpse.Serial);
 
             GameActions.DoubleClickQueued(corpse.Serial);
         }
         private void LootSelectedIndex()
         {
             if (SelectedIndex == -1)
-                lootButton.InvokeMouseUp(lootButton.Location, MouseButtonType.Left);
-            else if (dataBox.Children.Count > SelectedIndex)
-            {
-                AutoLootManager.Instance.LootItem(dataBox.Children[SelectedIndex].LocalSerial);
-            }
-        }
-        private void ClearDataBox()
-        {
-            List<Control> removeAfter = new List<Control>();
-
-            foreach (Control c in dataBox.Children)
-            {
-                if (c is NearbyItemDisplay cd)
-                {
-                    cd.ReturnToPool();
-                    removeAfter.Add(c);
-                }
-                else
-                    c.Dispose();
-            }
-
-            foreach (Control c in removeAfter)
-                dataBox.Remove(c);
+                _lootButton.InvokeMouseUp(_lootButton.Location, MouseButtonType.Left);
+            else if (_dataBox.Children.Count > SelectedIndex)
+                MoveItemQueue.Instance?.EnqueueQuick(_dataBox.Children[SelectedIndex].LocalSerial); //Directly use move item queue instead of autoloot
         }
 
         public static bool IsCorpseRequested(uint serial, bool remove = true)
@@ -286,10 +270,10 @@ namespace ClassicUO.Game.UI
             base.Dispose();
             _corpsesRequested.Clear();
             EventSink.OnCorpseCreated -= EventSink_OnCorpseCreated;
-            resizeDrag.MouseUp -= ResizeDrag_MouseUp;
-            resizeDrag.MouseDown -= ResizeDrag_MouseDown;
+            _resizeDrag.MouseUp -= ResizeDrag_MouseUp;
+            _resizeDrag.MouseDown -= ResizeDrag_MouseDown;
             EventSink.OPLOnReceive -= EventSink_OPLOnReceive;
-            lastLocation = Location;
+            _lastLocation = Location;
         }
         protected override void OnKeyDown(SDL.SDL_Keycode key, SDL.SDL_Keymod mod)
         {
@@ -329,32 +313,34 @@ namespace ClassicUO.Game.UI
         {
             base.Update();
 
-            if (selectedIndex == -1)
-                lootButton.IsSelected = true;
+            if (_selectedIndex == -1)
+                _lootButton.IsSelected = true;
             else
-                lootButton.IsSelected = false;
+                _lootButton.IsSelected = false;
 
-            int steps = Mouse.LDragOffset.Y;
-
-            if (dragging && steps != 0)
+            if (_dragging)
             {
-                Height = dragStartH + steps;
-                if (Height < 200)
-                    Height = 200;
-                ProfileManager.CurrentProfile.NearbyLootGumpHeight = Height;
+                int steps = Mouse.LDragOffset.Y;
+                if(steps != 0)
+                {
+                    Height = _dragStartH + steps;
+                    if (Height < 200)
+                        Height = 200;
+                    ProfileManager.CurrentProfile.NearbyLootGumpHeight = Height;
 
 
-                scrollArea.Height = Height - lootButton.Y - lootButton.Height;
-                alphaBG.Height = Height;
-                resizeDrag.Y = Height - 10;
-                scrollArea.SlowUpdate();//Recalculate scrollbar
+                    _scrollArea.Height = Height - _lootButton.Y - _lootButton.Height;
+                    _alphaBg.Height = Height;
+                    _resizeDrag.Y = Height - 10;
+                    _scrollArea.SlowUpdate();//Recalculate scrollbar
+                }
             }
 
-            if (Time.Ticks > nextClean)
+            if (Time.Ticks > _nextClean)
             {
                 _openedCorpses.Clear();
                 _corpsesRequested.Clear();
-                nextClean = Time.Ticks + 60000;
+                _nextClean = Time.Ticks + 120000;
             }
         }
         protected override void UpdateContents()
@@ -367,13 +353,10 @@ namespace ClassicUO.Game.UI
     internal class NearbyItemDisplay : Control
     {
         private const int ITEM_SIZE = 40;
-        private static Queue<NearbyItemDisplay> pool = new Queue<NearbyItemDisplay>();
         private Label itemLabel;
         private AlphaBlendControl alphaBG;
         private Item currentItem;
         private int index;
-        private bool highlight = false;
-        private ushort borderHighlightHue = 0;
         private readonly Texture2D borderTexture;
 
         private ushort bgHue
@@ -389,16 +372,6 @@ namespace ClassicUO.Game.UI
                 return 0;
             }
         }
-        public static NearbyItemDisplay GetOne(Item item, int index)
-        {
-            NearbyItemDisplay nearbyItemDisplay = pool.Count > 0 ? pool.Dequeue() : new NearbyItemDisplay(item, index);
-
-            if (nearbyItemDisplay.IsDisposed)
-                return new NearbyItemDisplay(item, index);
-
-            nearbyItemDisplay.SetItem(item, index);
-            return nearbyItemDisplay;
-        }
 
         public NearbyItemDisplay(Item item, int index)
         {
@@ -410,7 +383,7 @@ namespace ClassicUO.Game.UI
             borderTexture = SolidColorTextureCache.GetTexture(Color.White);
             CanMove = true;
             AcceptMouseInput = true;
-            Width = NearbyLootGump.WIDTH;
+            Width = NearbyLootGump.WIDTH - 18; //-18 for scroll bar
             Height = ITEM_SIZE;
             this.index = index;
 
@@ -421,7 +394,6 @@ namespace ClassicUO.Game.UI
 
         public void SetItem(Item item, int index)
         {
-            highlight = false;
             currentItem = item;
             this.index = index;
             if (item == null) return;
@@ -451,22 +423,9 @@ namespace ClassicUO.Game.UI
                 itemLabel.Text = name;
             }
 
-            ItemPropertiesData data = new ItemPropertiesData(item);
-            foreach (GridHighlightData config in GridHighlightData.AllConfigs)
-            {
-                if (config.IsMatch(data))
-                {
-                    highlight = true;
-                    borderHighlightHue = config.Hue;
-                }
-            }
+            World.OPL.Contains(item);
 
             SetTooltip(item);
-        }
-
-        public void ReturnToPool()
-        {
-            pool.Enqueue(this);
         }
 
         public override void Update()
@@ -506,7 +465,7 @@ namespace ClassicUO.Game.UI
                 GameActions.Print($"Added this item to auto loot.");
             }
 
-            AutoLootManager.Instance.LootItem(LocalSerial);
+            MoveItemQueue.Instance?.EnqueueQuick(currentItem); //Directly use move item queue instead of autoloot
         }
 
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)
@@ -569,12 +528,12 @@ namespace ClassicUO.Game.UI
                 );
             }
 
-            if (highlight)
+            if (currentItem != null && currentItem.MatchesHighlightData)
             {
                 int bx = x + 6;
                 int by = y + 6;
 
-                Vector3 borderHueVec = ShaderHueTranslator.GetHueVector(borderHighlightHue, false, 0.8f);
+                Vector3 borderHueVec = ShaderHueTranslator.GetHueVector(currentItem.HighlightHue, false, 0.8f);
 
                 batcher.Draw( //Top bar
                     borderTexture,

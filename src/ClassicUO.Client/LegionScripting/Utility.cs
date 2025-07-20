@@ -276,7 +276,7 @@ namespace ClassicUO.LegionScripting
                             }
                             break;
                         case ScanTypeObject.Followers:
-                            if (!(mobile.IsRenamable && mobile.NotorietyFlag != NotorietyFlag.Invulnerable && mobile.NotorietyFlag != NotorietyFlag.Enemy))
+                            if (!(mobile.IsRenamable && mobile.NotorietyFlag != NotorietyFlag.Enemy))
                             {
                                 continue;
                             }

@@ -360,7 +360,7 @@ namespace ClassicUO.Game.Data
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsWallOfStone(ushort g)
         {
-            return g == 0x038A;
+            return g == 0x82;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

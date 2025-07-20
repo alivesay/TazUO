@@ -48,7 +48,8 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using ClassicUO.Game.Scenes;
-using static ClassicUO.Game.UI.Gumps.GridHightlightMenu;
+using static ClassicUO.Game.UI.Gumps.GridHighLight.GridHighlightMenu;
+using ClassicUO.Game.UI.Gumps.GridHighLight;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -311,8 +312,6 @@ namespace ClassicUO.Game.UI.Gumps
 
             BuildBorder();
             ResizeWindow(savedSize);
-
-            EventSink.OPLOnReceive += OPLReceived;
         }
 
         public override GumpType GumpType => GumpType.GridContainer;
@@ -320,21 +319,30 @@ namespace ClassicUO.Game.UI.Gumps
         private ContextMenuControl GenContextMenu()
         {
             var control = new ContextMenuControl();
-            control.Add(new ContextMenuItemEntry("Open Original Container", () =>
+            control.Add(new ContextMenuItemEntry("Open Original View", () =>
             {
                 UseOldContainerStyle = true;
                 OpenOldContainer(LocalSerial);
             }));
 
-            control.Add(new ContextMenuItemEntry("Stack similar items in original container", () =>
+            control.Add(new ContextMenuItemEntry
+            (
+                "Open New Containers in the Original View", () =>
+                {
+                    ProfileManager.CurrentProfile.GridContainersDefaultToOldStyleView = !ProfileManager.CurrentProfile.GridContainersDefaultToOldStyleView;
+                    openRegularGump.ContextMenu = GenContextMenu();
+                }, true, ProfileManager.CurrentProfile.GridContainersDefaultToOldStyleView
+            ));
+            
+            control.Add(new ContextMenuItemEntry("Stack Similar Items in the Original View", () =>
             {
                 StackNonStackableItems = !StackNonStackableItems;
                 openRegularGump.ContextMenu = GenContextMenu();
             }, true, StackNonStackableItems));
 
-            control.Add(new ContextMenuItemEntry("Open Grid highlight settings", () =>
+            control.Add(new ContextMenuItemEntry("Open Grid View Highlight Settings", () =>
             {
-                GridHightlightMenu.Open();
+                GridHighlightMenu.Open();
             }));
             return control;
         }
@@ -361,20 +369,17 @@ namespace ClassicUO.Game.UI.Gumps
                    + (borderWidth * 2)          // Borders on the top and bottom
                    + ((gridItemSize + Y_SPACING) * rows); // Total height of grid items with spacing
         }
-        private void OPLReceived(object sender, OPLEventArgs e)
-        {
-            gridSlotManager.FindItem(e.Serial)?.ApplyGridHighlighting();
-        }
+
         public override void Save(XmlTextWriter writer)
         {
             base.Save(writer);
 
             if (!skipSave)
             {
-                GridSaveSystem.Instance.SaveContainer(this);
+                GridSaveSystem.Instance?.SaveContainer(this);
             }
 
-            if (IsPlayerBackpack)
+            if (IsPlayerBackpack && ProfileManager.CurrentProfile != null)
             {
                 ProfileManager.CurrentProfile.BackpackGridPosition = Location;
                 ProfileManager.CurrentProfile.BackpackGridSize = new Point(Width, Height);
@@ -492,8 +497,6 @@ namespace ClassicUO.Game.UI.Gumps
 
         public override void Dispose()
         {
-            EventSink.OPLOnReceive -= OPLReceived;
-
             if (isCorpse)
             {
                 lastCorpseX = X;
@@ -769,9 +772,6 @@ namespace ClassicUO.Game.UI.Gumps
             private CustomToolTip toolTipThis, toolTipitem1, toolTipitem2;
             private readonly List<SimpleTimedTextGump> timedTexts = new();
 
-            private bool borderHighlight;
-            private ushort borderHighlightHue;
-
             public bool Highlight { get; set; }
             public bool SelectHighlight { get; set; }
             public Item SlotItem
@@ -839,30 +839,6 @@ namespace ClassicUO.Game.UI.Gumps
 
                 timedTexts.Add(timedText);
                 UIManager.Add(timedText);
-            }
-
-            public void ApplyGridHighlighting()
-            {
-                SetHighlightBorderHue(0);
-
-                if (_item == null) return;
-
-                ItemPropertiesData itemData = new ItemPropertiesData(_item);
-
-                if (!itemData.HasData) return;
-
-                foreach (var highlightConfig in GridHighlightData.AllConfigs)
-                    if (highlightConfig.IsMatch(itemData))
-                    {
-                        SetHighlightBorderHue(highlightConfig.Hue);
-                        if (CUOEnviroment.Debug)
-                            GameActions.Print($"Item {_item.Name} matched grid highlight: {highlightConfig.Name}");
-                    }
-            }
-            public void SetHighlightBorderHue(ushort hue)
-            {
-                borderHighlight = hue != 0;
-                borderHighlightHue = hue;
             }
 
             public void Resize()
@@ -1122,7 +1098,8 @@ namespace ClassicUO.Game.UI.Gumps
 
             public override bool Draw(UltimaBatcher2D batcher, int x, int y)
             {
-                if (_item != null && _item.ItemData.Layer > 0 && hit.MouseIsOver && Keyboard.Ctrl && (toolTipThis == null || toolTipThis.IsDisposed) && (toolTipitem1 == null || toolTipitem1.IsDisposed) && (toolTipitem2 == null || toolTipitem2.IsDisposed))
+                bool itemNull = _item == null;
+                if (!itemNull && _item.ItemData.Layer > 0 && hit.MouseIsOver && Keyboard.Ctrl && (toolTipThis == null || toolTipThis.IsDisposed) && (toolTipitem1 == null || toolTipitem1.IsDisposed) && (toolTipitem2 == null || toolTipitem2.IsDisposed))
                 {
                     Item compItem = World.Player.FindItemByLayer((Layer)_item.ItemData.Layer);
                     if (compItem != null && (Layer)_item.ItemData.Layer != Layer.Backpack)
@@ -1196,15 +1173,15 @@ namespace ClassicUO.Game.UI.Gumps
                     hueVector
                 );
 
-                if (borderHighlight)
+                if (!itemNull && _item.MatchesHighlightData)
                 {
                     int bx = x + 6;
                     int by = y + 6;
-                    int bsize = ProfileManager.CurrentProfile.GridHightlightSize;
+                    int bsize = ProfileManager.CurrentProfile.GridHighlightSize;
 
 
                     Texture2D borderTexture = SolidColorTextureCache.GetTexture(Color.White);
-                    Vector3 borderHueVec = ShaderHueTranslator.GetHueVector(borderHighlightHue, false, 0.8f);
+                    Vector3 borderHueVec = ShaderHueTranslator.GetHueVector(_item.HighlightHue, false, 0.8f);
 
                     batcher.Draw( //Top bar
                         borderTexture,
@@ -1428,7 +1405,6 @@ namespace ClassicUO.Game.UI.Gumps
                             slot.Value.IsVisible = true;
                         }
                     }
-                    slot.Value.ApplyGridHighlighting();
                 }
                 SetGridPositions();
             }
@@ -1538,6 +1514,8 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         continue;
                     }
+
+                    World.OPL.Contains(item); //Request tooltip data
 
                     contents.Add(item);
                 }
@@ -1997,7 +1975,7 @@ namespace ClassicUO.Game.UI.Gumps
             }
             public bool UseOriginalContainerGump(uint container)
             {
-                bool useOriginalContainer = false;
+                bool useOriginalContainer = ProfileManager.CurrentProfile?.GridContainersDefaultToOldStyleView ?? false;
 
                 XElement thisContainer = rootElement.Element("container_" + container.ToString());
                 if (thisContainer != null)

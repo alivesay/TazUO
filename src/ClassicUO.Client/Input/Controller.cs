@@ -96,6 +96,8 @@ namespace ClassicUO.Input
         {
             return ButtonStates.ContainsKey(button) && ButtonStates[button];
         }
+        
+        public static bool AreButtonsPressed(int[] buttons, bool exact = true) => AreButtonsPressed(buttons.Select(x => (SDL.SDL_GameControllerButton)x).ToArray(), exact);
 
         /// <summary>
         /// Check is the supplied list of buttons are currently pressed.

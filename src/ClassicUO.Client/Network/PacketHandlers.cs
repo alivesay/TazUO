@@ -328,6 +328,7 @@ namespace ClassicUO.Network
             Handler.Add(0xF5, DisplayMap);
             Handler.Add(0xF6, BoatMoving);
             Handler.Add(0xF7, PacketList);
+            Handler.Add(EnhancedPacketHandler.EPID, EnhancedPacketHandler.Handle); //For handling custom packets
 
             // login
             Handler.Add(0xA8, ServerListReceived);
@@ -2115,14 +2116,17 @@ namespace ClassicUO.Network
                             if (isSingleUpdate)
                             {
                                 float change = realVal / 10.0f - skill.Value;
+                                int deltaThreshold = ProfileManager.CurrentProfile?.ShowSkillsChangedDeltaValue ?? 0;
 
                                 if (
                                     change != 0.0f
                                     && !float.IsNaN(change)
                                     && ProfileManager.CurrentProfile != null
                                     && ProfileManager.CurrentProfile.ShowSkillsChangedMessage
-                                    && Math.Abs(change * 10)
-                                        >= ProfileManager.CurrentProfile.ShowSkillsChangedDeltaValue
+                                    && (
+                                        deltaThreshold <= 0
+                                        || skill.ValueFixed / deltaThreshold != realVal / deltaThreshold
+                                    )
                                 )
                                 {
                                     GameActions.Print(
@@ -5029,7 +5033,7 @@ namespace ClassicUO.Network
                 if (p.ReadBool())
                 {
                     // client can disconnect
-                    NetClient.Socket.Disconnect();
+                    NetClient.Socket.Disconnect().Wait();
                     Client.Game.SetScene(new LoginScene());
                 }
                 else
@@ -6249,7 +6253,8 @@ namespace ClassicUO.Network
                 Log.Warn("AddItemToContainer function adds mobile as Item");
             }
 
-            if (item != null && (container.Graphic != 0x2006 || item.Layer == Layer.Invalid))
+            //Added item.Container != containerSerial to prevent closing containers when changing facets
+            if (item != null && item.Container != containerSerial && (container.Graphic != 0x2006 || item.Layer == Layer.Invalid))
             {
                 World.RemoveItem(item, true);
             }
@@ -6263,8 +6268,14 @@ namespace ClassicUO.Network
             item.Y = y;
             item.Z = 0;
 
-            World.RemoveItemFromContainer(item);
-            item.Container = containerSerial;
+            //Added item.Container != containerSerial to prevent closing containers when changing facets
+            //Shouldn't need to remove it just to add it back in
+            if (item.Container != containerSerial)
+            {
+                World.RemoveItemFromContainer(item);
+                item.Container = containerSerial;
+            }
+            
             container.PushToBack(item);
 
             if (SerialHelper.IsMobile(containerSerial))
@@ -7399,6 +7410,12 @@ namespace ClassicUO.Network
             {
                 World.Player.HasGump = true;
                 World.Player.LastGumpID = gumpID;
+            }
+
+            if (gump.X == 0 && gump.Y == 0)
+            {
+                gump.CenterXInViewPort();
+                gump.CenterYInViewPort();
             }
 
             return gump;

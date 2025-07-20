@@ -44,6 +44,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -51,7 +52,7 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private const int WIDTH = 400;
 
-        private readonly Dictionary<Buttons, string> _buttonsToSkillsValues = new Dictionary<
+        private static readonly Dictionary<Buttons, string> _buttonsToSkillsValues = new Dictionary<
             Buttons,
             string
         >
@@ -68,8 +69,8 @@ namespace ClassicUO.Game.UI.Gumps
 
         public static bool Dragging;
 
-        private bool _sortAsc;
-        private string _sortField;
+        private static bool _sortAsc;
+        private static string _sortField = "Name";
         private readonly GumpPic _sortOrderIndicator;
         private double _totalReal,
             _totalValue;
@@ -81,6 +82,7 @@ namespace ClassicUO.Game.UI.Gumps
         private AlphaBlendControl background;
 
         private ScrollArea area;
+        private static int last_x = 100, last_y = 100, last_button = (int)Buttons.SortName;
 
         public SkillGumpAdvanced() : base(0, 0)
         {
@@ -139,7 +141,7 @@ namespace ClassicUO.Game.UI.Gumps
                 )
                 {
                     ButtonParameter = (int)Buttons.SortName,
-                    IsSelected = true
+                    IsSelected = last_button == (int)Buttons.SortName
                 }
             );
 
@@ -156,6 +158,7 @@ namespace ClassicUO.Game.UI.Gumps
                 )
                 {
                     ButtonParameter = (int)Buttons.SortReal,
+                    IsSelected = last_button == (int)Buttons.SortReal
                 }
             );
 
@@ -172,6 +175,7 @@ namespace ClassicUO.Game.UI.Gumps
                 )
                 {
                     ButtonParameter = (int)Buttons.SortBase,
+                    IsSelected = last_button == (int)Buttons.SortBase
                 }
             );
 
@@ -188,6 +192,7 @@ namespace ClassicUO.Game.UI.Gumps
                 )
                 {
                     ButtonParameter = (int)Buttons.SortCap,
+                    IsSelected = last_button == (int)Buttons.SortCap
                 }
             );
 
@@ -204,6 +209,7 @@ namespace ClassicUO.Game.UI.Gumps
                 )
                 {
                     ButtonParameter = (int)Buttons.SortLock,
+                    IsSelected = last_button == (int)Buttons.SortLock
                 }
             );
 
@@ -263,19 +269,48 @@ namespace ClassicUO.Game.UI.Gumps
             Add(BottomArea);
 
             Add(_sortOrderIndicator = new GumpPic(0, 0, 0x985, 0));
-            OnButtonClick((int)Buttons.SortName);
+            //OnButtonClick((int)Buttons.SortName);
 
             Add(resizeDrag = new Button(0, 0x837, 0x838, 0x838));
             resizeDrag.MouseDown += ResizeDrag_MouseDown;
             resizeDrag.MouseUp += ResizeDrag_MouseUp;
             resizeDrag.X = Width - 10;
             resizeDrag.Y = Height - 10;
+            X = last_x;
+            Y = last_y;
+            
+            SetSortIndicatorPosition();
+            ForceUpdate();
+        }
+        
+        private void SetSortIndicatorPosition()
+        {
+            if (FindControls<NiceButton>().Any(s => s.ButtonParameter == last_button))
+            {
+                NiceButton btn = FindControls<NiceButton>()
+                    .First(s => s.ButtonParameter == last_button);
+
+                ushort g = (ushort)(_sortAsc ? 0x985 : 0x983);
+
+                _sortOrderIndicator.Graphic = g;
+                _sortOrderIndicator.X = btn.X + btn.Width - 15;
+                _sortOrderIndicator.Y = btn.Y + 5;
+                btn.IsSelected = true;
+            }
+        }
+
+        protected override void OnMove(int x, int y)
+        {
+            base.OnMove(x, y);
+            last_x = X;
+            last_y = Y;
         }
 
         public override GumpType GumpType => GumpType.SkillMenu;
 
         public override void OnButtonClick(int buttonID)
         {
+            last_button = buttonID;
             if (_buttonsToSkillsValues.TryGetValue((Buttons)buttonID, out string fieldValue))
             {
                 if (_sortField == fieldValue)
@@ -286,17 +321,7 @@ namespace ClassicUO.Game.UI.Gumps
                 _sortField = fieldValue;
             }
 
-            if (FindControls<NiceButton>().Any(s => s.ButtonParameter == buttonID))
-            {
-                NiceButton btn = FindControls<NiceButton>()
-                    .First(s => s.ButtonParameter == buttonID);
-
-                ushort g = (ushort)(_sortAsc ? 0x985 : 0x983);
-
-                _sortOrderIndicator.Graphic = g;
-                _sortOrderIndicator.X = btn.X + btn.Width - 15;
-                _sortOrderIndicator.Y = btn.Y + 5;
-            }
+            SetSortIndicatorPosition();
 
             _updateSkillsNeeded = true;
         }
@@ -478,14 +503,36 @@ namespace ClassicUO.Game.UI.Gumps
             }
 
 
-
             _databox.WantUpdateSize = true;
             _databox.ReArrangeChildren();
 
             Add(real = new Label(_totalReal.ToString("F1"), true, 1153) { X = 205, Y = Height - 20, AcceptMouseInput = false});
             Add(value = new Label(_totalValue.ToString("F1"), true, 1153) { X = 255, Y = Height - 20, AcceptMouseInput = false});
+            
+            SetSortIndicatorPosition();
         }
 
+        public override void Save(XmlTextWriter writer)
+        {
+            base.Save(writer);
+
+            writer.WriteAttributeString("sortasc", _sortAsc.ToString());
+            writer.WriteAttributeString("sortfield", _sortField);
+            writer.WriteAttributeString("lastbutton", last_button.ToString());
+        }
+
+        public override void Restore(XmlElement xml)
+        {
+            base.Restore(xml);
+            last_x = X; //Update from saved xml position
+            last_y = Y;
+            if(xml.HasAttribute("sortasc"))
+                bool.TryParse(xml.GetAttribute("sortasc"), out _sortAsc);
+            if(xml.HasAttribute("sortfield"))
+                _sortField = xml.GetAttribute("sortfield");
+            if(xml.HasAttribute("lastbutton"))
+                int.TryParse(xml.GetAttribute("lastbutton"), out last_button);
+        }
 
         private void ResizeDrag_MouseUp(object sender, Input.MouseEventArgs e)
         {

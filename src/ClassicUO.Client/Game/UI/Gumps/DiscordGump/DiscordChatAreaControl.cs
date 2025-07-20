@@ -45,7 +45,7 @@ public class DiscordChatAreaControl : Control
 
         c.BaseColor = new(31, 31, 31);
 
-        _chatScroll = new(c.X, 0, Width, Height, true)
+        _chatScroll = new(c.X, 0, Width, Height - 20, true)
         {
             ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways
         };

@@ -63,6 +63,7 @@ namespace ClassicUO.Game.UI.Gumps
         MacroButtonEditor = 6464,
         DurabilityGump = 6465,
         GridContainer = 8787,
-        NearbyCorpseLoot
+        NearbyCorpseLoot,
+        SpellBar
     }
 }

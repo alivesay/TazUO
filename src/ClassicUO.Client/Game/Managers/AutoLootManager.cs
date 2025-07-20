@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ClassicUO.Game.Managers
@@ -56,7 +57,7 @@ namespace ClassicUO.Game.Managers
             
             if (cont == null) return;
             
-            if (cont.Distance <= ProfileManager.CurrentProfile.AutoOpenCorpseRange && (!cont.IsHumanCorpse || ProfileManager.CurrentProfile.AutoLootHumanCorpses))
+            if (cont.Distance <= ProfileManager.CurrentProfile.AutoOpenCorpseRange)
             {
                 for (LinkedObject i = cont.Items; i != null; i = i.Next)
                 {
@@ -71,6 +72,13 @@ namespace ClassicUO.Game.Managers
         private void CheckAndLoot(Item i)
         {
             if (!loaded || i == null || quickContainsLookup.Contains(i.Serial)) return;
+            
+            if(i.IsCorpse)
+            {
+                HandleCorpse(i);
+
+                return;
+            }
 
             if (IsOnLootList(i))
             {
@@ -245,6 +253,8 @@ namespace ClassicUO.Game.Managers
 
             if (nextLootTime > Time.Ticks) return;
 
+            if (Client.Game.GameCursor.ItemHold.Enabled)
+                return; //Prevent moving stuff while holding an item.
 
             var moveItem = lootItems.Dequeue();
             if (moveItem != 0)
@@ -386,7 +396,7 @@ namespace ClassicUO.Game.Managers
                 else
                     search = StringHelper.GetPluralAdjustedString(compareTo.ItemData.Name);
 
-                return System.Text.RegularExpressions.Regex.IsMatch(search, RegexSearch, System.Text.RegularExpressions.RegexOptions.Multiline);
+                return RegexHelper.GetRegex(RegexSearch, RegexOptions.Multiline).IsMatch(search);
             }
 
             public bool Equals(AutoLootConfigEntry other)

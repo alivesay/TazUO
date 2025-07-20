@@ -18,12 +18,7 @@ namespace ClassicUO.Game.Managers
 
         public void AddTile(int x, int y, int map, ushort hue)
         {
-            if (markedTiles.TryGetValue(FormatLocKey(x, y, map), out hue)) {
-                markedTiles.Add(FormatLocKey(x, y, map), hue);
-            } else
-            {
-                markedTiles.Add(FormatLocKey(x, y, map), hue);
-            }
+            markedTiles[FormatLocKey(x, y, map)] = hue;
         }
 
         public void RemoveTile(int x, int y, int map)

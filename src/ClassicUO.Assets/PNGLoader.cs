@@ -115,6 +115,9 @@ namespace ClassicUO.Assets
                 }
             }
 
+            if (texture == null)
+                return new ArtInfo();
+
             return new ArtInfo()
             {
                 Pixels = GetPixels(texture),

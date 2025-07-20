@@ -517,6 +517,21 @@ namespace ClassicUO
                         PacketLogger.Default.Enabled = true;
                         PacketLogger.Default.CreateFile();
 
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            var vals = value.Split(',');
+
+                            foreach (string val in vals)
+                            {
+                                string hex = val.Trim().StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+                                    ? val.Trim().Substring(2)
+                                    : val.Trim();
+
+                                if (byte.TryParse(hex, NumberStyles.HexNumber, null, out byte res2))
+                                    PacketLogger.Default.LogPacketID.Add(res2);
+                            }
+                        }
+
                         break;
 
                     case "language":

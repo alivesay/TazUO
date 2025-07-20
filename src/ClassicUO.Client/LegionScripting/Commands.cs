@@ -96,7 +96,7 @@ namespace ClassicUO.LegionScripting
         {
             if (World.Player.Race == RaceType.GARGOYLE)
             {
-                NetClient.Socket.Send_ToggleGargoyleFlying();
+                AsyncNetClient.Socket.Send_ToggleGargoyleFlying();
                 return true;
             }
 
@@ -742,13 +742,13 @@ namespace ClassicUO.LegionScripting
             switch (args[0].AsString())
             {
                 case "honor":
-                    NetClient.Socket.Send_InvokeVirtueRequest(0x01);
+                    AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x01);
                     break;
                 case "sacrifice":
-                    NetClient.Socket.Send_InvokeVirtueRequest(0x02);
+                    AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x02);
                     break;
                 case "valor":
-                    NetClient.Socket.Send_InvokeVirtueRequest(0x03);
+                    AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x03);
                     break;
             }
 
@@ -861,11 +861,11 @@ namespace ClassicUO.LegionScripting
         {
             if (MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
             {
-                NetClient.Socket.Send_ASCIIPromptResponse(string.Empty, true);
+                AsyncNetClient.Socket.Send_ASCIIPromptResponse(string.Empty, true);
             }
             else if (MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
             {
-                NetClient.Socket.Send_UnicodePromptResponse(string.Empty, Settings.GlobalSettings.Language, true);
+                AsyncNetClient.Socket.Send_UnicodePromptResponse(string.Empty, Settings.GlobalSettings.Language, true);
             }
 
             MessageManager.PromptData = default;
@@ -882,11 +882,11 @@ namespace ClassicUO.LegionScripting
             {
                 if (MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
                 {
-                    NetClient.Socket.Send_ASCIIPromptResponse(text, text.Length < 1);
+                    AsyncNetClient.Socket.Send_ASCIIPromptResponse(text, text.Length < 1);
                 }
                 else if (MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
                 {
-                    NetClient.Socket.Send_UnicodePromptResponse(text, Settings.GlobalSettings.Language, text.Length < 1);
+                    AsyncNetClient.Socket.Send_UnicodePromptResponse(text, Settings.GlobalSettings.Language, text.Length < 1);
                 }
 
                 MessageManager.PromptData = default;
@@ -902,8 +902,8 @@ namespace ClassicUO.LegionScripting
             uint serial = args[0].AsSerial();
 
             PopupMenuGump.CloseNext = serial;
-            NetClient.Socket.Send_RequestPopupMenu(serial);
-            NetClient.Socket.Send_PopupMenuSelection(serial, args[1].AsUShort());
+            AsyncNetClient.Socket.Send_RequestPopupMenu(serial);
+            AsyncNetClient.Socket.Send_PopupMenuSelection(serial, args[1].AsUShort());
 
             return true;
         }

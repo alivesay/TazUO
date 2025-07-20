@@ -64,7 +64,7 @@ namespace ClassicUO.Game.Managers
 
         private void OnRawMessageReceived(object sender, MessageEventArgs e)
         {
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 if (loaded && e.Parent != null && ReferenceEquals(e.Parent, World.Player))
                 {
@@ -96,6 +96,7 @@ namespace ClassicUO.Game.Managers
             {
                 World.Player.Flags |= Flags.Frozen;
             }
+            EventSink.InvokeSpellCastBegin(spell.ID);
         }
 
         public void ClearCasting()
@@ -464,6 +465,7 @@ namespace ClassicUO.Game.Managers
             public double CastTime { get; set; } = 0.0;
             public bool ShowCastRangeDuringCasting { get; set; } = false;
             public bool FreezeCharacterWhileCasting { get; set; } = false;
+            public bool ExpectTargetCursor { get; set; } = false;
 
             public static SpellRangeInfo FromSpellDef(SpellDefinition spell)
             {

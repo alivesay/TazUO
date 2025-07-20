@@ -204,7 +204,7 @@ namespace ClassicUO.Configuration
             public string DragAnchored { get; set; } = "Anchor opened health bars together";
             public string ShowStatsChangedMsg { get; set; } = "Show stats changed messages";
             public string ShowSkillsChangedMsg { get; set; } = "Show skills changed messages";
-            public string ChangeVolume { get; set; } = "Changed by";
+            public string ChangeVolume { get; set; } = "Every tenth (0.1)";
             #endregion
 
             #region General->TerrainStatics
@@ -418,6 +418,7 @@ namespace ClassicUO.Configuration
             #region General
             public string GridContainers { get; set; } = "Grid containers";
             public string EnableGridContainers { get; set; } = "Enable grid containers";
+            public string GridContainersDefaultToOldStyleView { get; set; } = "Open new containers in the original view";
             public string GridContainerScale { get; set; } = "Grid container scale";
             public string AlsoScaleItems { get; set; } = "Also scale items";
             public string GridItemBorderOpacity { get; set; } = "Grid item border opacity";
@@ -448,6 +449,7 @@ namespace ClassicUO.Configuration
             public string JournalBackgroundColor { get; set; } = "Background color";
             public string JournalStyle { get; set; } = "Journal style";
             public string JournalHideBorders { get; set; } = "Hide borders";
+            public string JournalHideSystemPrefix { get; set; } = "Hide \"System:\" prefix";
             public string HideTimestamp { get; set; } = "Hide timestamp";
             public string JournalAnchor { get; set; } = "Make anchorable";
             #endregion
@@ -549,6 +551,7 @@ namespace ClassicUO.Configuration
             public string OverheadFont { get; set; } = "Overhead font";
             public string JournalFont { get; set; } = "Journal font";
             public string NameplateFont { get; set; } = "Nameplate font";
+            public string Optionsfont { get; set; } = "Options menu font";
             #endregion
 
             #region Controller
@@ -588,6 +591,10 @@ namespace ClassicUO.Configuration
 
             public string AutoSellMenu { get; set; } = "Auto Sell";
             public string AutoSellEnable { get; set; } = "Enable auto sell feature";
+            public string AutoSellMaxUniques { get; set; } = "Maximum unique items per transaction";
+            public string AutoSellMaxUniquesTooltip { get; set; } = "This is the maximum number of unique items that will be sold at once. A value of 0 means unlimited. A stack of items counts as one towards this limit. Some servers block transactions that sell too many unique items.";
+            public string AutoSellMaxItems { get; set; } = "Maximum total items per transaction";
+            public string AutoSellMaxItemsTooltip { get; set; } = "This is the maximum number of items that will be sold at once. A value of 0 means unlimited. Some servers block transactions that sell too many items.";
 
             public string AutoBuyMenu { get; set; } = "Auto Buy";
             public string AutoBuyEnable { get; set; } = "Enable auto buy feature";

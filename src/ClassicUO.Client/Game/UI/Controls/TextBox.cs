@@ -40,6 +40,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using ClassicUO.Utility;
 
 namespace ClassicUO.Game.UI.Controls
 {
@@ -327,8 +328,8 @@ namespace ClassicUO.Game.UI.Controls
             WantUpdateSize = false;
         }
 
-        private static readonly Regex _baseFontColorRegex = new Regex("<basefont color=\"?'?(?<color>.*?)\"?'?>", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-        private static readonly Regex _bodyTextColorRegex = new Regex("<Bodytextcolor\"?'?(?<color>.*?)\"?'?>", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+        private static readonly Regex _baseFontColorRegex = RegexHelper.GetRegex("<basefont color=\"?'?(?<color>.*?)\"?'?>", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+        private static readonly Regex _bodyTextColorRegex = RegexHelper.GetRegex("<bodytextcolor\"?'?(?<color>.*?)\"?'?>", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
         public static string ConvertHTMLColorsToFSS(string text)
         {

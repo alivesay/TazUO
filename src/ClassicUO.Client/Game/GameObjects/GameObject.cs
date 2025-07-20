@@ -95,6 +95,7 @@ namespace ClassicUO.Game.GameObjects
         // FIXME: remove it
         public sbyte FoliageIndex = -1;
         public ushort OriginalGraphic => originalGraphic == 0 ? Graphic : originalGraphic;
+        public void ResetOriginalGraphic() => originalGraphic = 0;
         public ushort Graphic
         {
             get => graphic; set

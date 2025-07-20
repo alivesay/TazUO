@@ -31,6 +31,7 @@
 #endregion
 
 using System.IO;
+using ClassicUO.Game.UI.Gumps.GridHighLight;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 
@@ -54,6 +55,12 @@ namespace ClassicUO.Configuration
             CurrentProfile.Username = username;
             CurrentProfile.ServerName = servername;
             CurrentProfile.CharacterName = charactername;
+
+            if (CurrentProfile.GridHighlightSetup.Count == 0)
+            {
+                GridHighLightProfile.MigrateGridHighlightToSetup(CurrentProfile);
+                ConfigurationResolver.Save(CurrentProfile, Path.Combine(ProfilePath, "profile.json"), ProfileJsonContext.DefaultToUse);
+            }
 
             ValidateFields(CurrentProfile);
 

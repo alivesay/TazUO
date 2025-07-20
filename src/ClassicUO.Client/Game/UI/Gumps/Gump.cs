@@ -231,17 +231,12 @@ namespace ClassicUO.Game.UI.Gumps
         public void SetInScreen()
         {
             Rectangle windowBounds = Client.Game.Window.ClientBounds;
-            Rectangle bounds = Bounds;
-            bounds.X += windowBounds.X;
-            bounds.Y += windowBounds.Y;
 
-            if (windowBounds.Intersects(bounds))
-            {
-                return;
-            }
+            int newX = (int)MathHelper.Clamp(X, 0, windowBounds.Width - Width);
+            int newY = (int)MathHelper.Clamp(Y, 0, windowBounds.Height - Height);
 
-            X = (int)MathHelper.Clamp(bounds.X, 0, windowBounds.Width - Width);
-            Y = (int)MathHelper.Clamp(bounds.Y, 0, windowBounds.Height - Height);
+            X = newX;
+            Y = newY;
         }
 
         public virtual void Restore(XmlElement xml)

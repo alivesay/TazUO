@@ -1,11 +1,86 @@
+class Buff:
+    Graphic: int = None
+    Text: str = None
+    Timer: int = None
+    Type = None
+    Title: str = None
+
+class PyControl:
+
+    def SetRect(x: int, y: int, w: int, h: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetWidth(width: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetHeight(height: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetX(x: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetY(y: int) -> "PyControl":
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def SetPos(x: int, y: int) -> "PyControl":
+        """
+         Use int python API
+        
+        """
+        pass
+
+    def GetX() -> int:
+        """
+         Used in python API
+        
+        """
+        pass
+
+    def GetY() -> int:
+        """
+         Used in python API
+        
+        """
+        pass
+
+class PyProfile:
+    CharacterName: str = None
+    ServerName: str = None
+    LootBagSerial: int = None
+    FavoriteBagSerial: int = None
+    MoveItemDelay: int = None
+    AutoLootEnabled: bool = None
+
 JournalEntries = None
-Backpack = None
+Backpack: int = None
 Player = None
+Bank: int = None
 Random = None
-LastTargetSerial = None
+LastTargetSerial: int = None
 LastTargetPos = None
-LastTargetGraphic = None
-Found = None
+LastTargetGraphic: int = None
+Found: int = None
+PyProfile: PyProfile = None
 
 class ScanType:
     Hostile = 0
@@ -24,7 +99,13 @@ class Notoriety:
     Murderer = 1
     Invulnerable = 1
 
-def ProcessCallbacks():
+class PersistentVar:
+    Char = 1
+    Account = 2
+    Server = 3
+    Global = 4
+
+def ProcessCallbacks() -> None:
     """
      Use this when you need to wait for players to click buttons.
      Example:
@@ -37,14 +118,60 @@ def ProcessCallbacks():
     """
     pass
 
-def CloseGumps():
+def SetSharedVar(name: str, value: Any) -> None:
+    """
+     Set a variable that is shared between scripts.
+     Example:
+     ```py
+     API.SetSharedVar("myVar", 10)
+     ```
+    
+    """
+    pass
+
+def GetSharedVar(name: str) -> Any:
+    """
+     Get the value of a shared variable.
+     Example:
+     ```py
+     myVar = API.GetSharedVar("myVar")
+     if myVar:
+      API.SysMsg(f"myVar is {myVar}")
+     ```
+    
+    """
+    pass
+
+def RemoveSharedVar(name: str) -> None:
+    """
+     Try to remove a shared variable.
+     Example:
+     ```py
+     API.RemoveSharedVar("myVar")
+     ```
+    
+    """
+    pass
+
+def ClearSharedVars() -> None:
+    """
+     Clear all shared vars.
+     Example:
+     ```py
+     API.ClearSharedVars()
+     ```
+    
+    """
+    pass
+
+def CloseGumps() -> None:
     """
      Close all gumps created by the API unless marked to remain open.
     
     """
     pass
 
-def Attack(serial: int):
+def Attack(serial: int) -> None:
     """
      Attack a mobile
      Example:
@@ -57,7 +184,7 @@ def Attack(serial: int):
     """
     pass
 
-def BandageSelf():
+def BandageSelf() -> bool:
     """
      Attempt to bandage yourself. Older clients this will not work, you will need to find a bandage, use it, and target yourself.
      Example:
@@ -74,7 +201,7 @@ def BandageSelf():
     """
     pass
 
-def ClearLeftHand():
+def ClearLeftHand() -> int:
     """
      If you have an item in your left hand, move it to your backpack
      Sets API.Found to the item's serial.
@@ -88,7 +215,7 @@ def ClearLeftHand():
     """
     pass
 
-def ClearRightHand():
+def ClearRightHand() -> int:
     """
      If you have an item in your right hand, move it to your backpack
      Sets API.Found to the item's serial.
@@ -102,7 +229,7 @@ def ClearRightHand():
     """
     pass
 
-def ClickObject(serial: int):
+def ClickObject(serial: int) -> None:
     """
      Single click an object
      Example:
@@ -113,7 +240,7 @@ def ClickObject(serial: int):
     """
     pass
 
-def UseObject(serial: int, skipQueue: bool = True):
+def UseObject(serial: int, skipQueue: bool = True) -> None:
     """
      Attempt to use(double click) an object.
      Example:
@@ -124,7 +251,7 @@ def UseObject(serial: int, skipQueue: bool = True):
     """
     pass
 
-def Contents(serial: int):
+def Contents(serial: int) -> int:
     """
      Get an item count for the contents of a container
      Example:
@@ -137,7 +264,7 @@ def Contents(serial: int):
     """
     pass
 
-def ContextMenu(serial: int, entry: int):
+def ContextMenu(serial: int, entry: int) -> None:
     """
      Send a context menu(right click menu) response.
      This does not open the menu, you do not need to open the menu first. This handles both in one action.
@@ -149,7 +276,7 @@ def ContextMenu(serial: int, entry: int):
     """
     pass
 
-def EquipItem(serial: int):
+def EquipItem(serial: int) -> None:
     """
      Attempt to equip an item. Layer is automatically detected.
      Example:
@@ -162,14 +289,14 @@ def EquipItem(serial: int):
     """
     pass
 
-def ClearMoveQueue():
+def ClearMoveQueue() -> None:
     """
      Clear the move item que of all items.
     
     """
     pass
 
-def QueMoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: int = 0xFFFF):
+def QueMoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: int = 0xFFFF) -> None:
     """
      Move an item to another container.
      Use x, and y if you don't want items stacking in the desination container.
@@ -191,7 +318,7 @@ def QueMoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y:
     """
     pass
 
-def MoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: int = 0xFFFF):
+def MoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: int = 0xFFFF) -> None:
     """
      Move an item to another container.
      Use x, and y if you don't want items stacking in the desination container.
@@ -214,7 +341,7 @@ def MoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: in
     """
     pass
 
-def QueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0):
+def QueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0, OSI: bool = False) -> None:
     """
      Move an item to the ground near you.
      Example:
@@ -227,7 +354,7 @@ def QueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int 
     """
     pass
 
-def MoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0):
+def MoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0, OSI: bool = False) -> None:
     """
      Move an item to the ground near you.
      Example:
@@ -241,7 +368,7 @@ def MoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0
     """
     pass
 
-def UseSkill(skillName: str):
+def UseSkill(skillName: str) -> None:
     """
      Use a skill.
      Example:
@@ -253,7 +380,7 @@ def UseSkill(skillName: str):
     """
     pass
 
-def CastSpell(spellName: str):
+def CastSpell(spellName: str) -> None:
     """
      Attempt to cast a spell by its name.
      Example:
@@ -266,7 +393,7 @@ def CastSpell(spellName: str):
     """
     pass
 
-def BuffExists(buffName: str):
+def BuffExists(buffName: str) -> bool:
     """
      Check if a buff is active.
      Example:
@@ -278,7 +405,22 @@ def BuffExists(buffName: str):
     """
     pass
 
-def SysMsg(message: str, hue: int = 946):
+def ActiveBuffs() -> list[Buff]:
+    """
+     Get a list of all buffs that are active.
+     See [Buff](Buff.md) to see what attributes are available.
+     Buff does not get updated after you access it in python, you will need to call this again to get the latest buff data.
+     Example:
+     ```py
+     buffs = API.ActiveBuffs()
+     for buff in buffs:
+         API.SysMsg(buff.Title)
+     ```
+    
+    """
+    pass
+
+def SysMsg(message: str, hue: int = 946) -> None:
     """
      Show a system message(Left side of screen).
      Example:
@@ -289,7 +431,7 @@ def SysMsg(message: str, hue: int = 946):
     """
     pass
 
-def Msg(message: str):
+def Msg(message: str) -> None:
     """
      Say a message outloud.
      Example:
@@ -300,7 +442,7 @@ def Msg(message: str):
     """
     pass
 
-def HeadMsg(message: str, serial: int, hue: int = 1337):
+def HeadMsg(message: str, serial: int, hue: int = 1337) -> None:
     """
      Show a message above a mobile or item, this is only visible to you.
      Example:
@@ -311,7 +453,7 @@ def HeadMsg(message: str, serial: int, hue: int = 1337):
     """
     pass
 
-def PartyMsg(message: str):
+def PartyMsg(message: str) -> None:
     """
      Send a message to your party.
      Example:
@@ -322,7 +464,7 @@ def PartyMsg(message: str):
     """
     pass
 
-def GuildMsg(message: str):
+def GuildMsg(message: str) -> None:
     """
      Send your guild a message.
      Example:
@@ -333,7 +475,7 @@ def GuildMsg(message: str):
     """
     pass
 
-def AllyMsg(message: str):
+def AllyMsg(message: str) -> None:
     """
      Send a message to your alliance.
      Example:
@@ -344,7 +486,7 @@ def AllyMsg(message: str):
     """
     pass
 
-def WhisperMsg(message: str):
+def WhisperMsg(message: str) -> None:
     """
      Whisper a message.
      Example:
@@ -355,7 +497,7 @@ def WhisperMsg(message: str):
     """
     pass
 
-def YellMsg(message: str):
+def YellMsg(message: str) -> None:
     """
      Yell a message.
      Example:
@@ -366,7 +508,7 @@ def YellMsg(message: str):
     """
     pass
 
-def EmoteMsg(message: str):
+def EmoteMsg(message: str) -> None:
     """
      Emote a message.
      Example:
@@ -377,7 +519,7 @@ def EmoteMsg(message: str):
     """
     pass
 
-def FindItem(serial: int):
+def FindItem(serial: int) -> Item:
     """
      Try to get an item by its serial.
      Sets API.Found to the serial of the item found.
@@ -393,7 +535,7 @@ def FindItem(serial: int):
     """
     pass
 
-def FindType(graphic: int, container: int = 1337, range: int = 1337, hue: int = 1337, minamount: int = 0):
+def FindType(graphic: int, container: int = 1337, range: int = 1337, hue: int = 1337, minamount: int = 0) -> Item:
     """
      Attempt to find an item by type(graphic).
      Sets API.Found to the serial of the item found.
@@ -408,7 +550,7 @@ def FindType(graphic: int, container: int = 1337, range: int = 1337, hue: int = 
     """
     pass
 
-def FindTypeAll(graphic: int, container: int = 1337, range: int = 1337, hue: int = 1337, minamount: int = 0):
+def FindTypeAll(graphic: int, container: int = 1337, range: int = 1337, hue: int = 1337, minamount: int = 0) -> list[Item]:
     """
      Return a list of items matching the parameters set.
      Example:
@@ -421,7 +563,7 @@ def FindTypeAll(graphic: int, container: int = 1337, range: int = 1337, hue: int
     """
     pass
 
-def FindLayer(layer: str, serial: int = 1337):
+def FindLayer(layer: str, serial: int = 1337) -> Item:
     """
      Attempt to find an item on a layer.
      Sets API.Found to the serial of the item found.
@@ -435,7 +577,7 @@ def FindLayer(layer: str, serial: int = 1337):
     """
     pass
 
-def ItemsInContainer(container: int, recursive: bool = False):
+def ItemsInContainer(container: int, recursive: bool = False) -> list[Item]:
     """
      Get all items in a container.
      Example:
@@ -451,7 +593,7 @@ def ItemsInContainer(container: int, recursive: bool = False):
     """
     pass
 
-def UseType(graphic: int, hue: int = 1337, container: int = 1337, skipQueue: bool = True):
+def UseType(graphic: int, hue: int = 1337, container: int = 1337, skipQueue: bool = True) -> None:
     """
      Attempt to use the first item found by graphic(type).
      Example:
@@ -464,7 +606,7 @@ def UseType(graphic: int, hue: int = 1337, container: int = 1337, skipQueue: boo
     """
     pass
 
-def CreateCooldownBar(seconds: float, text: str, hue: int):
+def CreateCooldownBar(seconds: float, text: str, hue: int) -> None:
     """
      Create a cooldown bar.
      Example:
@@ -475,7 +617,7 @@ def CreateCooldownBar(seconds: float, text: str, hue: int):
     """
     pass
 
-def IgnoreObject(serial: int):
+def IgnoreObject(serial: int) -> None:
     """
      Adds an item or mobile to your ignore list.
      These are unique lists per script. Ignoring an item in one script, will not affect other running scripts.
@@ -489,7 +631,7 @@ def IgnoreObject(serial: int):
     """
     pass
 
-def ClearIgnoreList():
+def ClearIgnoreList() -> None:
     """
      Clears the ignore list. Allowing functions to see those items again.
      Example:
@@ -500,7 +642,7 @@ def ClearIgnoreList():
     """
     pass
 
-def OnIgnoreList(serial: int):
+def OnIgnoreList(serial: int) -> bool:
     """
      Check if a serial is on the ignore list.
      Example:
@@ -512,7 +654,7 @@ def OnIgnoreList(serial: int):
     """
     pass
 
-def Pathfind(x: int, y: int, z: int = 1337, distance: int = 0):
+def Pathfind(x: int, y: int, z: int = 1337, distance: int = 1, wait: bool = False, timeout: int = 10) -> bool:
     """
      Attempt to pathfind to a location.  This will fail with large distances.
      Example:
@@ -523,20 +665,20 @@ def Pathfind(x: int, y: int, z: int = 1337, distance: int = 0):
     """
     pass
 
-def Pathfind(entity: int, distance: int = 0):
+def PathfindEntity(entity: int, distance: int = 1, wait: bool = False, timeout: int = 10) -> bool:
     """
      Attempt to pathfind to a mobile or item.
      Example:
      ```py
      mob = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)
      if mob:
-       API.Pathfind(mob)
+       API.PathfindEntity(mob)
      ```
     
     """
     pass
 
-def Pathfinding():
+def Pathfinding() -> bool:
     """
      Check if you are already pathfinding.
      Example:
@@ -549,7 +691,7 @@ def Pathfinding():
     """
     pass
 
-def CancelPathfinding():
+def CancelPathfinding() -> None:
     """
      Cancel pathfinding.
      Example:
@@ -561,7 +703,7 @@ def CancelPathfinding():
     """
     pass
 
-def AutoFollow(mobile: int):
+def AutoFollow(mobile: int) -> None:
     """
      Automatically follow a mobile. This is different than pathfinding. This will continune to follow the mobile.
      Example:
@@ -574,7 +716,7 @@ def AutoFollow(mobile: int):
     """
     pass
 
-def CancelAutoFollow():
+def CancelAutoFollow() -> None:
     """
      Cancel auto follow mode.
      Example:
@@ -586,7 +728,7 @@ def CancelAutoFollow():
     """
     pass
 
-def Run(direction: str):
+def Run(direction: str) -> None:
     """
      Run in a direction.
      Example:
@@ -597,7 +739,7 @@ def Run(direction: str):
     """
     pass
 
-def Walk(direction: str):
+def Walk(direction: str) -> None:
     """
      Walk in a direction.
      Example:
@@ -608,7 +750,7 @@ def Walk(direction: str):
     """
     pass
 
-def Turn(direction: str):
+def Turn(direction: str) -> None:
     """
      Turn your character a specific direction.
      Example:
@@ -619,7 +761,7 @@ def Turn(direction: str):
     """
     pass
 
-def Rename(serial: int, name: str):
+def Rename(serial: int, name: str) -> None:
     """
      Attempt to rename something like a pet.
      Example:
@@ -630,20 +772,18 @@ def Rename(serial: int, name: str):
     """
     pass
 
-def Dismount():
+def Dismount() -> None:
     """
      Attempt to dismount if mounted.
      Example:
      ```py
-     mount = API.Dismount()
-     if mount:
-       API.UseObject(mount)
+     API.Dismount()
      ```
     
     """
     pass
 
-def Mount(serial: int):
+def Mount(serial: int) -> None:
     """
      Attempt to mount(double click)
      Example:
@@ -654,7 +794,7 @@ def Mount(serial: int):
     """
     pass
 
-def WaitForTarget(targetType: str = "any", timeout: float = 5):
+def WaitForTarget(targetType: str = "any", timeout: float = 5) -> bool:
     """
      Wait for a target cursor.
      Example:
@@ -665,7 +805,7 @@ def WaitForTarget(targetType: str = "any", timeout: float = 5):
     """
     pass
 
-def Target(serial: int):
+def Target(serial: int) -> None:
     """
      Target an item or mobile.
      Example:
@@ -677,7 +817,7 @@ def Target(serial: int):
     """
     pass
 
-def Target(x: int, y: int, z: int, graphic: int = 1337):
+def Target(x: int, y: int, z: int, graphic: int = 1337) -> None:
     """
      Target a location. Include graphic if targeting a static.
      Example:
@@ -689,20 +829,20 @@ def Target(x: int, y: int, z: int, graphic: int = 1337):
     """
     pass
 
-def RequestTarget(timeout: float = 5):
+def RequestTarget(timeout: float = 5) -> int:
     """
      Request the player to target something.
      Example:
      ```py
      target = API.RequestTarget()
      if target:
-       API.SysMsg("Targeted: " + str(target.Name))
+       API.SysMsg("Targeted serial: " + str(target))
      ```
     
     """
     pass
 
-def TargetSelf():
+def TargetSelf() -> None:
     """
      Target yourself.
      Example:
@@ -713,9 +853,10 @@ def TargetSelf():
     """
     pass
 
-def TargetLandRel(xOffset: int, yOffset: int):
+def TargetLandRel(xOffset: int, yOffset: int) -> None:
     """
      Target a land tile relative to your position.
+     If this doesn't work, try TargetTileRel instead.
      Example:
      ```py
      API.TargetLand(1, 1)
@@ -724,9 +865,10 @@ def TargetLandRel(xOffset: int, yOffset: int):
     """
     pass
 
-def TargetTileRel(xOffset: int, yOffset: int, graphic: int = 1337):
+def TargetTileRel(xOffset: int, yOffset: int, graphic: int = 1337) -> None:
     """
      Target a tile relative to your location.
+     If this doesn't work, try TargetLandRel instead.'
      Example:
      ```py
      API.TargetTileRel(1, 1)
@@ -735,7 +877,7 @@ def TargetTileRel(xOffset: int, yOffset: int, graphic: int = 1337):
     """
     pass
 
-def CancelTarget():
+def CancelTarget() -> None:
     """
      Cancel targeting.
      Example:
@@ -748,7 +890,7 @@ def CancelTarget():
     """
     pass
 
-def HasTarget(targetType: str = "any"):
+def HasTarget(targetType: str = "any") -> bool:
     """
      Check if the player has a target cursor.
      Example:
@@ -760,7 +902,21 @@ def HasTarget(targetType: str = "any"):
     """
     pass
 
-def SetSkillLock(skill: str, up_down_locked: str):
+def GetMap() -> int:
+    """
+     Get the current map index.
+     Standard maps are:
+     0 = Fel
+     1 = Tram
+     2 = Ilshenar
+     3 = Malas
+     4 = Tokuno
+     5 = TerMur
+    
+    """
+    pass
+
+def SetSkillLock(skill: str, up_down_locked: str) -> None:
     """
      Set a skills lock status.
      Example:
@@ -771,7 +927,7 @@ def SetSkillLock(skill: str, up_down_locked: str):
     """
     pass
 
-def SetStatLock(stat: str, up_down_locked: str):
+def SetStatLock(stat: str, up_down_locked: str) -> None:
     """
      Set a skills lock status.
      Example:
@@ -782,7 +938,7 @@ def SetStatLock(stat: str, up_down_locked: str):
     """
     pass
 
-def Logout():
+def Logout() -> None:
     """
      Logout of the game.
      Example:
@@ -793,7 +949,7 @@ def Logout():
     """
     pass
 
-def ItemNameAndProps(serial: int, wait: bool = False, timeout: int = 10):
+def ItemNameAndProps(serial: int, wait: bool = False, timeout: int = 10) -> str:
     """
      Gets item name and properties.
      This returns the name and properties in a single string. You can split it by new line if you want to separate them.
@@ -809,7 +965,7 @@ def ItemNameAndProps(serial: int, wait: bool = False, timeout: int = 10):
     """
     pass
 
-def HasGump(ID: int = 1337):
+def HasGump(ID: int = 1337) -> int:
     """
      Check if a player has a server gump. Leave blank to check if they have any server gump.
      Example:
@@ -821,7 +977,7 @@ def HasGump(ID: int = 1337):
     """
     pass
 
-def ReplyGump(button: int, gump: int = 1337):
+def ReplyGump(button: int, gump: int = 1337) -> bool:
     """
      Reply to a gump.
      Example:
@@ -832,7 +988,7 @@ def ReplyGump(button: int, gump: int = 1337):
     """
     pass
 
-def CloseGump(ID: int = 1337):
+def CloseGump(ID: int = 1337) -> None:
     """
      Close the last gump open, or a specific gump.
      Example:
@@ -843,7 +999,7 @@ def CloseGump(ID: int = 1337):
     """
     pass
 
-def GumpContains(text: str, ID: int = 1337):
+def GumpContains(text: str, ID: int = 1337) -> bool:
     """
      Check if a gump contains a specific text.
      Example:
@@ -855,7 +1011,7 @@ def GumpContains(text: str, ID: int = 1337):
     """
     pass
 
-def GetGump(ID: int = 1337):
+def GetGump(ID: int = 1337) -> Gump:
     """
      Get a gump by ID.
      Example:
@@ -869,7 +1025,7 @@ def GetGump(ID: int = 1337):
     """
     pass
 
-def ToggleFly():
+def ToggleFly() -> None:
     """
      Toggle flying if you are a gargoyle.
      Example:
@@ -880,7 +1036,7 @@ def ToggleFly():
     """
     pass
 
-def ToggleAbility(ability: str):
+def ToggleAbility(ability: str) -> None:
     """
      Toggle an ability.
      Example:
@@ -892,7 +1048,7 @@ def ToggleAbility(ability: str):
     """
     pass
 
-def PrimaryAbilityActive():
+def PrimaryAbilityActive() -> bool:
     """
      Check if your primary ability is active.
      Example:
@@ -904,7 +1060,7 @@ def PrimaryAbilityActive():
     """
     pass
 
-def SecondaryAbilityActive():
+def SecondaryAbilityActive() -> bool:
     """
      Check if your secondary ability is active.
      Example:
@@ -916,7 +1072,7 @@ def SecondaryAbilityActive():
     """
     pass
 
-def InJournal(msg: str):
+def InJournal(msg: str) -> bool:
     """
      Check if your journal contains a message.
      Example:
@@ -928,10 +1084,10 @@ def InJournal(msg: str):
     """
     pass
 
-def InJournalAny(msgs: list[str]):
+def InJournalAny(msgs: list[str]) -> bool:
     """
      Check if the journal contains *any* of the strings in this list.
-     Can be regex, prepend your msgs with $  .
+     Can be regex, prepend your msgs with $
      Example:
      ```py
      if API.InJournalAny(["You have been slain", "You are dead"]):
@@ -941,7 +1097,7 @@ def InJournalAny(msgs: list[str]):
     """
     pass
 
-def ClearJournal():
+def ClearJournal() -> None:
     """
      Clear your journal(This is specific for each script).
      Example:
@@ -952,7 +1108,7 @@ def ClearJournal():
     """
     pass
 
-def Pause(seconds: float):
+def Pause(seconds: float) -> None:
     """
      Pause the script.
      Example:
@@ -963,7 +1119,7 @@ def Pause(seconds: float):
     """
     pass
 
-def Stop():
+def Stop() -> None:
     """
      Stops the current script.
      Example:
@@ -974,7 +1130,7 @@ def Stop():
     """
     pass
 
-def ToggleAutoLoot():
+def ToggleAutoLoot() -> None:
     """
      Toggle autolooting on or off.
      Example:
@@ -985,7 +1141,7 @@ def ToggleAutoLoot():
     """
     pass
 
-def AutoLootContainer(container: int):
+def AutoLootContainer(container: int) -> None:
     """
      Use autoloot on a specific container.
      Example:
@@ -998,7 +1154,7 @@ def AutoLootContainer(container: int):
     """
     pass
 
-def Virtue(virtue: str):
+def Virtue(virtue: str) -> None:
     """
      Use a virtue.
      Example:
@@ -1009,7 +1165,7 @@ def Virtue(virtue: str):
     """
     pass
 
-def NearestEntity(scanType: Any, maxDistance: int = 10):
+def NearestEntity(scanType: ScanType, maxDistance: int = 10) -> Any:
     """
      Find the nearest item/mobile based on scan type.
      Sets API.Found to the serial of the item/mobile.
@@ -1025,7 +1181,7 @@ def NearestEntity(scanType: Any, maxDistance: int = 10):
     """
     pass
 
-def NearestMobile(notoriety: list[Any], maxDistance: int = 10):
+def NearestMobile(notoriety: list[Notoriety], maxDistance: int = 10) -> Mobile:
     """
      Get the nearest mobile by Notoriety.
      Sets API.Found to the serial of the mobile.
@@ -1041,7 +1197,7 @@ def NearestMobile(notoriety: list[Any], maxDistance: int = 10):
     """
     pass
 
-def NearestCorpse(distance: int = 3):
+def NearestCorpse(distance: int = 3) -> Item:
     """
      Get the nearest corpse within a distance.
      Sets API.Found to the serial of the corpse.
@@ -1056,7 +1212,7 @@ def NearestCorpse(distance: int = 3):
     """
     pass
 
-def NearestMobiles(notoriety: list[Any], maxDistance: int = 10):
+def NearestMobiles(notoriety: list[Notoriety], maxDistance: int = 10) -> list[Mobile]:
     """
      Get all mobiles matching Notoriety and distance.
      Example:
@@ -1071,7 +1227,7 @@ def NearestMobiles(notoriety: list[Any], maxDistance: int = 10):
     """
     pass
 
-def FindMobile(serial: int):
+def FindMobile(serial: int) -> Mobile:
     """
      Get a mobile from its serial.
      Sets API.Found to the serial of the mobile.
@@ -1086,7 +1242,7 @@ def FindMobile(serial: int):
     """
     pass
 
-def GetAllMobiles():
+def GetAllMobiles() -> list[Mobile]:
     """
      Return a list of all mobiles the client is aware of.
      Example:
@@ -1102,7 +1258,7 @@ def GetAllMobiles():
     """
     pass
 
-def GetTile(x: int, y: int):
+def GetTile(x: int, y: int) -> GameObject:
     """
      Get the tile at a location.
      Example:
@@ -1115,7 +1271,7 @@ def GetTile(x: int, y: int):
     """
     pass
 
-def CreateGump(acceptMouseInput: bool = True, canMove: bool = True, keepOpen: bool = False):
+def CreateGump(acceptMouseInput: bool = True, canMove: bool = True, keepOpen: bool = False) -> Gump:
     """
      Get a blank gump.
      Example:
@@ -1129,7 +1285,7 @@ def CreateGump(acceptMouseInput: bool = True, canMove: bool = True, keepOpen: bo
     """
     pass
 
-def AddGump(g: Any):
+def AddGump(g: Gump) -> None:
     """
      Add a gump to the players screen.
      Example:
@@ -1143,7 +1299,7 @@ def AddGump(g: Any):
     """
     pass
 
-def CreateGumpCheckbox(text: str = "", hue: int = 0):
+def CreateGumpCheckbox(text: str = "", hue: int = 0, isChecked: bool = False) -> PyControl:
     """
      Create a checkbox for gumps.
       Example:
@@ -1160,7 +1316,7 @@ def CreateGumpCheckbox(text: str = "", hue: int = 0):
     """
     pass
 
-def CreateGumpLabel(text: str, hue: int = 996):
+def CreateGumpLabel(text: str, hue: int = 996) -> PyControl:
     """
      Create a label for a gump.
      Example:
@@ -1174,7 +1330,7 @@ def CreateGumpLabel(text: str, hue: int = 996):
     """
     pass
 
-def CreateGumpColorBox(opacity: float = 0.7, color: str = "#000000"):
+def CreateGumpColorBox(opacity: float = 0.7, color: str = "#000000") -> PyControl:
     """
      Get a transparent color box for gumps.
      Example:
@@ -1191,7 +1347,7 @@ def CreateGumpColorBox(opacity: float = 0.7, color: str = "#000000"):
     """
     pass
 
-def CreateGumpItemPic(graphic: int, width: int, height: int):
+def CreateGumpItemPic(graphic: int, width: int, height: int) -> PyControl:
     """
      Create a picture of an item.
      Example:
@@ -1205,7 +1361,7 @@ def CreateGumpItemPic(graphic: int, width: int, height: int):
     """
     pass
 
-def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, pressed: int = 0x00F0, hover: int = 0x00EE):
+def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, pressed: int = 0x00F0, hover: int = 0x00EE) -> PyControl:
     """
      Create a button for gumps.
      Example:
@@ -1225,7 +1381,7 @@ def CreateGumpButton(text: str = "", hue: int = 996, normal: int = 0x00EF, press
     """
     pass
 
-def CreateSimpleButton(text: str, width: int, height: int):
+def CreateSimpleButton(text: str, width: int, height: int) -> PyControl:
     """
      Create a simple button, does not use graphics.
      Example:
@@ -1240,7 +1396,7 @@ def CreateSimpleButton(text: str, width: int, height: int):
     """
     pass
 
-def CreateGumpRadioButton(text: str = "", group: int = 0, inactive: int = 0x00D0, active: int = 0x00D1, hue: int = 0xFFFF):
+def CreateGumpRadioButton(text: str = "", group: int = 0, inactive: int = 0x00D0, active: int = 0x00D1, hue: int = 0xFFFF, isChecked: bool = False) -> PyControl:
     """
      Create a radio button for gumps, use group numbers to only allow one item to be checked at a time.
      Example:
@@ -1256,7 +1412,7 @@ def CreateGumpRadioButton(text: str = "", group: int = 0, inactive: int = 0x00D0
     """
     pass
 
-def CreateGumpTextBox(text: str = "", width: int = 200, height: int = 30, multiline: bool = False):
+def CreateGumpTextBox(text: str = "", width: int = 200, height: int = 30, multiline: bool = False) -> PyControl:
     """
      Create a text area control.
      Example:
@@ -1286,7 +1442,7 @@ def CreateGumpTextBox(text: str = "", width: int = 200, height: int = 30, multil
     """
     pass
 
-def CreateGumpTTFLabel(text: str, size: float, color: str = "#FFFFFF", font: str = TrueTypeLoader.EMBEDDED_FONT, aligned: str = "let", maxWidth: int = 0, applyStroke: bool = False):
+def CreateGumpTTFLabel(text: str, size: float, color: str = "#FFFFFF", font: str = TrueTypeLoader.EMBEDDED_FONT, aligned: str = "let", maxWidth: int = 0, applyStroke: bool = False) -> PyControl:
     """
      Create a TTF label with advanced options.
      Example:
@@ -1304,7 +1460,7 @@ def CreateGumpTTFLabel(text: str, size: float, color: str = "#FFFFFF", font: str
     """
     pass
 
-def CreateGumpSimpleProgressBar(width: int, height: int, backgroundColor: str = "#616161", foregroundColor: str = "#212121", value: int = 100, max: int = 100):
+def CreateGumpSimpleProgressBar(width: int, height: int, backgroundColor: str = "#616161", foregroundColor: str = "#212121", value: int = 100, max: int = 100) -> PyControl:
     """
      Create a progress bar. Can be updated as needed with `bar.SetProgress(current, max)`.
      Example:
@@ -1331,7 +1487,35 @@ def CreateGumpSimpleProgressBar(width: int, height: int, backgroundColor: str = 
     """
     pass
 
-def AddControlOnClick(control: Any, onClick: Any, leftOnly: bool = True):
+def CreateGumpScrollArea(x: int, y: int, width: int, height: int) -> PyControl:
+    """
+     Create a scrolling area, add and position controls to it directly.
+     Example:
+     ```py
+     sa = API.CreateGumpScrollArea(0, 60, 200, 140)
+     gump.Add(sa)
+    
+     for i in range(10):
+         label = API.CreateGumpTTFLabel(f"Label {i + 1}", 20, "#FFFFFF", "alagard")
+         label.SetRect(5, i * 20, 180, 20)
+         sa.Add(label)
+     ```
+    
+    """
+    pass
+
+def CreateGumpPic(graphic: int, x: int = 0, y: int = 0, hue: int = 0) -> PyControl:
+    """
+     Create a gump pic(Use this for gump art, not item art)
+     Example:
+     ```py
+     gumpPic = API.CreateGumpPic(0xafb)
+     gump.Add(gumpPic)
+    
+    """
+    pass
+
+def AddControlOnClick(control: PyControl, onClick: Any, leftOnly: bool = True) -> PyControl:
     """
      Add an onClick callback to a control.
      Example:
@@ -1347,7 +1531,27 @@ def AddControlOnClick(control: Any, onClick: Any, leftOnly: bool = True):
     """
     pass
 
-def GetSkill(skill: str):
+def AddControlOnDisposed(control: PyControl, onDispose: Any) -> PyControl:
+    """
+     Add onDispose(Closed) callback to a control.
+     Example:
+     ```py
+     def onClose():
+         API.Stop()
+    
+     gump = API.CreateGump()
+     gump.SetRect(100, 100, 200, 200)
+    
+     bg = API.CreateGumpColorBox(opacity=0.7, color="#000000")
+     gump.Add(bg.SetRect(0, 0, 200, 200))
+    
+     API.AddControlOnDisposed(gump, onClose)
+     ```
+    
+    """
+    pass
+
+def GetSkill(skill: str) -> Skill:
     """
      Get a skill from the player. See the Skill class for what properties are available: https://github.com/bittiez/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs
      Example:
@@ -1363,7 +1567,7 @@ def GetSkill(skill: str):
     """
     pass
 
-def DisplayRange(distance: int, hue: int = 22):
+def DisplayRange(distance: int, hue: int = 22) -> None:
     """
      Show a radius around the player.
      Example:
@@ -1374,7 +1578,7 @@ def DisplayRange(distance: int, hue: int = 22):
     """
     pass
 
-def ToggleScript(scriptName: str):
+def ToggleScript(scriptName: str) -> None:
     """
      Toggle another script on or off.
      Example:
@@ -1385,7 +1589,21 @@ def ToggleScript(scriptName: str):
     """
     pass
 
-def AddMapMarker(name: str, x: int = int.MaxValue, y: int = int.MaxValue, map: int = int.MaxValue, color: str = "purple"):
+def PlayScript(scriptName: str) -> None:
+    """
+     Play a legion script.
+    
+    """
+    pass
+
+def StopScript(scriptName: str) -> None:
+    """
+     Stop a legion script.
+    
+    """
+    pass
+
+def AddMapMarker(name: str, x: int = int.MaxValue, y: int = int.MaxValue, map: int = int.MaxValue, color: str = "purple") -> None:
     """
      Add a marker to the current World Map (If one is open)
      Example:
@@ -1396,12 +1614,57 @@ def AddMapMarker(name: str, x: int = int.MaxValue, y: int = int.MaxValue, map: i
     """
     pass
 
-def RemoveMapMarker(name: str):
+def RemoveMapMarker(name: str) -> None:
     """
      Remove a marker from the world map.
      Example:
      ```py
      API.RemoveMapMarker("Death")
+     ```
+    
+    """
+    pass
+
+def IsProcessingMoveQue() -> bool:
+    """
+     Check if the move item queue is being processed. You can use this to prevent actions if the queue is being processed.
+     Example:
+     ```py
+     if API.IsProcessingMoveQue():
+       API.Pause(0.5)
+     ```
+    
+    """
+    pass
+
+def SavePersistentVar(name: str, value: str, scope: Any) -> None:
+    """
+     Save a variable that persists between sessions and scripts.
+     Example:
+     ```py
+     API.SavePersistentVar("TotalKills", "5", API.PersistentVar.Char)
+     ```
+    
+    """
+    pass
+
+def RemovePersistentVar(name: str, scope: Any) -> None:
+    """
+     Delete/remove a persistent variable.
+     Example:
+     ```py
+     API.RemovePersistentVar("TotalKills", API.PersistentVar.Char)
+     ```
+    
+    """
+    pass
+
+def GetPersistentVar(name: str, defaultValue: str, scope: Any) -> str:
+    """
+     Get a persistent variable.
+     Example:
+     ```py
+     API.GetPersistentVar("TotalKills", "0", API.PersistentVar.Char)
      ```
     
     """

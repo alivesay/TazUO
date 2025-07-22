@@ -2487,7 +2487,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             PositionHelper.PositionControl(s.FullControl);
             PositionHelper.BlankLine();
-            
+
             options.Add
             (
                 s = new SettingsOption
@@ -3278,11 +3278,11 @@ namespace ClassicUO.Game.UI.Gumps
 
                                         Task.Factory.StartNew
                                         (() =>
+                                        {
+                                            try
                                             {
-                                                try
-                                                {
-                                                    using HttpClient httpClient = new HttpClient();
-                                                    string result = httpClient.GetStringAsync(uri).Result;
+                                                using HttpClient httpClient = new HttpClient();
+                                                string result = httpClient.GetStringAsync(uri).Result;
 
                                                     if (SpellVisualRangeManager.Instance.LoadFromString(result))
                                                     {
@@ -3369,6 +3369,38 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             c.SetTooltip("This only works if you have enable chat by pressing enter, and chat disabled. Otherwise you will still be typing into your chatbar.");
+
+            #region HideHouses
+            content.BlankLine();
+
+            content.AddToRight(new HttpClickableLink("Houses Wiki", "https://github.com/bittiez/TazUO/wiki/TazUO.HideHouses", ThemeSettings.TEXT_FONT_COLOR), true, page);
+
+            content.BlankLine();
+            content.AddToRight
+            (
+                new SliderWithLabel
+                (
+                    lang.GetTazUO.ToggleHouses, 0, ThemeSettings.SLIDER_WIDTH, 0, 25, profile.HideHousesAtZLevel, (i) =>
+                    {
+                        profile.HideHousesAtZLevel = (byte)i;
+                    }
+                ), true, page
+            );
+
+            content.BlankLine();
+
+            content.AddToRight
+            (
+                c = new CheckboxWithLabel
+                (
+                    lang.GetTazUO.EnableHouseToggle, 0, profile.ToggleHideHouses, (b) =>
+                    {
+                        profile.ToggleHideHouses = b;
+                    }
+                ), true, page
+            );
+            #endregion
+
 
             #endregion
 
@@ -3554,7 +3586,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.RemoveIndent();
             content.BlankLine();
-            
+
             content.AddToRight
             (
                 GenerateFontSelector(lang.GetTazUO.Optionsfont, ProfileManager.CurrentProfile.OptionsFont, (i, s) => { ProfileManager.CurrentProfile.OptionsFont = s; }),
@@ -3651,10 +3683,10 @@ namespace ClassicUO.Game.UI.Gumps
             (
                 c = new ModernButton
                     (0, 0, content.RightWidth - 20, 40, ButtonAction.Activate, string.Format(lang.GetTazUO.OverrideAll, locations.Count - 1), ThemeSettings.BUTTON_FONT_COLOR)
-                    {
-                        IsSelectable = true,
-                        IsSelected = true
-                    }, true, page
+                {
+                    IsSelectable = true,
+                    IsSelected = true
+                }, true, page
             );
 
             c.MouseUp += (s, e) =>
@@ -3907,6 +3939,8 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight(GenHotKeyDisplay("Screen shot gump/tooltip only", "CTRL PRINTSCREEN", ewidth), true, page);
 
             #endregion
+
+            
 
             options.Add(new SettingsOption("", content, MainContent.RightWidth, (int)PAGE.TUOOptions));
         }
@@ -4273,17 +4307,17 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Task.Factory.StartNew
                     (() =>
+                    {
+                        var tVal = _searchText.Text;
+                        System.Threading.Thread.Sleep(1500);
+
+                        if (_searchText.Text == tVal)
                         {
-                            var tVal = _searchText.Text;
-                            System.Threading.Thread.Sleep(1500);
+                            if (String.IsNullOrEmpty(_searchText.Text))
+                                return;
 
-                            if (_searchText.Text == tVal)
-                            {
-                                if (String.IsNullOrEmpty(_searchText.Text))
-                                    return;
-
-                                data.SearchText = _searchText.Text;
-                                data.Save();
+                            data.SearchText = _searchText.Text;
+                            data.Save();
 
                                 UIManager.Add
                                 (
@@ -4314,14 +4348,14 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Task.Factory.StartNew
                     (() =>
-                        {
-                            var tVal = _formatText.Text;
-                            System.Threading.Thread.Sleep(1500);
+                    {
+                        var tVal = _formatText.Text;
+                        System.Threading.Thread.Sleep(1500);
 
-                            if (_formatText.Text == tVal)
-                            {
-                                data.FormattedText = _formatText.Text;
-                                data.Save();
+                        if (_formatText.Text == tVal)
+                        {
+                            data.FormattedText = _formatText.Text;
+                            data.Save();
 
                                 UIManager.Add
                                 (
@@ -4364,16 +4398,16 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Task.Factory.StartNew
                     (() =>
-                        {
-                            var tVal = _min1.Text;
-                            System.Threading.Thread.Sleep(1500);
+                    {
+                        var tVal = _min1.Text;
+                        System.Threading.Thread.Sleep(1500);
 
-                            if (_min1.Text == tVal)
+                        if (_min1.Text == tVal)
+                        {
+                            if (int.TryParse(_min1.Text, out int val))
                             {
-                                if (int.TryParse(_min1.Text, out int val))
-                                {
-                                    data.Min1 = val;
-                                    data.Save();
+                                data.Min1 = val;
+                                data.Save();
 
                                     UIManager.Add
                                     (
@@ -4406,16 +4440,16 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Task.Factory.StartNew
                     (() =>
-                        {
-                            var tVal = _max1.Text;
-                            System.Threading.Thread.Sleep(1500);
+                    {
+                        var tVal = _max1.Text;
+                        System.Threading.Thread.Sleep(1500);
 
-                            if (_max1.Text == tVal)
+                        if (_max1.Text == tVal)
+                        {
+                            if (int.TryParse(_max1.Text, out int val))
                             {
-                                if (int.TryParse(_max1.Text, out int val))
-                                {
-                                    data.Max1 = val;
-                                    data.Save();
+                                data.Max1 = val;
+                                data.Save();
 
                                     UIManager.Add
                                     (
@@ -4458,16 +4492,16 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Task.Factory.StartNew
                     (() =>
-                        {
-                            var tVal = _min2.Text;
-                            System.Threading.Thread.Sleep(1500);
+                    {
+                        var tVal = _min2.Text;
+                        System.Threading.Thread.Sleep(1500);
 
-                            if (_min2.Text == tVal)
+                        if (_min2.Text == tVal)
+                        {
+                            if (int.TryParse(_min2.Text, out int val))
                             {
-                                if (int.TryParse(_min2.Text, out int val))
-                                {
-                                    data.Min2 = val;
-                                    data.Save();
+                                data.Min2 = val;
+                                data.Save();
 
                                     UIManager.Add
                                     (
@@ -4500,16 +4534,16 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     Task.Factory.StartNew
                     (() =>
-                        {
-                            var tVal = _max2.Text;
-                            System.Threading.Thread.Sleep(1500);
+                    {
+                        var tVal = _max2.Text;
+                        System.Threading.Thread.Sleep(1500);
 
-                            if (_max2.Text == tVal)
+                        if (_max2.Text == tVal)
+                        {
+                            if (int.TryParse(_max2.Text, out int val))
                             {
-                                if (int.TryParse(_max2.Text, out int val))
-                                {
-                                    data.Max2 = val;
-                                    data.Save();
+                                data.Max2 = val;
+                                data.Save();
 
                                     UIManager.Add
                                     (

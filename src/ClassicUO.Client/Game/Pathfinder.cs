@@ -49,7 +49,7 @@ namespace ClassicUO.Game
         public bool AutoWalking { get; set; }
 
         public static bool PathFindingCanBeCancelled { get; set; }
-        
+
         public static bool FastRotation { get; set; }
 
         public bool BlockMoving { get; set; }
@@ -58,6 +58,71 @@ namespace ClassicUO.Game
         public Pathfinder(World world)
         {
             _world = world;
+        }
+
+        public static bool ObjectBlocksLOS(GameObject obj, int losMinZ, int losMaxZ)
+        {
+            int objZ = obj.Z;
+            int objHeight = 0;
+            bool isBlocker = false;
+
+            switch (obj)
+            {
+                case Land land:
+                    objHeight = 1;
+                    isBlocker = land.TileData.IsImpassable;
+                    break;
+                case Static s:
+                    ref StaticTiles staticData = ref Client.Game.UO.FileManager.TileData.StaticData[s.OriginalGraphic];
+                    objHeight = staticData.Height;
+                    isBlocker = staticData.IsImpassable || staticData.IsWall;
+                    break;
+                case Item i:
+                    objHeight = i.ItemData.Height;
+                    isBlocker = i.ItemData.IsImpassable;
+                    break;
+                case Multi m:
+                    objHeight = m.ItemData.Height;
+                    isBlocker = m.ItemData.IsImpassable;
+                    break;
+                default:
+                    return false;
+            }
+
+            if (!isBlocker)
+                return false;
+
+            int objTop = objZ + objHeight;
+
+            int losMin = Math.Min(losMinZ, losMaxZ);
+            int losMax = Math.Max(losMinZ, losMaxZ);
+
+            if (objTop > losMin && objZ < losMax)
+                return true;
+
+            return false;
+        }
+
+        public static readonly ObjectPool<List<GameObject>> _listPool = new ObjectPool<List<GameObject>>(
+            () => new List<GameObject>(),
+            list => list.Clear(),
+            100
+        );
+
+        public static List<GameObject> GetAllObjectsAt(int x, int y)
+        {
+            var result = _listPool.Get();
+            GameObject tile = Client.Game.UO.World.Map.GetTile(x, y, false);
+            if (tile == null)
+                return result;
+
+            GameObject obj = tile;
+            while (obj.TPrevious != null)
+                obj = obj.TPrevious;
+            for (; obj != null; obj = obj.TNext)
+                result.Add(obj);
+
+            return result;
         }
 
         private bool CreateItemList(List<PathObject> list, int x, int y, int stepState)
@@ -745,14 +810,14 @@ namespace ClassicUO.Game
             updatedNode.Direction = direction;
             updatedNode.Parent = parent;
             updatedNode.DistFromStartCost = newDistFromStart;
-            updatedNode.DistFromGoalCost = GetGoalDistCost(new Point(x, y), cost); 
+            updatedNode.DistFromGoalCost = GetGoalDistCost(new Point(x, y), cost);
             updatedNode.Cost = updatedNode.DistFromStartCost + updatedNode.DistFromGoalCost;
-            
+
             if (_openSet.Contains(coordinate))
             {
                 // Since tile is already in the open list, we enqueue the better option that
                 // has a lower cost (existing one will be ignored later by PriorityQueue impl)
-                
+
                 _openSet.Enqueue(updatedNode);
                 return false;
             }
@@ -766,7 +831,7 @@ namespace ClassicUO.Game
             }
 
             return true;
-            
+
         }
 
         private bool OpenNodes(PathNode node)
@@ -814,7 +879,7 @@ namespace ClassicUO.Game
                     }
                 }
             }
-            
+
             return found;
         }
 
@@ -840,7 +905,7 @@ namespace ClassicUO.Game
             return null;
         }
 
-        private bool FindPath(int maxNodes)
+        private bool FindPath(int maxNodes, bool ignoreAutowalkState)
         {
             var startNode = PathNode.Get();
 
@@ -849,7 +914,7 @@ namespace ClassicUO.Game
             startNode.Z = _world.Player.Z;
             startNode.Parent = null;
             startNode.DistFromStartCost = 0;
-            
+
             var startPoint = new Point(_startPoint.X, _startPoint.Y);
             startNode.DistFromGoalCost = GetGoalDistCost(startPoint, 0);
             startNode.Cost = startNode.DistFromGoalCost;
@@ -863,7 +928,7 @@ namespace ClassicUO.Game
                 _run = true;
             }
 
-            while (AutoWalking)
+            while (ignoreAutowalkState || AutoWalking)
             {
                 var currentNode = FindCheapestNode();
 
@@ -898,7 +963,7 @@ namespace ClassicUO.Game
             var current = goalNode;
             var visited = new HashSet<PathNode>();
             int iterations = 0;
-    
+
             while (current is not null && current.Parent != current && iterations < PATHFINDER_MAX_NODES)
             {
                 // Check for cycles
@@ -908,23 +973,51 @@ namespace ClassicUO.Game
                     Log.Warn("[Pathfinder]Cycle detected in path reconstruction!");
                     break;
                 }
-        
+
                 visited.Add(current);
                 pathStack.Push(current);
                 current = current.Parent;
                 iterations++;
             }
-    
+
             if (iterations >= PATHFINDER_MAX_NODES)
             {
                 Log.Warn($"[Pathfinder]Path reconstruction hit iteration limit: {PATHFINDER_MAX_NODES}");
             }
-    
+
             _path.Clear();
             while (pathStack.Count > 0)
             {
                 _path.Add(pathStack.Pop());
             }
+        }
+
+        public List<(int X, int Y, int Z)> GetPathTo(int x, int y, int z, int distance)
+        {
+            CleanupPathfinding();
+            _pointIndex = 0;
+            _goalNode = null;
+            _run = false;
+            _startPoint.X = _world.Player.X;
+            _startPoint.Y = _world.Player.Y;
+            _endPoint.X = x;
+            _endPoint.Y = y;
+            _endPointZ = z;
+            _pathfindDistance = distance;
+
+            if (!FindPath(PATHFINDER_MAX_NODES, ignoreAutowalkState: true))
+            {
+                return null;
+            }
+
+            var result = new List<(int X, int Y, int Z)>(_path.Count);
+
+            foreach (var node in _path)
+            {
+                result.Add((node.X, node.Y, node.Z));
+            }
+
+            return result;
         }
 
         public bool WalkTo(int x, int y, int z, int distance)
@@ -948,7 +1041,7 @@ namespace ClassicUO.Game
             _pathfindDistance = distance;
             AutoWalking = true;
 
-            if (FindPath(PATHFINDER_MAX_NODES))
+            if (FindPath(PATHFINDER_MAX_NODES, ignoreAutowalkState: false))
             {
                 _pointIndex = 1;
                 ProcessAutoWalk();
@@ -994,7 +1087,7 @@ namespace ClassicUO.Game
             _run = false;
             CleanupPathfinding();
         }
-        
+
         private static void CleanupPathfinding()
         {
             // Clean up any remaining nodes in the open set
@@ -1045,7 +1138,7 @@ namespace ClassicUO.Game
                     po.AverageZ = 0;
                     po.Height = 0;
                     po.Object = null;
-                }, 
+                },
                 15
                 );
             private PathObject(uint flags, int z, int avgZ, int h, GameObject obj)
@@ -1072,7 +1165,7 @@ namespace ClassicUO.Game
             {
                 _pool.Return(this);
             }
-            
+
             public uint Flags { get; private set; }
 
             public int Z { get; private set; }
@@ -1099,11 +1192,11 @@ namespace ClassicUO.Game
         private class PathNode
         {
             private static ObjectPool<PathNode> _pool = new(
-                ()=>new PathNode(), 
+                ()=>new PathNode(),
                 (pn) => {pn.Reset();},
                 15
                 );
-            
+
             private PathNode()
             {
             }

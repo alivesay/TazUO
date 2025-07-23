@@ -1974,17 +1974,17 @@ public class WorldMapGump : ResizableGump
             {
                 return;
             }
-            
+
             var mapMarkerFile = _markerFiles.FirstOrDefault(x => x.FullPath == UserMarkersFilePath);
 
             if (mapMarkerFile == null)
                 return;
-            
+
             var markersToRemove = mapMarkerFile.Markers.Where(m => m.Name.Equals(markerName, StringComparison.Ordinal)).ToList();
-                             
+
              if (markersToRemove.Count == 0)
                  return;
-             
+
              foreach (var marker in markersToRemove)
              {
                  mapMarkerFile.Markers.Remove(marker);
@@ -2062,7 +2062,7 @@ public class WorldMapGump : ResizableGump
 
     public override bool Draw(UltimaBatcher2D batcher, int x, int y)
     {
-        if (IsDisposed || !World.InGame)
+        if (IsDisposed || !IsVisible || !World.InGame)
         {
             return false;
         }

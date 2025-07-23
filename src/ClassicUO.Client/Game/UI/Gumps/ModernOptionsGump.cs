@@ -3137,6 +3137,8 @@ namespace ClassicUO.Game.UI.Gumps
             content.BlankLine();
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.IgnoreStaminaCheck, 0, profile.IgnoreStaminaCheck, (b) => profile.IgnoreStaminaCheck = b), true, page);
 
+            content.BlankLine();
+            content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.DisableGrayEnemies, 0, profile.DisableGrayEnemies, (b) => profile.DisableGrayEnemies = b), true, page);;
             #endregion
 
             #region Misc
@@ -3378,27 +3380,28 @@ namespace ClassicUO.Game.UI.Gumps
             content.BlankLine();
             content.AddToRight
             (
-                new SliderWithLabel
+                c = new CheckboxWithLabel
                 (
-                    lang.GetTazUO.ToggleHouses, 0, ThemeSettings.SLIDER_WIDTH, 0, 25, profile.HideHousesAtZLevel, (i) =>
+                    lang.GetTazUO.EnableHouseTransparency, 0, profile.ForceHouseTransparency, (b) =>
                     {
-                        profile.HideHousesAtZLevel = (byte)i;
+                        profile.ForceHouseTransparency = b;
                     }
                 ), true, page
             );
 
             content.BlankLine();
-
+            content.Indent();
             content.AddToRight
             (
-                c = new CheckboxWithLabel
+                new SliderWithLabel
                 (
-                    lang.GetTazUO.EnableHouseToggle, 0, profile.ToggleHideHouses, (b) =>
+                    lang.GetTazUO.ForcedHouseTransparencyLevel, 0, ThemeSettings.SLIDER_WIDTH, 0, 255, profile.ForcedHouseTransparency, (i) =>
                     {
-                        profile.ToggleHideHouses = b;
+                        profile.ForcedHouseTransparency = (byte)i;
                     }
                 ), true, page
             );
+            content.RemoveIndent();
             #endregion
 
 
@@ -3940,7 +3943,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             #endregion
 
-            
+
 
             options.Add(new SettingsOption("", content, MainContent.RightWidth, (int)PAGE.TUOOptions));
         }

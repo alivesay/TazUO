@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System.Collections.Generic;
 using ClassicUO.Configuration;
@@ -6,21 +6,22 @@ using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Network;
-using ClassicUO.Network.Encryption;
 using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.Managers
 {
     public class WMapEntity
     {
+        private static Dictionary<uint, string> _mobileNameCache = new();
+
         public WMapEntity(uint serial)
         {
             Serial = serial;
 
-            //var mob = World.Mobiles.Get(serial);
+            var mob = Client.Game.UO.World.Mobiles.Get(serial);
 
-            //if (mob != null)
-            //    GetName();
+            if (mob != null)
+                GetName();
         }
 
         public bool IsGuild;
@@ -29,17 +30,18 @@ namespace ClassicUO.Game.Managers
         public readonly uint Serial;
         public int X, Y, HP, Map;
 
-        //public string GetName()
-        //{
-        //    Entity e = World.Get(Serial);
+        public string GetName()
+        {
+            Entity e = Client.Game.UO.World.Get(Serial);
 
-        //    if (e != null && !e.IsDestroyed && !string.IsNullOrEmpty(e.Name) && Name != e.Name)
-        //    {
-        //        Name = e.Name;
-        //    }
+            if (e != null && !e.IsDestroyed && !string.IsNullOrEmpty(e.Name) && Name != e.Name)
+            {
+                Name = e.Name;
+                _mobileNameCache[Serial] = Name;
+            }
 
-        //    return string.IsNullOrEmpty(Name) ? "<out of range>" : Name;
-        //}
+            return string.IsNullOrEmpty(Name) && !_mobileNameCache.TryGetValue(Serial, out Name) ? "<out of range>" : Name;
+        }
     }
 
     public sealed class WorldMapEntityManager

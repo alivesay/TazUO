@@ -140,20 +140,12 @@ namespace ClassicUO.Game.GameObjects
                 }
             }
 
-            bool isAttack = Serial == World.TargetManager.LastAttack;
-            bool isUnderMouse =
-                World.TargetManager.IsTargeting && ReferenceEquals(SelectedObject.Object, this);
-
             if (Serial != World.Player.Serial)
             {
-                if (isAttack || isUnderMouse)
-                {
+                if (World.TargetManager.IsTargeting && ReferenceEquals(SelectedObject.Object, this) || (Serial == World.TargetManager.LastAttack && !ProfileManager.CurrentProfile.DisableGrayEnemies))
                     overridedHue = Notoriety.GetHue(NotorietyFlag);
-                }
-                else if (inParty && ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.OverridePartyAndGuildHue)
-                {
+                else if (inParty && ProfileManager.CurrentProfile.OverridePartyAndGuildHue)
                     overridedHue = ProfileManager.CurrentProfile.FriendHue;
-                }
             }
 
             ProcessSteps(out byte dir);

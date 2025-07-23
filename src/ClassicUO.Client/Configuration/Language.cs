@@ -159,6 +159,7 @@ namespace ClassicUO.Configuration
             public string AuraForParty { get; set; } = "Use a custom color for party members";
             public string AuraPartyColor { get; set; } = "Party aura color";
             public string IgnoreStaminaCheck { get; set; } = "Disable stamina check for movement";
+            public string DisableGrayEnemies { get; set; } = "Don't make last target/enemies gray";
             #endregion
 
             #region General->Gumps
@@ -535,8 +536,8 @@ namespace ClassicUO.Configuration
             public string SOSGumpID { get; set; } = "SOS Gump ID";
             public string UseWASDMovement { get; set; } = "Use WASD movement instead of arrow keys";
             public string BorderCaveTiles { get; set; } = "Apply a border to static item art";
-            public string ToggleHouses { get; set; } = "Hide Houses at Z-Level";
-            public string EnableHouseToggle { get; set; } = "Enable Hide Houses";
+            public string ForcedHouseTransparencyLevel { get; set; } = "Forced house transparency";
+            public string EnableHouseTransparency { get; set; } = "Enable forced house transparency";
             #endregion
 
             #region Tooltips

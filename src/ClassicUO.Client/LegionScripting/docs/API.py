@@ -63,6 +63,82 @@ class PyControl:
         """
         pass
 
+class PyEntity:
+    Distance: int = None
+    __class__: str = None
+    Serial: int = None
+
+    def ToString() -> str:
+        """
+         Returns a readable string representation of the entity.
+         Used when printing or converting the object to a string in Python scripts.
+        
+        """
+        pass
+
+    def SetHue(hue: int) -> None:
+        pass
+
+class PyGameObject:
+    __class__: str = None
+    X: int = None
+    Y: int = None
+    Z: int = None
+    Graphic: int = None
+    Hue: int = None
+
+    def HasLineOfSightFrom(observer: Any = None) -> bool:
+        """
+         Determines if there is line of sight from the specified observer to this object.
+         If no observer is specified, it defaults to the player.
+        
+        """
+        pass
+
+    def ToString() -> str:
+        """
+         Returns a readable string representation of the game object.
+         Used when printing or converting the object to a string in Python scripts.
+        
+        """
+        pass
+
+    def __repr__() -> str:
+        """
+         Returns a detailed string representation of the object.
+         This string is used by Python’s built-in <c>repr()</c> function.
+        
+        """
+        pass
+
+class PyItem:
+    Amount: int = None
+    IsCorpse: bool = None
+    Opened: bool = None
+    __class__: str = None
+
+class PyLand:
+    __class__: str = None
+
+class PyMobile:
+    HitsDiff: int = None
+    ManaDiff: int = None
+    StamDiff: int = None
+    IsDead: bool = None
+    IsPoisoned: bool = None
+    HitsMax: int = None
+    Hits: int = None
+    StaminaMax: int = None
+    Stamina: int = None
+    ManaMax: int = None
+    Mana: int = None
+    IsRenamable: bool = None
+    IsHuman: bool = None
+    __class__: str = None
+
+class PyMulti:
+    __class__: str = None
+
 class PyProfile:
     CharacterName: str = None
     ServerName: str = None
@@ -70,6 +146,9 @@ class PyProfile:
     FavoriteBagSerial: int = None
     MoveItemDelay: int = None
     AutoLootEnabled: bool = None
+
+class PyStatic:
+    __class__: str = None
 
 JournalEntries = None
 Backpack: int = None
@@ -201,7 +280,7 @@ def BandageSelf() -> bool:
     """
     pass
 
-def ClearLeftHand() -> int:
+def ClearLeftHand() -> Any:
     """
      If you have an item in your left hand, move it to your backpack
      Sets API.Found to the item's serial.
@@ -215,7 +294,7 @@ def ClearLeftHand() -> int:
     """
     pass
 
-def ClearRightHand() -> int:
+def ClearRightHand() -> Any:
     """
      If you have an item in your right hand, move it to your backpack
      Sets API.Found to the item's serial.
@@ -519,7 +598,7 @@ def EmoteMsg(message: str) -> None:
     """
     pass
 
-def FindItem(serial: int) -> Item:
+def FindItem(serial: int) -> Any:
     """
      Try to get an item by its serial.
      Sets API.Found to the serial of the item found.
@@ -535,7 +614,7 @@ def FindItem(serial: int) -> Item:
     """
     pass
 
-def FindType(graphic: int, container: int = 1337, range: int = 1337, hue: int = 1337, minamount: int = 0) -> Item:
+def FindType(graphic: int, container: int = 1337, range: int = 1337, hue: int = 1337, minamount: int = 0) -> Any:
     """
      Attempt to find an item by type(graphic).
      Sets API.Found to the serial of the item found.
@@ -550,7 +629,7 @@ def FindType(graphic: int, container: int = 1337, range: int = 1337, hue: int = 
     """
     pass
 
-def FindTypeAll(graphic: int, container: int = 1337, range: int = 1337, hue: int = 1337, minamount: int = 0) -> list[Item]:
+def FindTypeAll(graphic: int, container: int = 1337, range: int = 1337, hue: int = 1337, minamount: int = 0) -> list[Any]:
     """
      Return a list of items matching the parameters set.
      Example:
@@ -563,7 +642,7 @@ def FindTypeAll(graphic: int, container: int = 1337, range: int = 1337, hue: int
     """
     pass
 
-def FindLayer(layer: str, serial: int = 1337) -> Item:
+def FindLayer(layer: str, serial: int = 1337) -> Any:
     """
      Attempt to find an item on a layer.
      Sets API.Found to the serial of the item found.
@@ -577,7 +656,7 @@ def FindLayer(layer: str, serial: int = 1337) -> Item:
     """
     pass
 
-def ItemsInContainer(container: int, recursive: bool = False) -> list[Item]:
+def ItemsInContainer(container: int, recursive: bool = False) -> list[Any]:
     """
      Get all items in a container.
      Example:
@@ -854,6 +933,14 @@ def RequestTarget(timeout: float = 5) -> int:
      if target:
        API.SysMsg("Targeted serial: " + str(target))
      ```
+    
+    """
+    pass
+
+def RequestAnyTarget(timeout: float = 5) -> Any:
+    """
+     Prompts the player to target any object in the game world, including an <c>Item</c> , <c>Mobile</c> , <c>Land</c> tile, <c>Static</c> , or <c>Multi</c> .
+     Waits for the player to select a target within a given timeout period.
     
     """
     pass
@@ -1197,7 +1284,7 @@ def NearestEntity(scanType: ScanType, maxDistance: int = 10) -> Any:
     """
     pass
 
-def NearestMobile(notoriety: list[Notoriety], maxDistance: int = 10) -> Mobile:
+def NearestMobile(notoriety: list[Notoriety], maxDistance: int = 10) -> Any:
     """
      Get the nearest mobile by Notoriety.
      Sets API.Found to the serial of the mobile.
@@ -1213,7 +1300,7 @@ def NearestMobile(notoriety: list[Notoriety], maxDistance: int = 10) -> Mobile:
     """
     pass
 
-def NearestCorpse(distance: int = 3) -> Item:
+def NearestCorpse(distance: int = 3) -> Any:
     """
      Get the nearest corpse within a distance.
      Sets API.Found to the serial of the corpse.
@@ -1228,7 +1315,7 @@ def NearestCorpse(distance: int = 3) -> Item:
     """
     pass
 
-def NearestMobiles(notoriety: list[Notoriety], maxDistance: int = 10) -> list[Mobile]:
+def NearestMobiles(notoriety: list[Notoriety], maxDistance: int = 10) -> list[Any]:
     """
      Get all mobiles matching Notoriety and distance.
      Example:
@@ -1243,7 +1330,7 @@ def NearestMobiles(notoriety: list[Notoriety], maxDistance: int = 10) -> list[Mo
     """
     pass
 
-def FindMobile(serial: int) -> Mobile:
+def FindMobile(serial: int) -> Any:
     """
      Get a mobile from its serial.
      Sets API.Found to the serial of the mobile.
@@ -1258,7 +1345,7 @@ def FindMobile(serial: int) -> Mobile:
     """
     pass
 
-def GetAllMobiles() -> list[Mobile]:
+def GetAllMobiles() -> list[Any]:
     """
      Return a list of all mobiles the client is aware of.
      Example:
@@ -1274,7 +1361,7 @@ def GetAllMobiles() -> list[Mobile]:
     """
     pass
 
-def GetTile(x: int, y: int) -> GameObject:
+def GetTile(x: int, y: int) -> Any:
     """
      Get the tile at a location.
      Example:

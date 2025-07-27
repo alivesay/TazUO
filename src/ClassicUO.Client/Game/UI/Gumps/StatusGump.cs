@@ -114,11 +114,10 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        public override void Update()
+        protected override void OnMove(int x, int y)
         {
-            base.Update();
-            if (ProfileManager.CurrentProfile.StatusGumpPosition != Location)
-                ProfileManager.CurrentProfile.StatusGumpPosition = Location;
+            base.OnMove(x, y);
+            ProfileManager.CurrentProfile.StatusGumpPosition = Location;
         }
 
         protected override void OnMouseDown(int x, int y, MouseButtonType button)

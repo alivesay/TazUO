@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -92,6 +92,9 @@ namespace ClassicUO.Game.Map
                     land.Z = z;
                     land.UpdateScreenPosition();
 
+                    if (TileMarkerManager.Instance.IsTileMarked(land.X, land.Y, map.Index, out var hue))
+                        land.Hue = hue;
+
                     AddGameObject(land, x, y);
                 }
             }
@@ -119,6 +122,9 @@ namespace ClassicUO.Game.Map
                         staticObject.Y = (ushort)(by + sb.Y);
                         staticObject.Z = sb.Z;
                         staticObject.UpdateScreenPosition();
+
+                        if (TileMarkerManager.Instance.IsTileMarked(staticObject.X, staticObject.Y, map.Index, out var hue))
+                            staticObject.Hue = hue;
 
                         AddGameObject(staticObject, sb.X, sb.Y);
                     }

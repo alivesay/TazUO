@@ -26,6 +26,8 @@ namespace ClassicUO.Game.Managers
         public void AddTile(int x, int y, int map, ushort hue)
         {
             markedTiles[FormatLocKey(x, y, map)] = hue;
+
+            Client.Game.UO.World.Map.GetTile(x, y).Hue = hue;
         }
 
         public void RemoveTile(int x, int y, int map)

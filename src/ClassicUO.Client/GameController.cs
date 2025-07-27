@@ -367,7 +367,7 @@ namespace ClassicUO
             Profiler.EnterContext("Mouse");
             Mouse.Update();
             Profiler.ExitContext("Mouse");
-            
+
             Profiler.EnterContext("Packets");
             // var data = NetClient.Socket.CollectAvailableData();
             // var packetsCount = PacketHandlers.Handler.ParsePackets(data);
@@ -388,10 +388,12 @@ namespace ClassicUO
             Profiler.EnterContext("UI Update");
             UIManager.Update();
             Profiler.ExitContext("UI Update");
-            
+
             Profiler.EnterContext("LScript");
             LegionScripting.LegionScripting.OnUpdate();
             Profiler.ExitContext("LScript");
+
+            MainThreadQueue.ProcessQueue();
 
             if (Time.Ticks >= _nextSlowUpdate)
             {
@@ -436,8 +438,8 @@ namespace ClassicUO
 
             UO.GameCursor?.Update();
             Audio?.Update();
-            
-            DiscordManager.Instance.Update(); 
+
+            DiscordManager.Instance.Update();
 
 
             for (var i = _queuedActions.Count - 1; i >= 0; i--)

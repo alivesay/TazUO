@@ -4,6 +4,7 @@ using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
+using ClassicUO.Resources;
 using ClassicUO.Utility;
 
 namespace ClassicUO.Game.UI.Gumps;
@@ -49,6 +50,15 @@ public class AssistantGump : BaseOptionsGump
         scroll.Add
             (PositionHelper.PositionControl(new HttpClickableLink("Autoloot Wiki", "https://github.com/PlayTazUO/TazUO/wiki/TazUO.Simple-Auto-Loot", ThemeSettings.TEXT_FONT_COLOR)));
 
+        PositionHelper.BlankLine();
+
+        ModernButton b;
+        scroll.Add(PositionHelper.PositionControl(b = new ModernButton(0, 0, 200, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Set grab bag", ThemeSettings.BUTTON_FONT_COLOR)));
+        b.MouseUp += (s, e) =>
+        {
+            GameActions.Print(World, ResGumps.TargetContainerToGrabItemsInto);
+            World.TargetManager.SetTargeting(CursorTarget.SetGrabBag, 0, TargetType.Neutral);
+        };
         PositionHelper.BlankLine();
 
         scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel(lang.GetTazUO.AutoLootEnable, 0, profile.EnableAutoLoot, b => profile.EnableAutoLoot = b)));

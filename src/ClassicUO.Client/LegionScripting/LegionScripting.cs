@@ -391,10 +391,6 @@ namespace ClassicUO.LegionScripting
 
             SaveScriptSettings();
 
-            while (API.QueuedPythonActions.TryDequeue(out var action)) //Clear any queued actions
-            {
-            }
-
             _enabled = false;
         }
 
@@ -427,9 +423,6 @@ namespace ClassicUO.LegionScripting
 
                 removeRunningScripts.Clear();
             }
-
-            while (API.QueuedPythonActions.TryDequeue(out var action))
-                action();
         }
 
         public static void PlayScript(ScriptFile script)
@@ -491,7 +484,7 @@ namespace ClassicUO.LegionScripting
             }
 
             //script.PythonScriptStopped();
-            API.QueuedPythonActions.Enqueue(() => { StopScript(script); });
+            MainThreadQueue.EnqueueAction(() => { StopScript(script); });
         }
 
         public static void StopScript(ScriptFile script)
@@ -731,11 +724,11 @@ namespace ClassicUO.LegionScripting
                         var client = new System.Net.WebClient();
                         var api = client.DownloadString(new Uri("https://raw.githubusercontent.com/PlayTazUO/TazUO/refs/heads/dev/src/ClassicUO.Client/LegionScripting/docs/API.py"));
                         File.WriteAllText(Path.Combine(CUOEnviroment.ExecutablePath, "LegionScripts", "API.py"), api);
-                        API.QueuedPythonActions.Enqueue(() => { GameActions.Print(World, "Updated API!"); });
+                        MainThreadQueue.EnqueueAction(() => { GameActions.Print(World, "Updated API!"); });
                     }
                     catch (Exception ex)
                     {
-                        API.QueuedPythonActions.Enqueue(() => { GameActions.Print(World, "Failed to update the API..", 32); });
+                        MainThreadQueue.EnqueueAction(() => { GameActions.Print(World, "Failed to update the API..", 32); });
                         Log.Error(ex.ToString());
                     }
 

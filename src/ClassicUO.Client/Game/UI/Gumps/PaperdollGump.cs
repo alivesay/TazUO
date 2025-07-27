@@ -620,8 +620,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 BuildGump();
 
-                //GameActions.DoubleClick(0x8000_0000 | LocalSerial);
-                Client.Game.GetScene<GameScene>()?.DoubleClickDelayed(LocalSerial);
+                GameActions.OpenPaperdoll(World, LocalSerial);
 
                 IsMinimized = bool.Parse(xml.GetAttribute("isminimized"));
                 if (ProfileManager.CurrentProfile != null)

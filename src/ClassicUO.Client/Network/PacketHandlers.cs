@@ -2324,12 +2324,11 @@ sealed class PacketHandlers
             LoginScene.Instance?.Dispose();
             LoginGump.Instance?.Dispose();
 
-            //GameActions.OpenPaperdoll(world.Player);
-            GameActions.RequestMobileStatus(world, world.Player);
-            NetClient.Socket.Send_OpenChat("");
+                GameActions.RequestMobileStatus(world, world.Player);
+                NetClient.Socket.Send_OpenChat("");
 
-            NetClient.Socket.Send_SkillsRequest(world.Player);
-            scene.DoubleClickDelayed(world.Player);
+                NetClient.Socket.Send_SkillsRequest(world.Player);
+                scene.DoubleClickDelayed(world.Player);
 
             if (Client.Game.UO.Version >= Utility.ClientVersion.CV_306E)
             {

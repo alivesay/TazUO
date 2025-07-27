@@ -606,6 +606,8 @@ namespace ClassicUO.Configuration
         public bool NearbyLootConcealsContainerOnOpen { get; set; } = true;
         public bool SpellBar_ShowHotkeys { get; set; } = true;
         public byte ForcedHouseTransparency { get;  set; } = 40;
+        public ushort ForcedTransparencyHouseTileHue { get; set; } = 0;
+
         public bool ForceHouseTransparency { get; set; }
         public ulong HideHudGumpFlags { get; set; }
         public bool DisableGrayEnemies { get; set; }
@@ -617,9 +619,13 @@ namespace ClassicUO.Configuration
                 return;
 
             Log.Trace($"Saving path:\t\t{path}");
+            var filePath = Path.Combine(path, "profile.json");
+
+            // Create backup rotation before saving
+            CreateBackupRotation(filePath);
 
             // Save profile settings
-            ConfigurationResolver.Save(this, Path.Combine(path, "profile.json"), ProfileJsonContext.DefaultToUse.Profile);
+            ConfigurationResolver.Save(this, filePath, ProfileJsonContext.DefaultToUse.Profile);
 
             // Save opened gumps
             if (saveGumps)
@@ -632,6 +638,44 @@ namespace ClassicUO.Configuration
         public void SaveAsFile(string path, string filename)
         {
             ConfigurationResolver.Save(this, Path.Combine(path, filename), ProfileJsonContext.DefaultToUse.Profile);
+        }
+
+        private void CreateBackupRotation(string filePath)
+        {
+            if (!File.Exists(filePath))
+                return;
+
+            var backup3 = filePath + ".bak3";
+            var backup2 = filePath + ".bak2";
+            var backup1 = filePath + ".bak1";
+
+            try
+            {
+                // Remove oldest backup if it exists
+                if (File.Exists(backup3))
+                {
+                    File.Delete(backup3);
+                }
+
+                // Rotate backups: .bak2 -> .bak3, .bak1 -> .bak2
+                if (File.Exists(backup2))
+                {
+                    File.Move(backup2, backup3);
+                }
+
+                if (File.Exists(backup1))
+                {
+                    File.Move(backup1, backup2);
+                }
+
+                // Copy current file to .bak1
+                File.Copy(filePath, backup1);
+            }
+            catch (IOException e)
+            {
+                // Log backup rotation failure but don't prevent the save
+                Log.Error($"Failed to create backup rotation: {e}");
+            }
         }
 
         public void SaveAs(string path, string filename = "default.json")
@@ -765,6 +809,7 @@ namespace ClassicUO.Configuration
         public List<Gump> ReadGumps(World world, string path)
         {
             List<Gump> gumps = new List<Gump>();
+            List<(Gump gump, GumpType type, int x, int y, uint serial, uint parent, XmlElement xml)> nestedGumps = new();
 
             // load skillsgroup
             world.SkillsGroupManager.Load();
@@ -806,6 +851,7 @@ namespace ClassicUO.Configuration
                             int x = int.Parse(xml.GetAttribute(nameof(x)));
                             int y = int.Parse(xml.GetAttribute(nameof(y)));
                             uint serial = uint.Parse(xml.GetAttribute(nameof(serial)));
+                            uint? parent = uint.TryParse(xml.GetAttribute(nameof(parent)), out var result) ? result : null;
 
                             if (uint.TryParse(xml.GetAttribute("serverSerial"), out uint serverSerial))
                             {
@@ -981,10 +1027,17 @@ namespace ClassicUO.Configuration
                                 continue;
                             }
 
+                            if (parent.HasValue)
+                            {
+                                nestedGumps.Add((gump, type, x, y, serial, parent.Value, xml));
+                                continue;
+                            }
+
                             gump.LocalSerial = serial;
                             gump.Restore(xml);
                             gump.X = x;
                             gump.Y = y;
+                            gump.SetInScreen();
 
                             if (gump.LocalSerial != 0)
                             {
@@ -999,6 +1052,51 @@ namespace ClassicUO.Configuration
                         catch (Exception ex)
                         {
                             Log.Error(ex.ToString());
+                        }
+                    }
+
+                    HashSet<uint> processedSerials = new();
+                    while (nestedGumps.Count != 0)
+                    {
+                        int initialCount = nestedGumps.Count;
+                        foreach (var entry in nestedGumps.ToList())
+                        {
+                            var (gump, type, x, y, serial, parent, xml) = entry;
+                            bool parentIsInList = nestedGumps.Any(g => parent == g.serial);
+                            if (parentIsInList)
+                            {
+                                continue;
+                            }
+
+                            if (!processedSerials.Contains(parent) && world.Get(parent) is null)
+                            {
+                                continue;
+                            }
+
+                            processedSerials.Add(serial);
+                            nestedGumps.Remove(entry);
+
+                            gump.LocalSerial = serial;
+                            gump.Restore(xml);
+                            gump.X = x;
+                            gump.Y = y;
+                            gump.SetInScreen();
+
+                            if (gump.LocalSerial != 0)
+                            {
+                                UIManager.SavePosition(gump.LocalSerial, new Point(x, y));
+                            }
+
+                            if (!gump.IsDisposed)
+                            {
+                                gumps.Add(gump);
+                            }
+                        }
+
+                        if (initialCount == nestedGumps.Count)
+                        {
+                            Log.Warn($"[Profile.ReadGumps] Skipping nested gumps: {string.Join(", ", nestedGumps)}");
+                            break;
                         }
                     }
 
@@ -1081,6 +1179,7 @@ namespace ClassicUO.Configuration
                                     gump.Restore(xml);
                                     gump.X = x;
                                     gump.Y = y;
+                                    gump.SetInScreen();
 
                                     if (!gump.IsDisposed)
                                     {

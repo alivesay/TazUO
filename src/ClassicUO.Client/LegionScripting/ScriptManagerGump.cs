@@ -217,9 +217,9 @@ namespace ClassicUO.LegionScripting
 
             private const string SCRIPT_HEADER =
             "# See examples at" +
-            "\n#   https://github.com/bittiez/PublicLegionScripts/" +
+            "\n#   https://github.com/PlayTazUO/PublicLegionScripts/" +
             "\n# Or documentation at" +
-            "\n#   https://github.com/bittiez/TazUO/wiki/TazUO.Legion-Scripting";
+            "\n#   https://github.com/PlayTazUO/TazUO/wiki/TazUO.Legion-Scripting";
             private const string EXAMPLE_LSCRIPT =
             SCRIPT_HEADER +
             @"

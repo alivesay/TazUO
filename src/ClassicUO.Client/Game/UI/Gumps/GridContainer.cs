@@ -214,6 +214,7 @@ namespace ClassicUO.Game.UI.Gumps
                 "/c[orange]Grid Container Controls:/cd\n" +
                 "Ctrl + Click to lock an item in place\n" +
                 "Alt + Click to add an item to the quick move queue\n" +
+                "Alt + Double Click to add all similar items to the quick move queue\n" +
                 "Shift + Click to add an item to your auto loot list\n" +
                 "Sort and single click looting can be enabled with the icons on the right side");
 
@@ -383,6 +384,12 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 ProfileManager.CurrentProfile.BackpackGridPosition = Location;
                 ProfileManager.CurrentProfile.BackpackGridSize = new Point(Width, Height);
+            }
+
+            var item = World.Items.Get(LocalSerial);
+            if (item is not null)
+            {
+                writer.WriteAttributeString("parent", item.Container.ToString());
             }
 
             writer.WriteAttributeString("ogContainer", originalContainerItemGraphic.ToString());
@@ -902,6 +909,7 @@ namespace ClassicUO.Game.UI.Gumps
                     return;
 
                 if (!Keyboard.Ctrl &&
+                    !Keyboard.Alt &&
                     ProfileManager.CurrentProfile.DoubleClickToLootInsideContainers &&
                     gridContainer.isCorpse &&
                     !_item.IsDestroyed &&
@@ -909,9 +917,35 @@ namespace ClassicUO.Game.UI.Gumps
                     container != world.Player.FindItemByLayer(Layer.Backpack) &&
                     !_item.IsLocked &&
                     _item.IsLootable)
+                {
                     GameActions.GrabItem(world, _item, _item.Amount);
+                }
+                else if (Keyboard.Alt && _item != null)
+                {
+                    var graphic = _item.Graphic;
+                    var hue = _item.Hue;
+                    foreach (var gridItem in gridContainer.gridSlotManager.GridSlots.Values)
+                    {
+                        var item = gridItem?._item;
+                        if (item is null ||
+                            graphic != item.Graphic ||
+                            hue != item.Hue ||
+                            MultiItemMoveGump.MoveItems.Contains(item))
+                        {
+                            continue;
+                        }
+
+                        MultiItemMoveGump.MoveItems.Enqueue(item);
+                        gridItem.SelectHighlight = true;
+                    }
+
+                    int multimoveX = gridContainer.X >= 200 ? gridContainer.X - 200 : gridContainer.X + gridContainer.Width;
+                    MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, multimoveX, gridContainer.Y);
+                }
                 else
+                {
                     GameActions.DoubleClick(world, LocalSerial);
+                }
 
                 e.Result = true;
             }
@@ -967,9 +1001,9 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         if (!MultiItemMoveGump.MoveItems.Contains(_item))
                             MultiItemMoveGump.MoveItems.Enqueue(_item);
-                        MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, gridContainer.X - 200, gridContainer.Y);
+                        int multimoveX = gridContainer.X >= 200 ? gridContainer.X - 200 : gridContainer.X + gridContainer.Width;
+                        MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, multimoveX, gridContainer.Y);
                         SelectHighlight = true;
-                        Mouse.CancelDoubleClick = true;
                     }
                     else if (Keyboard.Shift && _item != null && ProfileManager.CurrentProfile.EnableAutoLoot && !ProfileManager.CurrentProfile.HoldShiftForContext && !ProfileManager.CurrentProfile.HoldShiftToSplitStack)
                     {
@@ -1054,7 +1088,8 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (!MultiItemMoveGump.MoveItems.Contains(_item))
                         MultiItemMoveGump.MoveItems.Enqueue(_item);
-                    MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, gridContainer.X - 200, gridContainer.Y);
+                    int multimoveX = gridContainer.X >= 200 ? gridContainer.X - 200 : gridContainer.X + gridContainer.Width;
+                    MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, multimoveX, gridContainer.Y);
                     SelectHighlight = true;
                 }
 
@@ -1085,7 +1120,8 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         if (!MultiItemMoveGump.MoveItems.Contains(_item))
                             MultiItemMoveGump.MoveItems.Enqueue(_item);
-                        MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, gridContainer.X - 200, gridContainer.Y);
+                        int multimoveX = gridContainer.X >= 200 ? gridContainer.X - 200 : gridContainer.X + gridContainer.Width;
+                        MultiItemMoveGump.AddMultiItemMoveGumpToUI(world, multimoveX, gridContainer.Y);
                         SelectHighlight = true;
                     }
 

@@ -930,7 +930,7 @@ namespace ClassicUO.LegionScripting
         ///   API.SysMsg("Wearing a helmet!")
         /// ```
         /// </summary>
-        /// <param name="layer">The layer to check, see https://github.com/bittiez/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Layers.cs</param>
+        /// <param name="layer">The layer to check, see https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Layers.cs</param>
         /// <param name="serial">Optional, if not set it will check yourself, otherwise it will check the mobile requested</param>
         /// <returns>The item if it exists</returns>
         public Item FindLayer(string layer, uint serial = uint.MaxValue) => InvokeOnMainThread
@@ -1327,12 +1327,17 @@ namespace ClassicUO.LegionScripting
         /// API.Dismount()
         /// ```
         /// </summary>
-        public void Dismount() => InvokeOnMainThread
+        /// <param name="skipQueue">Defaults true, set to false to use a double click queue</param>
+        public void Dismount(bool skipQueue = true) => InvokeOnMainThread
         (() =>
             {
                 if (World.Player.FindItemByLayer(Layer.Mount) != null)
-                    GameActions.DoubleClick(World, World.Player);
-
+                {
+                    if (skipQueue)
+                        GameActions.DoubleClick(World, World.Player);
+                    else
+                        GameActions.DoubleClickQueued(World.Player);
+                }
             }
         );
 
@@ -1344,7 +1349,16 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="serial"></param>
-        public void Mount(uint serial) => InvokeOnMainThread(() => { GameActions.DoubleClick(World, serial); });
+        /// <param name="skipQueue">Defaults true, set to false to use a double click queue</param>
+        public void Mount(uint serial, bool skipQueue = true) => InvokeOnMainThread
+        (() =>
+            {
+                if (skipQueue)
+                    GameActions.DoubleClick(World, serial);
+                else
+                    GameActions.DoubleClickQueued(serial);
+            }
+        );
 
         /// <summary>
         /// Wait for a target cursor.
@@ -2648,7 +2662,7 @@ namespace ClassicUO.LegionScripting
         #endregion
 
         /// <summary>
-        /// Get a skill from the player. See the Skill class for what properties are available: https://github.com/bittiez/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs
+        /// Get a skill from the player. See the Skill class for what properties are available: https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs
         /// Example:
         /// ```py
         /// skill = API.GetSkill("Hiding")

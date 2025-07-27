@@ -729,7 +729,7 @@ namespace ClassicUO.LegionScripting
                     try
                     {
                         var client = new System.Net.WebClient();
-                        var api = client.DownloadString(new Uri("https://raw.githubusercontent.com/bittiez/TazUO/refs/heads/dev/src/ClassicUO.Client/LegionScripting/docs/API.py"));
+                        var api = client.DownloadString(new Uri("https://raw.githubusercontent.com/PlayTazUO/TazUO/refs/heads/dev/src/ClassicUO.Client/LegionScripting/docs/API.py"));
                         File.WriteAllText(Path.Combine(CUOEnviroment.ExecutablePath, "LegionScripts", "API.py"), api);
                         API.QueuedPythonActions.Enqueue(() => { GameActions.Print(World, "Updated API!"); });
                     }
@@ -775,7 +775,7 @@ namespace ClassicUO.LegionScripting
         public ScriptEngine pythonEngine;
         public ScriptScope pythonScope;
         public API scopedAPI;
-        
+
         public bool IsPlaying
         {
             get
@@ -883,7 +883,7 @@ namespace ClassicUO.LegionScripting
 
             pythonEngine = Python.CreateEngine();
 
-            string dir = System.IO.Path.GetDirectoryName(FullPath);                       
+            string dir = System.IO.Path.GetDirectoryName(FullPath);
             ICollection<string> paths = pythonEngine.GetSearchPaths();
             paths.Add(System.IO.Path.Combine(CUOEnviroment.ExecutablePath, "iplib"));
             paths.Add(System.IO.Path.Combine(CUOEnviroment.ExecutablePath, "LegionScripts"));

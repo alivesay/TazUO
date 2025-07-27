@@ -16,6 +16,8 @@ namespace ClassicUO.Game.UI.Gumps
         private bool _isDown,
             _isLeft;
         private readonly HSliderBar _slider;
+        public override bool ShouldBeSaved => false;
+        public override GumpType GumpType => GumpType.MenuGump;
 
         public MenuGump(World world, uint serial, uint serv, string name) : base(world, serial, serv)
         {

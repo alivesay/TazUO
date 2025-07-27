@@ -7,7 +7,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
   
 [Additional notes](notes.md)  
   
-This was generated on `7/23/25`.
+This was generated on `7/26/25`.
   
 # API  
 
@@ -906,7 +906,7 @@ This was generated on `7/23/25`.
 **Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| layer | string | No | The layer to check, see https://github.com/bittiez/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Layers.cs |
+| layer | string | No | The layer to check, see https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Layers.cs |
 | serial | uint | Yes | Optional, if not set it will check yourself, otherwise it will check the mobile requested |
 
 ---> Return Type: *Item*
@@ -1295,7 +1295,7 @@ This was generated on `7/23/25`.
 ***
 
 
-<details><summary><h3>Dismount()</h3></summary>
+<details><summary><h3>Dismount(skipQueue)</h3></summary>
 
  Attempt to dismount if mounted.  
  Example:  
@@ -1304,6 +1304,11 @@ This was generated on `7/23/25`.
  ```  
   
 
+**Parameters**  
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| skipQueue | bool | Yes | Defaults true, set to false to use a double click queue |
+
 ---> Does not return anything
 
 </details>
@@ -1311,7 +1316,7 @@ This was generated on `7/23/25`.
 ***
 
 
-<details><summary><h3>Mount(serial)</h3></summary>
+<details><summary><h3>Mount(serial, skipQueue)</h3></summary>
 
  Attempt to mount(double click)  
  Example:  
@@ -1324,6 +1329,7 @@ This was generated on `7/23/25`.
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
 | serial | uint | No |  |
+| skipQueue | bool | Yes | Defaults true, set to false to use a double click queue |
 
 ---> Does not return anything
 
@@ -2635,7 +2641,7 @@ This was generated on `7/23/25`.
 
 <details><summary><h3>GetSkill(skill)</h3></summary>
 
- Get a skill from the player. See the Skill class for what properties are available: https://github.com/bittiez/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs  
+ Get a skill from the player. See the Skill class for what properties are available: https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs  
  Example:  
  ```py  
  skill = API.GetSkill("Hiding")  

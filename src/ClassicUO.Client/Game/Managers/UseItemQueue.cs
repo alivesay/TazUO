@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Game.GameObjects;
+using ClassicUO.Configuration;
 using ClassicUO.Utility.Collections;
 
 namespace ClassicUO.Game.Managers
@@ -10,11 +11,12 @@ namespace ClassicUO.Game.Managers
         private readonly Deque<uint> _actions = new Deque<uint>();
         private long _timer;
         private readonly World _world;
-
+        private static long _delay = 1000;
 
         public UseItemQueue(World world)
         {
-            _timer = Time.Ticks + 1000;
+            _delay = ProfileManager.CurrentProfile.MoveMultiObjectDelay;
+            _timer = Time.Ticks + _delay;
             _world = world;
         }
 
@@ -22,7 +24,7 @@ namespace ClassicUO.Game.Managers
         {
             if (_timer < Time.Ticks)
             {
-                _timer = Time.Ticks + 1000;
+                _timer = Time.Ticks + _delay;
 
                 if (_actions.Count == 0)
                 {
@@ -30,16 +32,7 @@ namespace ClassicUO.Game.Managers
                 }
 
                 uint serial = _actions.RemoveFromFront();
-
-                if (_world.Get(serial) != null)
-                {
-                    if (SerialHelper.IsMobile(serial))
-                    {
-                        serial |= 0x8000_0000;
-                    }
-
-                    GameActions.DoubleClick(_world,serial);
-                }
+                GameActions.DoubleClick(_world, serial);
             }
         }
 

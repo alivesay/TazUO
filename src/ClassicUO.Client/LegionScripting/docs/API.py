@@ -788,7 +788,7 @@ def Rename(serial: int, name: str) -> None:
     """
     pass
 
-def Dismount() -> None:
+def Dismount(skipQueue: bool = True) -> None:
     """
      Attempt to dismount if mounted.
      Example:
@@ -799,7 +799,7 @@ def Dismount() -> None:
     """
     pass
 
-def Mount(serial: int) -> None:
+def Mount(serial: int, skipQueue: bool = True) -> None:
     """
      Attempt to mount(double click)
      Example:
@@ -1569,7 +1569,7 @@ def AddControlOnDisposed(control: PyControl, onDispose: Any) -> PyControl:
 
 def GetSkill(skill: str) -> Skill:
     """
-     Get a skill from the player. See the Skill class for what properties are available: https://github.com/bittiez/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs
+     Get a skill from the player. See the Skill class for what properties are available: https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs
      Example:
      ```py
      skill = API.GetSkill("Hiding")

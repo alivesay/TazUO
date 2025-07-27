@@ -9,6 +9,8 @@ namespace ClassicUO.Game.UI.Gumps
     public class TextEntryDialogGump : Gump
     {
         private readonly StbTextBox _textBox;
+        public override bool ShouldBeSaved => false;
+        public override GumpType GumpType => GumpType.TextEntryDialogGump;
 
         public TextEntryDialogGump
         (

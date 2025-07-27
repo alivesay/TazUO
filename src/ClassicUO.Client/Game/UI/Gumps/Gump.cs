@@ -31,7 +31,9 @@ namespace ClassicUO.Game.UI.Gumps
 
         public World World { get; }
         
-        public bool CanBeSaved => GumpType != Gumps.GumpType.None || ServerSerial != 0;
+        public virtual bool ShouldBeSaved => true;
+
+        public bool CanBeSaved => ShouldBeSaved && (GumpType != Gumps.GumpType.None || ServerSerial != 0);
 
         public virtual GumpType GumpType { get; }
 

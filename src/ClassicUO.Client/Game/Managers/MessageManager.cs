@@ -199,6 +199,10 @@ namespace ClassicUO.Game.Managers
                             {
                                 ((GridContainer)gump.Value).HandleObjectMessage(parent, text, hue);
                             }
+                            if(gump.Value is ModernPaperdoll && !gump.Value.IsDisposed)
+                            {
+                                ((ModernPaperdoll)gump.Value).HandleObjectMessage(parent, text, hue);
+                            }
                         }
                     }
                     goto case MessageType.Limit3Spell;

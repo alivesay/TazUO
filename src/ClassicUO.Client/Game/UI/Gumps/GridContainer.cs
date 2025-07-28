@@ -1382,9 +1382,11 @@ namespace ClassicUO.Game.UI.Gumps
                 area = controlArea;
                 foreach (var item in gridContainer.gridContainerEntry.Slots.Values)
                 {
-                    ItemPositions.Add(item.Slot, item.Serial);
+                    ItemPositions[item.Slot] = item.Serial;
+
                     if (item.Locked)
-                        itemLocks.Add(item.Serial);
+                        if (!itemLocks.Contains(item.Serial))
+                            itemLocks.Add(item.Serial);
                 }
                 container = world.Items.Get(thisContainer);
                 UpdateItems();

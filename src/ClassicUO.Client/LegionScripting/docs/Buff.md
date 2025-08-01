@@ -1,16 +1,34 @@
-# Buff  
+---
+title: Buff
+description: Buff class documentation
+---
 
 ## Properties
-_No properties found._
+*No properties found.*
 
-- **Graphic** (*ushort*)
-- **Text** (*string*)
-- **Timer** (*long*)
-- **Type** (*BuffIconType*)
-- **Title** (*string*)
+### `Graphic`
+
+**Type:** `ushort`
+
+### `Text`
+
+**Type:** `string`
+
+### `Timer`
+
+**Type:** `long`
+
+### `Type`
+
+**Type:** `BuffIconType`
+
+### `Title`
+
+**Type:** `string`
+
 
 ## Enums
-_No enums found._
+*No enums found.*
 
 ## Methods
-_No methods found._
+*No methods found.*

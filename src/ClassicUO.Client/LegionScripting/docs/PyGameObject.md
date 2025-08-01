@@ -1,4 +1,7 @@
-# PyGameObject  
+---
+title: PyGameObject
+description:  Base class for all Python-accessible game world objects.   Encapsulates common spatial and visual properties such as position and graphics.  
+---
 
 ## Class Description
  Base class for all Python-accessible game world objects.
@@ -6,72 +9,88 @@
 
 
 ## Properties
-- **__class__** (*string*)
-  -  The Python-visible class name of this object.
+### `__class__`
+
+**Type:** `string`
+
+ The Python-visible class name of this object.
  Accessible in Python as <c>obj.__class__</c> .
 
 
-- **X** (*ushort*)
-  -  The X-coordinate of the object in the game world.
 
-- **Y** (*ushort*)
-  -  The Y-coordinate of the object in the game world.
+### `X`
 
-- **Z** (*sbyte*)
-  -  The Z-coordinate (elevation) of the object in the game world.
+**Type:** `ushort`
 
-- **Graphic** (*ushort*)
-  -  The graphic ID of the object, representing its visual appearance.
+ The X-coordinate of the object in the game world.
 
-- **Hue** (*ushort*)
-  -  The hue (color tint) applied to the object.
+
+### `Y`
+
+**Type:** `ushort`
+
+ The Y-coordinate of the object in the game world.
+
+
+### `Z`
+
+**Type:** `sbyte`
+
+ The Z-coordinate (elevation) of the object in the game world.
+
+
+### `Graphic`
+
+**Type:** `ushort`
+
+ The graphic ID of the object, representing its visual appearance.
+
+
+### `Hue`
+
+**Type:** `ushort`
+
+ The hue (color tint) applied to the object.
+
 
 
 ## Enums
-_No enums found._
+*No enums found.*
 
 ## Methods
+### HasLineOfSightFrom
+`(observer)`
+ Determines if there is line of sight from the specified observer to this object.
+ If no observer is specified, it defaults to the player.
 
-<details><summary><h3>HasLineOfSightFrom(observer)</h3></summary>
 
- Determines if there is line of sight from the specified observer to this object.  
- If no observer is specified, it defaults to the player.  
-  
+**Parameters:**
 
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| observer | PyGameObject | Yes | The observing GameObject (optional). |
+| `observer` | `PyGameObject` | ✅ Yes | The observing GameObject (optional). |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### ToString
 
-
-<details><summary><h3>ToString()</h3></summary>
-
- Returns a readable string representation of the game object.  
- Used when printing or converting the object to a string in Python scripts.  
-  
-
----> Return Type: *string*
-
-</details>
-
-***
+ Returns a readable string representation of the game object.
+ Used when printing or converting the object to a string in Python scripts.
 
 
-<details><summary><h3>__repr__()</h3></summary>
+**Return Type:** `string`
 
- Returns a detailed string representation of the object.  
- This string is used by Python’s built-in <c>repr()</c> function.  
-  
+---
 
----> Return Type: *string*
+### __repr__
 
-</details>
+ Returns a detailed string representation of the object.
+ This string is used by Python’s built-in <c>repr()</c> function.
 
-***
+
+**Return Type:** `string`
+
+---
 

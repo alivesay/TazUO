@@ -1,29 +1,56 @@
-# PyProfile  
+---
+title: PyProfile
+description: PyProfile class documentation
+---
 
 ## Properties
-- **CharacterName** (*string*)
-  -  Get the current character name
+### `CharacterName`
 
-- **ServerName** (*string*)
-  -  Get the current server name
+**Type:** `string`
 
-- **LootBagSerial** (*uint*)
-  -  Serial of the player's loot bag, otherwise 0
-
-- **FavoriteBagSerial** (*uint*)
-  -  Serial of the player's favorite move bag, otherwise 0
-
-- **MoveItemDelay** (*int*)
-  -  The player's move item delay in milliseconds.
-
-- **AutoLootEnabled** (*bool*)
-  -  Does the player have auto loot enabled?
+ Get the current character name
 
 
-_No properties found._
+### `ServerName`
+
+**Type:** `string`
+
+ Get the current server name
+
+
+### `LootBagSerial`
+
+**Type:** `uint`
+
+ Serial of the player's loot bag, otherwise 0
+
+
+### `FavoriteBagSerial`
+
+**Type:** `uint`
+
+ Serial of the player's favorite move bag, otherwise 0
+
+
+### `MoveItemDelay`
+
+**Type:** `int`
+
+ The player's move item delay in milliseconds.
+
+
+### `AutoLootEnabled`
+
+**Type:** `bool`
+
+ Does the player have auto loot enabled?
+
+
+
+*No fields found.*
 
 ## Enums
-_No enums found._
+*No enums found.*
 
 ## Methods
-_No methods found._
+*No methods found.*

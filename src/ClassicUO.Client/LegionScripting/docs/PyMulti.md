@@ -1,4 +1,7 @@
-# PyMulti  
+---
+title: PyMulti
+description:  Represents a Python-accessible multi-tile structure (e.g., player buildings or player ships) in the game world.   Inherits spatial and visual data from <see cref="PyGameObject"/> .  
+---
 
 ## Class Description
  Represents a Python-accessible multi-tile structure (e.g., player buildings or player ships) in the game world.
@@ -6,15 +9,19 @@
 
 
 ## Properties
-- **__class__** (*string*)
-  -  The Python-visible class name of this object.
+### `__class__`
+
+**Type:** `string`
+
+ The Python-visible class name of this object.
  Accessible in Python as <c>obj.__class__</c> .
 
 
-_No properties found._
+
+*No fields found.*
 
 ## Enums
-_No enums found._
+*No enums found.*
 
 ## Methods
-_No methods found._
+*No methods found.*

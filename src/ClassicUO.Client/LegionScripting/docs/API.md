@@ -7,7 +7,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
   
 [Additional notes](notes.md)  
   
-This was generated on `7/28/25`.
+This was generated on `7/31/25`.
   
 # API  
 
@@ -2814,6 +2814,42 @@ This was generated on `7/28/25`.
  ```py  
  if API.IsProcessingMoveQue():  
    API.Pause(0.5)  
+ ```  
+  
+
+---> Return Type: *bool*
+
+</details>
+
+***
+
+
+<details><summary><h3>IsProcessingUseItemQueue()</h3></summary>
+
+ Check if the use item queue is being processed. You can use this to prevent actions if the queue is being processed.  
+ Example:  
+ ```py  
+ if API.IsProcessingUseItemQueue():  
+   API.Pause(0.5)  
+ ```  
+  
+
+---> Return Type: *bool*
+
+</details>
+
+***
+
+
+<details><summary><h3>IsGlobalCooldownActive()</h3></summary>
+
+ Check if the global cooldown is currently active. This applies to actions like moving or using items,  
+ and prevents new actions from executing until the cooldown has expired.  
+  
+ Example:  
+ ```py  
+ if API.IsGlobalCooldownActive():  
+     API.Pause(0.5)  
  ```  
   
 

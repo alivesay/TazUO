@@ -179,9 +179,6 @@ namespace ClassicUO.Game.UI.Gumps
                 gump = UIManager.GetGump<StatusGumpOutlands>();
             }
 
-
-            gump?.SetInScreen();
-
             return gump;
         }
 

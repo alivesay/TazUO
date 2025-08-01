@@ -144,7 +144,7 @@ namespace ClassicUO.Game.UI.Gumps
             StackNonStackableItems = gridContainerEntry.VisuallyStackNonStackables;
 
             Point lastPos = IsPlayerBackpack ? ProfileManager.CurrentProfile.BackpackGridPosition : gridContainerEntry.GetPosition();
-            if (lastPos == Point.Zero)
+            if (lastPos == Point.Zero || (lastPos.X == 100 && lastPos.Y == 100)) //Default positions, use last static position
             {
                 lastPos.X = lastX;
                 lastPos.Y = lastY;
@@ -517,6 +517,13 @@ namespace ClassicUO.Game.UI.Gumps
         {
             if (isCorpse && container != null && container == SelectedObject.CorpseObject)
                 SelectedObject.CorpseObject = null;
+        }
+
+        protected override void OnMove(int x, int y)
+        {
+            base.OnMove(x, y);
+            gridContainerEntry.X = X;
+            gridContainerEntry.Y = Y;
         }
 
         public override void Dispose()

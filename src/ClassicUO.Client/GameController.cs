@@ -54,6 +54,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using SDL2;
 using static SDL2.SDL;
 
 namespace ClassicUO
@@ -413,6 +414,7 @@ namespace ClassicUO
                 viewport.X = -5;
                 viewport.Y = -5;
             }
+            bufferRect = new Rectangle(0, 0, GraphicManager.PreferredBackBufferWidth, GraphicManager.PreferredBackBufferHeight);
         }
 
         public void MaximizeWindow()
@@ -422,6 +424,7 @@ namespace ClassicUO
             GraphicManager.PreferredBackBufferWidth = Client.Game.Window.ClientBounds.Width;
             GraphicManager.PreferredBackBufferHeight = Client.Game.Window.ClientBounds.Height;
             GraphicManager.ApplyChanges();
+            bufferRect = new Rectangle(0, 0, GraphicManager.PreferredBackBufferWidth, GraphicManager.PreferredBackBufferHeight);
         }
 
         public bool IsWindowMaximized()

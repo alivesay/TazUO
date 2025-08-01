@@ -136,6 +136,7 @@ public class GridContainerSaveData
                     _entries[entry.Serial] = entry;
                 }
 
+                return;
             }
             catch (Exception e)
             {

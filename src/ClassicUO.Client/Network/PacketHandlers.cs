@@ -2340,6 +2340,10 @@ sealed class PacketHandlers
                 NetClient.Socket.Send_ClientViewRange(world.ClientViewRange);
             }
 
+                // Reset the global action cooldown here because, for some reason, immediately
+                // sending multiple actions (e.g. reopening paperdoll and reopening containers)
+                // results in the server telling the client it must wait to perform actions.
+                GlobalActionCooldown.BeginCooldown();
             List<Gump> gumps = ProfileManager.CurrentProfile.ReadGumps(
                 world,
                 ProfileManager.ProfilePath

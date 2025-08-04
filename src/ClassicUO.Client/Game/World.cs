@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System.Collections.Generic;
 using System.Linq;
@@ -22,12 +22,14 @@ namespace ClassicUO.Game
 {
     public sealed class World
     {
+        public static World Instance { get; private set; }
         private readonly EffectManager _effectManager;
         private readonly List<uint> _toRemove = new List<uint>();
         private uint _timeToDelete;
 
         public World()
         {
+            Instance = this;
             WMapManager = new WorldMapEntityManager(this);
             CorpseManager = new CorpseManager(this);
             Party = new PartyManager(this);
@@ -839,8 +841,6 @@ namespace ClassicUO.Game
             }
 
             UIManager.GetGump<BaseHealthBarGump>(Player?.Serial)?.Dispose();
-
-            GridContainer.ClearInstance();
 
             ObjectToRemove = 0;
             LastObject = 0;

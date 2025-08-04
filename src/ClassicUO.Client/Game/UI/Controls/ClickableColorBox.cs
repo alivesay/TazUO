@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Gumps;
@@ -68,7 +68,7 @@ namespace ClassicUO.Game.UI.Controls
                 UIManager.GetGump<ColorPickerGump>()?.Dispose();
                 if (useModernSelector)
                 {
-                    UIManager.Add(new ModernColorPicker(_world, s => Hue = s) { X = 100, Y = 100 });
+                    UIManager.Add(new ModernColorPicker(_world, s => Hue = s));
                 }
                 else
                 {

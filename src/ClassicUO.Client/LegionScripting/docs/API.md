@@ -1,2893 +1,2737 @@
-# Python API Documentation  
+---
+title: Python API Documentation
+description: Automatically generated documentation for the Python API scripting system
+tableOfContents:
+  minHeadingLevel: 1
+  maxHeadingLevel: 4
+---
+
 This is automatically generated documentation for the Python API scripting.  
-All methods, properties, enums, etc need to pre prefaced with `API.` for example: `API.Msg("An example")`.  
-  
+
+:::note[Usage]
+All methods, properties, enums, etc need to pre prefaced with `API.` for example:
+ `API.Msg("An example")`.
+:::
+
+:::tip[API.py File]
 If you download the [API.py](API.py) file, put it in the same folder as your python scripts and add `import API` to your script, that will enable some mild form of autocomplete in an editor like VS Code.  
-You can now type `-updateapi` in game to download the latest API.py file.  
-  
-[Additional notes](notes.md)  
-  
-This was generated on `7/27/25`.
-  
-# API  
 
-## Class Description
- Python scripting access point
+You can now type `-updateapi` in game to download the latest API.py file.
+:::
 
+[Additional notes](../notes/)  
+
+*This was generated on `8/4/25`.*
 
 ## Properties
-- **JournalEntries** (*ConcurrentQueue<JournalEntry>*)
-- **Backpack** (*uint*)
-  -  Get the player's backpack serial
+### `JournalEntries`
 
-- **Player** (*PlayerMobile*)
-  -  Returns the player character object
+**Type:** `ConcurrentQueue<JournalEntry>`
 
-- **Bank** (*uint*)
-  -  Return the player's bank container serial if open, otherwise 0
+### `Backpack`
 
-- **Random** (*Random*)
-  -  Can be used for random numbers.
+**Type:** `uint`
+
+ Get the player's backpack serial
+
+
+### `Player`
+
+**Type:** `PlayerMobile`
+
+ Returns the player character object
+
+
+### `Bank`
+
+**Type:** `uint`
+
+ Return the player's bank container serial if open, otherwise 0
+
+
+### `Random`
+
+**Type:** `Random`
+
+ Can be used for random numbers.
  `API.Random.Next(1, 100)` will return a number between 1 and 100.
  `API.Random.Next(100)` will return a number between 0 and 100.
 
-- **LastTargetSerial** (*uint*)
-  -  The serial of the last target, if it has a serial.
 
-- **LastTargetPos** (*Vector3Int*)
-  -  The last target's position
+### `LastTargetSerial`
 
-- **LastTargetGraphic** (*ushort*)
-  -  The graphic of the last targeting object
+**Type:** `uint`
 
-- **Found** (*uint*)
-  -  The serial of the last item or mobile from the various findtype/mobile methods
+ The serial of the last target, if it has a serial.
 
 
-- **PyProfile** (*PyProfile*)
-  -  Access useful player settings.
+### `LastTargetPos`
+
+**Type:** `Vector3Int`
+
+ The last target's position
+
+
+### `LastTargetGraphic`
+
+**Type:** `ushort`
+
+ The graphic of the last targeting object
+
+
+### `Found`
+
+**Type:** `uint`
+
+ The serial of the last item or mobile from the various findtype/mobile methods
+
+
+
+### `PyProfile`
+
+**Type:** `PyProfile`
+
+ Access useful player settings.
+
 
 
 ## Enums
 ### ScanType
 
 **Values:**
-- Hostile
-- Party
-- Followers
-- Objects
-- Mobiles
+- `Hostile`
+- `Party`
+- `Followers`
+- `Objects`
+- `Mobiles`
 
 ### Notoriety
 
 **Values:**
-- Unknown
-- Innocent
-- Ally
-- Gray
-- Criminal
-- Enemy
-- Murderer
-- Invulnerable
+- `Unknown`
+- `Innocent`
+- `Ally`
+- `Gray`
+- `Criminal`
+- `Enemy`
+- `Murderer`
+- `Invulnerable`
 
 ### PersistentVar
 
 **Values:**
-- Char
-- Account
-- Server
-- Global
+- `Char`
+- `Account`
+- `Server`
+- `Global`
 
 
 ## Methods
+### ProcessCallbacks
 
-<details><summary><h3>ProcessCallbacks()</h3></summary>
-
- Use this when you need to wait for players to click buttons.  
- Example:  
- ```py  
- while True:  
-   API.ProcessCallbacks()  
-   API.Pause(0.1)  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Use this when you need to wait for players to click buttons.
+ Example:
+ ```py
+ while True:
+   API.ProcessCallbacks()
+   API.Pause(0.1)
+ ```
 
 
-<details><summary><h3>SetSharedVar(name, value)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Set a variable that is shared between scripts.  
- Example:  
- ```py  
- API.SetSharedVar("myVar", 10)  
- ```  
-  
+---
 
-**Parameters**  
+### SetSharedVar
+`(name, value)`
+ Set a variable that is shared between scripts.
+ Example:
+ ```py
+ API.SetSharedVar("myVar", 10)
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| name | string | No | Name of the var |
-| value | object | No | Value, can be a number, text, or *most* other objects too. |
+| `name` | `string` | ❌ No | Name of the var |
+| `value` | `object` | ❌ No | Value, can be a number, text, or *most* other objects too. |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### GetSharedVar
+`(name)`
+ Get the value of a shared variable.
+ Example:
+ ```py
+ myVar = API.GetSharedVar("myVar")
+ if myVar:
+  API.SysMsg(f"myVar is {myVar}")
+ ```
 
 
-<details><summary><h3>GetSharedVar(name)</h3></summary>
+**Parameters:**
 
- Get the value of a shared variable.  
- Example:  
- ```py  
- myVar = API.GetSharedVar("myVar")  
- if myVar:  
-  API.SysMsg(f"myVar is {myVar}")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| name | string | No | Name of the var |
+| `name` | `string` | ❌ No | Name of the var |
 
----> Return Type: *object*
+**Return Type:** `object`
 
-</details>
+---
 
-***
+### RemoveSharedVar
+`(name)`
+ Try to remove a shared variable.
+ Example:
+ ```py
+ API.RemoveSharedVar("myVar")
+ ```
 
 
-<details><summary><h3>RemoveSharedVar(name)</h3></summary>
+**Parameters:**
 
- Try to remove a shared variable.  
- Example:  
- ```py  
- API.RemoveSharedVar("myVar")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| name | string | No | Name of the var |
+| `name` | `string` | ❌ No | Name of the var |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### ClearSharedVars
 
-
-<details><summary><h3>ClearSharedVars()</h3></summary>
-
- Clear all shared vars.  
- Example:  
- ```py  
- API.ClearSharedVars()  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Clear all shared vars.
+ Example:
+ ```py
+ API.ClearSharedVars()
+ ```
 
 
-<details><summary><h3>CloseGumps()</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Close all gumps created by the API unless marked to remain open.  
-  
+---
 
----> Does not return anything
+### CloseGumps
 
-</details>
-
-***
+ Close all gumps created by the API unless marked to remain open.
 
 
-<details><summary><h3>Attack(serial)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Attack a mobile  
- Example:  
- ```py  
- enemy = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)  
- if enemy:  
-   API.Attack(enemy)  
- ```  
-  
+---
 
-**Parameters**  
+### Attack
+`(serial)`
+ Attack a mobile
+ Example:
+ ```py
+ enemy = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)
+ if enemy:
+   API.Attack(enemy)
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
+| `serial` | `uint` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### BandageSelf
 
-
-<details><summary><h3>BandageSelf()</h3></summary>
-
- Attempt to bandage yourself. Older clients this will not work, you will need to find a bandage, use it, and target yourself.  
- Example:  
- ```py  
- if player.HitsMax - player.Hits > 10 or player.IsPoisoned:  
-   if API.BandageSelf():  
-     API.CreateCooldownBar(delay, "Bandaging...", 21)  
-     API.Pause(8)  
-   else:  
-     API.SysMsg("WARNING: No bandages!", 32)  
-     break  
- ```  
-  
-
----> Return Type: *bool*
-
-</details>
-
-***
+ Attempt to bandage yourself. Older clients this will not work, you will need to find a bandage, use it, and target yourself.
+ Example:
+ ```py
+ if player.HitsMax - player.Hits > 10 or player.IsPoisoned:
+   if API.BandageSelf():
+     API.CreateCooldownBar(delay, "Bandaging...", 21)
+     API.Pause(8)
+   else:
+     API.SysMsg("WARNING: No bandages!", 32)
+     break
+ ```
 
 
-<details><summary><h3>ClearLeftHand()</h3></summary>
+**Return Type:** `bool`
 
- If you have an item in your left hand, move it to your backpack  
- Sets API.Found to the item's serial.  
- Example:  
- ```py  
- leftHand = API.ClearLeftHand()  
- if leftHand:  
-   API.SysMsg("Cleared left hand: " + leftHand.Name)  
- ```  
-  
+---
 
----> Return Type: *PyItem*
+### ClearLeftHand
 
-</details>
-
-***
+ If you have an item in your left hand, move it to your backpack
+ Sets API.Found to the item's serial.
+ Example:
+ ```py
+ leftHand = API.ClearLeftHand()
+ if leftHand:
+   API.SysMsg("Cleared left hand: " + leftHand.Name)
+ ```
 
 
-<details><summary><h3>ClearRightHand()</h3></summary>
+**Return Type:** `PyItem`
 
- If you have an item in your right hand, move it to your backpack  
- Sets API.Found to the item's serial.  
- Example:  
- ```py  
- rightHand = API.ClearRightHand()  
- if rightHand:  
-   API.SysMsg("Cleared right hand: " + rightHand.Name)  
-  ```  
-  
+---
 
----> Return Type: *PyItem*
+### ClearRightHand
 
-</details>
-
-***
+ If you have an item in your right hand, move it to your backpack
+ Sets API.Found to the item's serial.
+ Example:
+ ```py
+ rightHand = API.ClearRightHand()
+ if rightHand:
+   API.SysMsg("Cleared right hand: " + rightHand.Name)
+  ```
 
 
-<details><summary><h3>ClickObject(serial)</h3></summary>
+**Return Type:** `PyItem`
 
- Single click an object  
- Example:  
- ```py  
- API.ClickObject(API.Player)  
- ```  
-  
+---
 
-**Parameters**  
+### ClickObject
+`(serial)`
+ Single click an object
+ Example:
+ ```py
+ API.ClickObject(API.Player)
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No | Serial, or item/mobile reference |
+| `serial` | `uint` | ❌ No | Serial, or item/mobile reference |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### UseObject
+`(serial, skipQueue)`
+ Attempt to use(double click) an object.
+ Example:
+ ```py
+ API.UseObject(API.Backpack)
+ ```
 
 
-<details><summary><h3>UseObject(serial, skipQueue)</h3></summary>
+**Parameters:**
 
- Attempt to use(double click) an object.  
- Example:  
- ```py  
- API.UseObject(API.Backpack)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No | The serial |
-| skipQueue | bool | Yes | Defaults true, set to false to use a double click queue |
+| `serial` | `uint` | ❌ No | The serial |
+| `skipQueue` | `bool` | ✅ Yes | Defaults true, set to false to use a double click queue |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Contents
+`(serial)`
+ Get an item count for the contents of a container
+ Example:
+ ```py
+ count = API.Contents(API.Backpack)
+ if count > 0:
+   API.SysMsg(f"You have {count} items in your backpack")
+ ```
 
 
-<details><summary><h3>Contents(serial)</h3></summary>
+**Parameters:**
 
- Get an item count for the contents of a container  
- Example:  
- ```py  
- count = API.Contents(API.Backpack)  
- if count > 0:  
-   API.SysMsg(f"You have {count} items in your backpack")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
+| `serial` | `uint` | ❌ No |  |
 
----> Return Type: *int*
+**Return Type:** `int`
 
-</details>
+---
 
-***
+### ContextMenu
+`(serial, entry)`
+ Send a context menu(right click menu) response.
+ This does not open the menu, you do not need to open the menu first. This handles both in one action.
+ Example:
+ ```py
+ API.ContextMenu(API.Player, 1)
+ ```
 
 
-<details><summary><h3>ContextMenu(serial, entry)</h3></summary>
+**Parameters:**
 
- Send a context menu(right click menu) response.  
- This does not open the menu, you do not need to open the menu first. This handles both in one action.  
- Example:  
- ```py  
- API.ContextMenu(API.Player, 1)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
-| entry | ushort | No | Entries start at 0, the top entry will be 0, then 1, 2, etc. (Usually) |
+| `serial` | `uint` | ❌ No |  |
+| `entry` | `ushort` | ❌ No | Entries start at 0, the top entry will be 0, then 1, 2, etc. (Usually) |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### EquipItem
+`(serial)`
+ Attempt to equip an item. Layer is automatically detected.
+ Example:
+ ```py
+ lefthand = API.ClearLeftHand()
+ API.Pause(2)
+ API.EquipItem(lefthand)
+ ```
 
 
-<details><summary><h3>EquipItem(serial)</h3></summary>
+**Parameters:**
 
- Attempt to equip an item. Layer is automatically detected.  
- Example:  
- ```py  
- lefthand = API.ClearLeftHand()  
- API.Pause(2)  
- API.EquipItem(lefthand)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
+| `serial` | `uint` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### ClearMoveQueue
 
-
-<details><summary><h3>ClearMoveQueue()</h3></summary>
-
- Clear the move item que of all items.  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Clear the move item que of all items.
 
 
-<details><summary><h3>QueMoveItem(serial, destination, amt, x, y)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Move an item to another container.  
- Use x, and y if you don't want items stacking in the desination container.  
- Example:  
- ```py  
- items = API.ItemsInContainer(API.Backpack)  
-  
- API.SysMsg("Target your fish barrel", 32)  
- barrel = API.RequestTarget()  
-  
-  
- if len(items) > 0 and barrel:  
-     for item in items:  
-         data = API.ItemNameAndProps(item)  
-         if data and "An Exotic Fish" in data:  
-             API.QueMoveItem(item, barrel)  
- ```  
-  
+---
 
-**Parameters**  
+### QueMoveItem
+`(serial, destination, amt, x, y)`
+ Move an item to another container.
+ Use x, and y if you don't want items stacking in the desination container.
+ Example:
+ ```py
+ items = API.ItemsInContainer(API.Backpack)
+
+ API.SysMsg("Target your fish barrel", 32)
+ barrel = API.RequestTarget()
+
+
+ if len(items) > 0 and barrel:
+     for item in items:
+         data = API.ItemNameAndProps(item)
+         if data and "An Exotic Fish" in data:
+             API.QueMoveItem(item, barrel)
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
-| destination | uint | No |  |
-| amt | ushort | Yes | Amount to move |
-| x | int | Yes | X coordinate inside a container |
-| y | int | Yes | Y coordinate inside a container |
+| `serial` | `uint` | ❌ No |  |
+| `destination` | `uint` | ❌ No |  |
+| `amt` | `ushort` | ✅ Yes | Amount to move |
+| `x` | `int` | ✅ Yes | X coordinate inside a container |
+| `y` | `int` | ✅ Yes | Y coordinate inside a container |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### MoveItem
+`(serial, destination, amt, x, y)`
+ Move an item to another container.
+ Use x, and y if you don't want items stacking in the desination container.
+ Example:
+ ```py
+ items = API.ItemsInContainer(API.Backpack)
+
+ API.SysMsg("Target your fish barrel", 32)
+ barrel = API.RequestTarget()
 
 
-<details><summary><h3>MoveItem(serial, destination, amt, x, y)</h3></summary>
+ if len(items) > 0 and barrel:
+     for item in items:
+         data = API.ItemNameAndProps(item)
+         if data and "An Exotic Fish" in data:
+             API.MoveItem(item, barrel)
+             API.Pause(0.75)
+ ```
 
- Move an item to another container.  
- Use x, and y if you don't want items stacking in the desination container.  
- Example:  
- ```py  
- items = API.ItemsInContainer(API.Backpack)  
-  
- API.SysMsg("Target your fish barrel", 32)  
- barrel = API.RequestTarget()  
-  
-  
- if len(items) > 0 and barrel:  
-     for item in items:  
-         data = API.ItemNameAndProps(item)  
-         if data and "An Exotic Fish" in data:  
-             API.MoveItem(item, barrel)  
-             API.Pause(0.75)  
- ```  
-  
 
-**Parameters**  
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
-| destination | uint | No |  |
-| amt | int | Yes | Amount to move |
-| x | int | Yes | X coordinate inside a container |
-| y | int | Yes | Y coordinate inside a container |
+| `serial` | `uint` | ❌ No |  |
+| `destination` | `uint` | ❌ No |  |
+| `amt` | `int` | ✅ Yes | Amount to move |
+| `x` | `int` | ✅ Yes | X coordinate inside a container |
+| `y` | `int` | ✅ Yes | Y coordinate inside a container |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### QueMoveItemOffset
+`(serial, amt, x, y, z, OSI)`
+ Move an item to the ground near you.
+ Example:
+ ```py
+ items = API.ItemsInContainer(API.Backpack)
+ for item in items:
+   API.QueMoveItemOffset(item, 0, 1, 0, 0)
+ ```
 
 
-<details><summary><h3>QueMoveItemOffset(serial, amt, x, y, z, OSI)</h3></summary>
+**Parameters:**
 
- Move an item to the ground near you.  
- Example:  
- ```py  
- items = API.ItemsInContainer(API.Backpack)  
- for item in items:  
-   API.QueMoveItemOffset(item, 0, 1, 0, 0)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
-| amt | ushort | Yes | 0 to grab entire stack |
-| x | int | Yes | Offset from your location |
-| y | int | Yes | Offset from your location |
-| z | int | Yes | Offset from your location. Leave blank in most cases |
-| OSI | bool | Yes | True if you are playing OSI |
+| `serial` | `uint` | ❌ No |  |
+| `amt` | `ushort` | ✅ Yes | 0 to grab entire stack |
+| `x` | `int` | ✅ Yes | Offset from your location |
+| `y` | `int` | ✅ Yes | Offset from your location |
+| `z` | `int` | ✅ Yes | Offset from your location. Leave blank in most cases |
+| `OSI` | `bool` | ✅ Yes | True if you are playing OSI |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### MoveItemOffset
+`(serial, amt, x, y, z, OSI)`
+ Move an item to the ground near you.
+ Example:
+ ```py
+ items = API.ItemsInContainer(API.Backpack)
+ for item in items:
+   API.MoveItemOffset(item, 0, 1, 0, 0)
+   API.Pause(0.75)
+ ```
 
 
-<details><summary><h3>MoveItemOffset(serial, amt, x, y, z, OSI)</h3></summary>
+**Parameters:**
 
- Move an item to the ground near you.  
- Example:  
- ```py  
- items = API.ItemsInContainer(API.Backpack)  
- for item in items:  
-   API.MoveItemOffset(item, 0, 1, 0, 0)  
-   API.Pause(0.75)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
-| amt | int | Yes | 0 to grab entire stack |
-| x | int | Yes | Offset from your location |
-| y | int | Yes | Offset from your location |
-| z | int | Yes | Offset from your location. Leave blank in most cases |
-| OSI | bool | Yes | True if you are playing OSI |
+| `serial` | `uint` | ❌ No |  |
+| `amt` | `int` | ✅ Yes | 0 to grab entire stack |
+| `x` | `int` | ✅ Yes | Offset from your location |
+| `y` | `int` | ✅ Yes | Offset from your location |
+| `z` | `int` | ✅ Yes | Offset from your location. Leave blank in most cases |
+| `OSI` | `bool` | ✅ Yes | True if you are playing OSI |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### UseSkill
+`(skillName)`
+ Use a skill.
+ Example:
+ ```py
+ API.UseSkill("Hiding")
+ API.Pause(11)
+ ```
 
 
-<details><summary><h3>UseSkill(skillName)</h3></summary>
+**Parameters:**
 
- Use a skill.  
- Example:  
- ```py  
- API.UseSkill("Hiding")  
- API.Pause(11)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| skillName | string | No | Can be a partial match. Will match the first skill containing this text. |
+| `skillName` | `string` | ❌ No | Can be a partial match. Will match the first skill containing this text. |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### CastSpell
+`(spellName)`
+ Attempt to cast a spell by its name.
+ Example:
+ ```py
+ API.CastSpell("Fireball")
+ API.WaitForTarget()
+ API.Target(API.Player)
+ ```
 
 
-<details><summary><h3>CastSpell(spellName)</h3></summary>
+**Parameters:**
 
- Attempt to cast a spell by its name.  
- Example:  
- ```py  
- API.CastSpell("Fireball")  
- API.WaitForTarget()  
- API.Target(API.Player)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| spellName | string | No | This can be a partial match. Fireba will cast Fireball. |
+| `spellName` | `string` | ❌ No | This can be a partial match. Fireba will cast Fireball. |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### BuffExists
+`(buffName)`
+ Check if a buff is active.
+ Example:
+ ```py
+ if API.BuffExists("Bless"):
+   API.SysMsg("You are blessed!")
+ ```
 
 
-<details><summary><h3>BuffExists(buffName)</h3></summary>
+**Parameters:**
 
- Check if a buff is active.  
- Example:  
- ```py  
- if API.BuffExists("Bless"):  
-   API.SysMsg("You are blessed!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| buffName | string | No | The name/title of the buff |
+| `buffName` | `string` | ❌ No | The name/title of the buff |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### ActiveBuffs
 
-
-<details><summary><h3>ActiveBuffs()</h3></summary>
-
- Get a list of all buffs that are active.  
- See [Buff](Buff.md) to see what attributes are available.  
- Buff does not get updated after you access it in python, you will need to call this again to get the latest buff data.  
- Example:  
- ```py  
- buffs = API.ActiveBuffs()  
- for buff in buffs:  
-     API.SysMsg(buff.Title)  
- ```  
-  
-
----> Return Type: *Buff[]*
-
-</details>
-
-***
+ Get a list of all buffs that are active.
+ See [Buff](Buff.md) to see what attributes are available.
+ Buff does not get updated after you access it in python, you will need to call this again to get the latest buff data.
+ Example:
+ ```py
+ buffs = API.ActiveBuffs()
+ for buff in buffs:
+     API.SysMsg(buff.Title)
+ ```
 
 
-<details><summary><h3>SysMsg(message, hue)</h3></summary>
+**Return Type:** `Buff[]`
 
- Show a system message(Left side of screen).  
- Example:  
- ```py  
- API.SysMsg("Script started!")  
- ```  
-  
+---
 
-**Parameters**  
+### SysMsg
+`(message, hue)`
+ Show a system message(Left side of screen).
+ Example:
+ ```py
+ API.SysMsg("Script started!")
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No | Message |
-| hue | ushort | Yes | Color of the message |
+| `message` | `string` | ❌ No | Message |
+| `hue` | `ushort` | ✅ Yes | Color of the message |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Msg
+`(message)`
+ Say a message outloud.
+ Example:
+ ```py
+ API.Say("Hello friend!")
+ ```
 
 
-<details><summary><h3>Msg(message)</h3></summary>
+**Parameters:**
 
- Say a message outloud.  
- Example:  
- ```py  
- API.Say("Hello friend!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No | The message to say |
+| `message` | `string` | ❌ No | The message to say |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### HeadMsg
+`(message, serial, hue)`
+ Show a message above a mobile or item, this is only visible to you.
+ Example:
+ ```py
+ API.HeadMsg("Only I can see this!", API.Player)
+ ```
 
 
-<details><summary><h3>HeadMsg(message, serial, hue)</h3></summary>
+**Parameters:**
 
- Show a message above a mobile or item, this is only visible to you.  
- Example:  
- ```py  
- API.HeadMsg("Only I can see this!", API.Player)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No | The message |
-| serial | uint | No | The item or mobile |
-| hue | ushort | Yes | Message hue |
+| `message` | `string` | ❌ No | The message |
+| `serial` | `uint` | ❌ No | The item or mobile |
+| `hue` | `ushort` | ✅ Yes | Message hue |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### PartyMsg
+`(message)`
+ Send a message to your party.
+ Example:
+ ```py
+ API.PartyMsg("The raid begins in 30 second! Wait... we don't have raids, wrong game..")
+ ```
 
 
-<details><summary><h3>PartyMsg(message)</h3></summary>
+**Parameters:**
 
- Send a message to your party.  
- Example:  
- ```py  
- API.PartyMsg("The raid begins in 30 second! Wait... we don't have raids, wrong game..")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No | The message |
+| `message` | `string` | ❌ No | The message |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### GuildMsg
+`(message)`
+ Send your guild a message.
+ Example:
+ ```py
+ API.GuildMsg("Hey guildies, just restocked my vendor, fresh valorite suits available!")
+ ```
 
 
-<details><summary><h3>GuildMsg(message)</h3></summary>
+**Parameters:**
 
- Send your guild a message.  
- Example:  
- ```py  
- API.GuildMsg("Hey guildies, just restocked my vendor, fresh valorite suits available!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No |  |
+| `message` | `string` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### AllyMsg
+`(message)`
+ Send a message to your alliance.
+ Example:
+ ```py
+ API.AllyMsg("Hey allies, just restocked my vendor, fresh valorite suits available!")
+ ```
 
 
-<details><summary><h3>AllyMsg(message)</h3></summary>
+**Parameters:**
 
- Send a message to your alliance.  
- Example:  
- ```py  
- API.AllyMsg("Hey allies, just restocked my vendor, fresh valorite suits available!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No |  |
+| `message` | `string` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### WhisperMsg
+`(message)`
+ Whisper a message.
+ Example:
+ ```py
+ API.WhisperMsg("Psst, bet you didn't see me here..")
+ ```
 
 
-<details><summary><h3>WhisperMsg(message)</h3></summary>
+**Parameters:**
 
- Whisper a message.  
- Example:  
- ```py  
- API.WhisperMsg("Psst, bet you didn't see me here..")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No |  |
+| `message` | `string` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### YellMsg
+`(message)`
+ Yell a message.
+ Example:
+ ```py
+ API.YellMsg("Vendor restocked, get your fresh feathers!")
+ ```
 
 
-<details><summary><h3>YellMsg(message)</h3></summary>
+**Parameters:**
 
- Yell a message.  
- Example:  
- ```py  
- API.YellMsg("Vendor restocked, get your fresh feathers!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No |  |
+| `message` | `string` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### EmoteMsg
+`(message)`
+ Emote a message.
+ Example:
+ ```py
+ API.EmoteMsg("laughing")
+ ```
 
 
-<details><summary><h3>EmoteMsg(message)</h3></summary>
+**Parameters:**
 
- Emote a message.  
- Example:  
- ```py  
- API.EmoteMsg("laughing")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| message | string | No |  |
+| `message` | `string` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### FindItem
+`(serial)`
+ Try to get an item by its serial.
+ Sets API.Found to the serial of the item found.
+ Example:
+ ```py
+ donkey = API.RequestTarget()
+ item = API.FindItem(donkey)
+ if item:
+   API.SysMsg("Found the donkey!")
+   API.UseObject(item)
+ ```
 
 
-<details><summary><h3>FindItem(serial)</h3></summary>
+**Parameters:**
 
- Try to get an item by its serial.  
- Sets API.Found to the serial of the item found.  
- Example:  
- ```py  
- donkey = API.RequestTarget()  
- item = API.FindItem(donkey)  
- if item:  
-   API.SysMsg("Found the donkey!")  
-   API.UseObject(item)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No | The serial |
+| `serial` | `uint` | ❌ No | The serial |
 
----> Return Type: *PyItem*
+**Return Type:** `PyItem`
 
-</details>
+---
 
-***
+### FindType
+`(graphic, container, range, hue, minamount)`
+ Attempt to find an item by type(graphic).
+ Sets API.Found to the serial of the item found.
+ Example:
+ ```py
+ item = API.FindType(0x0EED, API.Backpack)
+ if item:
+   API.SysMsg("Found the item!")
+   API.UseObject(item)
+ ```
 
 
-<details><summary><h3>FindType(graphic, container, range, hue, minamount)</h3></summary>
+**Parameters:**
 
- Attempt to find an item by type(graphic).  
- Sets API.Found to the serial of the item found.  
- Example:  
- ```py  
- item = API.FindType(0x0EED, API.Backpack)  
- if item:  
-   API.SysMsg("Found the item!")  
-   API.UseObject(item)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| graphic | uint | No | Graphic/Type of item to find |
-| container | uint | Yes | Container to search |
-| range | ushort | Yes | Max range of item |
-| hue | ushort | Yes | Hue of item |
-| minamount | ushort | Yes | Only match if item stack is at least this much |
+| `graphic` | `uint` | ❌ No | Graphic/Type of item to find |
+| `container` | `uint` | ✅ Yes | Container to search |
+| `range` | `ushort` | ✅ Yes | Max range of item |
+| `hue` | `ushort` | ✅ Yes | Hue of item |
+| `minamount` | `ushort` | ✅ Yes | Only match if item stack is at least this much |
 
----> Return Type: *PyItem*
+**Return Type:** `PyItem`
 
-</details>
+---
 
-***
+### FindTypeAll
+`(graphic, container, range, hue, minamount)`
+ Return a list of items matching the parameters set.
+ Example:
+ ```py
+ items = API.FindTypeAll(0x0EED, API.Backpack)
+ if items:
+   API.SysMsg("Found " + str(len(items)) + " items!")
+ ```
 
 
-<details><summary><h3>FindTypeAll(graphic, container, range, hue, minamount)</h3></summary>
+**Parameters:**
 
- Return a list of items matching the parameters set.  
- Example:  
- ```py  
- items = API.FindTypeAll(0x0EED, API.Backpack)  
- if items:  
-   API.SysMsg("Found " + str(len(items)) + " items!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| graphic | uint | No | Graphic/Type of item to find |
-| container | uint | Yes | Container to search |
-| range | ushort | Yes | Max range of item(if on ground) |
-| hue | ushort | Yes | Hue of item |
-| minamount | ushort | Yes | Only match if item stack is at least this much |
+| `graphic` | `uint` | ❌ No | Graphic/Type of item to find |
+| `container` | `uint` | ✅ Yes | Container to search |
+| `range` | `ushort` | ✅ Yes | Max range of item(if on ground) |
+| `hue` | `ushort` | ✅ Yes | Hue of item |
+| `minamount` | `ushort` | ✅ Yes | Only match if item stack is at least this much |
 
----> Return Type: *PyItem[]*
+**Return Type:** `PyItem[]`
 
-</details>
+---
 
-***
+### FindLayer
+`(layer, serial)`
+ Attempt to find an item on a layer.
+ Sets API.Found to the serial of the item found.
+ Example:
+ ```py
+ item = API.FindLayer("Helmet")
+ if item:
+   API.SysMsg("Wearing a helmet!")
+ ```
 
 
-<details><summary><h3>FindLayer(layer, serial)</h3></summary>
+**Parameters:**
 
- Attempt to find an item on a layer.  
- Sets API.Found to the serial of the item found.  
- Example:  
- ```py  
- item = API.FindLayer("Helmet")  
- if item:  
-   API.SysMsg("Wearing a helmet!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| layer | string | No | The layer to check, see https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Layers.cs |
-| serial | uint | Yes | Optional, if not set it will check yourself, otherwise it will check the mobile requested |
+| `layer` | `string` | ❌ No | The layer to check, see https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Layers.cs |
+| `serial` | `uint` | ✅ Yes | Optional, if not set it will check yourself, otherwise it will check the mobile requested |
 
----> Return Type: *PyItem*
+**Return Type:** `PyItem`
 
-</details>
+---
 
-***
+### ItemsInContainer
+`(container, recursive)`
+ Get all items in a container.
+ Example:
+ ```py
+ items = API.ItemsInContainer(API.Backpack)
+ if items:
+   API.SysMsg("Found " + str(len(items)) + " items!")
+   for item in items:
+     API.SysMsg(item.Name)
+     API.Pause(0.5)
+ ```
 
 
-<details><summary><h3>ItemsInContainer(container, recursive)</h3></summary>
+**Parameters:**
 
- Get all items in a container.  
- Example:  
- ```py  
- items = API.ItemsInContainer(API.Backpack)  
- if items:  
-   API.SysMsg("Found " + str(len(items)) + " items!")  
-   for item in items:  
-     API.SysMsg(item.Name)  
-     API.Pause(0.5)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| container | uint | No |  |
-| recursive | bool | Yes | Search sub containers also? |
+| `container` | `uint` | ❌ No |  |
+| `recursive` | `bool` | ✅ Yes | Search sub containers also? |
 
----> Return Type: *PyItem[]*
+**Return Type:** `PyItem[]`
 
-</details>
+---
 
-***
+### UseType
+`(graphic, hue, container, skipQueue)`
+ Attempt to use the first item found by graphic(type).
+ Example:
+ ```py
+ API.UseType(0x3434, API.Backpack)
+ API.WaitForTarget()
+ API.Target(API.Player)
+ ```
 
 
-<details><summary><h3>UseType(graphic, hue, container, skipQueue)</h3></summary>
+**Parameters:**
 
- Attempt to use the first item found by graphic(type).  
- Example:  
- ```py  
- API.UseType(0x3434, API.Backpack)  
- API.WaitForTarget()  
- API.Target(API.Player)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| graphic | uint | No | Graphic/Type |
-| hue | ushort | Yes | Hue of item |
-| container | uint | Yes | Parent container |
-| skipQueue | bool | Yes | Defaults to true, set to false to queue the double click |
+| `graphic` | `uint` | ❌ No | Graphic/Type |
+| `hue` | `ushort` | ✅ Yes | Hue of item |
+| `container` | `uint` | ✅ Yes | Parent container |
+| `skipQueue` | `bool` | ✅ Yes | Defaults to true, set to false to queue the double click |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### CreateCooldownBar
+`(seconds, text, hue)`
+ Create a cooldown bar.
+ Example:
+ ```py
+ API.CreateCooldownBar(5, "Healing", 21)
+ ```
 
 
-<details><summary><h3>CreateCooldownBar(seconds, text, hue)</h3></summary>
+**Parameters:**
 
- Create a cooldown bar.  
- Example:  
- ```py  
- API.CreateCooldownBar(5, "Healing", 21)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| seconds | double | No | Duration in seconds for the cooldown bar |
-| text | string | No | Text on the cooldown bar |
-| hue | ushort | No | Hue to color the cooldown bar |
+| `seconds` | `double` | ❌ No | Duration in seconds for the cooldown bar |
+| `text` | `string` | ❌ No | Text on the cooldown bar |
+| `hue` | `ushort` | ❌ No | Hue to color the cooldown bar |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### IgnoreObject
+`(serial)`
+ Adds an item or mobile to your ignore list.
+ These are unique lists per script. Ignoring an item in one script, will not affect other running scripts.
+ Example:
+ ```py
+ for item in ItemsInContainer(API.Backpack):
+   if item.Name == "Dagger":
+   API.IgnoreObject(item)
+ ```
 
 
-<details><summary><h3>IgnoreObject(serial)</h3></summary>
+**Parameters:**
 
- Adds an item or mobile to your ignore list.  
- These are unique lists per script. Ignoring an item in one script, will not affect other running scripts.  
- Example:  
- ```py  
- for item in ItemsInContainer(API.Backpack):  
-   if item.Name == "Dagger":  
-   API.IgnoreObject(item)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No | The item/mobile serial |
+| `serial` | `uint` | ❌ No | The item/mobile serial |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### ClearIgnoreList
 
-
-<details><summary><h3>ClearIgnoreList()</h3></summary>
-
- Clears the ignore list. Allowing functions to see those items again.  
- Example:  
- ```py  
- API.ClearIgnoreList()  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Clears the ignore list. Allowing functions to see those items again.
+ Example:
+ ```py
+ API.ClearIgnoreList()
+ ```
 
 
-<details><summary><h3>OnIgnoreList(serial)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Check if a serial is on the ignore list.  
- Example:  
- ```py  
- if API.OnIgnoreList(API.Backpack):  
-   API.SysMsg("Currently ignoring backpack")  
- ```  
-  
+---
 
-**Parameters**  
+### OnIgnoreList
+`(serial)`
+ Check if a serial is on the ignore list.
+ Example:
+ ```py
+ if API.OnIgnoreList(API.Backpack):
+   API.SysMsg("Currently ignoring backpack")
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
+| `serial` | `uint` | ❌ No |  |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### Pathfind
+`(x, y, z, distance, wait, timeout)`
+ Attempt to pathfind to a location.  This will fail with large distances.
+ Example:
+ ```py
+ API.Pathfind(1414, 1515)
+ ```
 
 
-<details><summary><h3>Pathfind(x, y, z, distance, wait, timeout)</h3></summary>
+**Parameters:**
 
- Attempt to pathfind to a location.  This will fail with large distances.  
- Example:  
- ```py  
- API.Pathfind(1414, 1515)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| x | int | No |  |
-| y | int | No |  |
-| z | int | Yes |  |
-| distance | int | Yes | Distance away from goal to stop. |
-| wait | bool | Yes | True/False if you want to wait for pathfinding to complete or time out |
-| timeout | int | Yes | Seconds to wait before cancelling waiting |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
+| `z` | `int` | ✅ Yes |  |
+| `distance` | `int` | ✅ Yes | Distance away from goal to stop. |
+| `wait` | `bool` | ✅ Yes | True/False if you want to wait for pathfinding to complete or time out |
+| `timeout` | `int` | ✅ Yes | Seconds to wait before cancelling waiting |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### PathfindEntity
+`(entity, distance, wait, timeout)`
+ Attempt to pathfind to a mobile or item.
+ Example:
+ ```py
+ mob = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)
+ if mob:
+   API.PathfindEntity(mob)
+ ```
 
 
-<details><summary><h3>PathfindEntity(entity, distance, wait, timeout)</h3></summary>
+**Parameters:**
 
- Attempt to pathfind to a mobile or item.  
- Example:  
- ```py  
- mob = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)  
- if mob:  
-   API.PathfindEntity(mob)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| entity | uint | No | The mobile or item |
-| distance | int | Yes | Distance to stop from goal |
-| wait | bool | Yes | True/False if you want to wait for pathfinding to complete or time out |
-| timeout | int | Yes | Seconds to wait before cancelling waiting |
+| `entity` | `uint` | ❌ No | The mobile or item |
+| `distance` | `int` | ✅ Yes | Distance to stop from goal |
+| `wait` | `bool` | ✅ Yes | True/False if you want to wait for pathfinding to complete or time out |
+| `timeout` | `int` | ✅ Yes | Seconds to wait before cancelling waiting |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### Pathfinding
 
-
-<details><summary><h3>Pathfinding()</h3></summary>
-
- Check if you are already pathfinding.  
- Example:  
- ```py  
- if API.Pathfinding():  
-   API.SysMsg("Pathfinding...!")  
-   API.Pause(0.25)  
- ```  
-  
-
----> Return Type: *bool*
-
-</details>
-
-***
+ Check if you are already pathfinding.
+ Example:
+ ```py
+ if API.Pathfinding():
+   API.SysMsg("Pathfinding...!")
+   API.Pause(0.25)
+ ```
 
 
-<details><summary><h3>CancelPathfinding()</h3></summary>
+**Return Type:** `bool`
 
- Cancel pathfinding.  
- Example:  
- ```py  
- if API.Pathfinding():  
-   API.CancelPathfinding()  
- ```  
-  
+---
 
----> Does not return anything
+### CancelPathfinding
 
-</details>
-
-***
+ Cancel pathfinding.
+ Example:
+ ```py
+ if API.Pathfinding():
+   API.CancelPathfinding()
+ ```
 
 
-<details><summary><h3>GetPath(x, y, z, distance)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Attempt to build a path to a location.  This will fail with large distances.  
- Example:  
- ```py  
- API.RequestTarget()  
- path = API.GetPath(int(API.LastTargetPos.X), int(API.LastTargetPos.Y))  
- if path is not None:  
-     for x, y, z in path:  
-         tile = API.GetTile(x, y)  
-         tile.Hue = 53  
- ```  
-  
+---
 
-**Parameters**  
+### GetPath
+`(x, y, z, distance)`
+ Attempt to build a path to a location.  This will fail with large distances.
+ Example:
+ ```py
+ API.RequestTarget()
+ path = API.GetPath(int(API.LastTargetPos.X), int(API.LastTargetPos.Y))
+ if path is not None:
+     for x, y, z in path:
+         tile = API.GetTile(x, y)
+         tile.Hue = 53
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| x | int | No |  |
-| y | int | No |  |
-| z | int | Yes |  |
-| distance | int | Yes | Distance away from goal to stop. |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
+| `z` | `int` | ✅ Yes |  |
+| `distance` | `int` | ✅ Yes | Distance away from goal to stop. |
 
----> Return Type: *PythonList*
+**Return Type:** `PythonList`
 
-</details>
+---
 
-***
+### AutoFollow
+`(mobile)`
+ Automatically follow a mobile. This is different than pathfinding. This will continune to follow the mobile.
+ Example:
+ ```py
+ mob = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)
+ if mob:
+   API.AutoFollow(mob)
+ ```
 
 
-<details><summary><h3>AutoFollow(mobile)</h3></summary>
+**Parameters:**
 
- Automatically follow a mobile. This is different than pathfinding. This will continune to follow the mobile.  
- Example:  
- ```py  
- mob = API.NearestMobile([API.Notoriety.Gray, API.Notoriety.Criminal], 7)  
- if mob:  
-   API.AutoFollow(mob)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| mobile | uint | No | The mobile |
+| `mobile` | `uint` | ❌ No | The mobile |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### CancelAutoFollow
 
-
-<details><summary><h3>CancelAutoFollow()</h3></summary>
-
- Cancel auto follow mode.  
- Example:  
- ```py  
- if API.Pathfinding():  
-   API.CancelAutoFollow()  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Cancel auto follow mode.
+ Example:
+ ```py
+ if API.Pathfinding():
+   API.CancelAutoFollow()
+ ```
 
 
-<details><summary><h3>Run(direction)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Run in a direction.  
- Example:  
- ```py  
- API.Run("north")  
- ```  
-  
+---
 
-**Parameters**  
+### Run
+`(direction)`
+ Run in a direction.
+ Example:
+ ```py
+ API.Run("north")
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| direction | string | No | north/northeast/south/west/etc |
+| `direction` | `string` | ❌ No | north/northeast/south/west/etc |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Walk
+`(direction)`
+ Walk in a direction.
+ Example:
+ ```py
+ API.Walk("north")
+ ```
 
 
-<details><summary><h3>Walk(direction)</h3></summary>
+**Parameters:**
 
- Walk in a direction.  
- Example:  
- ```py  
- API.Walk("north")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| direction | string | No | north/northeast/south/west/etc |
+| `direction` | `string` | ❌ No | north/northeast/south/west/etc |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Turn
+`(direction)`
+ Turn your character a specific direction.
+ Example:
+ ```py
+ API.Turn("north")
+ ```
 
 
-<details><summary><h3>Turn(direction)</h3></summary>
+**Parameters:**
 
- Turn your character a specific direction.  
- Example:  
- ```py  
- API.Turn("north")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| direction | string | No | north, northeast, etc |
+| `direction` | `string` | ❌ No | north, northeast, etc |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Rename
+`(serial, name)`
+ Attempt to rename something like a pet.
+ Example:
+ ```py
+ API.Rename(0x12345678, "My Handsome Pet")
+ ```
 
 
-<details><summary><h3>Rename(serial, name)</h3></summary>
+**Parameters:**
 
- Attempt to rename something like a pet.  
- Example:  
- ```py  
- API.Rename(0x12345678, "My Handsome Pet")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No | Serial of the mobile to rename |
-| name | string | No | The new name |
+| `serial` | `uint` | ❌ No | Serial of the mobile to rename |
+| `name` | `string` | ❌ No | The new name |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Dismount
+`(skipQueue)`
+ Attempt to dismount if mounted.
+ Example:
+ ```py
+ API.Dismount()
+ ```
 
 
-<details><summary><h3>Dismount(skipQueue)</h3></summary>
+**Parameters:**
 
- Attempt to dismount if mounted.  
- Example:  
- ```py  
- API.Dismount()  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| skipQueue | bool | Yes | Defaults true, set to false to use a double click queue |
+| `skipQueue` | `bool` | ✅ Yes | Defaults true, set to false to use a double click queue |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Mount
+`(serial, skipQueue)`
+ Attempt to mount(double click)
+ Example:
+ ```py
+ API.Mount(0x12345678)
+ ```
 
 
-<details><summary><h3>Mount(serial, skipQueue)</h3></summary>
+**Parameters:**
 
- Attempt to mount(double click)  
- Example:  
- ```py  
- API.Mount(0x12345678)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
-| skipQueue | bool | Yes | Defaults true, set to false to use a double click queue |
+| `serial` | `uint` | ❌ No |  |
+| `skipQueue` | `bool` | ✅ Yes | Defaults true, set to false to use a double click queue |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### WaitForTarget
+`(targetType, timeout)`
+ Wait for a target cursor.
+ Example:
+ ```py
+ API.WaitForTarget()
+ ```
 
 
-<details><summary><h3>WaitForTarget(targetType, timeout)</h3></summary>
+**Parameters:**
 
- Wait for a target cursor.  
- Example:  
- ```py  
- API.WaitForTarget()  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| targetType | string | Yes | neutral/harmful/beneficial/any/harm/ben |
-| timeout | double | Yes | Max duration in seconds to wait |
+| `targetType` | `string` | ✅ Yes | neutral/harmful/beneficial/any/harm/ben |
+| `timeout` | `double` | ✅ Yes | Max duration in seconds to wait |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### Target
+`(serial)`
+ Target an item or mobile.
+ Example:
+ ```py
+ if API.WaitForTarget():
+   API.Target(0x12345678)
+ ```
 
 
-<details><summary><h3>Target(serial)</h3></summary>
+**Parameters:**
 
- Target an item or mobile.  
- Example:  
- ```py  
- if API.WaitForTarget():  
-   API.Target(0x12345678)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No | Serial of the item/mobile to target |
+| `serial` | `uint` | ❌ No | Serial of the item/mobile to target |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Target
+`(x, y, z, graphic)`
+ Target a location. Include graphic if targeting a static.
+ Example:
+ ```py
+ if API.WaitForTarget():
+   API.Target(1243, 1337, 0)
+  ```
 
 
-<details><summary><h3>Target(x, y, z, graphic)</h3></summary>
+**Parameters:**
 
- Target a location. Include graphic if targeting a static.  
- Example:  
- ```py  
- if API.WaitForTarget():  
-   API.Target(1243, 1337, 0)  
-  ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| x | ushort | No |  |
-| y | ushort | No |  |
-| z | short | No |  |
-| graphic | ushort | Yes | Graphic of the static to target |
+| `x` | `ushort` | ❌ No |  |
+| `y` | `ushort` | ❌ No |  |
+| `z` | `short` | ❌ No |  |
+| `graphic` | `ushort` | ✅ Yes | Graphic of the static to target |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### RequestTarget
+`(timeout)`
+ Request the player to target something.
+ Example:
+ ```py
+ target = API.RequestTarget()
+ if target:
+   API.SysMsg("Targeted serial: " + str(target))
+ ```
 
 
-<details><summary><h3>RequestTarget(timeout)</h3></summary>
+**Parameters:**
 
- Request the player to target something.  
- Example:  
- ```py  
- target = API.RequestTarget()  
- if target:  
-   API.SysMsg("Targeted serial: " + str(target))  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| timeout | double | Yes | Mac duration to wait for them to target something. |
+| `timeout` | `double` | ✅ Yes | Mac duration to wait for them to target something. |
 
----> Return Type: *uint*
+**Return Type:** `uint`
 
-</details>
+---
 
-***
+### RequestAnyTarget
+`(timeout)`
+ Prompts the player to target any object in the game world, including an <c>Item</c> , <c>Mobile</c> , <c>Land</c> tile, <c>Static</c> , or <c>Multi</c> .
+ Waits for the player to select a target within a given timeout period.
 
 
-<details><summary><h3>RequestAnyTarget(timeout)</h3></summary>
+**Parameters:**
 
- Prompts the player to target any object in the game world, including an <c>Item</c> , <c>Mobile</c> , <c>Land</c> tile, <c>Static</c> , or <c>Multi</c> .  
- Waits for the player to select a target within a given timeout period.  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| timeout | double | Yes | The maximum time, in seconds, to wait for a valid target selection.  
+| `timeout` | `double` | ✅ Yes | The maximum time, in seconds, to wait for a valid target selection.  
          If the timeout expires without a selection, the method returns <c>null</c> . |
 
----> Return Type: *PyGameObject*
+**Return Type:** `PyGameObject`
 
-</details>
+---
 
-***
+### TargetSelf
 
-
-<details><summary><h3>TargetSelf()</h3></summary>
-
- Target yourself.  
- Example:  
- ```py  
- API.TargetSelf()  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Target yourself.
+ Example:
+ ```py
+ API.TargetSelf()
+ ```
 
 
-<details><summary><h3>TargetLandRel(xOffset, yOffset)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Target a land tile relative to your position.  
- If this doesn't work, try TargetTileRel instead.  
- Example:  
- ```py  
- API.TargetLand(1, 1)  
- ```  
-  
+---
 
-**Parameters**  
+### TargetLandRel
+`(xOffset, yOffset)`
+ Target a land tile relative to your position.
+ If this doesn't work, try TargetTileRel instead.
+ Example:
+ ```py
+ API.TargetLand(1, 1)
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| xOffset | int | No | X from your position |
-| yOffset | int | No | Y from your position |
+| `xOffset` | `int` | ❌ No | X from your position |
+| `yOffset` | `int` | ❌ No | Y from your position |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### TargetTileRel
+`(xOffset, yOffset, graphic)`
+ Target a tile relative to your location.
+ If this doesn't work, try TargetLandRel instead.'
+ Example:
+ ```py
+ API.TargetTileRel(1, 1)
+ ```
 
 
-<details><summary><h3>TargetTileRel(xOffset, yOffset, graphic)</h3></summary>
+**Parameters:**
 
- Target a tile relative to your location.  
- If this doesn't work, try TargetLandRel instead.'  
- Example:  
- ```py  
- API.TargetTileRel(1, 1)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| xOffset | int | No | X Offset from your position |
-| yOffset | int | No | Y Offset from your position |
-| graphic | ushort | Yes | Optional graphic, will try to use the graphic of the tile at that location if left empty. |
+| `xOffset` | `int` | ❌ No | X Offset from your position |
+| `yOffset` | `int` | ❌ No | Y Offset from your position |
+| `graphic` | `ushort` | ✅ Yes | Optional graphic, will try to use the graphic of the tile at that location if left empty. |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### CancelTarget
 
-
-<details><summary><h3>CancelTarget()</h3></summary>
-
- Cancel targeting.  
- Example:  
- ```py  
- if API.WaitForTarget():  
-   API.CancelTarget()  
-   API.SysMsg("Targeting cancelled, april fools made you target something!")  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Cancel targeting.
+ Example:
+ ```py
+ if API.WaitForTarget():
+   API.CancelTarget()
+   API.SysMsg("Targeting cancelled, april fools made you target something!")
+ ```
 
 
-<details><summary><h3>HasTarget(targetType)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Check if the player has a target cursor.  
- Example:  
- ```py  
- if API.HasTarget():  
-     API.CancelTarget()  
- ```  
-  
+---
 
-**Parameters**  
+### HasTarget
+`(targetType)`
+ Check if the player has a target cursor.
+ Example:
+ ```py
+ if API.HasTarget():
+     API.CancelTarget()
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| targetType | string | Yes | neutral/harmful/beneficial/any/harm/ben |
+| `targetType` | `string` | ✅ Yes | neutral/harmful/beneficial/any/harm/ben |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### GetMap
 
-
-<details><summary><h3>GetMap()</h3></summary>
-
- Get the current map index.  
- Standard maps are:  
- 0 = Fel  
- 1 = Tram  
- 2 = Ilshenar  
- 3 = Malas  
- 4 = Tokuno  
- 5 = TerMur  
-  
-
----> Return Type: *int*
-
-</details>
-
-***
+ Get the current map index.
+ Standard maps are:
+ 0 = Fel
+ 1 = Tram
+ 2 = Ilshenar
+ 3 = Malas
+ 4 = Tokuno
+ 5 = TerMur
 
 
-<details><summary><h3>SetSkillLock(skill, up_down_locked)</h3></summary>
+**Return Type:** `int`
 
- Set a skills lock status.  
- Example:  
- ```py  
- API.SetSkillLock("Hiding", "locked")  
- ```  
-  
+---
 
-**Parameters**  
+### SetSkillLock
+`(skill, up_down_locked)`
+ Set a skills lock status.
+ Example:
+ ```py
+ API.SetSkillLock("Hiding", "locked")
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| skill | string | No | The skill name, can be partia; |
-| up_down_locked | string | No | up/down/locked |
+| `skill` | `string` | ❌ No | The skill name, can be partia; |
+| `up_down_locked` | `string` | ❌ No | up/down/locked |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### SetStatLock
+`(stat, up_down_locked)`
+ Set a skills lock status.
+ Example:
+ ```py
+ API.SetStatLock("str", "locked")
+ ```
 
 
-<details><summary><h3>SetStatLock(stat, up_down_locked)</h3></summary>
+**Parameters:**
 
- Set a skills lock status.  
- Example:  
- ```py  
- API.SetStatLock("str", "locked")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| stat | string | No | The stat name, str, dex, int; Defaults to str. |
-| up_down_locked | string | No | up/down/locked |
+| `stat` | `string` | ❌ No | The stat name, str, dex, int; Defaults to str. |
+| `up_down_locked` | `string` | ❌ No | up/down/locked |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Logout
 
-
-<details><summary><h3>Logout()</h3></summary>
-
- Logout of the game.  
- Example:  
- ```py  
- API.Logout()  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Logout of the game.
+ Example:
+ ```py
+ API.Logout()
+ ```
 
 
-<details><summary><h3>ItemNameAndProps(serial, wait, timeout)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Gets item name and properties.  
- This returns the name and properties in a single string. You can split it by new line if you want to separate them.  
- Example:  
- ```py  
- data = API.ItemNameAndProps(0x12345678, True)  
- if data:  
-   API.SysMsg("Item data: " + data)  
-   if "An Exotic Fish" in data:  
-     API.SysMsg("Found an exotic fish!")  
- ```  
-  
+---
 
-**Parameters**  
+### ItemNameAndProps
+`(serial, wait, timeout)`
+ Gets item name and properties.
+ This returns the name and properties in a single string. You can split it by new line if you want to separate them.
+ Example:
+ ```py
+ data = API.ItemNameAndProps(0x12345678, True)
+ if data:
+   API.SysMsg("Item data: " + data)
+   if "An Exotic Fish" in data:
+     API.SysMsg("Found an exotic fish!")
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
-| wait | bool | Yes | True or false to wait for name and props |
-| timeout | int | Yes | Timeout in seconds |
+| `serial` | `uint` | ❌ No |  |
+| `wait` | `bool` | ✅ Yes | True or false to wait for name and props |
+| `timeout` | `int` | ✅ Yes | Timeout in seconds |
 
----> Return Type: *string*
+**Return Type:** `string`
 
-</details>
+---
 
-***
+### HasGump
+`(ID)`
+ Check if a player has a server gump. Leave blank to check if they have any server gump.
+ Example:
+ ```py
+ if API.HasGump(0x12345678):
+   API.SysMsg("Found a gump!")
+```
 
 
-<details><summary><h3>HasGump(ID)</h3></summary>
+**Parameters:**
 
- Check if a player has a server gump. Leave blank to check if they have any server gump.  
- Example:  
- ```py  
- if API.HasGump(0x12345678):  
-   API.SysMsg("Found a gump!")  
-```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| ID | uint | Yes | Skip to check if player has any gump from server. |
+| `ID` | `uint` | ✅ Yes | Skip to check if player has any gump from server. |
 
----> Return Type: *uint*
+**Return Type:** `uint`
 
-</details>
+---
 
-***
+### ReplyGump
+`(button, gump)`
+ Reply to a gump.
+ Example:
+ ```py
+ API.ReplyGump(21)
+ ```
 
 
-<details><summary><h3>ReplyGump(button, gump)</h3></summary>
+**Parameters:**
 
- Reply to a gump.  
- Example:  
- ```py  
- API.ReplyGump(21)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| button | int | No | Button ID |
-| gump | uint | Yes | Gump ID, leave blank to reply to last gump |
+| `button` | `int` | ❌ No | Button ID |
+| `gump` | `uint` | ✅ Yes | Gump ID, leave blank to reply to last gump |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### CloseGump
+`(ID)`
+ Close the last gump open, or a specific gump.
+ Example:
+ ```py
+ API.CloseGump()
+ ```
 
 
-<details><summary><h3>CloseGump(ID)</h3></summary>
+**Parameters:**
 
- Close the last gump open, or a specific gump.  
- Example:  
- ```py  
- API.CloseGump()  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| ID | uint | Yes | Gump ID |
+| `ID` | `uint` | ✅ Yes | Gump ID |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### GumpContains
+`(text, ID)`
+ Check if a gump contains a specific text.
+ Example:
+ ```py
+ if API.GumpContains("Hello"):
+   API.SysMsg("Found the text!")
+ ```
 
 
-<details><summary><h3>GumpContains(text, ID)</h3></summary>
+**Parameters:**
 
- Check if a gump contains a specific text.  
- Example:  
- ```py  
- if API.GumpContains("Hello"):  
-   API.SysMsg("Found the text!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| text | string | No | Can be regex if you start with $, otherwise it's just regular search. Case Sensitive. |
-| ID | uint | Yes | Gump ID, blank to use the last gump. |
+| `text` | `string` | ❌ No | Can be regex if you start with $, otherwise it's just regular search. Case Sensitive. |
+| `ID` | `uint` | ✅ Yes | Gump ID, blank to use the last gump. |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### GetGump
+`(ID)`
+ Get a gump by ID.
+ Example:
+ ```py
+ gump = API.GetGump()
+ if gump:
+   API.SysMsg("Found the gump!")
+   API.CloseGump(gump)
+ ```
 
 
-<details><summary><h3>GetGump(ID)</h3></summary>
+**Parameters:**
 
- Get a gump by ID.  
- Example:  
- ```py  
- gump = API.GetGump()  
- if gump:  
-   API.SysMsg("Found the gump!")  
-   API.CloseGump(gump)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| ID | uint | Yes | Leabe blank to use last gump opened from server |
+| `ID` | `uint` | ✅ Yes | Leabe blank to use last gump opened from server |
 
----> Return Type: *Gump*
+**Return Type:** `Gump`
 
-</details>
+---
 
-***
+### ToggleFly
 
-
-<details><summary><h3>ToggleFly()</h3></summary>
-
- Toggle flying if you are a gargoyle.  
- Example:  
- ```py  
- API.ToggleFly()  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Toggle flying if you are a gargoyle.
+ Example:
+ ```py
+ API.ToggleFly()
+ ```
 
 
-<details><summary><h3>ToggleAbility(ability)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Toggle an ability.  
- Example:  
- ```py  
- if not API.PrimaryAbilityActive():  
-   API.ToggleAbility("primary")  
- ```  
-  
+---
 
-**Parameters**  
+### ToggleAbility
+`(ability)`
+ Toggle an ability.
+ Example:
+ ```py
+ if not API.PrimaryAbilityActive():
+   API.ToggleAbility("primary")
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| ability | string | No | primary/secondary/stun/disarm |
+| `ability` | `string` | ❌ No | primary/secondary/stun/disarm |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### PrimaryAbilityActive
 
-
-<details><summary><h3>PrimaryAbilityActive()</h3></summary>
-
- Check if your primary ability is active.  
- Example:  
- ```py  
- if API.PrimaryAbilityActive():  
-   API.SysMsg("Primary ability is active!")  
- ```  
-  
-
----> Return Type: *bool*
-
-</details>
-
-***
+ Check if your primary ability is active.
+ Example:
+ ```py
+ if API.PrimaryAbilityActive():
+   API.SysMsg("Primary ability is active!")
+ ```
 
 
-<details><summary><h3>SecondaryAbilityActive()</h3></summary>
+**Return Type:** `bool`
 
- Check if your secondary ability is active.  
- Example:  
- ```py  
- if API.SecondaryAbilityActive():  
-   API.SysMsg("Secondary ability is active!")  
- ```  
-  
+---
 
----> Return Type: *bool*
+### SecondaryAbilityActive
 
-</details>
-
-***
+ Check if your secondary ability is active.
+ Example:
+ ```py
+ if API.SecondaryAbilityActive():
+   API.SysMsg("Secondary ability is active!")
+ ```
 
 
-<details><summary><h3>InJournal(msg)</h3></summary>
+**Return Type:** `bool`
 
- Check if your journal contains a message.  
- Example:  
- ```py  
- if API.InJournal("You have been slain"):  
-   API.SysMsg("You have been slain!")  
- ```  
-  
+---
 
-**Parameters**  
+### InJournal
+`(msg)`
+ Check if your journal contains a message.
+ Example:
+ ```py
+ if API.InJournal("You have been slain"):
+   API.SysMsg("You have been slain!")
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| msg | string | No | The message to check for. Can be regex, prepend your msg with $ |
+| `msg` | `string` | ❌ No | The message to check for. Can be regex, prepend your msg with $ |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### InJournalAny
+`(msgs)`
+ Check if the journal contains *any* of the strings in this list.
+ Can be regex, prepend your msgs with $
+ Example:
+ ```py
+ if API.InJournalAny(["You have been slain", "You are dead"]):
+   API.SysMsg("You have been slain or dead!")
+ ```
 
 
-<details><summary><h3>InJournalAny(msgs)</h3></summary>
+**Parameters:**
 
- Check if the journal contains *any* of the strings in this list.  
- Can be regex, prepend your msgs with $  
- Example:  
- ```py  
- if API.InJournalAny(["You have been slain", "You are dead"]):  
-   API.SysMsg("You have been slain or dead!")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| msgs | IList<string> | No |  |
+| `msgs` | `IList<string>` | ❌ No |  |
 
----> Return Type: *bool*
+**Return Type:** `bool`
 
-</details>
+---
 
-***
+### ClearJournal
 
-
-<details><summary><h3>ClearJournal()</h3></summary>
-
- Clear your journal(This is specific for each script).  
- Example:  
- ```py  
- API.ClearJournal()  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Clear your journal(This is specific for each script).
+ Example:
+ ```py
+ API.ClearJournal()
+ ```
 
 
-<details><summary><h3>Pause(seconds)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Pause the script.  
- Example:  
- ```py  
- API.Pause(5)  
- ```  
-  
+---
 
-**Parameters**  
+### Pause
+`(seconds)`
+ Pause the script.
+ Example:
+ ```py
+ API.Pause(5)
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| seconds | double | No |  |
+| `seconds` | `double` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Stop
 
-
-<details><summary><h3>Stop()</h3></summary>
-
- Stops the current script.  
- Example:  
- ```py  
- API.Stop()  
- ```  
-  
-
----> Does not return anything
-
-</details>
-
-***
+ Stops the current script.
+ Example:
+ ```py
+ API.Stop()
+ ```
 
 
-<details><summary><h3>ToggleAutoLoot()</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Toggle autolooting on or off.  
- Example:  
- ```py  
- API.ToggleAutoLoot()  
- ```  
-  
+---
 
----> Does not return anything
+### ToggleAutoLoot
 
-</details>
-
-***
+ Toggle autolooting on or off.
+ Example:
+ ```py
+ API.ToggleAutoLoot()
+ ```
 
 
-<details><summary><h3>AutoLootContainer(container)</h3></summary>
+**Return Type:** `void` *(Does not return anything)*
 
- Use autoloot on a specific container.  
- Example:  
- ```py  
- targ = API.RequestTarget()  
- if targ:  
-   API.AutoLootContainer(targ)  
- ```  
-  
+---
 
-**Parameters**  
+### AutoLootContainer
+`(container)`
+ Use autoloot on a specific container.
+ Example:
+ ```py
+ targ = API.RequestTarget()
+ if targ:
+   API.AutoLootContainer(targ)
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| container | uint | No |  |
+| `container` | `uint` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### Virtue
+`(virtue)`
+ Use a virtue.
+ Example:
+ ```py
+ API.Virtue("honor")
+ ```
 
 
-<details><summary><h3>Virtue(virtue)</h3></summary>
+**Parameters:**
 
- Use a virtue.  
- Example:  
- ```py  
- API.Virtue("honor")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| virtue | string | No | honor/sacrifice/valor |
+| `virtue` | `string` | ❌ No | honor/sacrifice/valor |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### NearestEntity
+`(scanType, maxDistance)`
+ Find the nearest item/mobile based on scan type.
+ Sets API.Found to the serial of the item/mobile.
+ Example:
+ ```py
+ item = API.NearestEntity(API.ScanType.Item, 5)
+ if item:
+   API.SysMsg("Found an item!")
+   API.UseObject(item)
+   # You can use API.FindItem or API.FindMobile(item.Serial) to determine if it's an item or mobile
+ ```
 
 
-<details><summary><h3>NearestEntity(scanType, maxDistance)</h3></summary>
+**Parameters:**
 
- Find the nearest item/mobile based on scan type.  
- Sets API.Found to the serial of the item/mobile.  
- Example:  
- ```py  
- item = API.NearestEntity(API.ScanType.Item, 5)  
- if item:  
-   API.SysMsg("Found an item!")  
-   API.UseObject(item)  
-   # You can use API.FindItem or API.FindMobile(item.Serial) to determine if it's an item or mobile  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| scanType | ScanType | No |  |
-| maxDistance | int | Yes |  |
+| `scanType` | `ScanType` | ❌ No |  |
+| `maxDistance` | `int` | ✅ Yes |  |
 
----> Return Type: *PyEntity*
+**Return Type:** `PyEntity`
 
-</details>
+---
 
-***
+### NearestMobile
+`(notoriety, maxDistance)`
+ Get the nearest mobile by Notoriety.
+ Sets API.Found to the serial of the mobile.
+ Example:
+ ```py
+ mob = API.NearestMobile([API.Notoriety.Murderer, API.Notoriety.Criminal], 7)
+ if mob:
+   API.SysMsg("Found a criminal!")
+   API.Msg("Guards!")
+   API.Attack(mob)
+   ```
 
 
-<details><summary><h3>NearestMobile(notoriety, maxDistance)</h3></summary>
+**Parameters:**
 
- Get the nearest mobile by Notoriety.  
- Sets API.Found to the serial of the mobile.  
- Example:  
- ```py  
- mob = API.NearestMobile([API.Notoriety.Murderer, API.Notoriety.Criminal], 7)  
- if mob:  
-   API.SysMsg("Found a criminal!")  
-   API.Msg("Guards!")  
-   API.Attack(mob)  
-   ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| notoriety | IList<Notoriety> | No | List of notorieties |
-| maxDistance | int | Yes |  |
+| `notoriety` | `IList<Notoriety>` | ❌ No | List of notorieties |
+| `maxDistance` | `int` | ✅ Yes |  |
 
----> Return Type: *PyMobile*
+**Return Type:** `PyMobile`
 
-</details>
+---
 
-***
+### NearestCorpse
+`(distance)`
+ Get the nearest corpse within a distance.
+ Sets API.Found to the serial of the corpse.
+ Example:
+ ```py
+ corpse = API.NearestCorpse()
+ if corpse:
+   API.SysMsg("Found a corpse!")
+   API.UseObject(corpse)
+ ```
 
 
-<details><summary><h3>NearestCorpse(distance)</h3></summary>
+**Parameters:**
 
- Get the nearest corpse within a distance.  
- Sets API.Found to the serial of the corpse.  
- Example:  
- ```py  
- corpse = API.NearestCorpse()  
- if corpse:  
-   API.SysMsg("Found a corpse!")  
-   API.UseObject(corpse)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| distance | int | Yes |  |
+| `distance` | `int` | ✅ Yes |  |
 
----> Return Type: *PyItem*
+**Return Type:** `PyItem`
 
-</details>
+---
 
-***
+### NearestMobiles
+`(notoriety, maxDistance)`
+ Get all mobiles matching Notoriety and distance.
+ Example:
+ ```py
+ mob = API.NearestMobiles([API.Notoriety.Murderer, API.Notoriety.Criminal], 7)
+ if len(mob) > 0:
+   API.SysMsg("Found enemies!")
+   API.Msg("Guards!")
+   API.Attack(mob[0])
+   ```
 
 
-<details><summary><h3>NearestMobiles(notoriety, maxDistance)</h3></summary>
+**Parameters:**
 
- Get all mobiles matching Notoriety and distance.  
- Example:  
- ```py  
- mob = API.NearestMobiles([API.Notoriety.Murderer, API.Notoriety.Criminal], 7)  
- if len(mob) > 0:  
-   API.SysMsg("Found enemies!")  
-   API.Msg("Guards!")  
-   API.Attack(mob[0])  
-   ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| notoriety | IList<Notoriety> | No | List of notorieties |
-| maxDistance | int | Yes |  |
+| `notoriety` | `IList<Notoriety>` | ❌ No | List of notorieties |
+| `maxDistance` | `int` | ✅ Yes |  |
 
----> Return Type: *PyMobile[]*
+**Return Type:** `PyMobile[]`
 
-</details>
+---
 
-***
+### FindMobile
+`(serial)`
+ Get a mobile from its serial.
+ Sets API.Found to the serial of the mobile.
+ Example:
+ ```py
+ mob = API.FindMobile(0x12345678)
+ if mob:
+   API.SysMsg("Found the mobile!")
+   API.UseObject(mob)
+ ```
 
 
-<details><summary><h3>FindMobile(serial)</h3></summary>
+**Parameters:**
 
- Get a mobile from its serial.  
- Sets API.Found to the serial of the mobile.  
- Example:  
- ```py  
- mob = API.FindMobile(0x12345678)  
- if mob:  
-   API.SysMsg("Found the mobile!")  
-   API.UseObject(mob)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| serial | uint | No |  |
+| `serial` | `uint` | ❌ No |  |
 
----> Return Type: *PyMobile*
+**Return Type:** `PyMobile`
 
-</details>
+---
 
-***
+### GetAllMobiles
 
-
-<details><summary><h3>GetAllMobiles()</h3></summary>
-
- Return a list of all mobiles the client is aware of.  
- Example:  
- ```py  
- mobiles = API.GetAllMobiles()  
- if mobiles:  
-   API.SysMsg("Found " + str(len(mobiles)) + " mobiles!")  
-   for mob in mobiles:  
-     API.SysMsg(mob.Name)  
-     API.Pause(0.5)  
- ```  
-  
-
----> Return Type: *PyMobile[]*
-
-</details>
-
-***
+ Return a list of all mobiles the client is aware of.
+ Example:
+ ```py
+ mobiles = API.GetAllMobiles()
+ if mobiles:
+   API.SysMsg("Found " + str(len(mobiles)) + " mobiles!")
+   for mob in mobiles:
+     API.SysMsg(mob.Name)
+     API.Pause(0.5)
+ ```
 
 
-<details><summary><h3>GetTile(x, y)</h3></summary>
+**Return Type:** `PyMobile[]`
 
- Get the tile at a location.  
- Example:  
- ```py  
- tile = API.GetTile(1414, 1515)  
- if tile:  
-   API.SysMsg(f"Found a tile with graphic: {tile.Graphic}")  
- ```  
-  
+---
 
-**Parameters**  
+### GetTile
+`(x, y)`
+ Get the tile at a location.
+ Example:
+ ```py
+ tile = API.GetTile(1414, 1515)
+ if tile:
+   API.SysMsg(f"Found a tile with graphic: {tile.Graphic}")
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| x | int | No |  |
-| y | int | No |  |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
 
----> Return Type: *PyGameObject*
+**Return Type:** `PyGameObject`
 
-</details>
+---
 
-***
+### CreateGump
+`(acceptMouseInput, canMove, keepOpen)`
+ Get a blank gump.
+ Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ g.Add(API.CreateGumpLabel("Hello World!"))
+ API.AddGump(g)
+ ```
 
 
-<details><summary><h3>CreateGump(acceptMouseInput, canMove, keepOpen)</h3></summary>
+**Parameters:**
 
- Get a blank gump.  
- Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- g.Add(API.CreateGumpLabel("Hello World!"))  
- API.AddGump(g)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| acceptMouseInput | bool | Yes | Allow clicking the gump |
-| canMove | bool | Yes | Allow the player to move this gump |
-| keepOpen | bool | Yes | If true, the gump won't be closed if the script stops. Otherwise, it will be closed when the script is stopped. Defaults to false. |
+| `acceptMouseInput` | `bool` | ✅ Yes | Allow clicking the gump |
+| `canMove` | `bool` | ✅ Yes | Allow the player to move this gump |
+| `keepOpen` | `bool` | ✅ Yes | If true, the gump won't be closed if the script stops. Otherwise, it will be closed when the script is stopped. Defaults to false. |
 
----> Return Type: *Gump*
+**Return Type:** `Gump`
 
-</details>
+---
 
-***
+### AddGump
+`(g)`
+ Add a gump to the players screen.
+ Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ g.Add(API.CreateGumpLabel("Hello World!"))
+ API.AddGump(g)
+ ```
 
 
-<details><summary><h3>AddGump(g)</h3></summary>
+**Parameters:**
 
- Add a gump to the players screen.  
- Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- g.Add(API.CreateGumpLabel("Hello World!"))  
- API.AddGump(g)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| g | Gump | No | The gump to add |
+| `g` | `Gump` | ❌ No | The gump to add |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### CreateGumpCheckbox
+`(text, hue, isChecked)`
+ Create a checkbox for gumps.
+  Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ cb = API.CreateGumpCheckbox("Check me?!")
+ g.Add(cb)
+ API.AddGump(g)
+
+ API.SysMsg("Checkbox checked: " + str(cb.IsChecked))
+ ```
 
 
-<details><summary><h3>CreateGumpCheckbox(text, hue, isChecked)</h3></summary>
+**Parameters:**
 
- Create a checkbox for gumps.  
-  Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- cb = API.CreateGumpCheckbox("Check me?!")  
- g.Add(cb)  
- API.AddGump(g)  
-  
- API.SysMsg("Checkbox checked: " + str(cb.IsChecked))  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| text | string | Yes | Optional text label |
-| hue | ushort | Yes | Optional hue |
-| isChecked | bool | Yes | Default false, set to true if you want this checkbox checked on creation |
+| `text` | `string` | ✅ Yes | Optional text label |
+| `hue` | `ushort` | ✅ Yes | Optional hue |
+| `isChecked` | `bool` | ✅ Yes | Default false, set to true if you want this checkbox checked on creation |
 
----> Return Type: *Checkbox*
+**Return Type:** `Checkbox`
 
-</details>
+---
 
-***
+### CreateGumpLabel
+`(text, hue)`
+ Create a label for a gump.
+ Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ g.Add(API.CreateGumpLabel("Hello World!"))
+ API.AddGump(g)
+ ```
 
 
-<details><summary><h3>CreateGumpLabel(text, hue)</h3></summary>
+**Parameters:**
 
- Create a label for a gump.  
- Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- g.Add(API.CreateGumpLabel("Hello World!"))  
- API.AddGump(g)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| text | string | No | The text |
-| hue | ushort | Yes | The hue of the text |
+| `text` | `string` | ❌ No | The text |
+| `hue` | `ushort` | ✅ Yes | The hue of the text |
 
----> Return Type: *Label*
+**Return Type:** `Label`
 
-</details>
+---
 
-***
+### CreateGumpColorBox
+`(opacity, color)`
+ Get a transparent color box for gumps.
+ Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ cb = API.CreateGumpColorBox(0.5, "#000000")
+ cb.SetWidth(200)
+ cb.SetHeight(200)
+ g.Add(cb)
+ API.AddGump(g)
+ ```
 
 
-<details><summary><h3>CreateGumpColorBox(opacity, color)</h3></summary>
+**Parameters:**
 
- Get a transparent color box for gumps.  
- Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- cb = API.CreateGumpColorBox(0.5, "#000000")  
- cb.SetWidth(200)  
- cb.SetHeight(200)  
- g.Add(cb)  
- API.AddGump(g)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| opacity | float | Yes | 0.5 = 50% |
-| color | string | Yes | Html color code like #000000 |
+| `opacity` | `float` | ✅ Yes | 0.5 = 50% |
+| `color` | `string` | ✅ Yes | Html color code like #000000 |
 
----> Return Type: *AlphaBlendControl*
+**Return Type:** `AlphaBlendControl`
 
-</details>
+---
 
-***
+### CreateGumpItemPic
+`(graphic, width, height)`
+ Create a picture of an item.
+ Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ g.Add(API.CreateGumpItemPic(0x0E78, 50, 50))
+ API.AddGump(g)
+ ```
 
 
-<details><summary><h3>CreateGumpItemPic(graphic, width, height)</h3></summary>
+**Parameters:**
 
- Create a picture of an item.  
- Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- g.Add(API.CreateGumpItemPic(0x0E78, 50, 50))  
- API.AddGump(g)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| graphic | uint | No |  |
-| width | int | No |  |
-| height | int | No |  |
+| `graphic` | `uint` | ❌ No |  |
+| `width` | `int` | ❌ No |  |
+| `height` | `int` | ❌ No |  |
 
----> Return Type: *ResizableStaticPic*
+**Return Type:** `ResizableStaticPic`
 
-</details>
+---
 
-***
+### CreateGumpButton
+`(text, hue, normal, pressed, hover)`
+ Create a button for gumps.
+ Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ button = API.CreateGumpButton("Click Me!")
+ g.Add(button)
+ API.AddGump(g)
+
+ while True:
+   API.SysMsg("Button currently clicked?: " + str(button.IsClicked))
+   API.SysMsg("Button clicked since last check?: " + str(button.HasBeenClicked()))
+   API.Pause(0.2)
+ ```
 
 
-<details><summary><h3>CreateGumpButton(text, hue, normal, pressed, hover)</h3></summary>
+**Parameters:**
 
- Create a button for gumps.  
- Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- button = API.CreateGumpButton("Click Me!")  
- g.Add(button)  
- API.AddGump(g)  
-  
- while True:  
-   API.SysMsg("Button currently clicked?: " + str(button.IsClicked))  
-   API.SysMsg("Button clicked since last check?: " + str(button.HasBeenClicked()))  
-   API.Pause(0.2)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| text | string | Yes |  |
-| hue | ushort | Yes |  |
-| normal | ushort | Yes | Graphic when not clicked or hovering |
-| pressed | ushort | Yes | Graphic when pressed |
-| hover | ushort | Yes | Graphic on hover |
+| `text` | `string` | ✅ Yes |  |
+| `hue` | `ushort` | ✅ Yes |  |
+| `normal` | `ushort` | ✅ Yes | Graphic when not clicked or hovering |
+| `pressed` | `ushort` | ✅ Yes | Graphic when pressed |
+| `hover` | `ushort` | ✅ Yes | Graphic on hover |
 
----> Return Type: *Button*
+**Return Type:** `Button`
 
-</details>
+---
 
-***
+### CreateSimpleButton
+`(text, width, height)`
+ Create a simple button, does not use graphics.
+ Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ button = API.CreateSimpleButton("Click Me!", 100, 20)
+ g.Add(button)
+ API.AddGump(g)
+ ```
 
 
-<details><summary><h3>CreateSimpleButton(text, width, height)</h3></summary>
+**Parameters:**
 
- Create a simple button, does not use graphics.  
- Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- button = API.CreateSimpleButton("Click Me!", 100, 20)  
- g.Add(button)  
- API.AddGump(g)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| text | string | No |  |
-| width | int | No |  |
-| height | int | No |  |
+| `text` | `string` | ❌ No |  |
+| `width` | `int` | ❌ No |  |
+| `height` | `int` | ❌ No |  |
 
----> Return Type: *NiceButton*
+**Return Type:** `NiceButton`
 
-</details>
+---
 
-***
+### CreateGumpRadioButton
+`(text, group, inactive, active, hue, isChecked)`
+ Create a radio button for gumps, use group numbers to only allow one item to be checked at a time.
+ Example:
+ ```py
+ g = API.CreateGump()
+ g.SetRect(100, 100, 200, 200)
+ rb = API.CreateGumpRadioButton("Click Me!", 1)
+ g.Add(rb)
+ API.AddGump(g)
+ API.SysMsg("Radio button checked?: " + str(rb.IsChecked))
+ ```
 
 
-<details><summary><h3>CreateGumpRadioButton(text, group, inactive, active, hue, isChecked)</h3></summary>
+**Parameters:**
 
- Create a radio button for gumps, use group numbers to only allow one item to be checked at a time.  
- Example:  
- ```py  
- g = API.CreateGump()  
- g.SetRect(100, 100, 200, 200)  
- rb = API.CreateGumpRadioButton("Click Me!", 1)  
- g.Add(rb)  
- API.AddGump(g)  
- API.SysMsg("Radio button checked?: " + str(rb.IsChecked))  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| text | string | Yes | Optional text |
-| group | int | Yes | Group ID |
-| inactive | ushort | Yes | Unchecked graphic |
-| active | ushort | Yes | Checked graphic |
-| hue | ushort | Yes | Text color |
-| isChecked | bool | Yes | Defaults false, set to true if you want this button checked by default. |
+| `text` | `string` | ✅ Yes | Optional text |
+| `group` | `int` | ✅ Yes | Group ID |
+| `inactive` | `ushort` | ✅ Yes | Unchecked graphic |
+| `active` | `ushort` | ✅ Yes | Checked graphic |
+| `hue` | `ushort` | ✅ Yes | Text color |
+| `isChecked` | `bool` | ✅ Yes | Defaults false, set to true if you want this button checked by default. |
 
----> Return Type: *RadioButton*
+**Return Type:** `RadioButton`
 
-</details>
+---
 
-***
+### CreateGumpTextBox
+`(text, width, height, multiline)`
+ Create a text area control.
+ Example:
+ ```py
+ w = 500
+ h = 600
+
+ gump = API.CreateGump(True, True)
+ gump.SetWidth(w)
+ gump.SetHeight(h)
+ gump.CenterXInViewPort()
+ gump.CenterYInViewPort()
+
+ bg = API.CreateGumpColorBox(0.7, "#D4202020")
+ bg.SetWidth(w)
+ bg.SetHeight(h)
+
+ gump.Add(bg)
+
+ textbox = API.CreateGumpTextBox("Text example", w, h, True)
+
+ gump.Add(textbox)
+
+ API.AddGump(gump)
+ ```
 
 
-<details><summary><h3>CreateGumpTextBox(text, width, height, multiline)</h3></summary>
+**Parameters:**
 
- Create a text area control.  
- Example:  
- ```py  
- w = 500  
- h = 600  
-  
- gump = API.CreateGump(True, True)  
- gump.SetWidth(w)  
- gump.SetHeight(h)  
- gump.CenterXInViewPort()  
- gump.CenterYInViewPort()  
-  
- bg = API.CreateGumpColorBox(0.7, "#D4202020")  
- bg.SetWidth(w)  
- bg.SetHeight(h)  
-  
- gump.Add(bg)  
-  
- textbox = API.CreateGumpTextBox("Text example", w, h, True)  
-  
- gump.Add(textbox)  
-  
- API.AddGump(gump)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| text | string | Yes |  |
-| width | int | Yes |  |
-| height | int | Yes |  |
-| multiline | bool | Yes |  |
+| `text` | `string` | ✅ Yes |  |
+| `width` | `int` | ✅ Yes |  |
+| `height` | `int` | ✅ Yes |  |
+| `multiline` | `bool` | ✅ Yes |  |
 
----> Return Type: *TTFTextInputField*
+**Return Type:** `TTFTextInputField`
 
-</details>
+---
 
-***
+### CreateGumpTTFLabel
+`(text, size, color, font, aligned, maxWidth, applyStroke)`
+ Create a TTF label with advanced options.
+ Example:
+ ```py
+ gump = API.CreateGump()
+ gump.SetRect(100, 100, 200, 200)
+
+ ttflabel = API.CreateGumpTTFLabel("Example label", 25, "#F100DD", "alagard")
+ ttflabel.SetRect(10, 10, 180, 30)
+ gump.Add(ttflabel)
+
+ API.AddGump(gump) #Add the gump to the players screen
+ ```
 
 
-<details><summary><h3>CreateGumpTTFLabel(text, size, color, font, aligned, maxWidth, applyStroke)</h3></summary>
+**Parameters:**
 
- Create a TTF label with advanced options.  
- Example:  
- ```py  
- gump = API.CreateGump()  
- gump.SetRect(100, 100, 200, 200)  
-  
- ttflabel = API.CreateGumpTTFLabel("Example label", 25, "#F100DD", "alagard")  
- ttflabel.SetRect(10, 10, 180, 30)  
- gump.Add(ttflabel)  
-  
- API.AddGump(gump) #Add the gump to the players screen  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| text | string | No |  |
-| size | float | No | Font size |
-| color | string | Yes | Hex color: #FFFFFF. Must begin with #. |
-| font | string | Yes | Must have the font installed in TazUO |
-| aligned | string | Yes | left/center/right. Must set a max width for this to work. |
-| maxWidth | int | Yes | Max width before going to the next line |
-| applyStroke | bool | Yes | Uses players stroke settings, this turns it on or off |
+| `text` | `string` | ❌ No |  |
+| `size` | `float` | ❌ No | Font size |
+| `color` | `string` | ✅ Yes | Hex color: #FFFFFF. Must begin with #. |
+| `font` | `string` | ✅ Yes | Must have the font installed in TazUO |
+| `aligned` | `string` | ✅ Yes | left/center/right. Must set a max width for this to work. |
+| `maxWidth` | `int` | ✅ Yes | Max width before going to the next line |
+| `applyStroke` | `bool` | ✅ Yes | Uses players stroke settings, this turns it on or off |
 
----> Return Type: *TextBox*
+**Return Type:** `TextBox`
 
-</details>
+---
 
-***
+### CreateGumpSimpleProgressBar
+`(width, height, backgroundColor, foregroundColor, value, max)`
+ Create a progress bar. Can be updated as needed with `bar.SetProgress(current, max)`.
+ Example:
+ ```py
+ gump = API.CreateGump()
+ gump.SetRect(100, 100, 400, 200)
+
+ pb = API.CreateGumpSimpleProgressBar(400, 200)
+ gump.Add(pb)
+
+ API.AddGump(gump)
+
+ cur = 0
+ max = 100
+
+ while True:
+   pb.SetProgress(cur, max)
+   if cur >= max:
+   break
+   cur += 1
+   API.Pause(0.5)
+ ```
 
 
-<details><summary><h3>CreateGumpSimpleProgressBar(width, height, backgroundColor, foregroundColor, value, max)</h3></summary>
+**Parameters:**
 
- Create a progress bar. Can be updated as needed with `bar.SetProgress(current, max)`.  
- Example:  
- ```py  
- gump = API.CreateGump()  
- gump.SetRect(100, 100, 400, 200)  
-  
- pb = API.CreateGumpSimpleProgressBar(400, 200)  
- gump.Add(pb)  
-  
- API.AddGump(gump)  
-  
- cur = 0  
- max = 100  
-  
- while True:  
-   pb.SetProgress(cur, max)  
-   if cur >= max:  
-   break  
-   cur += 1  
-   API.Pause(0.5)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| width | int | No | The width of the bar |
-| height | int | No | The height of the bar |
-| backgroundColor | string | Yes | The background color(Hex color like #616161) |
-| foregroundColor | string | Yes | The foreground color(Hex color like #212121) |
-| value | int | Yes | The current value, for example 70 |
-| max | int | Yes | The max value(or what would be 100%), for example 100 |
+| `width` | `int` | ❌ No | The width of the bar |
+| `height` | `int` | ❌ No | The height of the bar |
+| `backgroundColor` | `string` | ✅ Yes | The background color(Hex color like #616161) |
+| `foregroundColor` | `string` | ✅ Yes | The foreground color(Hex color like #212121) |
+| `value` | `int` | ✅ Yes | The current value, for example 70 |
+| `max` | `int` | ✅ Yes | The max value(or what would be 100%), for example 100 |
 
----> Return Type: *SimpleProgressBar*
+**Return Type:** `SimpleProgressBar`
 
-</details>
+---
 
-***
+### CreateGumpScrollArea
+`(x, y, width, height)`
+ Create a scrolling area, add and position controls to it directly.
+ Example:
+ ```py
+ sa = API.CreateGumpScrollArea(0, 60, 200, 140)
+ gump.Add(sa)
+
+ for i in range(10):
+     label = API.CreateGumpTTFLabel(f"Label {i + 1}", 20, "#FFFFFF", "alagard")
+     label.SetRect(5, i * 20, 180, 20)
+     sa.Add(label)
+ ```
 
 
-<details><summary><h3>CreateGumpScrollArea(x, y, width, height)</h3></summary>
+**Parameters:**
 
- Create a scrolling area, add and position controls to it directly.  
- Example:  
- ```py  
- sa = API.CreateGumpScrollArea(0, 60, 200, 140)  
- gump.Add(sa)  
-  
- for i in range(10):  
-     label = API.CreateGumpTTFLabel(f"Label {i + 1}", 20, "#FFFFFF", "alagard")  
-     label.SetRect(5, i * 20, 180, 20)  
-     sa.Add(label)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| x | int | No |  |
-| y | int | No |  |
-| width | int | No |  |
-| height | int | No |  |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
+| `width` | `int` | ❌ No |  |
+| `height` | `int` | ❌ No |  |
 
----> Return Type: *ScrollArea*
+**Return Type:** `ScrollArea`
 
-</details>
+---
 
-***
+### CreateGumpPic
+`(graphic, x, y, hue)`
+ Create a gump pic(Use this for gump art, not item art)
+ Example:
+ ```py
+ gumpPic = API.CreateGumpPic(0xafb)
+ gump.Add(gumpPic)
 
 
-<details><summary><h3>CreateGumpPic(graphic, x, y, hue)</h3></summary>
+**Parameters:**
 
- Create a gump pic(Use this for gump art, not item art)  
- Example:  
- ```py  
- gumpPic = API.CreateGumpPic(0xafb)  
- gump.Add(gumpPic)  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| graphic | ushort | No |  |
-| x | int | Yes |  |
-| y | int | Yes |  |
-| hue | ushort | Yes |  |
+| `graphic` | `ushort` | ❌ No |  |
+| `x` | `int` | ✅ Yes |  |
+| `y` | `int` | ✅ Yes |  |
+| `hue` | `ushort` | ✅ Yes |  |
 
----> Return Type: *GumpPic*
+**Return Type:** `GumpPic`
 
-</details>
+---
 
-***
+### AddControlOnClick
+`(control, onClick, leftOnly)`
+ Add an onClick callback to a control.
+ Example:
+ ```py
+ def myfunc:
+   API.SysMsg("Something clicked!")
+ bg = API.CreateGumpColorBox(0.7, "#D4202020")
+ API.AddControlOnClick(bg, myfunc)
+ while True:
+   API.ProcessCallbacks()
+ ```
 
 
-<details><summary><h3>AddControlOnClick(control, onClick, leftOnly)</h3></summary>
+**Parameters:**
 
- Add an onClick callback to a control.  
- Example:  
- ```py  
- def myfunc:  
-   API.SysMsg("Something clicked!")  
- bg = API.CreateGumpColorBox(0.7, "#D4202020")  
- API.AddControlOnClick(bg, myfunc)  
- while True:  
-   API.ProcessCallbacks()  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| control | Control | No | The control listening for clicks |
-| onClick | object | No | The callback function |
-| leftOnly | bool | Yes | Only accept left mouse clicks? |
+| `control` | `Control` | ❌ No | The control listening for clicks |
+| `onClick` | `object` | ❌ No | The callback function |
+| `leftOnly` | `bool` | ✅ Yes | Only accept left mouse clicks? |
 
----> Return Type: *Control*
+**Return Type:** `Control`
 
-</details>
+---
 
-***
+### AddControlOnDisposed
+`(control, onDispose)`
+ Add onDispose(Closed) callback to a control.
+ Example:
+ ```py
+ def onClose():
+     API.Stop()
+
+ gump = API.CreateGump()
+ gump.SetRect(100, 100, 200, 200)
+
+ bg = API.CreateGumpColorBox(opacity=0.7, color="#000000")
+ gump.Add(bg.SetRect(0, 0, 200, 200))
+
+ API.AddControlOnDisposed(gump, onClose)
+ ```
 
 
-<details><summary><h3>AddControlOnDisposed(control, onDispose)</h3></summary>
+**Parameters:**
 
- Add onDispose(Closed) callback to a control.  
- Example:  
- ```py  
- def onClose():  
-     API.Stop()  
-  
- gump = API.CreateGump()  
- gump.SetRect(100, 100, 200, 200)  
-  
- bg = API.CreateGumpColorBox(opacity=0.7, color="#000000")  
- gump.Add(bg.SetRect(0, 0, 200, 200))  
-  
- API.AddControlOnDisposed(gump, onClose)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| control | Control | No |  |
-| onDispose | object | No |  |
+| `control` | `Control` | ❌ No |  |
+| `onDispose` | `object` | ❌ No |  |
 
----> Return Type: *Control*
+**Return Type:** `Control`
 
-</details>
+---
 
-***
+### GetSkill
+`(skill)`
+ Get a skill from the player. See the Skill class for what properties are available: https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs
+ Example:
+ ```py
+ skill = API.GetSkill("Hiding")
+ if skill:
+   API.SysMsg("Skill: " + skill.Name)
+   API.SysMsg("Skill Value: " + str(skill.Value))
+   API.SysMsg("Skill Cap: " + str(skill.Cap))
+   API.SysMsg("Skill Lock: " + str(skill.Lock))
+   ```
 
 
-<details><summary><h3>GetSkill(skill)</h3></summary>
+**Parameters:**
 
- Get a skill from the player. See the Skill class for what properties are available: https://github.com/PlayTazUO/TazUO/blob/main/src/ClassicUO.Client/Game/Data/Skill.cs  
- Example:  
- ```py  
- skill = API.GetSkill("Hiding")  
- if skill:  
-   API.SysMsg("Skill: " + skill.Name)  
-   API.SysMsg("Skill Value: " + str(skill.Value))  
-   API.SysMsg("Skill Cap: " + str(skill.Cap))  
-   API.SysMsg("Skill Lock: " + str(skill.Lock))  
-   ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| skill | string | No | Skill name, case-sensitive |
+| `skill` | `string` | ❌ No | Skill name, case-sensitive |
 
----> Return Type: *Skill*
+**Return Type:** `Skill`
 
-</details>
+---
 
-***
+### DisplayRange
+`(distance, hue)`
+ Show a radius around the player.
+ Example:
+ ```py
+ API.DisplayRange(7, 32)
+ ```
 
 
-<details><summary><h3>DisplayRange(distance, hue)</h3></summary>
+**Parameters:**
 
- Show a radius around the player.  
- Example:  
- ```py  
- API.DisplayRange(7, 32)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| distance | ushort | No | Distance from the player |
-| hue | ushort | Yes | The color to change the tiles at that distance |
+| `distance` | `ushort` | ❌ No | Distance from the player |
+| `hue` | `ushort` | ✅ Yes | The color to change the tiles at that distance |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### ToggleScript
+`(scriptName)`
+ Toggle another script on or off.
+ Example:
+ ```py
+ API.ToggleScript("MyScript.py")
+ ```
 
 
-<details><summary><h3>ToggleScript(scriptName)</h3></summary>
+**Parameters:**
 
- Toggle another script on or off.  
- Example:  
- ```py  
- API.ToggleScript("MyScript.py")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| scriptName | string | No | Full name including extension. Can be .py or .lscript. |
+| `scriptName` | `string` | ❌ No | Full name including extension. Can be .py or .lscript. |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### PlayScript
+`(scriptName)`
+ Play a legion script.
 
 
-<details><summary><h3>PlayScript(scriptName)</h3></summary>
+**Parameters:**
 
- Play a legion script.  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| scriptName | string | No | This is the file name including extension. |
+| `scriptName` | `string` | ❌ No | This is the file name including extension. |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### StopScript
+`(scriptName)`
+ Stop a legion script.
 
 
-<details><summary><h3>StopScript(scriptName)</h3></summary>
+**Parameters:**
 
- Stop a legion script.  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| scriptName | string | No | This is the file name including extension. |
+| `scriptName` | `string` | ❌ No | This is the file name including extension. |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### AddMapMarker
+`(name, x, y, map, color)`
+ Add a marker to the current World Map (If one is open)
+ Example:
+ ```py
+ API.AddMapMarker("Death")
+ ```
 
 
-<details><summary><h3>AddMapMarker(name, x, y, map, color)</h3></summary>
+**Parameters:**
 
- Add a marker to the current World Map (If one is open)  
- Example:  
- ```py  
- API.AddMapMarker("Death")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| name | string | No |  |
-| x | int | Yes | Defaults to current player X. |
-| y | int | Yes | Defaults to current player Y. |
-| map | int | Yes | Defaults to current map. |
-| color | string | Yes | red/green/blue/purple/black/yellow/white. Default purple. |
+| `name` | `string` | ❌ No |  |
+| `x` | `int` | ✅ Yes | Defaults to current player X. |
+| `y` | `int` | ✅ Yes | Defaults to current player Y. |
+| `map` | `int` | ✅ Yes | Defaults to current map. |
+| `color` | `string` | ✅ Yes | red/green/blue/purple/black/yellow/white. Default purple. |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### RemoveMapMarker
+`(name)`
+ Remove a marker from the world map.
+ Example:
+ ```py
+ API.RemoveMapMarker("Death")
+ ```
 
 
-<details><summary><h3>RemoveMapMarker(name)</h3></summary>
+**Parameters:**
 
- Remove a marker from the world map.  
- Example:  
- ```py  
- API.RemoveMapMarker("Death")  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| name | string | No |  |
+| `name` | `string` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### IsProcessingMoveQue
 
-
-<details><summary><h3>IsProcessingMoveQue()</h3></summary>
-
- Check if the move item queue is being processed. You can use this to prevent actions if the queue is being processed.  
- Example:  
- ```py  
- if API.IsProcessingMoveQue():  
-   API.Pause(0.5)  
- ```  
-  
-
----> Return Type: *bool*
-
-</details>
-
-***
+ Check if the move item queue is being processed. You can use this to prevent actions if the queue is being processed.
+ Example:
+ ```py
+ if API.IsProcessingMoveQue():
+   API.Pause(0.5)
+ ```
 
 
-<details><summary><h3>SavePersistentVar(name, value, scope)</h3></summary>
+**Return Type:** `bool`
 
- Save a variable that persists between sessions and scripts.  
- Example:  
- ```py  
- API.SavePersistentVar("TotalKills", "5", API.PersistentVar.Char)  
- ```  
-  
+---
 
-**Parameters**  
+### IsProcessingUseItemQueue
+
+ Check if the use item queue is being processed. You can use this to prevent actions if the queue is being processed.
+ Example:
+ ```py
+ if API.IsProcessingUseItemQueue():
+   API.Pause(0.5)
+ ```
+
+
+**Return Type:** `bool`
+
+---
+
+### IsGlobalCooldownActive
+
+ Check if the global cooldown is currently active. This applies to actions like moving or using items,
+ and prevents new actions from executing until the cooldown has expired.
+ 
+ Example:
+ ```py
+ if API.IsGlobalCooldownActive():
+     API.Pause(0.5)
+ ```
+
+
+**Return Type:** `bool`
+
+---
+
+### SavePersistentVar
+`(name, value, scope)`
+ Save a variable that persists between sessions and scripts.
+ Example:
+ ```py
+ API.SavePersistentVar("TotalKills", "5", API.PersistentVar.Char)
+ ```
+
+
+**Parameters:**
+
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| name | string | No |  |
-| value | string | No |  |
-| scope | PersistentVar | No |  |
+| `name` | `string` | ❌ No |  |
+| `value` | `string` | ❌ No |  |
+| `scope` | `PersistentVar` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### RemovePersistentVar
+`(name, scope)`
+ Delete/remove a persistent variable.
+ Example:
+ ```py
+ API.RemovePersistentVar("TotalKills", API.PersistentVar.Char)
+ ```
 
 
-<details><summary><h3>RemovePersistentVar(name, scope)</h3></summary>
+**Parameters:**
 
- Delete/remove a persistent variable.  
- Example:  
- ```py  
- API.RemovePersistentVar("TotalKills", API.PersistentVar.Char)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| name | string | No |  |
-| scope | PersistentVar | No |  |
+| `name` | `string` | ❌ No |  |
+| `scope` | `PersistentVar` | ❌ No |  |
 
----> Does not return anything
+**Return Type:** `void` *(Does not return anything)*
 
-</details>
+---
 
-***
+### GetPersistentVar
+`(name, defaultValue, scope)`
+ Get a persistent variable.
+ Example:
+ ```py
+ API.GetPersistentVar("TotalKills", "0", API.PersistentVar.Char)
+ ```
 
 
-<details><summary><h3>GetPersistentVar(name, defaultValue, scope)</h3></summary>
+**Parameters:**
 
- Get a persistent variable.  
- Example:  
- ```py  
- API.GetPersistentVar("TotalKills", "0", API.PersistentVar.Char)  
- ```  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| name | string | No |  |
-| defaultValue | string | No | The value returned if no value was saved |
-| scope | PersistentVar | No |  |
+| `name` | `string` | ❌ No |  |
+| `defaultValue` | `string` | ❌ No | The value returned if no value was saved |
+| `scope` | `PersistentVar` | ❌ No |  |
 
----> Return Type: *string*
+**Return Type:** `string`
 
-</details>
+---
 
-***
+### MarkTile
+`(x, y, hue, map)`
+ Mark a tile with a specific hue.
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
+| `hue` | `ushort` | ❌ No |  |
+| `map` | `int` | ✅ Yes | Defaults to current map |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### RemoveMarkedTile
+`(x, y, map)`
+ Remove a marked tile. See MarkTile for more info.
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
+| `map` | `int` | ✅ Yes |  |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
 

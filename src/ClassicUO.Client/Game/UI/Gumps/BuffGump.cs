@@ -38,8 +38,6 @@ namespace ClassicUO.Game.UI.Gumps
             _direction = GumpDirection.LEFT_HORIZONTAL;
             _graphic = 0x7580;
 
-            SetInScreen();
-
             BuildGump();
         }
 

@@ -73,9 +73,6 @@ namespace ClassicUO.Game.UI.Gumps
             BuildGump();
 
             CurrentCounterBarGump = this;
-
-            SetInScreen();
-            
             IsLocked = ProfileManager.CurrentProfile.CounterGumpLocked;
         }
 
@@ -548,7 +545,7 @@ namespace ClassicUO.Game.UI.Gumps
                         {
                             Log.Trace(pg.GetType().ToString());
                             pg.IsLocked = ProfileManager.CurrentProfile.CounterGumpLocked = !pg.IsLocked;
-                        }                                        
+                        }
                     if (Client.Game.UO.GameCursor.ItemHold.Enabled)
                     {
                         SetGraphic(

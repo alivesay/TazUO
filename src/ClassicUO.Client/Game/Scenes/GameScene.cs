@@ -108,6 +108,38 @@ namespace ClassicUO.Game.Scenes
 
         private uint _lastResync = Time.Ticks;
 
+        public GameScene()
+        {
+            SDL.SDL_SetWindowMinimumSize(Client.Game.Window.Handle, 640, 480);
+
+            Camera.Zoom = ProfileManager.CurrentProfile.DefaultScale;
+            Camera.Bounds.X = Math.Max(0, ProfileManager.CurrentProfile.GameWindowPosition.X);
+            Camera.Bounds.Y = Math.Max(0, ProfileManager.CurrentProfile.GameWindowPosition.Y);
+            Camera.Bounds.Width = Math.Max(0, ProfileManager.CurrentProfile.GameWindowSize.X);
+            Camera.Bounds.Height = Math.Max(0, ProfileManager.CurrentProfile.GameWindowSize.Y);
+
+            Client.Game.Window.AllowUserResizing = true;
+
+            if (ProfileManager.CurrentProfile.WindowBorderless)
+            {
+                Client.Game.SetWindowBorderless(true);
+            }
+            else if (Settings.GlobalSettings.IsWindowMaximized)
+            {
+                Client.Game.MaximizeWindow();
+            }
+            else if (Settings.GlobalSettings.WindowSize.HasValue)
+            {
+                int w = Settings.GlobalSettings.WindowSize.Value.X;
+                int h = Settings.GlobalSettings.WindowSize.Value.Y;
+
+                w = Math.Max(640, w);
+                h = Math.Max(480, h);
+
+                Client.Game.SetWindowSize(w, h);
+            }
+        }
+
         public void DoubleClickDelayed(uint serial)
         {
             _useItemQueue.Add(serial);
@@ -117,13 +149,7 @@ namespace ClassicUO.Game.Scenes
         {
             base.Load();
             
-            Client.Game.Window.AllowUserResizing = true;
-
-            Camera.Zoom = ProfileManager.CurrentProfile.DefaultScale;
-            Camera.Bounds.X = Math.Max(0, ProfileManager.CurrentProfile.GameWindowPosition.X);
-            Camera.Bounds.Y = Math.Max(0, ProfileManager.CurrentProfile.GameWindowPosition.Y);
-            Camera.Bounds.Width = Math.Max(0, ProfileManager.CurrentProfile.GameWindowSize.X);
-            Camera.Bounds.Height = Math.Max(0, ProfileManager.CurrentProfile.GameWindowSize.Y);
+            GridContainerSaveData.Instance.Load();
 
             Client.Game.UO.GameCursor.ItemHold.Clear();
 
@@ -150,27 +176,6 @@ namespace ClassicUO.Game.Scenes
             EventSink.MessageReceived += ChatOnMessageReceived;
             UIManager.ContainerScale = ProfileManager.CurrentProfile.ContainersScale / 100f;
 
-            SDL.SDL_SetWindowMinimumSize(Client.Game.Window.Handle, 640, 480);
-
-            if (ProfileManager.CurrentProfile.WindowBorderless)
-            {
-                Client.Game.SetWindowBorderless(true);
-            }
-            else if (Settings.GlobalSettings.IsWindowMaximized)
-            {
-                Client.Game.MaximizeWindow();
-            }
-            else if (Settings.GlobalSettings.WindowSize.HasValue)
-            {
-                int w = Settings.GlobalSettings.WindowSize.Value.X;
-                int h = Settings.GlobalSettings.WindowSize.Value.Y;
-
-                w = Math.Max(640, w);
-                h = Math.Max(480, h);
-
-                Client.Game.SetWindowSize(w, h);
-            }
-
             Plugin.OnConnected();
             EventSink.InvokeOnConnected(null);
             GameController.UpdateBackgroundHueShader();
@@ -182,12 +187,14 @@ namespace ClassicUO.Game.Scenes
             {
                 XmlGumpHandler.TryAutoOpenByName(_world, xml);
             }
-            
+
             PersistentVars.Load();
             LegionScripting.LegionScripting.Init(_world);
             BuySellAgent.Load();
             GraphicsReplacement.Load();
             SpellBarManager.Load();
+            if(ProfileManager.CurrentProfile.EnableCaveBorder)
+                StaticFilters.ApplyCaveTileBorder();
         }
 
         private void ChatOnMessageReceived(object sender, MessageEventArgs e)
@@ -331,7 +338,10 @@ namespace ClassicUO.Game.Scenes
             {
                 return;
             }
-            
+
+            GridContainerSaveData.Instance.Save();
+            GridContainerSaveData.Reset();
+
             SpellBarManager.Unload();
             _moveItemQueue.Clear();
 
@@ -812,6 +822,19 @@ namespace ClassicUO.Game.Scenes
             _world.Player.Pathfinder.ProcessAutoWalk();
             _world.DelayedObjectClickManager.Update();
 
+
+            if (
+                (currentProfile.CorpseOpenOptions == 1 || currentProfile.CorpseOpenOptions == 3)
+                    && World.Instance.TargetManager.IsTargeting
+                || (currentProfile.CorpseOpenOptions == 2 || currentProfile.CorpseOpenOptions == 3)
+                    && World.Instance.Player.IsHidden
+            )
+            {
+                _useItemQueue.ClearCorpses();
+            }
+
+            _useItemQueue.Update();
+
             AutoLootManager.Instance.Update();
             _moveItemQueue.ProcessQueue();
             GridHighlightData.ProcessQueue(_world);
@@ -858,18 +881,6 @@ namespace ClassicUO.Game.Scenes
             }
 
             _world.Macros.Update();
-
-            if (
-                (currentProfile.CorpseOpenOptions == 1 || currentProfile.CorpseOpenOptions == 3)
-                    && _world.TargetManager.IsTargeting
-                || (currentProfile.CorpseOpenOptions == 2 || currentProfile.CorpseOpenOptions == 3)
-                    && _world.Player.IsHidden
-            )
-            {
-                _useItemQueue.ClearCorpses();
-            }
-
-            _useItemQueue.Update();
 
             if (Time.Ticks > _nextProfileSave)
             {

@@ -544,7 +544,7 @@ public class BaseOptionsGump : Gump
             }
         }
     }
-    
+
     protected class HotkeyBox : Control
     {
         private bool _actived;
@@ -1750,7 +1750,7 @@ public class BaseOptionsGump : Gump
 
             SearchValueChanged += ModernOptionsGump_SearchValueChanged;
         }
-        
+
         public override void Dispose()
         {
             base.Dispose();
@@ -2211,7 +2211,7 @@ public class BaseOptionsGump : Gump
             SearchValueChanged += ModernOptionsGump_SearchValueChanged;
             this.options = options;
         }
-        
+
         public override void Dispose()
         {
             base.Dispose();
@@ -2271,7 +2271,7 @@ public class BaseOptionsGump : Gump
             private int _selectedIndex = 0;
             private readonly int[] _originalIndices;
             private readonly string[] _sortedItems;
-            
+
             private World world;
 
             public Combobox(World world, int width, string[] items, int selected = -1, int maxHeight = 400, Action<int, string> onOptionSelected = null)
@@ -2288,10 +2288,10 @@ public class BaseOptionsGump : Gump
                 _originalIndices = Enumerable.Range(0, items.Length).ToArray();
                 _sortedItems = new string[items.Length];
                 Array.Copy(items, _sortedItems, items.Length);
-    
+
                 // Sort both arrays together
                 Array.Sort(_sortedItems, _originalIndices);
-    
+
                 // Find the display index for the selected original index
                 int displayIndex = selected > -1 ? Array.IndexOf(_originalIndices, selected) : -1;
 
@@ -2303,7 +2303,7 @@ public class BaseOptionsGump : Gump
                 _label.X = 2;
                 _label.Y = (Height >> 1) - (_label.Height >> 1);
                 Add(_label);
-                
+
                 _selectedIndex = displayIndex;
             }
 
@@ -2506,6 +2506,7 @@ public class BaseOptionsGump : Gump
 
     protected class InputFieldWithLabel : Control, SearchableOption
     {
+        public string Text => _inputField.Text;
         private readonly InputField _inputField;
         private readonly TextBox _label;
 
@@ -2532,7 +2533,7 @@ public class BaseOptionsGump : Gump
 
             SearchValueChanged += ModernOptionsGump_SearchValueChanged;
         }
-        
+
         public override void Dispose()
         {
             base.Dispose();
@@ -2557,6 +2558,11 @@ public class BaseOptionsGump : Gump
             {
                 _label.Alpha = 1f;
             }
+        }
+
+        public void SetText(string text)
+        {
+            _inputField.SetText(text);
         }
 
         public bool Search(string text)
@@ -2599,14 +2605,18 @@ public class BaseOptionsGump : Gump
 
             SearchValueChanged += ModernOptionsGump_SearchValueChanged;
         }
-        
+
         public override void Dispose()
         {
             base.Dispose();
             SearchValueChanged -= ModernOptionsGump_SearchValueChanged;
         }
 
-        public ushort Hue => _colorPicker.Hue;
+        public ushort Hue
+        {
+            get { return _colorPicker.Hue; }
+            set { _colorPicker.Hue = value; }
+        }
 
         private void ModernOptionsGump_SearchValueChanged(object sender, EventArgs e)
         {

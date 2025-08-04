@@ -455,9 +455,10 @@ namespace ClassicUO.Game.UI.Controls
 
             if (Client.Game.UO.Gumps.GetGump((ushort)(animID + offset)).Texture == null)
             {
-                Log.Error(
-                    $"Texture not found in paperdoll: gump_graphic: {(ushort)(animID + offset)}"
-                );
+                if(animID + offset != 61000) //Not sure why the paperdoll is always trying to create this animation, I think it's a bug on the server side
+                    Log.Error(
+                        $"Texture not found in paperdoll: gump_graphic: {(ushort)(animID + offset)}"
+                    );
 
                 return false;
             }

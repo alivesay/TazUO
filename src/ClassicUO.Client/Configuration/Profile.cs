@@ -1037,7 +1037,7 @@ namespace ClassicUO.Configuration
                             gump.Restore(xml);
                             gump.X = x;
                             gump.Y = y;
-                            gump.SetInScreen();
+                            //gump.SetInScreen();
 
                             if (gump.LocalSerial != 0)
                             {
@@ -1080,7 +1080,7 @@ namespace ClassicUO.Configuration
                             gump.Restore(xml);
                             gump.X = x;
                             gump.Y = y;
-                            gump.SetInScreen();
+                            //gump.SetInScreen();
 
                             if (gump.LocalSerial != 0)
                             {
@@ -1179,7 +1179,7 @@ namespace ClassicUO.Configuration
                                     gump.Restore(xml);
                                     gump.X = x;
                                     gump.Y = y;
-                                    gump.SetInScreen();
+                                    //gump.SetInScreen();
 
                                     if (!gump.IsDisposed)
                                     {

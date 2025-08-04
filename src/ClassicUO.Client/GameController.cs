@@ -26,6 +26,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using SDL2;
 using static SDL2.SDL;
 
 namespace ClassicUO
@@ -42,8 +43,10 @@ namespace ClassicUO
         private bool _suppressedDraw;
         private Texture2D _background;
         private bool _pluginsInitialized = false;
+        private Rectangle bufferRect = Rectangle.Empty;
 
         private static Vector3 bgHueShader = new Vector3(0, 0, 0.3f);
+        private bool drawScene = false;
 
         public GameController(IPluginHost pluginHost)
         {
@@ -66,6 +69,7 @@ namespace ClassicUO
             IsFixedTimeStep = false; // Settings.GlobalSettings.FixedTimeStep;
             TargetElapsedTime = TimeSpan.FromMilliseconds(1000.0 / 250.0);
             PluginHost = pluginHost;
+            bufferRect = new Rectangle(0, 0, GraphicManager.PreferredBackBufferWidth, GraphicManager.PreferredBackBufferHeight);
         }
 
         public Scene Scene { get; private set; }
@@ -204,6 +208,11 @@ namespace ClassicUO
             Scene?.Dispose();
             Scene = scene;
             Scene?.Load();
+
+            if (Scene != null && Scene.IsLoaded)
+                drawScene = true;
+            else
+                drawScene = false;
         }
 
         public void SetVSync(bool value)
@@ -263,6 +272,7 @@ namespace ClassicUO
             GraphicManager.PreferredBackBufferWidth = width;
             GraphicManager.PreferredBackBufferHeight = height;
             GraphicManager.ApplyChanges();
+            bufferRect = new Rectangle(0, 0, GraphicManager.PreferredBackBufferWidth, GraphicManager.PreferredBackBufferHeight);
         }
 
         public void SetWindowBorderless(bool borderless)
@@ -316,6 +326,7 @@ namespace ClassicUO
                 viewport.X = -5;
                 viewport.Y = -5;
             }
+            bufferRect = new Rectangle(0, 0, GraphicManager.PreferredBackBufferWidth, GraphicManager.PreferredBackBufferHeight);
         }
 
         public void MaximizeWindow()
@@ -325,6 +336,7 @@ namespace ClassicUO
             GraphicManager.PreferredBackBufferWidth = Client.Game.Window.ClientBounds.Width;
             GraphicManager.PreferredBackBufferHeight = Client.Game.Window.ClientBounds.Height;
             GraphicManager.ApplyChanges();
+            bufferRect = new Rectangle(0, 0, GraphicManager.PreferredBackBufferWidth, GraphicManager.PreferredBackBufferHeight);
         }
 
         public bool IsWindowMaximized()
@@ -356,42 +368,56 @@ namespace ClassicUO
 
         protected override void Update(GameTime gameTime)
         {
+            #if DEBUG
             if (Profiler.InContext("OutOfContext"))
             {
                 Profiler.ExitContext("OutOfContext");
             }
+            #endif
 
             Time.Ticks = (uint)gameTime.TotalGameTime.TotalMilliseconds;
             Time.Delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            #if DEBUG
             Profiler.EnterContext("Mouse");
+            #endif
             Mouse.Update();
+            #if DEBUG
             Profiler.ExitContext("Mouse");
 
             Profiler.EnterContext("Packets");
-            // var data = NetClient.Socket.CollectAvailableData();
-            // var packetsCount = PacketHandlers.Handler.ParsePackets(data);
-            // NetClient.Socket.Statistics.TotalPacketsReceived += (uint)packetsCount;
-            // NetClient.Socket.Flush();
+            #endif
             AsyncNetClient.Socket.ProcessIncomingMessages();
+            #if DEBUG
             Profiler.ExitContext("Packets");
+            #endif
 
             Plugin.Tick();
 
-            if (Scene != null && Scene.IsLoaded && !Scene.IsDestroyed)
+            if(drawScene)
             {
+                #if DEBUG
                 Profiler.EnterContext("Update");
+                #endif
                 Scene.Update();
+                #if DEBUG
                 Profiler.ExitContext("Update");
+                #endif
             }
 
+            #if DEBUG
             Profiler.EnterContext("UI Update");
+            #endif
             UIManager.Update();
+            #if DEBUG
             Profiler.ExitContext("UI Update");
 
             Profiler.EnterContext("LScript");
+            #endif
             LegionScripting.LegionScripting.OnUpdate();
+            #if DEBUG
             Profiler.ExitContext("LScript");
+            #endif
 
             MainThreadQueue.ProcessQueue();
 
@@ -476,10 +502,9 @@ namespace ClassicUO
                 bgHueShader = ShaderHueTranslator.GetHueVector(ProfileManager.CurrentProfile.MainWindowBackgroundHue, false, bgHueShader.Z);
         }
 
-        private Stopwatch drawTimer = new ();
-
         protected override void Draw(GameTime gameTime)
         {
+            #if DEBUG
             Profiler.EndFrame();
             Profiler.BeginFrame();
 
@@ -489,35 +514,19 @@ namespace ClassicUO
             }
 
             Profiler.EnterContext("RenderFrame");
+            #endif
 
             _totalFrames++;
             GraphicsDevice.Clear(Color.Black);
 
             _uoSpriteBatch.Begin();
-            var rect = new Rectangle(0, 0, GraphicManager.PreferredBackBufferWidth, GraphicManager.PreferredBackBufferHeight);
-            _uoSpriteBatch.Draw(SolidColorTextureCache.GetTexture(Color.Black), rect, Vector3.UnitZ);
-
-            _uoSpriteBatch.DrawTiled(_background, rect, _background.Bounds, bgHueShader);
+            _uoSpriteBatch.DrawTiled(_background, bufferRect, _background.Bounds, bgHueShader);
             _uoSpriteBatch.End();
 
-            if (Scene != null && Scene.IsLoaded && !Scene.IsDestroyed)
-            {
+            if (drawScene)
                 Scene.Draw(_uoSpriteBatch);
-            }
 
             UIManager.Draw(_uoSpriteBatch);
-
-            if ((UO.World?.InGame ?? false) && SelectedObject.Object is TextObject t)
-            {
-                if (t.IsTextGump)
-                {
-                    t.ToTopD();
-                }
-                else
-                {
-                    UO.World.WorldTextManager?.MoveToTop(t);
-                }
-            }
 
             SelectedObject.HealthbarObject = null;
             SelectedObject.SelectedContainer = null;
@@ -527,8 +536,10 @@ namespace ClassicUO
             _uoSpriteBatch.End();
 
             base.Draw(gameTime);
+            #if DEBUG
             Profiler.ExitContext("RenderFrame");
             Profiler.EnterContext("OutOfContext");
+            #endif
 
             Plugin.ProcessDrawCmdList(GraphicsDevice);
 

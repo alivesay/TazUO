@@ -141,9 +141,6 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 gump = UIManager.GetGump<StatusGumpModern>();
             }
-
-            gump?.SetInScreen();
-
             return gump;
         }
 

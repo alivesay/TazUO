@@ -1742,6 +1742,32 @@ def IsProcessingMoveQue() -> bool:
     """
     pass
 
+def IsProcessingUseItemQueue() -> bool:
+    """
+     Check if the use item queue is being processed. You can use this to prevent actions if the queue is being processed.
+     Example:
+     ```py
+     if API.IsProcessingUseItemQueue():
+       API.Pause(0.5)
+     ```
+    
+    """
+    pass
+
+def IsGlobalCooldownActive() -> bool:
+    """
+     Check if the global cooldown is currently active. This applies to actions like moving or using items,
+     and prevents new actions from executing until the cooldown has expired.
+    
+     Example:
+     ```py
+     if API.IsGlobalCooldownActive():
+         API.Pause(0.5)
+     ```
+    
+    """
+    pass
+
 def SavePersistentVar(name: str, value: str, scope: Any) -> None:
     """
      Save a variable that persists between sessions and scripts.
@@ -1771,6 +1797,20 @@ def GetPersistentVar(name: str, defaultValue: str, scope: Any) -> str:
      ```py
      API.GetPersistentVar("TotalKills", "0", API.PersistentVar.Char)
      ```
+    
+    """
+    pass
+
+def MarkTile(x: int, y: int, hue: int, map: int = -1) -> None:
+    """
+     Mark a tile with a specific hue.
+    
+    """
+    pass
+
+def RemoveMarkedTile(x: int, y: int, map: int = -1) -> None:
+    """
+     Remove a marked tile. See MarkTile for more info.
     
     """
     pass

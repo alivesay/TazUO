@@ -1,141 +1,126 @@
-# PyControl  
+---
+title: PyControl
+description: PyControl class documentation
+---
 
 ## Properties
-_No properties found._
+*No properties found.*
 
-_No properties found._
+*No fields found.*
 
 ## Enums
-_No enums found._
+*No enums found.*
 
 ## Methods
+### SetRect
+`(x, y, w, h)`
+ Used in python API
 
-<details><summary><h3>SetRect(x, y, w, h)</h3></summary>
 
- Used in python API  
-  
+**Parameters:**
 
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| x | int | No |  |
-| y | int | No |  |
-| w | int | No |  |
-| h | int | No |  |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
+| `w` | `int` | ❌ No |  |
+| `h` | `int` | ❌ No |  |
 
----> Return Type: *Control*
+**Return Type:** `Control`
 
-</details>
+---
 
-***
+### SetWidth
+`(width)`
+ Used in python API
 
 
-<details><summary><h3>SetWidth(width)</h3></summary>
+**Parameters:**
 
- Used in python API  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| width | int | No |  |
+| `width` | `int` | ❌ No |  |
 
----> Return Type: *Control*
+**Return Type:** `Control`
 
-</details>
+---
 
-***
+### SetHeight
+`(height)`
+ Used in python API
 
 
-<details><summary><h3>SetHeight(height)</h3></summary>
+**Parameters:**
 
- Used in python API  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| height | int | No |  |
+| `height` | `int` | ❌ No |  |
 
----> Return Type: *Control*
+**Return Type:** `Control`
 
-</details>
+---
 
-***
+### SetX
+`(x)`
+ Used in python API
 
 
-<details><summary><h3>SetX(x)</h3></summary>
+**Parameters:**
 
- Used in python API  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| x | int | No |  |
+| `x` | `int` | ❌ No |  |
 
----> Return Type: *Control*
+**Return Type:** `Control`
 
-</details>
+---
 
-***
+### SetY
+`(y)`
+ Used in python API
 
 
-<details><summary><h3>SetY(y)</h3></summary>
+**Parameters:**
 
- Used in python API  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| y | int | No |  |
+| `y` | `int` | ❌ No |  |
 
----> Return Type: *Control*
+**Return Type:** `Control`
 
-</details>
+---
 
-***
+### SetPos
+`(x, y)`
+ Use int python API
 
 
-<details><summary><h3>SetPos(x, y)</h3></summary>
+**Parameters:**
 
- Use int python API  
-  
-
-**Parameters**  
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| x | int | No |  |
-| y | int | No |  |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
 
----> Return Type: *Control*
+**Return Type:** `Control`
 
-</details>
+---
 
-***
+### GetX
 
-
-<details><summary><h3>GetX()</h3></summary>
-
- Used in python API  
-  
-
----> Return Type: *int*
-
-</details>
-
-***
+ Used in python API
 
 
-<details><summary><h3>GetY()</h3></summary>
+**Return Type:** `int`
 
- Used in python API  
-  
+---
 
----> Return Type: *int*
+### GetY
 
-</details>
+ Used in python API
 
-***
+
+**Return Type:** `int`
+
+---
 

@@ -79,7 +79,7 @@ namespace ClassicUO.Game.GameObjects
             drawY += 22;
 
             bool hasShadow = !IsDead && !IsHidden && ProfileManager.CurrentProfile.ShadowsEnabled;
-            bool inParty = World.Party.Contains(this);
+            bool inParty = InParty;
 
             if (AuraManager.IsEnabled)
             {
@@ -96,13 +96,11 @@ namespace ClassicUO.Game.GameObjects
 
             bool isHuman = IsHuman;
 
-            bool isGargoyle =
-                Client.Version >= ClientVersion.CV_7000
-                && (Graphic == 666 || Graphic == 667 || Graphic == 0x02B7 || Graphic == 0x02B6);
+            bool isGargoyle = IsGargoyle;
 
             Vector3 hueVec = ShaderHueTranslator.GetHueVector(0, false, AlphaHue / 255f);
 
-            if (World.Player == this && ProfileManager.CurrentProfile.PlayerConstantAlpha != 100)
+            if (IsPlayer && ProfileManager.CurrentProfile.PlayerConstantAlpha != 100)
             {
                 hueVec = ShaderHueTranslator.GetHueVector(0, false, (float)ProfileManager.CurrentProfile.PlayerConstantAlpha / 100f);
             }
@@ -171,7 +169,7 @@ namespace ClassicUO.Game.GameObjects
                 }
             }
 
-            if (Serial != World.Player.Serial)
+            if (!IsPlayer)
             {
                 if (TargetManager.IsTargeting && ReferenceEquals(SelectedObject.Object, this) || (Serial == TargetManager.LastAttack && !ProfileManager.CurrentProfile.DisableGrayEnemies))
                     overridedHue = Notoriety.GetHue(NotorietyFlag);
@@ -305,7 +303,7 @@ namespace ClassicUO.Game.GameObjects
 
                     if (dir == 3)
                     {
-                        if (IsGargoyle)
+                        if (isGargoyle)
                         {
                             drawY -= 30 - SIT_OFFSET_Y;
                             animGroup = 42;
@@ -315,7 +313,7 @@ namespace ClassicUO.Game.GameObjects
                             animGroup = 25;
                         }
                     }
-                    else if (IsGargoyle)
+                    else if (isGargoyle)
                     {
                         animGroup = 42;
                     }
@@ -394,7 +392,7 @@ namespace ClassicUO.Game.GameObjects
 
                     if (isHuman)
                     {
-                        if (ProfileManager.CurrentProfile.HiddenLayers.Contains((int)layer) && ((ProfileManager.CurrentProfile.HideLayersForSelf && Serial == World.Player.Serial) || !ProfileManager.CurrentProfile.HideLayersForSelf))
+                        if (ProfileManager.CurrentProfile.HiddenLayers.Contains((int)layer) && ((ProfileManager.CurrentProfile.HideLayersForSelf && IsPlayer) || !ProfileManager.CurrentProfile.HideLayersForSelf))
                         {
                             continue;
                         }
@@ -470,42 +468,10 @@ namespace ClassicUO.Game.GameObjects
                         if (item.ItemData.IsLight)
                         {
                             Client.Game.GetScene<GameScene>().AddLight(this, item, drawX, drawY);
-
-                            /*DrawInternal
-                            (
-                                batcher,
-                                this,
-                                item,
-                                drawX,
-                                drawY,
-                                IsFlipped,
-                                animIndex,
-                                false,
-                                graphic,
-                                animGroup,
-                                dir,
-                                isHuman,
-                                false,
-                                alpha: HueVector.Z
-                            );
-                            */
-                            //break;
                         }
                     }
                 }
             }
-
-            //if (FileManager.Animations.SittingValue != 0)
-            //{
-            //    ref var sittingData = ref FileManager.Animations.SittingInfos[FileManager.Animations.SittingValue - 1];
-
-            //    if (FileManager.Animations.Direction == 3 && sittingData.DrawBack &&
-            //        HasEquipment && Equipment[(int) Layer.Cloak] == null)
-            //    {
-
-            //    }
-            //}
-            //
 
             FrameInfo.X = Math.Abs(FrameInfo.X);
             FrameInfo.Y = Math.Abs(FrameInfo.Y);

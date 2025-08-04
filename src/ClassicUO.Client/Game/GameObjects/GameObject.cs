@@ -113,6 +113,7 @@ namespace ClassicUO.Game.GameObjects
                 GraphicsReplacement.Replace(originalGraphic, ref value, ref hue);
                 Hue = hue; //Workaround for making sure hues are replaced as-well
                 graphic = value;
+                OnGraphicSet(graphic);
             }
         }
         public ushort Hue
@@ -133,6 +134,8 @@ namespace ClassicUO.Game.GameObjects
         public sbyte Z;
         public GameObject RenderListNext;
         private ushort graphic, originalGraphic, hue;
+
+        public virtual void OnGraphicSet(ushort newGraphic) { }
 
         public void AddDamage(int damage)
         {

@@ -2,7 +2,7 @@
 
 // Copyright (c) 2021, andreakarasho
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 1. Redistributions of source code must retain the above copyright
@@ -16,7 +16,7 @@
 // 4. Neither the name of the copyright holder nor the
 //    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -47,7 +47,7 @@ namespace ClassicUO.Game.GameObjects
     public class PlayerMobile : Mobile
     {
         private readonly Dictionary<BuffIconType, BuffIcon> _buffIcons = new Dictionary<BuffIconType, BuffIcon>();
-        
+
         public PlayerMobile(uint serial) : base(serial)
         {
             Skills = new Skill[SkillsLoader.Instance.SkillsCount];
@@ -68,6 +68,8 @@ namespace ClassicUO.Game.GameObjects
 
             if(ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.EnableSpellIndicators)
                 UIManager.Add(new SpellVisualRangeManager.CastTimerProgressBar());
+
+            IsPlayer = true;
         }
 
         public Skill[] Skills { get; }
@@ -1584,8 +1586,8 @@ namespace ClassicUO.Game.GameObjects
 
         //    //const int TIME_TURN_TO_LASTTARGET = 2000;
 
-        //    //if (TargetManager.LastAttack != 0 && 
-        //    //    InWarMode && 
+        //    //if (TargetManager.LastAttack != 0 &&
+        //    //    InWarMode &&
         //    //    Walker.LastStepRequestTime + TIME_TURN_TO_LASTTARGET < Time.Ticks)
         //    //{
         //    //    Mobile enemy = World.Mobiles.Get(TargetManager.LastAttack);
@@ -1593,7 +1595,7 @@ namespace ClassicUO.Game.GameObjects
         //    //    if (enemy != null && enemy.Distance <= 1)
         //    //    {
         //    //        Direction pdir = DirectionHelper.GetDirectionAB(World.Player.X,
-        //    //                                                        World.Player.Y, 
+        //    //                                                        World.Player.Y,
         //    //                                                        enemy.X,
         //    //                                                        enemy.Y);
 
@@ -1652,7 +1654,7 @@ namespace ClassicUO.Game.GameObjects
                 sbyte oldZ = z;
                 ushort walkTime = ProfileManager.CurrentProfile.TurnDelay;
 
-  
+
                 if (IsCardinalDirection(direction))
                 {
                     if (IsObstacle(direction, x, y, z))
@@ -1668,7 +1670,7 @@ namespace ClassicUO.Game.GameObjects
                         }
                         else
                         {
-                            return false; 
+                            return false;
                         }
                     }
                 }

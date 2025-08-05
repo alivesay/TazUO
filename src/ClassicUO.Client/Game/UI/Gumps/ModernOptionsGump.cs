@@ -4170,7 +4170,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         internal class ToolTipOverrideConfigs : Control
         {
-            private DataBox dataBox;
+            private VBoxContainer dataBox;
             private World world;
             public ToolTipOverrideConfigs(World world, int width)
             {
@@ -4206,7 +4206,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         Area _a;
                         dataBox.Add(_a = NewAreaSection(ProfileManager.CurrentProfile.ToolTipOverride_SearchText.Count, 0));
-                        Rearrange();
+                        ForceSizeUpdate();
                     }
                 };
 
@@ -4240,7 +4240,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (e.Button == Input.MouseButtonType.Left)
                     {
-                        ToolTipOverrideData.ImportOverrideSettings(world);
+                        ToolTipOverrideData.ImportOverrideSettings();
                     }
                 };
 
@@ -4275,7 +4275,6 @@ namespace ClassicUO.Game.UI.Gumps
                                         ProfileManager.CurrentProfile.ToolTipOverride_MaxVal2 = new List<int>();
                                         ProfileManager.CurrentProfile.ToolTipOverride_Layer = new List<byte>();
                                         dataBox.Clear();
-                                        Rearrange();
                                     }
                                 }
                             )
@@ -4283,16 +4282,21 @@ namespace ClassicUO.Game.UI.Gumps
                     }
                 };
 
-                dataBox = new(0, 30, Width, 0);
+                dataBox = new(Width) {Y = 25};
                 Add(dataBox);
 
+                BuildData();
+            }
+
+            private void BuildData()
+            {
+                dataBox.Clear();
                 for (int i = 0; i < ProfileManager.CurrentProfile.ToolTipOverride_SearchText.Count; i++)
                 {
                     Area _a;
                     dataBox.Add(_a = NewAreaSection(i, 0));
                 }
-
-                Rearrange();
+                ForceSizeUpdate();
             }
 
             private Area NewAreaSection(int keyLoc, int y)
@@ -4620,18 +4624,11 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         data.Delete();
                         area.Dispose();
-                        Rearrange();
+                        BuildData();
                     }
                 };
 
                 return area;
-            }
-
-            private void Rearrange()
-            {
-                dataBox.ReArrangeChildren(2);
-                dataBox.ForceSizeUpdate();
-                ForceSizeUpdate();
             }
         }
 

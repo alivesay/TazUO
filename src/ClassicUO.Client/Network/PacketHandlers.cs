@@ -1048,6 +1048,11 @@ sealed class PacketHandlers
 
                 if (top != null)
                 {
+                    if (it.Layer == Layer.Mount && top is Mobile mob)
+                    {
+                        mob.Mount = null;
+                    }
+
                     if (top == world.Player)
                     {
                         updateAbilities =
@@ -1902,6 +1907,11 @@ sealed class PacketHandlers
         Entity entity = world.Get(item.Container);
 
         entity?.PushToBack(item);
+
+        if (item.Layer == Layer.Mount && entity is Mobile mob)
+        {
+            mob.Mount = item;
+        }
 
         if (item.Layer >= Layer.ShopBuyRestock && item.Layer <= Layer.ShopSell)
         {
@@ -2985,7 +2995,7 @@ sealed class PacketHandlers
 
                 UIManager.GetGump<PaperDollGump>(serial)?.RequestUpdateContents();
                 UIManager.GetGump<ModernPaperdoll>(serial)?.RequestUpdateContents();
-                
+
                 if(mob.Serial == world.Player.Serial)
                     GameActions.RequestEquippedOPL(world);
             }
@@ -3023,6 +3033,11 @@ sealed class PacketHandlers
             world.RemoveItemFromContainer(item);
             item.Container = serial;
             item.Layer = (Layer)layer;
+
+            if (item.Layer == Layer.Mount && obj is Mobile parMob)
+            {
+                parMob.Mount = item;
+            }
 
             item.CheckGraphicChange();
 

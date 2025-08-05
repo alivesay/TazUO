@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
+using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.Managers
 {
@@ -127,13 +128,30 @@ namespace ClassicUO.Game.Managers
 
         public void Delete()
         {
-            ProfileManager.CurrentProfile.ToolTipOverride_SearchText.RemoveAt(Index);
-            ProfileManager.CurrentProfile.ToolTipOverride_NewFormat.RemoveAt(Index);
-            ProfileManager.CurrentProfile.ToolTipOverride_MinVal1.RemoveAt(Index);
-            ProfileManager.CurrentProfile.ToolTipOverride_MinVal2.RemoveAt(Index);
-            ProfileManager.CurrentProfile.ToolTipOverride_MaxVal1.RemoveAt(Index);
-            ProfileManager.CurrentProfile.ToolTipOverride_MaxVal2.RemoveAt(Index);
-            ProfileManager.CurrentProfile.ToolTipOverride_Layer.RemoveAt(Index);
+            if (Index < 0) return;
+
+            var profile = ProfileManager.CurrentProfile;
+
+            if (Index < profile.ToolTipOverride_SearchText.Count)
+                profile.ToolTipOverride_SearchText.RemoveAt(Index);
+
+            if (Index < profile.ToolTipOverride_NewFormat.Count)
+                profile.ToolTipOverride_NewFormat.RemoveAt(Index);
+
+            if (Index < profile.ToolTipOverride_MinVal1.Count)
+                profile.ToolTipOverride_MinVal1.RemoveAt(Index);
+
+            if (Index < profile.ToolTipOverride_MinVal2.Count)
+                profile.ToolTipOverride_MinVal2.RemoveAt(Index);
+
+            if (Index < profile.ToolTipOverride_MaxVal1.Count)
+                profile.ToolTipOverride_MaxVal1.RemoveAt(Index);
+
+            if (Index < profile.ToolTipOverride_MaxVal2.Count)
+                profile.ToolTipOverride_MaxVal2.RemoveAt(Index);
+
+            if (Index < profile.ToolTipOverride_Layer.Count)
+                profile.ToolTipOverride_Layer.RemoveAt(Index);
         }
 
         public static ToolTipOverrideData[] GetAllToolTipOverrides()
@@ -155,40 +173,56 @@ namespace ClassicUO.Game.Managers
         {
             ToolTipOverrideData[] allData = GetAllToolTipOverrides();
 
-            string result = JsonSerializer.Serialize(allData, ToolTipOverrideContext.Default.ToolTipOverrideDataArray);
-
-            string path = Path.Combine(CUOEnviroment.ExecutablePath, "tooltip_overrides.json");
-            if (CUOEnviroment.IsUnix)
+            UIManager.Add(new FileSelector(World.Instance, FileSelectorType.Directory, Environment.GetFolderPath(Environment.SpecialFolder.Desktop), ["*.json"], (p) =>
             {
-                File.WriteAllText(path, result);
-                GameActions.Print(world, $"Tooltip overrides exported to [{path}]");
-                return;
-            }
+                if (!Directory.Exists(p))
+                {
+                    GameActions.Print(World.Instance, "Directory doesn't exist!", 32);
+                    return;
+                }
+
+                try
+                {
+                    string result = JsonSerializer.Serialize(allData);
+                    var path = Path.Combine(p, "tooltip_overrides.json");
+                    File.WriteAllText(path, result);
+                    GameActions.Print(World.Instance, $"The override file has been saved to [{path}]");
+                }
+                catch (Exception e)
+                {
+                    GameActions.Print(World.Instance, "Failed to save the override file!", 32);
+                    Log.Error(e.ToString());
+                }
+            }));
         }
 
-        public static void ImportOverrideSettings(World world)
+        public static void ImportOverrideSettings()
         {
-            var input = new InputRequest(world, "Enter the path to the tooltip overrides json file", "Import", "Cancel", (r, path) =>
+            UIManager.Add(new FileSelector(World.Instance, FileSelectorType.File, Environment.GetFolderPath(Environment.SpecialFolder.Desktop), ["*.json"], (p) =>
             {
-                if (r == InputRequest.Result.BUTTON2) return;
-
-                if (File.Exists(path))
+                if (!File.Exists(p))
                 {
-                    try
-                    {
-                        string result = File.ReadAllText(path);
-                        ToolTipOverrideData[] imported = JsonSerializer.Deserialize(result, ToolTipOverrideContext.Default.ToolTipOverrideDataArray);
-                        foreach (ToolTipOverrideData importedData in imported)
-                            new ToolTipOverrideData(ProfileManager.CurrentProfile.ToolTipOverride_SearchText.Count, importedData.SearchText, importedData.FormattedText, importedData.Min1, importedData.Max1, importedData.Min2, importedData.Max2, (byte)importedData.ItemLayer).Save();
-
-                    }
-                    catch (Exception e)
-                    {
-                        GameActions.Print(world, e.Message);
-                        GameActions.Print(world, "It looks like there was an error trying to import your override settings.", 32);
-                    }
+                    GameActions.Print(World.Instance, "File doesn't exist!", 32);
+                    return;
                 }
-            });
+
+                try
+                {
+                    string result = File.ReadAllText(p);
+
+                    ToolTipOverrideData[] imported = JsonSerializer.Deserialize<ToolTipOverrideData[]>(result);
+
+                    foreach (ToolTipOverrideData importedData in imported)
+                        new ToolTipOverrideData(ProfileManager.CurrentProfile.ToolTipOverride_SearchText.Count, importedData.SearchText, importedData.FormattedText, importedData.Min1, importedData.Max1, importedData.Min2, importedData.Max2, (byte)importedData.ItemLayer).Save();
+
+                    GameActions.Print(World.Instance, $"Imported {imported.Length} tooltip overrides!");
+                }
+                catch (System.Exception e)
+                {
+                    Log.Error(e.ToString());
+                    GameActions.Print(World.Instance, "It looks like there was an error trying to import your override settings.", 32);
+                }
+            }));
         }
 
         private static string DecodeUnicodeEscapes(string input)

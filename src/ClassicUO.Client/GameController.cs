@@ -368,56 +368,35 @@ namespace ClassicUO
 
         protected override void Update(GameTime gameTime)
         {
-            #if DEBUG
-            if (Profiler.InContext("OutOfContext"))
-            {
-                Profiler.ExitContext("OutOfContext");
-            }
-            #endif
+            Profiler.ExitContext("OutOfContext");
 
             Time.Ticks = (uint)gameTime.TotalGameTime.TotalMilliseconds;
             Time.Delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            #if DEBUG
             Profiler.EnterContext("Mouse");
-            #endif
             Mouse.Update();
-            #if DEBUG
             Profiler.ExitContext("Mouse");
 
             Profiler.EnterContext("Packets");
-            #endif
             AsyncNetClient.Socket.ProcessIncomingMessages();
-            #if DEBUG
             Profiler.ExitContext("Packets");
-            #endif
 
             Plugin.Tick();
 
             if(drawScene)
             {
-                #if DEBUG
                 Profiler.EnterContext("Update");
-                #endif
                 Scene.Update();
-                #if DEBUG
                 Profiler.ExitContext("Update");
-                #endif
             }
 
-            #if DEBUG
             Profiler.EnterContext("UI Update");
-            #endif
             UIManager.Update();
-            #if DEBUG
             Profiler.ExitContext("UI Update");
 
             Profiler.EnterContext("LScript");
-            #endif
             LegionScripting.LegionScripting.OnUpdate();
-            #if DEBUG
             Profiler.ExitContext("LScript");
-            #endif
 
             MainThreadQueue.ProcessQueue();
 
@@ -504,17 +483,10 @@ namespace ClassicUO
 
         protected override void Draw(GameTime gameTime)
         {
-            #if DEBUG
             Profiler.EndFrame();
             Profiler.BeginFrame();
-
-            if (Profiler.InContext("OutOfContext"))
-            {
-                Profiler.ExitContext("OutOfContext");
-            }
-
-            Profiler.EnterContext("RenderFrame");
-            #endif
+            Profiler.ExitContext("OutOfContext");
+            Profiler.EnterContext("Draw-Tiles");
 
             _totalFrames++;
             GraphicsDevice.Clear(Color.Black);
@@ -522,11 +494,17 @@ namespace ClassicUO
             _uoSpriteBatch.Begin();
             _uoSpriteBatch.DrawTiled(_background, bufferRect, _background.Bounds, bgHueShader);
             _uoSpriteBatch.End();
+            Profiler.ExitContext("Draw-Tiles");
 
+            Profiler.EnterContext("Draw-Scene");
             if (drawScene)
                 Scene.Draw(_uoSpriteBatch);
+            Profiler.ExitContext("Draw-Scene");
 
+            Profiler.EnterContext("Draw-UI");
             UIManager.Draw(_uoSpriteBatch);
+            Profiler.ExitContext("Draw-UI");
+            Profiler.EnterContext("OutOfContext");
 
             SelectedObject.HealthbarObject = null;
             SelectedObject.SelectedContainer = null;
@@ -536,10 +514,6 @@ namespace ClassicUO
             _uoSpriteBatch.End();
 
             base.Draw(gameTime);
-            #if DEBUG
-            Profiler.ExitContext("RenderFrame");
-            Profiler.EnterContext("OutOfContext");
-            #endif
 
             Plugin.ProcessDrawCmdList(GraphicsDevice);
 

@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace ClassicUO.Utility
         private static readonly ProfileData m_TotalTimeData;
         private static readonly Stopwatch _timer;
         private static long m_BeginFrameTicks;
-        
+
         public static List<ProfileData> AllFrameData => m_AllFrameData;
 
         static Profiler()
@@ -34,6 +34,7 @@ namespace ClassicUO.Utility
 
         public static bool Enabled = false;
 
+        [Conditional("DEBUG")]
         public static void BeginFrame()
         {
             if (!Enabled)
@@ -70,6 +71,7 @@ namespace ClassicUO.Utility
             m_BeginFrameTicks = _timer.ElapsedTicks;
         }
 
+        [Conditional("DEBUG")]
         public static void EndFrame()
         {
             if (!Enabled)
@@ -81,6 +83,7 @@ namespace ClassicUO.Utility
             m_TotalTimeData.AddNewHitLength(LastFrameTimeMS);
         }
 
+        [Conditional("DEBUG")]
         public static void EnterContext(string context_name)
         {
             if (!Enabled)
@@ -91,16 +94,19 @@ namespace ClassicUO.Utility
             m_Context.Add(new ContextAndTick(context_name, _timer.ElapsedTicks));
         }
 
-        public static void ExitContext(string context_name)
+        [Conditional("DEBUG")]
+        public static void ExitContext(string context_name, bool errorNotInContext = false)
         {
             if (!Enabled)
             {
                 return;
             }
 
-            if (m_Context[m_Context.Count - 1].Name != context_name)
+            if (m_Context.Count == 0 || m_Context[m_Context.Count - 1].Name != context_name)
             {
-                Log.Error("Profiler.ExitProfiledContext: context_name does not match current context.");
+                if(errorNotInContext)
+                    Log.Error("Profiler.ExitProfiledContext: context_name does not match current context.");
+                return;
             }
 
             string[] context = new string[m_Context.Count];

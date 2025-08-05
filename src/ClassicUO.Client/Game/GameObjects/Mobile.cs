@@ -143,23 +143,13 @@ namespace ClassicUO.Game.GameObjects
             set { }
         }
 
-        public bool IsHuman =>
-            Graphic >= 0x0190 && Graphic <= 0x0193
-            || Graphic >= 0x00B7 && Graphic <= 0x00BA
-            || Graphic >= 0x025D && Graphic <= 0x0260
-            || Graphic == 0x029A
-            || Graphic == 0x029B
-            || Graphic == 0x02B6
-            || Graphic == 0x02B7
-            || Graphic == 0x03DB
-            || Graphic == 0x03DF
-            || Graphic == 0x03E2
-            || Graphic == 0x02E8
-            || Graphic == 0x02E9
-            || Graphic == 0x04E5;
-
-        public bool IsGargoyle =>
-            Client.Game.UO.Version >= ClientVersion.CV_7000 && Graphic == 0x029A || Graphic == 0x029B;
+        public Item Mount { get; set; }
+        public bool IsHuman { get; private set; }
+        public bool IsGargoyle { get; private set; }
+        /// <summary>
+        /// This is only set for the main player character. This is not an indicator for other players.
+        /// </summary>
+        public bool IsPlayer;
 
         public bool IsMounted
         {
@@ -176,6 +166,8 @@ namespace ClassicUO.Game.GameObjects
             }
         }
 
+        public bool InParty { get; set; }
+
         public bool IsDrivingBoat
         {
             get
@@ -189,12 +181,12 @@ namespace ClassicUO.Game.GameObjects
         public virtual bool IsWalking => LastStepTime > Time.Ticks - Constants.WALKING_DELAY;
 
         #region Python API accessors - Added for Python API
-        public bool IsAttackable => (Flags & Flags.YellowBar) == 0; 
+        public bool IsAttackable => (Flags & Flags.YellowBar) == 0;
         public int HitsDiff => HitsMax - Hits;
         public int StamDiff => StaminaMax - Stamina;
         public int ManaDiff => ManaMax - Mana;
         #endregion
-  
+
         public byte AnimationFrameCount;
         public bool AnimationFromServer;
         public bool IsFemale;
@@ -217,6 +209,13 @@ namespace ClassicUO.Game.GameObjects
             mobile.Serial = serial;
 
             return mobile;
+        }
+
+        public override void OnGraphicSet(ushort newGraphic)
+        {
+            base.OnGraphicSet(newGraphic);
+            IsHuman = HumanGraphicCheck();
+            IsGargoyle = GargoyleGraphicCheck();
         }
 
         public Item GetSecureTradeBox()
@@ -1056,6 +1055,25 @@ namespace ClassicUO.Game.GameObjects
                     }
             }
         }
+
+        private bool HumanGraphicCheck() =>
+            Graphic >= 0x0190 && Graphic <= 0x0193
+            || Graphic >= 0x00B7 && Graphic <= 0x00BA
+            || Graphic >= 0x025D && Graphic <= 0x0260
+            || Graphic == 0x029A
+            || Graphic == 0x029B
+            || Graphic == 0x02B6
+            || Graphic == 0x02B7
+            || Graphic == 0x03DB
+            || Graphic == 0x03DF
+            || Graphic == 0x03E2
+            || Graphic == 0x02E8
+            || Graphic == 0x02E9
+            || Graphic == 0x04E5;
+
+        private bool GargoyleGraphicCheck() =>
+            Client.Game.UO.Version >= ClientVersion.CV_7000
+            && (Graphic == 666 || Graphic == 667 || Graphic == 0x02B7 || Graphic == 0x02B6);
 
         public override void Destroy()
         {

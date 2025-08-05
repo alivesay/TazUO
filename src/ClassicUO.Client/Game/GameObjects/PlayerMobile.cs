@@ -40,6 +40,8 @@ namespace ClassicUO.Game.GameObjects
 
             if(ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.EnableSpellIndicators)
                 UIManager.Add(new SpellVisualRangeManager.CastTimerProgressBar(world));
+
+            IsPlayer = true;
         }
 
         public Skill[] Skills { get; }
@@ -593,7 +595,7 @@ namespace ClassicUO.Game.GameObjects
                 sbyte oldZ = z;
                 ushort walkTime = ProfileManager.CurrentProfile.TurnDelay;
 
-  
+
                 if (IsCardinalDirection(direction))
                 {
                     if (IsObstacle(direction, x, y, z))
@@ -609,7 +611,7 @@ namespace ClassicUO.Game.GameObjects
                         }
                         else
                         {
-                            return false; 
+                            return false;
                         }
                     }
                 }

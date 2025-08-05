@@ -1073,6 +1073,11 @@ namespace ClassicUO.Network
 
                     if (top != null)
                     {
+                        if (it.Layer == Layer.Mount && top is Mobile mob)
+                        {
+                            mob.Mount = null;
+                        }
+
                         if (top == World.Player)
                         {
                             updateAbilities =
@@ -1927,6 +1932,11 @@ namespace ClassicUO.Network
             Entity entity = World.Get(item.Container);
 
             entity?.PushToBack(item);
+
+            if (item.Layer == Layer.Mount && entity is Mobile mob)
+            {
+                mob.Mount = item;
+            }
 
             if (item.Layer >= Layer.ShopBuyRestock && item.Layer <= Layer.ShopSell)
             {
@@ -2988,7 +2998,7 @@ namespace ClassicUO.Network
 
                 UIManager.GetGump<PaperDollGump>(serial)?.RequestUpdateContents();
                 UIManager.GetGump<ModernPaperdoll>(serial)?.RequestUpdateContents();
-                
+
                 if(mob.Serial == World.Player.Serial)
                     GameActions.RequestEquippedOPL();
             }
@@ -3026,6 +3036,11 @@ namespace ClassicUO.Network
                 World.RemoveItemFromContainer(item);
                 item.Container = serial;
                 item.Layer = (Layer)layer;
+
+                if (item.Layer == Layer.Mount && obj is Mobile parMob)
+                {
+                    parMob.Mount = item;
+                }
 
                 item.CheckGraphicChange();
 
@@ -5521,7 +5536,7 @@ namespace ClassicUO.Network
             }
             byte[] decData = System.Buffers.ArrayPool<byte>.Shared.Rent(dlen);
             string layout;
-            
+
             try
             {
                 unsafe
@@ -5538,7 +5553,7 @@ namespace ClassicUO.Network
             {
                 System.Buffers.ArrayPool<byte>.Shared.Return(decData);
             }
-            
+
             try
             {
                 p.Skip((int)clen);
@@ -6277,7 +6292,7 @@ namespace ClassicUO.Network
                 World.RemoveItemFromContainer(item);
                 item.Container = containerSerial;
             }
-            
+
             container.PushToBack(item);
 
             if (SerialHelper.IsMobile(containerSerial))
@@ -6782,7 +6797,7 @@ namespace ClassicUO.Network
                     IsFromServer = true
                 };
             }
-            
+
             gump.PacketGumpText = string.Join("\n", lines);
 
             int group = 0;

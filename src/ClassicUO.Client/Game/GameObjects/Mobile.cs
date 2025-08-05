@@ -174,6 +174,7 @@ namespace ClassicUO.Game.GameObjects
             set { }
         }
 
+        public Item Mount { get; set; }
         public bool IsHuman { get; private set; }
         public bool IsGargoyle { get; private set; }
         /// <summary>

@@ -2,7 +2,7 @@
 
 // Copyright (c) 2021, andreakarasho
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 1. Redistributions of source code must retain the above copyright
@@ -16,7 +16,7 @@
 // 4. Neither the name of the copyright holder nor the
 //    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -46,7 +46,7 @@ namespace ClassicUO.Utility
         private static readonly ProfileData m_TotalTimeData;
         private static readonly Stopwatch _timer;
         private static long m_BeginFrameTicks;
-        
+
         public static List<ProfileData> AllFrameData => m_AllFrameData;
 
         static Profiler()
@@ -64,6 +64,7 @@ namespace ClassicUO.Utility
 
         public static bool Enabled = false;
 
+        [Conditional("DEBUG")]
         public static void BeginFrame()
         {
             if (!Enabled)
@@ -100,6 +101,7 @@ namespace ClassicUO.Utility
             m_BeginFrameTicks = _timer.ElapsedTicks;
         }
 
+        [Conditional("DEBUG")]
         public static void EndFrame()
         {
             if (!Enabled)
@@ -111,6 +113,7 @@ namespace ClassicUO.Utility
             m_TotalTimeData.AddNewHitLength(LastFrameTimeMS);
         }
 
+        [Conditional("DEBUG")]
         public static void EnterContext(string context_name)
         {
             if (!Enabled)
@@ -121,16 +124,19 @@ namespace ClassicUO.Utility
             m_Context.Add(new ContextAndTick(context_name, _timer.ElapsedTicks));
         }
 
-        public static void ExitContext(string context_name)
+        [Conditional("DEBUG")]
+        public static void ExitContext(string context_name, bool errorNotInContext = false)
         {
             if (!Enabled)
             {
                 return;
             }
 
-            if (m_Context[m_Context.Count - 1].Name != context_name)
+            if (m_Context.Count == 0 || m_Context[m_Context.Count - 1].Name != context_name)
             {
-                Log.Error("Profiler.ExitProfiledContext: context_name does not match current context.");
+                if(errorNotInContext)
+                    Log.Error("Profiler.ExitProfiledContext: context_name does not match current context.");
+                return;
             }
 
             string[] context = new string[m_Context.Count];

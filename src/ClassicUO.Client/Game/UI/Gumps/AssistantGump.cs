@@ -258,9 +258,29 @@ public class AssistantGump : BaseOptionsGump
             return new CheckboxWithLabel(name, 0, ByteFlagHelper.HasFlag(profile.HideHudGumpFlags, flag), b =>
             {
                 if (b)
+                {
                     profile.HideHudGumpFlags = ByteFlagHelper.AddFlag(profile.HideHudGumpFlags, flag);
+                    if ((HideHudFlags)flag == HideHudFlags.All)
+                    {
+                        var ag = new AssistantGump(){X = X, Y = Y};
+                        ag.ChangePage((int)PAGE.HUD);
+                        UIManager.Add(ag);
+                        Dispose();
+                    }
+                }
                 else
-                    profile.HideHudGumpFlags = ByteFlagHelper.RemoveFlag(profile.HideHudGumpFlags, flag);
+                {
+                    if ((HideHudFlags)flag == HideHudFlags.All)
+                    {
+                        profile.HideHudGumpFlags = 0;
+                        var ag = new AssistantGump(){X = X, Y = Y};
+                        ag.ChangePage((int)PAGE.HUD);
+                        UIManager.Add(ag);
+                        Dispose();
+                    }
+                    else
+                        profile.HideHudGumpFlags = ByteFlagHelper.RemoveFlag(profile.HideHudGumpFlags, flag);
+                }
             });
         }
     }

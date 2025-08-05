@@ -3,7 +3,7 @@ using System;
 namespace ClassicUO.Game.Data;
 
 [Flags]
-public enum HideHudFlags : ulong //Up to 64 gump types for ulong
+public enum HideHudFlags : ulong //Up to 63 gump types for ulong
 {
     None = 0,
     Paperdoll = 1 << 0,
@@ -24,5 +24,7 @@ public enum HideHudFlags : ulong //Up to 64 gump types for ulong
     BuffBar = 1 << 15,
     CounterBar = 1 << 16,
     InfoBar = 1 << 17,
-    SpellIcons = 1 << 18
+    SpellIcons = 1 << 18,
+
+    All = (1UL << 19) - 1 //Update 19 if more are added
 }

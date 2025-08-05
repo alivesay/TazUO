@@ -286,7 +286,7 @@ public class NineSliceGump : Gump
 
     public override bool Draw(UltimaBatcher2D batcher, int x, int y)
     {
-        if (IsDisposed || _customTexture == null || _customTexture.IsDisposed)
+        if (IsDisposed || !IsVisible || _customTexture == null || _customTexture.IsDisposed)
         {
             return false;
         }

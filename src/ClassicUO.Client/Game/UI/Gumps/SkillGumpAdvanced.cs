@@ -278,11 +278,11 @@ namespace ClassicUO.Game.UI.Gumps
             resizeDrag.Y = Height - 10;
             X = last_x;
             Y = last_y;
-            
+
             SetSortIndicatorPosition();
             ForceUpdate();
         }
-        
+
         private void SetSortIndicatorPosition()
         {
             if (FindControls<NiceButton>().Any(s => s.ButtonParameter == last_button))
@@ -508,7 +508,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             Add(real = new Label(_totalReal.ToString("F1"), true, 1153) { X = 205, Y = Height - 20, AcceptMouseInput = false});
             Add(value = new Label(_totalValue.ToString("F1"), true, 1153) { X = 255, Y = Height - 20, AcceptMouseInput = false});
-            
+
             SetSortIndicatorPosition();
         }
 
@@ -582,6 +582,8 @@ namespace ClassicUO.Game.UI.Gumps
 
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)
         {
+            if (!IsVisible) return false;
+
             Vector3 hueVector = ShaderHueTranslator.GetHueVector(0);
 
             batcher.DrawRectangle(

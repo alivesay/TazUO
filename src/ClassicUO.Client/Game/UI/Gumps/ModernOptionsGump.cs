@@ -3812,7 +3812,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     float v = ((float)s.GetValue() / (float)100);
 
-                    if (v <= 0)
+                    if (v <= 0 || v == 1f)
                         profile.GlobalScaling = false;
 
                     profile.GlobalScale = v > 0 ? v : 1f;

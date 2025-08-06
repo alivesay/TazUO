@@ -1,13 +1,10 @@
 using ClassicUO.Configuration;
 using ClassicUO.Game.UI.Controls;
-using ClassicUO.Renderer.Lights;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static ClassicUO.Game.UI.Gumps.OptionsGump;
 
 namespace ClassicUO.Game.UI.Gumps.GridHighLight
 {

@@ -1013,6 +1013,8 @@ namespace ClassicUO.Game.Scenes
                 return true;
             }
 
+            var profile = ProfileManager.CurrentProfile;
+
             Viewport r_viewport = batcher.GraphicsDevice.Viewport;
             Viewport camera_viewport = Camera.GetViewport();
             Matrix matrix = _use_render_target ? Matrix.Identity : Camera.ViewTransformMatrix;
@@ -1021,15 +1023,15 @@ namespace ClassicUO.Game.Scenes
 
             if (!_use_render_target)
             {
-                if (ProfileManager.CurrentProfile.GlobalScaling)
+                if (profile.GlobalScaling)
                 {
-                    Camera.Zoom = 1f; // oScale + ProfileManager.CurrentProfile.GlobalScale;
-                    matrix = Matrix.CreateScale(ProfileManager.CurrentProfile.GlobalScale);
+                    Camera.Zoom = 1f; // oScale + profile.GlobalScale;
+                    matrix = Matrix.CreateScale(profile.GlobalScale);
                     camera_viewport.Bounds = new Rectangle(
-                        (int)(camera_viewport.Bounds.X * ProfileManager.CurrentProfile.GlobalScale),
-                        (int)(camera_viewport.Bounds.Y * ProfileManager.CurrentProfile.GlobalScale),
-                        (int)(camera_viewport.Bounds.Width * ProfileManager.CurrentProfile.GlobalScale),
-                        (int)(camera_viewport.Bounds.Height * ProfileManager.CurrentProfile.GlobalScale)
+                        (int)(camera_viewport.Bounds.X * profile.GlobalScale),
+                        (int)(camera_viewport.Bounds.Y * profile.GlobalScale),
+                        (int)(camera_viewport.Bounds.Width * profile.GlobalScale),
+                        (int)(camera_viewport.Bounds.Height * profile.GlobalScale)
                         );
                 }
 
@@ -1051,7 +1053,7 @@ namespace ClassicUO.Game.Scenes
 
             if (_use_render_target)
             {
-                //switch (ProfileManager.CurrentProfile.FilterType)
+                //switch (profile.FilterType)
                 //{
                 //    default:
                 //    case 0:
@@ -1100,8 +1102,8 @@ namespace ClassicUO.Game.Scenes
             // draw lights
             if (can_draw_lights)
             {
-                if (ProfileManager.CurrentProfile.GlobalScaling)
-                    batcher.Begin(null, Matrix.CreateScale(ProfileManager.CurrentProfile.GlobalScale));
+                if (profile.GlobalScaling)
+                    batcher.Begin(null, Matrix.CreateScale(profile.GlobalScale));
                 else
                     batcher.Begin();
 
@@ -1127,8 +1129,8 @@ namespace ClassicUO.Game.Scenes
                 hue.Z = 1f;
             }
 
-            if (ProfileManager.CurrentProfile.GlobalScaling)
-                batcher.Begin(null, Matrix.CreateScale(ProfileManager.CurrentProfile.GlobalScale));
+            if (profile.GlobalScaling)
+                batcher.Begin(null, Matrix.CreateScale(profile.GlobalScale));
             else
                 batcher.Begin();
             DrawOverheads(batcher);
@@ -1223,9 +1225,6 @@ namespace ClassicUO.Game.Scenes
 
             batcher.End();
 
-            int flushes = batcher.FlushesDone;
-            int switches = batcher.TextureSwitches;
-
             if (use_render_target)
             {
                 batcher.GraphicsDevice.SetRenderTarget(null);
@@ -1235,7 +1234,7 @@ namespace ClassicUO.Game.Scenes
             //hueVec.X = 0;
             //hueVec.Y = 1;
             //hueVec.Z = 1;
-            //string s = $"Flushes: {flushes}\nSwitches: {switches}\nArt texture count: {TextureAtlas.Shared.TexturesCount}\nMaxZ: {_maxZ}\nMaxGround: {_maxGroundZ}";
+            //string s = $"Flushes: {batcher.FlushesDone}\nSwitches: {batcher.TextureSwitches}\nArt texture count: {TextureAtlas.Shared.TexturesCount}\nMaxZ: {_maxZ}\nMaxGround: {_maxGroundZ}";
             //batcher.DrawString(Fonts.Bold, s, 200, 200, ref hueVec);
             //hueVec = Vector3.Zero;
             //batcher.DrawString(Fonts.Bold, s, 200 + 1, 200 - 1, ref hueVec);
@@ -1403,29 +1402,26 @@ namespace ClassicUO.Game.Scenes
 
         private bool CheckDeathScreen(UltimaBatcher2D batcher)
         {
-            if (
-                ProfileManager.CurrentProfile != null
-                && ProfileManager.CurrentProfile.EnableDeathScreen
-            )
+            if (ProfileManager.CurrentProfile == null || !ProfileManager.CurrentProfile.EnableDeathScreen)
             {
-                if (_world.InGame)
-                {
-                    if (_world.Player.IsDead && _world.Player.DeathScreenTimer > Time.Ticks)
-                    {
-                        batcher.Begin();
-                        _youAreDeadText.Draw(
-                            batcher,
-                            Camera.Bounds.X + (Camera.Bounds.Width / 2 - _youAreDeadText.Width / 2),
-                            Camera.Bounds.Bottom / 2
-                        );
-                        batcher.End();
-
-                        return true;
-                    }
-                }
+                return false;
             }
 
-            return false;
+            if (!_world.Player.IsDead || _world.Player.DeathScreenTimer <= Time.Ticks)
+            {
+                return false;
+            }
+
+            batcher.Begin();
+            _youAreDeadText.Draw(
+                batcher,
+                Camera.Bounds.X + (Camera.Bounds.Width / 2 - _youAreDeadText.Width / 2),
+                Camera.Bounds.Bottom / 2
+            );
+            batcher.End();
+
+            return true;
+
         }
 
         private void StopFollowing()

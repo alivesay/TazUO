@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
 using System.Linq;
@@ -406,12 +406,6 @@ namespace ClassicUO.Game.UI.Controls
             {
                 var posX = (Client.Game.Window.ClientBounds.Width >> 1) - 300;
                 var posY = (Client.Game.Window.ClientBounds.Height >> 1) - 250;
-                Gumps.Gump opt = UIManager.GetGump<OptionsGump>();
-                if (opt != null)
-                {
-                    posX = opt.X + opt.Width + 5;
-                    posY = opt.Y;
-                }
                 if (position.HasValue)
                 {
                     posX = (int)position.Value.X;
@@ -572,12 +566,12 @@ namespace ClassicUO.Game.UI.Controls
             {
                 switch (buttonID)
                 {
-                    case (int)buttonsOption.RemoveBtn: 
+                    case (int)buttonsOption.RemoveBtn:
                         _control.Macro.Remove(_obj);
                         Dispose();
                         _control.SetupMacroUI();
                         OnDelete?.Invoke(this, _obj);
-                        break;                
+                        break;
                 }
             }
 

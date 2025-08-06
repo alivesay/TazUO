@@ -4,6 +4,7 @@ public class SettingsSection : Control
 {
     private const byte FONT = 0xFF;
     private const ushort HUE_FONT = 0xFFFF;
+
     private readonly DataBox _databox;
     private int _indent;
 
@@ -74,7 +75,7 @@ public class SettingsSection : Control
         base.Add(c, page);
     }
 
-    public void Add(Control c, int page = 0)
+    public override T Add<T>(T c, int page = 0)
     {
         int i = _databox.Children.Count - 1;
         int bottom = 0;
@@ -101,5 +102,6 @@ public class SettingsSection : Control
         _databox.WantUpdateSize = true;
 
         Height += c.Height + 2;
+        return c;
     }
 }

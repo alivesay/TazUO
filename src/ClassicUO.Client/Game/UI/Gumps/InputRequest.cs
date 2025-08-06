@@ -2,7 +2,6 @@
 using ClassicUO.Game.UI.Controls;
 using Microsoft.Xna.Framework;
 using System;
-using static ClassicUO.Game.UI.Gumps.OptionsGump;
 
 namespace ClassicUO.Game.UI.Gumps
 {

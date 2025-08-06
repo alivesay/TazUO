@@ -7,12 +7,9 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using static ClassicUO.Game.UI.Gumps.OptionsGump;
 
 namespace ClassicUO.Game.UI.Gumps.GridHighLight
 {
@@ -225,7 +222,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 {
                     if (!File.Exists(file))
                         return;
-                    
+
                     string json = File.ReadAllText(file);
                     var imported = JsonSerializer.Deserialize<List<GridHighlightSetupEntry>>(json);
                     if (imported != null)

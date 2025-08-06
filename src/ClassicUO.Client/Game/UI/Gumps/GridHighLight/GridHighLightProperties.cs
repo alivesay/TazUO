@@ -1,16 +1,8 @@
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Renderer;
-using ClassicUO.Renderer.Lights;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static ClassicUO.Game.UI.Gumps.OptionsGump;
-using static IronPython.Modules._ast;
 
 namespace ClassicUO.Game.UI.Gumps.GridHighLight
 {

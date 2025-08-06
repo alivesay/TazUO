@@ -31,6 +31,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
@@ -90,7 +91,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (Client.Version >= ClientVersion.CV_704565)
                     {
-                        _myCoins[0].Text = _gold.ToString();
+                        _myCoins[0].Text = FormatAsCurrency(_gold);
                     }
                 }
             }
@@ -107,7 +108,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (Client.Version >= ClientVersion.CV_704565)
                     {
-                        _myCoins[1].Text = _platinum.ToString();
+                        _myCoins[1].Text = FormatAsCurrency(_platinum);
                     }
                 }
             }
@@ -124,7 +125,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (Client.Version >= ClientVersion.CV_704565)
                     {
-                        _hisCoins[0].Text = _hisGold.ToString();
+                        _hisCoins[0].Text = FormatAsCurrency(_hisGold);
                     }
                 }
             }
@@ -141,7 +142,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (Client.Version >= ClientVersion.CV_704565)
                     {
-                        _hisCoins[1].Text = _hisPlatinum.ToString();
+                        _hisCoins[1].Text = FormatAsCurrency(_hisPlatinum);
                     }
                 }
             }
@@ -624,6 +625,11 @@ namespace ClassicUO.Game.UI.Gumps
         {
             ImAccepting = !ImAccepting;
             GameActions.AcceptTrade(ID1, ImAccepting);
+        }
+
+        private static string FormatAsCurrency(uint amount, bool useComma = true)
+        {
+            return amount.ToString("C0", CultureInfo.CurrentCulture);
         }
     }
 }

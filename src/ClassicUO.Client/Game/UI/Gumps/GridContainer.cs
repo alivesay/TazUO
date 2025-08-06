@@ -1388,17 +1388,9 @@ namespace ClassicUO.Game.UI.Gumps
                 }
 
                 container = World.Items.Get(thisContainer);
-                UpdateItems();
-                if (containerContents.Count > 125)
-                    amount = containerContents.Count;
                 #endregion
 
-                for (int i = 0; i < amount; i++)
-                {
-                    GridItem GI = new GridItem(0, gridItemSize, container, gridContainer, i);
-                    gridSlots.Add(i, GI);
-                    area.Add(GI);
-                }
+                SetupGridItemControls();
             }
 
             public void AddLockedItemSlot(uint serial, int specificSlot)
@@ -1426,6 +1418,8 @@ namespace ClassicUO.Game.UI.Gumps
 
             public void RebuildContainer(List<Item> filteredItems, string searchText = "", bool overrideSort = false)
             {
+                SetupGridItemControls();
+
                 foreach (var slot in gridSlots)
                 {
                     slot.Value.SetGridItem(null);
@@ -1598,7 +1592,21 @@ namespace ClassicUO.Game.UI.Gumps
                 return contents.OrderBy((x) => x.Graphic).ThenBy((x) => x.Hue).ToList();
             }
 
-            public int hcount = 0;
+            private void SetupGridItemControls()
+            {
+                UpdateItems();
+                if (containerContents.Count > 125)
+                    amount = containerContents.Count;
+
+                for (int i = 0; i < amount; i++)
+                {
+                    if (gridSlots.ContainsKey(i)) continue;
+
+                    GridItem GI = new GridItem(0, gridItemSize, container, gridContainer, i);
+                    gridSlots.Add(i, GI);
+                    area.Add(GI);
+                }
+            }
         }
 
         private class GridScrollArea : Control

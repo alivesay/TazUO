@@ -2,7 +2,7 @@
 
 // Copyright (c) 2021, andreakarasho
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 1. Redistributions of source code must retain the above copyright
@@ -16,7 +16,7 @@
 // 4. Neither the name of the copyright holder nor the
 //    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -61,7 +61,7 @@ namespace ClassicUO.Game.Managers
             prop.NameCliloc = namecliloc;
 
             EventSink.InvokeOPLOnReceive(null, new OPLEventArgs(serial, name, data));
-            
+
             GridHighlightData.ProcessItemOpl(serial);
         }
 
@@ -75,11 +75,11 @@ namespace ClassicUO.Game.Managers
                 return true; //p.Revision != 0;  <-- revision == 0 can contain the name.
             }
 
-            if(ProfileManager.CurrentProfile.ForceTooltipsOnOldClients) 
+            if(ProfileManager.CurrentProfile.ForceTooltipsOnOldClients)
                 ForcedTooltipManager.RequestName(serial);
 
             // if we don't have the OPL of this item, let's request it to the server.
-            // Original client seems asking for OPL when character is not running. 
+            // Original client seems asking for OPL when character is not running.
             // We'll ask OPL when mouse is over an object.
             if(World.ClientFeatures.TooltipsEnabled)
                 PacketHandlers.AddMegaClilocRequest(serial);
@@ -338,7 +338,7 @@ namespace ClassicUO.Game.Managers
 
                 // Remove any color tags like /c[#...]
                 string cleaned = RegexHelper.GetRegex(@"/c\[[#a-zA-Z0-9]+\]", RegexOptions.IgnoreCase).Replace(line, "").Replace("/cd", "").Trim();
-                
+
                 // Extract numbers
                 MatchCollection matches = RegexHelper.GetRegex(@"-?\d+(\.\d+)?").Matches(cleaned);
 
@@ -350,7 +350,7 @@ namespace ClassicUO.Game.Managers
                 }
 
                 // Remove all numbers and symbols from the cleaned string to isolate the name
-                Name = RegexHelper.GetRegex(@"[-+]?\d+(\.\d+)?[%]?(/[ ]*\d+)?", RegexOptions.IgnoreCase).Replace(cleaned, "").Trim();
+                Name = RegexHelper.GetRegex(@"[-+]?\d+(\.\d+)?[%]?([ ]*\d+)?", RegexOptions.IgnoreCase).Replace(cleaned, "").Trim();
 
                 // Fallback if something went wrong
                 if (string.IsNullOrWhiteSpace(Name))

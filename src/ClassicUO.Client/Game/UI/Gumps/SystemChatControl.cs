@@ -2,7 +2,7 @@
 
 // Copyright (c) 2021, andreakarasho
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 1. Redistributions of source code must retain the above copyright
@@ -16,7 +16,7 @@
 // 4. Neither the name of the copyright holder nor the
 //    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,9 +41,11 @@ using ClassicUO.Input;
 using ClassicUO.Network;
 using ClassicUO.Renderer;
 using ClassicUO.Resources;
-using ClassicUO.Utility.Collections;
 using ClassicUO.Utility.Platforms;
 using SDL2;
+using Control = ClassicUO.Game.UI.Controls.Control;
+using Label = ClassicUO.Game.UI.Controls.Label;
+using TextBox = ClassicUO.Game.UI.Controls.TextBox;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -78,7 +80,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         private readonly LinkedList<ChatLineTime> _textEntries;
         private readonly AlphaBlendControl _trans;
-
+        private int lastAutoCompleteIndex = 0;
 
         public SystemChatControl(int x, int y, int w, int h)
         {
@@ -356,8 +358,8 @@ namespace ClassicUO.Game.UI.Gumps
                 lineToRemove.Value.Destroy();
                 _textEntries.Remove(lineToRemove);
             }
-            
-            
+
+
             var last = _textEntries.Last?.Value;
 
             if (last != null && last.Duplicate(text))
@@ -610,6 +612,22 @@ namespace ClassicUO.Game.UI.Gumps
                     MessageManager.PromptData = default;
 
                     break;
+
+                case SDL.SDL_Keycode.SDLK_TAB when _mode == ChatMode.Default:
+                    List<string> autoComplete = CommandHistoryManager.GetAutocompleteSuggestions(TextBoxControl.Text);
+                    if (autoComplete != null && autoComplete.Count > 0)
+                    {
+                        ContextMenuControl cm = new();
+                        foreach (string s in autoComplete)
+                        {
+                            cm.Add(s, () =>
+                            {
+                                TextBoxControl.SetText(s);
+                            });
+                        }
+                        cm.Show();
+                    }
+                    break;
             }
         }
 
@@ -653,6 +671,8 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     case ChatMode.Default:
                         GameActions.Say(text, ProfileManager.CurrentProfile.SpeechHue);
+
+                        CommandHistoryManager.AddToHistoryIfCommand(text);
 
                         break;
 

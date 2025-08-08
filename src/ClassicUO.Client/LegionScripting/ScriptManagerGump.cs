@@ -56,10 +56,7 @@ namespace ClassicUO.LegionScripting
             refresh.ContextMenu = new ContextMenuControl();
             refresh.ContextMenu.Add(new ContextMenuItemEntry("Refresh", () =>
             {
-                Dispose();
-                ScriptManagerGump g = new ScriptManagerGump() { X = X, Y = Y };
-                g.ResizeWindow(new Point(Width, Height));
-                UIManager.Add(g);
+                Refresh();
             }));
             refresh.ContextMenu.Add(new ContextMenuItemEntry("Public Script Browser", () =>
             {
@@ -84,6 +81,14 @@ namespace ClassicUO.LegionScripting
 
             ResizeWindow(new Point(lastWidth, lastHeight));
             OnResize();
+        }
+
+        public void Refresh()
+        {
+            Dispose();
+            ScriptManagerGump g = new ScriptManagerGump() { X = X, Y = Y };
+            g.ResizeWindow(new Point(Width, Height));
+            UIManager.Add(g);
         }
 
         private void BuildGump()

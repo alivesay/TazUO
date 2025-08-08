@@ -614,18 +614,21 @@ namespace ClassicUO.Game.UI.Gumps
                     break;
 
                 case SDL.SDL_Keycode.SDLK_TAB when _mode == ChatMode.Default:
-                    List<string> autoComplete = CommandHistoryManager.GetAutocompleteSuggestions(TextBoxControl.Text);
+                    List<string> autoComplete = TextHistoryManager.GetAutocompleteSuggestions(TextBoxControl.Text, 5);
                     if (autoComplete != null && autoComplete.Count > 0)
                     {
-                        ContextMenuControl cm = new();
-                        foreach (string s in autoComplete)
+                        autoComplete.Insert(0, TextBoxControl.Text);
+                        void selected(string s)
                         {
-                            cm.Add(s, () =>
-                            {
-                                TextBoxControl.SetText(s);
-                            });
+                            TextBoxControl?.SetText(s);
                         }
-                        cm.Show();
+
+                        SelectableItemListGump listGump = new SelectableItemListGump(autoComplete, selected, selected);
+                        var viewport = Client.Game.GetScene<GameScene>().Camera.GetViewport();
+                        listGump.X = viewport.X + 10;
+                        listGump.Y = viewport.Height - listGump.Height + viewport.Y - 20;
+                        UIManager.Add(listGump);
+                        listGump.SetKeyboardFocus();
                     }
                     break;
             }
@@ -672,7 +675,7 @@ namespace ClassicUO.Game.UI.Gumps
                     case ChatMode.Default:
                         GameActions.Say(text, ProfileManager.CurrentProfile.SpeechHue);
 
-                        CommandHistoryManager.AddToHistoryIfCommand(text);
+                        TextHistoryManager.AddToHistoryIfCommand(text);
 
                         break;
 

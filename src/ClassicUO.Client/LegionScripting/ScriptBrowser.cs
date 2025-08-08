@@ -13,6 +13,7 @@ using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Input;
+using LScript;
 
 namespace ClassicUO.LegionScripting
 {
@@ -298,6 +299,17 @@ namespace ClassicUO.LegionScripting
                                 UIManager.Add(new ScriptEditor(f));
 
                                 GameActions.Print($"Downloaded script: {GHFileObject.name}");
+
+                                var scriptManager = UIManager.GetGump<ScriptManagerGump>();
+                                if(scriptManager != null)
+                                {
+                                    scriptManager.Refresh();
+                                }
+                                else
+                                {
+                                    ScriptManagerGump g = new ScriptManagerGump();
+                                    UIManager.Add(g);
+                                }
                             }
                             catch (Exception ex)
                             {

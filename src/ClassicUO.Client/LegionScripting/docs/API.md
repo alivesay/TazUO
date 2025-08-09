@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `8/1/25`.*
+*This was generated on `8/9/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -2626,7 +2626,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
  Check if the global cooldown is currently active. This applies to actions like moving or using items,
  and prevents new actions from executing until the cooldown has expired.
- 
+
  Example:
  ```py
  if API.IsGlobalCooldownActive():

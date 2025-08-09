@@ -350,7 +350,7 @@ namespace ClassicUO.Game.Managers
                 }
 
                 // Remove all numbers and symbols from the cleaned string to isolate the name
-                Name = RegexHelper.GetRegex(@"[-+]?\d+(\.\d+)?[%]?([ ]*\d+)?", RegexOptions.IgnoreCase).Replace(cleaned, "").Trim();
+                Name = RegexHelper.GetRegex(@"[-+]?\d+(\.\d+)?[%]?([- ]*\d+)?", RegexOptions.IgnoreCase).Replace(cleaned, "").Trim();
 
                 // Fallback if something went wrong
                 if (string.IsNullOrWhiteSpace(Name))

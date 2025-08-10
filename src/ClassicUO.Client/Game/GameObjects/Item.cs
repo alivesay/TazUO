@@ -97,7 +97,7 @@ namespace ClassicUO.Game.GameObjects
                 i.AllowedToDraw = true;
                 i.ExecuteAnimation = true;
                 i.HitsRequest = HitsRequestStatus.None;
-                
+
                 i.ResetOriginalGraphic();
                 i.MatchesHighlightData = false;
                 i.HighlightHue = 0;
@@ -170,16 +170,16 @@ namespace ClassicUO.Game.GameObjects
         public bool IsCorpse => /*MathHelper.InRange(Graphic, 0x0ECA, 0x0ED2) ||*/
             Graphic == 0x2006;
 
-        public bool IsHumanCorpse => IsCorpse && 
-            MathHelper.InRange(Amount, 0x0190, 0x0193) || 
-            MathHelper.InRange(Amount, 0x00B7, 0x00BA) || 
-            MathHelper.InRange(Amount, 0x025D, 0x0260) || 
-            MathHelper.InRange(Amount, 0x029A, 0x029B) || 
-            MathHelper.InRange(Amount, 0x02B6, 0x02B7) || 
-            Amount == 0x03DB || 
-            Amount == 0x03DF || 
-            Amount == 0x03E2 || 
-            Amount == 0x02E8 || 
+        public bool IsHumanCorpse => IsCorpse &&
+            MathHelper.InRange(Amount, 0x0190, 0x0193) ||
+            MathHelper.InRange(Amount, 0x00B7, 0x00BA) ||
+            MathHelper.InRange(Amount, 0x025D, 0x0260) ||
+            MathHelper.InRange(Amount, 0x029A, 0x029B) ||
+            MathHelper.InRange(Amount, 0x02B6, 0x02B7) ||
+            Amount == 0x03DB ||
+            Amount == 0x03DF ||
+            Amount == 0x03E2 ||
+            Amount == 0x02E8 ||
             Amount == 0x02E9;
 
         public bool OnGround => !SerialHelper.IsValid(Container);
@@ -647,7 +647,8 @@ namespace ClassicUO.Game.GameObjects
             { 0x3ED7, 0x060D },
             { 0x3ED8, 0x060F }, // a black dog?
             { 0x3ED9, 0x0610 }, // a dobberman?
-            { 0x3EDA, 0x0590 } // Frostmites Beetles
+            { 0x3EDA, 0x0590 }, // Frostmites Beetles
+            { 0x3EDE, 0x0673 } //Clydesdale?
         };
 
         public override ushort GetGraphicForAnimation()
@@ -777,7 +778,7 @@ namespace ClassicUO.Game.GameObjects
                     {
                         Client.Game.Animations.ConvertBodyIfNeeded(ref id);
                         var animGroup = Client.Game.Animations.GetAnimType(id);
-                        var animFlags = Client.Game.Animations.GetAnimFlags(id);                   
+                        var animFlags = Client.Game.Animations.GetAnimFlags(id);
                         byte action = AnimationsLoader.Instance.GetDeathAction(
                             id,
                             animFlags,

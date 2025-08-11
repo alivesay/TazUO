@@ -2083,7 +2083,7 @@ namespace ClassicUO.Network
                     {
                         if (advanced == null)
                         {
-                            UIManager.Add(advanced = new SkillGumpAdvanced { X = 100, Y = 100 });
+                            UIManager.Add(advanced = new SkillGumpAdvanced());
                         }
                     }
                 }

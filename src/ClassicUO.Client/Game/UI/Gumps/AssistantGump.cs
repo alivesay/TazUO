@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
@@ -7,6 +6,7 @@ using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
+using Microsoft.Xna.Framework;
 
 namespace ClassicUO.Game.UI.Gumps;
 
@@ -34,6 +34,7 @@ public class AssistantGump : BaseOptionsGump
         BuildSpellBar();
         BuildHUD();
         BuildSpellIndicator();
+        BuildJournalFilter();
 
         ChangePage((int)PAGE.AutoLoot);
     }
@@ -313,6 +314,74 @@ public class AssistantGump : BaseOptionsGump
         scroll.Add(PositionHelper.PositionControl(editor));
     }
 
+    private void BuildJournalFilter()
+    {
+        var page = (int)PAGE.JournalFilter;
+        MainContent.AddToLeft(CategoryButton("Journal Filter", page, MainContent.LeftWidth));
+        MainContent.ResetRightSide();
+
+        ScrollArea scroll = new(0, 0, MainContent.RightWidth, MainContent.Height);
+        MainContent.AddToRight(scroll, false, page);
+
+        PositionHelper.Reset();
+
+        scroll.Add(PositionHelper.PositionControl(new HttpClickableLink("Journal Filter Wiki", "https://github.com/PlayTazUO/TazUO/wiki/Journal-Filters", Color.White)));
+
+        VBoxContainer vbox = new(scroll.Width - 18);
+
+        ModernButton addButton = new(0, 0, 150, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Add entry", ThemeSettings.BUTTON_FONT_COLOR);
+        addButton.MouseUp += (s, e) =>
+        {
+            JournalFilterManager.Instance.AddFilter("Type your matching text here");
+            buildEntries();
+        };
+
+        scroll.Add(PositionHelper.PositionControl(addButton));
+        scroll.Add(PositionHelper.PositionControl(vbox));
+        buildEntries();
+
+        void buildEntries()
+        {
+            vbox.Clear();
+
+            foreach (string filter in JournalFilterManager.Instance.Filters)
+            {
+                vbox.Add(entryArea(filter));
+            }
+        }
+
+        Area entryArea(string filter)
+        {
+            string currentFilter = filter;
+            Area area = new Area();
+
+            InputField input = new InputField(scroll.Width - 18 - 25, ThemeSettings.CHECKBOX_SIZE, text: filter);
+            input.SetTooltip("Must match the journal entry exactly. Partial matches not supported.");
+            input.TextChanged += (s, e) =>
+            {
+                var newText = ((InputField.StbTextBox)s).Text;
+                JournalFilterManager.Instance.RemoveFilter(currentFilter);
+                JournalFilterManager.Instance.AddFilter(newText);
+                currentFilter = newText;
+            };
+
+            ModernButton del = new(scroll.Width-18-25, 0, 25, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "X", ThemeSettings.BUTTON_FONT_COLOR);
+            del.SetTooltip("Delete entry");
+            del.MouseUp += (s, e) =>
+            {
+                JournalFilterManager.Instance.RemoveFilter(currentFilter);
+                buildEntries();
+            };
+
+            area.Add(input);
+            area.Add(del);
+
+            area.ForceSizeUpdate();
+
+            return area;
+        }
+    }
+
     public enum PAGE
     {
         None,
@@ -323,6 +392,7 @@ public class AssistantGump : BaseOptionsGump
         SpellBar,
         HUD,
         SpellIndicator,
+        JournalFilter
     }
 
     #region CustomControls

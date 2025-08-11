@@ -379,6 +379,7 @@ namespace ClassicUO.Game.Scenes
 
             GridContainerSaveData.Instance.Save();
             GridContainerSaveData.Reset();
+            JournalFilterManager.Instance.Save();
 
             SpellBarManager.Unload();
             _moveItemQueue.Clear();

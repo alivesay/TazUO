@@ -1,36 +1,45 @@
+using System;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using ClassicUO.Game.Data;
 
 namespace ClassicUO.Game.UI.Gumps.GridHighLight
 {
-    public class GridHighlightProperties : Gump
+    public class GridHighlightProperties : NineSliceGump
     {
-        private const int WIDTH = 350, HEIGHT = 500;
-        private int lastYitem = 0;
+        private const int WIDTH = 400, HEIGHT = 540;
         private ScrollArea mainScrollArea;
         GridHighlightData data;
         private readonly int keyLoc;
         private readonly Dictionary<string, Checkbox> slotCheckboxes = new();
-        public GridHighlightProperties(int keyLoc, int x, int y) : base(0, 0)
+
+        public GridHighlightProperties(int keyLoc, int x, int y) : base(x, y, WIDTH, HEIGHT, ModernUIConstants.ModernUIPanel, ModernUIConstants.ModernUIPanel_BoderSize, true, WIDTH, HEIGHT)
         {
             data = GridHighlightData.GetGridHighlightData(keyLoc);
-            X = x;
-            Y = y;
-            Width = WIDTH;
-            Height = HEIGHT;
             CanMove = true;
             AcceptMouseInput = true;
             CanCloseWithRightClick = true;
+            this.keyLoc = keyLoc;
+            Build();
+        }
 
-            Add(new AlphaBlendControl(0.85f) { Width = WIDTH, Height = HEIGHT });
+        protected override void OnResize(int oldWidth, int oldHeight, int newWidth, int newHeight)
+        {
+            base.OnResize(oldWidth, oldHeight, newWidth, newHeight);
+            Build();
+        }
 
-            lastYitem = 0;
+        private void Build()
+        {
+            Clear();
+            Positioner pos = new();
+            Control temp;
 
             // Scroll area
-            Add(mainScrollArea = new ScrollArea(0, 0, WIDTH, HEIGHT, true) { ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways });
+            Add(mainScrollArea = new ScrollArea(BorderSize, BorderSize, Width - (BorderSize * 2), Height - (BorderSize * 2), true) { ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways });
 
             // Accept extra properties checkbox
             string acceptExtraPropertiesTooltip =
@@ -39,25 +48,17 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 "When un-checked: The item must match all configured properties and must not have any extra properties.";
 
             Checkbox acceptExtraPropertiesCheckbox;
-            mainScrollArea.Add(acceptExtraPropertiesCheckbox = new Checkbox(0x00D2, 0x00D3)
-            {
-                X = 0,
-                Y = 0,
-                IsChecked = data.AcceptExtraProperties
-            });
+            mainScrollArea.Add(pos.Position(acceptExtraPropertiesCheckbox = new Checkbox(0x00D2, 0x00D3) { IsChecked = data.AcceptExtraProperties }));
             acceptExtraPropertiesCheckbox.SetTooltip(acceptExtraPropertiesTooltip);
             acceptExtraPropertiesCheckbox.ValueChanged += (s, e) =>
             {
                 data.AcceptExtraProperties = acceptExtraPropertiesCheckbox.IsChecked;
             };
 
-            Label acceptExtraPropertiesLabel;
-            mainScrollArea.Add(acceptExtraPropertiesLabel = new Label("Allow extra properties", true, 0xffff) { X = 20, Y = 0 });
-
-            lastYitem += 20;
+            mainScrollArea.Add(pos.PositionRightOf(new Label("Allow extra properties", true, 0xffff), acceptExtraPropertiesCheckbox));
 
             InputField minPropertiesInput;
-            mainScrollArea.Add(minPropertiesInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 40, 20) { X = 0, Y = lastYitem });
+            mainScrollArea.Add(pos.Position(minPropertiesInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 40, 20)));
             minPropertiesInput.SetText(data.MinimumProperty.ToString());
             minPropertiesInput.TextChanged += (s, e) =>
             {
@@ -70,11 +71,10 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                     minPropertiesInput.Add(new FadingLabel(20, "Couldn't parse number", true, 0xff) { X = 0, Y = 0 });
                 }
             };
-            Label minPropertiesLabel;
-            mainScrollArea.Add(minPropertiesLabel = new Label("Min. property count", true, 0xffff) { X = minPropertiesInput.X + minPropertiesInput.Width, Y = lastYitem });
+            mainScrollArea.Add(temp = pos.PositionRightOf(new Label("Min. property count", true, 0xffff), minPropertiesInput));
 
             InputField maxPropertiesInput;
-            mainScrollArea.Add(maxPropertiesInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 40, 20) { X = 180, Y = lastYitem });
+            mainScrollArea.Add(pos.PositionRightOf(maxPropertiesInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 40, 20), temp, 20));
             maxPropertiesInput.SetText(data.MaximumProperty.ToString());
             maxPropertiesInput.TextChanged += (s, e) =>
             {
@@ -87,91 +87,67 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                     maxPropertiesInput.Add(new FadingLabel(20, "Couldn't parse number", true, 0xff) { X = 0, Y = 0 });
                 }
             };
-            Label maxPropertiesLabel;
-            mainScrollArea.Add(maxPropertiesLabel = new Label("Max. property count", true, 0xffff) { X = maxPropertiesInput.X + maxPropertiesInput.Width, Y = lastYitem });
-
-            lastYitem += 20;
+            mainScrollArea.Add(pos.PositionRightOf(new Label("Max. property count", true, 0xffff), maxPropertiesInput));;
 
             #region Name
-            AddSectionDivider();
-            mainScrollArea.Add(new Label("Item name", true, 0xffff, 120) { X = 0, Y = lastYitem });
 
-            lastYitem += 20;
+            mainScrollArea.Add(pos.Position(SectionDivider()));
+            mainScrollArea.Add(pos.Position(new Label("Item name", true, 0xffff, 120)));
 
             for (int i = 0; i < data.ItemNames.Count; i++)
             {
-                AddOther(data.ItemNames, i, lastYitem);
-                lastYitem += 25;
+                AddOther(data.ItemNames, i, pos.Y);
+                pos.Y += 25;
             }
 
             NiceButton addItemNameBtn;
-            mainScrollArea.Add(addItemNameBtn = new NiceButton(0, lastYitem, 180, 20, ButtonAction.Activate, "Add Item Name") { IsSelectable = false });
+            mainScrollArea.Add(pos.Position(addItemNameBtn = new NiceButton(0, 0, 180, 20, ButtonAction.Activate, "Add Item Name") { IsSelectable = false }));
             addItemNameBtn.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
                 {
                     data.ItemNames.Add("");
-                    Dispose();
-                    UIManager.Add(new GridHighlightProperties(keyLoc, X, Y));
+                    Build();
                 }
             };
 
-            lastYitem += 30;
             #endregion
 
             #region Properties
-            AddSectionDivider();
-            mainScrollArea.Add(new Label("Property name", true, 0xffff, 120) { X = 0, Y = lastYitem });
-            mainScrollArea.Add(new Label("Min value", true, 0xffff, 120) { X = 180, Y = lastYitem });
-            mainScrollArea.Add(new Label("Optional", true, 0xffff, 120) { X = 255, Y = lastYitem });
-            lastYitem += 20;
+
+            mainScrollArea.Add(pos.Position(SectionDivider()));
+            mainScrollArea.Add(new Label("Property name", true, 0xffff, 120) { X = 0, Y = pos.Y });
+            mainScrollArea.Add(new Label("Min value", true, 0xffff, 120) { X = mainScrollArea.Width - 38 - 63 - 75, Y = pos.Y });
+            mainScrollArea.Add(new Label("Optional", true, 0xffff, 120) { X = mainScrollArea.Width - 38 - 63, Y = pos.Y });
+            pos.Y += 20;
 
             for (int i = 0; i < data.Properties.Count; i++)
             {
-                AddProperty(data.Properties, i, lastYitem, [GridHighlightRules.Properties, GridHighlightRules.SuperSlayerProperties, GridHighlightRules.SlayerProperties]);
-                lastYitem += 25;
+                AddProperty(data.Properties, i, pos.Y, [GridHighlightRules.Properties, GridHighlightRules.SuperSlayerProperties, GridHighlightRules.SlayerProperties]);
+                pos.Y += 25;
             }
 
             NiceButton addPropBtn;
-            mainScrollArea.Add(addPropBtn = new NiceButton(0, lastYitem, 180, 20, ButtonAction.Activate, "Add Property") { IsSelectable = false });
+            mainScrollArea.Add(pos.Position(addPropBtn = new NiceButton(0, 0, 180, 20, ButtonAction.Activate, "Add Property") { IsSelectable = false }));
             addPropBtn.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
                 {
-                data.Properties.Add(new GridHighlightProperty
-                {
-                    Name = "",
-                    MinValue = -1,
-                    IsOptional = false
-                });
-                    Dispose();
-                    UIManager.Add(new GridHighlightProperties(keyLoc, X, Y));
+                    data.Properties.Add(new GridHighlightProperty { Name = "", MinValue = -1, IsOptional = false });
+                    Build();
                 }
             };
+
             #endregion Properties
 
-            lastYitem += 30;
-
             #region Equipment slot
-            AddSectionDivider();
-            string[] slotNames = new[]
-            {
-                "Talisman", "RightHand", "LeftHand",
-                "Head", "Earring", "Neck",
-                "Chest", "Shirt", "Back",
-                "Robe", "Arms", "Hands",
-                "Bracelet", "Ring", "Belt",
-                "Skirt", "Legs", "Footwear"
-            };
 
-            mainScrollArea.Add(new Label("Select equipment slots", true, 0xffff) { X = 0, Y = lastYitem });
+            mainScrollArea.Add(pos.Position(SectionDivider()));
+            string[] slotNames = new[] { "Talisman", "RightHand", "LeftHand", "Head", "Earring", "Neck", "Chest", "Shirt", "Back", "Robe", "Arms", "Hands", "Bracelet", "Ring", "Belt", "Skirt", "Legs", "Footwear" };
+
+            mainScrollArea.Add(temp = pos.Position(new Label("Select equipment slots", true, 0xffff)));
             Checkbox otherCheckbox;
-            mainScrollArea.Add(otherCheckbox = new Checkbox(0x00D2, 0x00D3)
-            {
-                X = 150,
-                Y = lastYitem,
-                IsChecked = (bool)typeof(GridHighlightSlot).GetProperty("Other").GetValue(data.EquipmentSlots)
-            });
+            mainScrollArea.Add(pos.PositionRightOf(otherCheckbox = new Checkbox(0x00D2, 0x00D3) { IsChecked = (bool)typeof(GridHighlightSlot).GetProperty("Other").GetValue(data.EquipmentSlots) }, temp, 20));
             otherCheckbox.ValueChanged += (s, e) =>
             {
                 foreach (string slotName in slotNames)
@@ -183,30 +159,21 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                         cb.IsChecked = !otherCheckbox.IsChecked;
                     }
                 }
+
                 typeof(GridHighlightSlot).GetProperty("Other").SetValue(data.EquipmentSlots, otherCheckbox.IsChecked);
             };
-            mainScrollArea.Add(new Label("Other / No Slot Assigned", true, 0xffff) { X = otherCheckbox.X + 20, Y = lastYitem });
+            mainScrollArea.Add(pos.PositionRightOf(new Label("Other / No Slot Assigned", true, 0xffff), otherCheckbox));
 
-            lastYitem += 20;
+            int columns = Math.Max(1, (mainScrollArea.Width - 18) / 110);
 
-            int colWidth = 110;
-            int checkboxHeight = 22;
-            int colCount = 3;
+            pos.StartTable(columns, mainScrollArea.Width / columns, 0);
 
             for (int i = 0; i < slotNames.Length; i++)
             {
-                int col = i % colCount;
-                int row = i / colCount;
-
                 string slotName = slotNames[i];
                 bool isChecked = (bool)typeof(GridHighlightSlot).GetProperty(slotName).GetValue(data.EquipmentSlots);
 
-                Checkbox cb = new Checkbox(0x00D2, 0x00D3)
-                {
-                    X = col * colWidth,
-                    Y = lastYitem + row * checkboxHeight,
-                    IsChecked = isChecked
-                };
+                Checkbox cb = new Checkbox(0x00D2, 0x00D3) { IsChecked = isChecked };
                 string currentSlotName = slotName;
                 cb.ValueChanged += (s, e) =>
                 {
@@ -214,96 +181,79 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 };
                 slotCheckboxes[slotName] = cb;
 
-                Label label = new Label(SplitCamelCase(slotName), true, 0xFFFF)
-                {
-                    X = cb.X + 20,
-                    Y = cb.Y
-                };
+                Label label = new Label(SplitCamelCase(slotName), true, 0xFFFF);
 
-                mainScrollArea.Add(cb);
-                mainScrollArea.Add(label);
+                mainScrollArea.Add(pos.Position(cb));
+                mainScrollArea.Add(pos.PositionRightOf(label, cb));
             }
+            pos.EndTable();
+
             #endregion Equipment slot
 
-            lastYitem += ((slotNames.Length + colCount - 1) / colCount) * checkboxHeight + 10;
 
             #region Negative
-            AddSectionDivider();
-            mainScrollArea.Add(new Label("Disqualifying Properties", true, 0xffff) { X = 0, Y = lastYitem });
+
+            mainScrollArea.Add(pos.Position(SectionDivider()));
+            mainScrollArea.Add(temp = pos.Position(new Label("Disqualifying Properties", true, 0xffff)));
             Checkbox weightCheckbox;
-            mainScrollArea.Add(weightCheckbox = new Checkbox(0x00D2, 0x00D3)
-            {
-                X = 150,
-                Y = lastYitem,
-                IsChecked = data.Overweight
-            });
+            mainScrollArea.Add(pos.PositionRightOf(weightCheckbox = new Checkbox(0x00D2, 0x00D3) { IsChecked = data.Overweight }, temp));
             weightCheckbox.ValueChanged += (s, e) =>
             {
                 data.Overweight = weightCheckbox.IsChecked;
             };
-            mainScrollArea.Add(new Label("Overweight (=50)", true, 0xffff) { X = weightCheckbox.X + 20, Y = lastYitem });
+            mainScrollArea.Add(pos.PositionRightOf(new Label("Overweight (=50)", true, 0xffff), weightCheckbox));
 
-            lastYitem += 20;
-            mainScrollArea.Add(new Label("Items with any of these properties will be excluded", true, 0xffff) { X = 0, Y = lastYitem });
-            lastYitem += 20;
+            mainScrollArea.Add(pos.Position(new Label("Items with any of these properties will be excluded", true, 0xffff)));
 
             for (int i = 0; i < data.ExcludeNegatives.Count; i++)
             {
-                AddOther(data.ExcludeNegatives, i, lastYitem, [GridHighlightRules.NegativeProperties, GridHighlightRules.Properties, GridHighlightRules.SuperSlayerProperties, GridHighlightRules.SlayerProperties]);
-                lastYitem += 25;
+                AddOther(data.ExcludeNegatives, i, pos.Y, [GridHighlightRules.NegativeProperties, GridHighlightRules.Properties, GridHighlightRules.SuperSlayerProperties, GridHighlightRules.SlayerProperties]);
+                pos.Y += 25;
             }
 
-            mainScrollArea.Add(addItemNameBtn = new NiceButton(0, lastYitem, 180, 20, ButtonAction.Activate, "Add Disqualifying Property") { IsSelectable = false });
+            mainScrollArea.Add(pos.Position(addItemNameBtn = new NiceButton(0, 0, 180, 20, ButtonAction.Activate, "Add Disqualifying Property") { IsSelectable = false }));
             addItemNameBtn.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
                 {
                     data.ExcludeNegatives.Add("");
-                    Dispose();
-                    UIManager.Add(new GridHighlightProperties(keyLoc, X, Y));
+                    Build();
                 }
             };
+
             #endregion Negative
 
-            lastYitem += 30;
-
             #region Rarity
-            AddSectionDivider();
-            mainScrollArea.Add(new Label("Item Rarity Filters", true, 0xffff) { X = 0, Y = lastYitem });
-            lastYitem += 20;
-            mainScrollArea.Add(new Label("Only items with at least one of these rarities will match", true, 0xffff) { X = 0, Y = lastYitem });
-            lastYitem += 20;
+
+            mainScrollArea.Add(pos.Position(SectionDivider()));
+
+            mainScrollArea.Add(pos.Position(new Label("Item Rarity Filters", true, 0xffff)));
+            mainScrollArea.Add(pos.Position(new Label("Only items with at least one of these rarities will match", true, 0xffff)));
 
             for (int i = 0; i < data.RequiredRarities.Count; i++)
             {
-                AddOther(data.RequiredRarities, i, lastYitem, [GridHighlightRules.RarityProperties]);
-                lastYitem += 25;
+                AddOther(data.RequiredRarities, i, pos.Y, [GridHighlightRules.RarityProperties]);
+                pos.Y += 25;
             }
 
             NiceButton addRarityBtn;
-            mainScrollArea.Add(addRarityBtn = new NiceButton(0, lastYitem, 180, 20, ButtonAction.Activate, "Add Rarity Filter") { IsSelectable = false });
+            mainScrollArea.Add(pos.Position(addRarityBtn = new NiceButton(0, 0, 180, 20, ButtonAction.Activate, "Add Rarity Filter") { IsSelectable = false }));
             addRarityBtn.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
                 {
                     data.RequiredRarities.Add("");
-                    Dispose();
-                    UIManager.Add(new GridHighlightProperties(keyLoc, X, Y));
+                    Build();
                 }
             };
-            #endregion Rarity
 
-            this.keyLoc = keyLoc;
+            #endregion Rarity
         }
 
-    private void AddSectionDivider()
-    {
-        lastYitem += 5;
-
-        mainScrollArea.Add(new Line(0, lastYitem, WIDTH, 1, Color.Gray.PackedValue));
-
-        lastYitem += 5;
-    }
+        private Control SectionDivider()
+        {
+            return new Line(0, 0, mainScrollArea.Width - 20, 1, Color.Gray.PackedValue);
+        }
 
         private string SplitCamelCase(string input)
         {
@@ -318,19 +268,19 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             }
 
             InputField propInput;
-            propInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 157, 25) { Y = y };
+            propInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, mainScrollArea.Width - 65, 25) { Y = y };
             if (propertySets != null)
             {
                 string[] values = GridHighlightRules.FlattenAndDistinctParameters(propertySets);
                 Combobox propCombobox;
-                mainScrollArea.Add(propCombobox = new Combobox(0, lastYitem, 175, values, 0, 200, true) { });
+                mainScrollArea.Add(propCombobox = new Combobox(0, y, propInput.Width + 15, values, 0, 200, true) { });
                 propCombobox.OnOptionSelected += (s, e) =>
-                    {
-                        var tVal = propCombobox.SelectedIndex;
+                {
+                    var tVal = propCombobox.SelectedIndex;
 
-                        string v = values[tVal];
-                        propInput.SetText(v);
-                    };
+                    string v = values[tVal];
+                    propInput.SetText(v);
+                };
             }
 
             mainScrollArea.Add(propInput);
@@ -341,15 +291,14 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             };
 
             NiceButton _del;
-            mainScrollArea.Add(_del = new NiceButton(315, y, 20, 20, ButtonAction.Activate, "X") { IsSelectable = false });
+            mainScrollArea.Add(_del = new NiceButton(mainScrollArea.Width - 38, y, 20, 20, ButtonAction.Activate, "X") { IsSelectable = false });
             _del.SetTooltip("Delete this property");
             _del.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
                 {
-                    Dispose();
                     others.RemoveAt(index);
-                    UIManager.Add(new GridHighlightProperties(keyLoc, X, Y));
+                    Build();
                 }
             };
         }
@@ -358,20 +307,15 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
         {
             while (properties.Count <= index)
             {
-                GridHighlightProperty property = new GridHighlightProperty
-                {
-                    Name = "",
-                    MinValue = -1,
-                    IsOptional = false,
-                };
+                GridHighlightProperty property = new GridHighlightProperty { Name = "", MinValue = -1, IsOptional = false, };
                 properties.Add(property);
             }
 
             Combobox propCombobox;
             InputField propInput;
-            propInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 157, 25) { Y = y };
+            propInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, mainScrollArea.Width - 38 - 63 - 97, 25) { Y = y };
             string[] values = GridHighlightRules.FlattenAndDistinctParameters(propertySets);
-            mainScrollArea.Add(propCombobox = new Combobox(0, lastYitem, 175, values, 0, 200, true) { });
+            mainScrollArea.Add(propCombobox = new Combobox(0, y, mainScrollArea.Width - 38 - 63 - 80, values, 0, 200, true) { });
             propCombobox.OnOptionSelected += (s, e) =>
             {
                 var tVal = propCombobox.SelectedIndex;
@@ -388,7 +332,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             };
 
             InputField valInput;
-            mainScrollArea.Add(valInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 60, 25) { X = 180, Y = y, NumbersOnly = true });
+            mainScrollArea.Add(valInput = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 60, 25) { X = mainScrollArea.Width - 38 - 63 - 75, Y = y, NumbersOnly = true });
             valInput.SetText(properties[index].MinValue.ToString());
             valInput.TextChanged += (s, e) =>
             {
@@ -398,48 +342,28 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 }
                 else
                 {
-                    valInput.Add(new FadingLabel(20, "Couldn't parse number", true, 0xff) { X = 180, Y = 0 });
+                    valInput.Add(new FadingLabel(20, "Couldn't parse number", true, 0xff) { X = 0, Y = 0 });
                 }
             };
 
             Checkbox isOptionalCheckbox;
-            mainScrollArea.Add(isOptionalCheckbox = new Checkbox(0x00D2, 0x00D3)
-            {
-                X = 255,
-                Y = y + 2,
-                IsChecked = properties[index].IsOptional
-            });
+            mainScrollArea.Add(isOptionalCheckbox = new Checkbox(0x00D2, 0x00D3) { X = mainScrollArea.Width - 38 - 63, Y = y + 2, IsChecked = properties[index].IsOptional });
             isOptionalCheckbox.ValueChanged += (s, e) =>
             {
                 properties[index].IsOptional = isOptionalCheckbox.IsChecked;
             };
 
             NiceButton _del;
-            mainScrollArea.Add(_del = new NiceButton(315, y, 20, 20, ButtonAction.Activate, "X") { IsSelectable = false });
+            mainScrollArea.Add(_del = new NiceButton(mainScrollArea.Width - 38, y, 20, 20, ButtonAction.Activate, "X") { IsSelectable = false });
             _del.SetTooltip("Delete this property");
             _del.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
                 {
-                    Dispose();
                     properties.RemoveAt(index);
-                    UIManager.Add(new GridHighlightProperties(keyLoc, X, Y));
+                    Build();
                 }
             };
-        }
-
-        public override bool Draw(UltimaBatcher2D batcher, int x, int y)
-        {
-            base.Draw(batcher, x, y);
-
-            batcher.DrawRectangle(
-                SolidColorTextureCache.GetTexture(Color.LightGray),
-                x - 1, y - 1,
-                WIDTH + 2, HEIGHT + 2,
-                new Vector3(0, 0, 1)
-                );
-
-            return true;
         }
     }
 }

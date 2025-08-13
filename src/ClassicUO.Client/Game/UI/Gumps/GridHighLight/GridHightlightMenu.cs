@@ -10,22 +10,18 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ClassicUO.Game.Data;
 
 namespace ClassicUO.Game.UI.Gumps.GridHighLight
 {
-    internal class GridHighlightMenu : Gump
+    internal class GridHighlightMenu : NineSliceGump
     {
         private const int WIDTH = 350, HEIGHT = 500;
-        private AlphaBlendControl background;
         private SettingsSection highlightSection;
         private ScrollArea highlightSectionScroll;
 
-        public GridHighlightMenu(int x = 100, int y = 100) : base(0, 0)
+        public GridHighlightMenu(int x = 100, int y = 100) : base(x, y, WIDTH, HEIGHT, ModernUIConstants.ModernUIPanel, ModernUIConstants.ModernUIPanel_BoderSize, true, WIDTH, HEIGHT)
         {
-            X = x;
-            Y = y;
-            Width = WIDTH;
-            Height = HEIGHT;
             CanMove = true;
             AcceptMouseInput = true;
             CanCloseWithRightClick = true;
@@ -33,18 +29,21 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             BuildGump();
         }
 
+        protected override void OnResize(int oldWidth, int oldHeight, int newWidth, int newHeight)
+        {
+            base.OnResize(oldWidth, oldHeight, newWidth, newHeight);
+            BuildGump();
+        }
+
         private void BuildGump()
         {
-            {
-                background = new AlphaBlendControl(0.85f);
-                background.Width = WIDTH;
-                background.Height = HEIGHT;
-                Add(background);
-            }
+            Clear();
             int y = 0;
             {
-                SettingsSection section = new SettingsSection("Grid highlighting settings", WIDTH);
-                section.Add(new Label("You can add object properties that you would like the grid to be highlighted for here.", true, 0xffff, WIDTH));
+                SettingsSection section = new SettingsSection("Grid highlighting settings", Width - (BorderSize*2));
+                section.X = BorderSize;
+                section.Y = BorderSize;
+                section.Add(new Label("You can add object properties that you would like the grid to be highlighted for here.", true, 0xffff, section.Width - 15));
 
                 NiceButton _;
                 section.Add(_ = new NiceButton(0, 0, 60, 20, ButtonAction.Activate, "Add +") { IsSelectable = false });
@@ -89,8 +88,8 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 y = section.Y + section.Height;
             }
 
-            highlightSection = new SettingsSection("", WIDTH) { Y = y };
-            highlightSection.Add(highlightSectionScroll = new ScrollArea(0, 0, WIDTH - 20, Height - y - 10, true) { ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways }); ;
+            highlightSection = new SettingsSection("", Width - (BorderSize * 2)) { Y = y, X = BorderSize };
+            highlightSection.Add(highlightSectionScroll = new ScrollArea(0, 0, highlightSection.Width - 20, Height - y - 10, true) { ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways }); ;
 
             y = 0;
             for (int i = 0; i < ProfileManager.CurrentProfile.GridHighlightSetup.Count; i++)
@@ -105,14 +104,14 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
         private Area NewAreaSection(int keyLoc, int y)
         {
             GridHighlightData data = GridHighlightData.GetGridHighlightData(keyLoc);
-            Area area = new Area() { Y = y };
-            area.Width = WIDTH - 40;
+            Area area = new Area() { Y = y, X = BorderSize };
+            area.Width = highlightSectionScroll.Width - 18;
             area.Height = 150;
             y = 0;
             int spaceBetween = 7;
 
             InputField _name;
-            area.Add(_name = new InputField(0x0BB8, 0xFF, 0xFFFF, true, 180, 20)
+            area.Add(_name = new InputField(0x0BB8, 0xFF, 0xFFFF, true, area.Width - 105, 20)
                 {
                     X = 0,
                     Y = y,
@@ -143,7 +142,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             };
 
             ModernColorPicker.HueDisplay hueDisplay;
-            area.Add(hueDisplay = new ModernColorPicker.HueDisplay(data.Hue, null, true) { X = _name.X + _name.Width + spaceBetween, Y = y });
+            area.Add(hueDisplay = new ModernColorPicker.HueDisplay(data.Hue, null, true) { X = area.Width - 98 - spaceBetween, Y = y });
             hueDisplay.SetTooltip("Select grid highlight hue");
             hueDisplay.HueChanged += (s, e) =>
             {
@@ -151,7 +150,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             };
 
             NiceButton _button;
-            area.Add(_button = new NiceButton(hueDisplay.X + hueDisplay.Width + spaceBetween, y, 60, 20, ButtonAction.Activate, "Properties") { IsSelectable = false });
+            area.Add(_button = new NiceButton(area.Width - 20 - 60 - spaceBetween, y, 60, 20, ButtonAction.Activate, "Properties") { IsSelectable = false });
             _button.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
@@ -173,9 +172,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                     UIManager.Add(new GridHighlightMenu(X, Y));
                 }
             };
-
-            y += 22;
-
+            area.ForceSizeUpdate(false);
             return area;
         }
 
@@ -245,18 +242,6 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
         private static void RunFileDialog(bool save, string title, Action<string> onResult)
         {
             FileSelector.ShowFileBrowser(save ? FileSelectorType.Directory : FileSelectorType.File, null, save ? null : ["*.json"], onResult, title);
-        }
-
-        public override bool Draw(UltimaBatcher2D batcher, int x, int y)
-        {
-            base.Draw(batcher, x, y);
-            batcher.DrawRectangle(
-                SolidColorTextureCache.GetTexture(Color.LightGray),
-                x - 1, y - 1,
-                WIDTH + 1, HEIGHT + 1,
-                Vector3.One
-            );
-            return true;
         }
     }
 }

@@ -96,7 +96,7 @@ namespace ClassicUO.Game.UI.Gumps
             TextBoxControl = new StbTextBox
             (
                 ProfileManager.CurrentProfile.ChatFont,
-                MAX_MESSAGE_LENGHT,
+                -1,
                 Width,
                 true,
                 FontStyle.BlackBorder | FontStyle.Fixed,
@@ -179,7 +179,6 @@ namespace ClassicUO.Game.UI.Gumps
                         case ChatMode.Default:
                             DisposeChatModePrefix();
                             TextBoxControl.Hue = ProfileManager.CurrentProfile.SpeechHue;
-                            TextBoxControl.ClearText();
 
                             break;
 
@@ -648,9 +647,17 @@ namespace ClassicUO.Game.UI.Gumps
                 return;
             }
 
-
             ChatMode sentMode = Mode;
+
             TextBoxControl.ClearText();
+
+            if (text.Length > MAX_MESSAGE_LENGHT)
+            {
+                GameActions.Print("Message too long, sending the first 100 characters.");
+                TextBoxControl.SetText(text.Substring(MAX_MESSAGE_LENGHT));
+                text = text.Substring(0, MAX_MESSAGE_LENGHT);
+            }
+
             _messageHistory.Add(new Tuple<ChatMode, string>(Mode, text));
             _messageHistoryIndex = _messageHistory.Count;
             Mode = ChatMode.Default;

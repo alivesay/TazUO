@@ -1432,7 +1432,8 @@ namespace ClassicUO.Game.Scenes
                                 )
                             )
                             {
-                                UIManager.SystemChat.ToggleChatVisibility();
+                                if(UIManager.SystemChat.TextBoxControl.Text.Length == 0)
+                                    UIManager.SystemChat.ToggleChatVisibility();
                             }
                         }
 

@@ -1,3 +1,4 @@
+#nullable enable
 using ClassicUO.Game.GameObjects;
 
 namespace ClassicUO.LegionScripting.PyClasses;

@@ -23,10 +23,7 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private const int WIDTH = 400;
 
-        private static readonly Dictionary<Buttons, string> _buttonsToSkillsValues = new Dictionary<
-            Buttons,
-            string
-        >
+        private static readonly Dictionary<Buttons, string> _buttonsToSkillsValues = new()
         {
             { Buttons.SortName, "Name" },
             { Buttons.SortReal, "Base" },
@@ -35,16 +32,15 @@ namespace ClassicUO.Game.UI.Gumps
             { Buttons.SortLock, "Lock" }
         };
 
-        private readonly DataBox _databox;
-        private readonly List<SkillListEntry> _skillListEntries = new List<SkillListEntry>();
+        private DataBox _databox;
+        private List<SkillListEntry> _skillListEntries = new();
 
         public static bool Dragging;
 
         private static bool _sortAsc;
         private static string _sortField = "Name";
-        private readonly GumpPic _sortOrderIndicator;
-        private double _totalReal,
-            _totalValue;
+        private GumpPic _sortOrderIndicator;
+        private double _totalReal, _totalValue;
         private bool _updateSkillsNeeded;
         private Button resizeDrag;
         private Area BottomArea;
@@ -57,8 +53,6 @@ namespace ClassicUO.Game.UI.Gumps
 
         public SkillGumpAdvanced(World world) : base(world, 0, 0)
         {
-            _totalReal = 0;
-            _totalValue = 0;
             CanMove = true;
             AcceptMouseInput = true;
             WantUpdateSize = false;
@@ -67,6 +61,12 @@ namespace ClassicUO.Game.UI.Gumps
             Height = 310;
             if (ProfileManager.CurrentProfile != null)
                 Height = ProfileManager.CurrentProfile.AdvancedSkillsGumpHeight;
+
+            Build();
+        }
+
+        private void Build()
+        {
 
             Add
             (background =
@@ -196,17 +196,6 @@ namespace ClassicUO.Game.UI.Gumps
                 )
             );
 
-            //Add
-            //(bottomLine =
-            //    new Line
-            //    (
-            //        area.X,
-            //        area.Height + area.Y - 1,
-            //        area.Width,
-            //        1,
-            //        0xFFFFFFFF
-            //    )
-            //);
             BottomArea = new Area()
             {
                 X = 1,
@@ -240,15 +229,17 @@ namespace ClassicUO.Game.UI.Gumps
             Add(BottomArea);
 
             Add(_sortOrderIndicator = new GumpPic(0, 0, 0x985, 0));
-            //OnButtonClick((int)Buttons.SortName);
 
             Add(resizeDrag = new Button(0, 0x837, 0x838, 0x838));
             resizeDrag.MouseDown += ResizeDrag_MouseDown;
             resizeDrag.MouseUp += ResizeDrag_MouseUp;
             resizeDrag.X = Width - 10;
             resizeDrag.Y = Height - 10;
-            X = last_x;
-            Y = last_y;
+
+            if(X == 0)
+                X = last_x;
+            if(Y == 0)
+                Y = last_y;
 
             SetSortIndicatorPosition();
             ForceUpdate();
@@ -273,6 +264,13 @@ namespace ClassicUO.Game.UI.Gumps
         protected override void OnMove(int x, int y)
         {
             base.OnMove(x, y);
+            last_x = X;
+            last_y = Y;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
             last_x = X;
             last_y = Y;
         }
@@ -495,8 +493,7 @@ namespace ClassicUO.Game.UI.Gumps
         public override void Restore(XmlElement xml)
         {
             base.Restore(xml);
-            last_x = X; //Update from saved xml position
-            last_y = Y;
+
             if(xml.HasAttribute("sortasc"))
                 bool.TryParse(xml.GetAttribute("sortasc"), out _sortAsc);
             if(xml.HasAttribute("sortfield"))

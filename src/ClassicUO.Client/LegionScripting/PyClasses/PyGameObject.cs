@@ -1,3 +1,4 @@
+using ClassicUO.Assets;
 using ClassicUO.Game.GameObjects;
 
 namespace ClassicUO.LegionScripting.PyClasses;
@@ -8,6 +9,32 @@ namespace ClassicUO.LegionScripting.PyClasses;
 /// </summary>
 public class PyGameObject
 {
+    /// <summary>
+    /// Check if the object is impassible or not based on item data.
+    /// </summary>
+    public bool Impassible
+    {
+        get
+        {
+            if(_gameObject == null) return true;
+
+            switch (_gameObject)
+            {
+                case Land land:
+                    return land.TileData.IsImpassable;
+                case Static s:
+                    ref StaticTiles staticData = ref Client.Game.UO.FileManager.TileData.StaticData[s.OriginalGraphic];
+                    return staticData.IsImpassable || staticData.IsWall;
+                case Item i:
+                    return i.ItemData.IsImpassable;
+                case Multi m:
+                    return m.ItemData.IsImpassable;
+                default:
+                    return false;
+            }
+        }
+    }
+
     /// <summary>
     /// The X-coordinate of the object in the game world.
     /// </summary>

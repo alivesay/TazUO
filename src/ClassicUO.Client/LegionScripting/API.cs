@@ -920,9 +920,10 @@ namespace ClassicUO.LegionScripting
                     Item item = m.FindItemByLayer(matchedLayer);
 
                     if (item != null)
+                    {
                         Found = item.Serial;
-
-                    return new PyItem(item);
+                        return new PyItem(item);
+                    }
                 }
 
                 return null;
@@ -2180,9 +2181,12 @@ namespace ClassicUO.LegionScripting
             var c = Utility.FindNearestCorpsePython(distance, this);
 
             if(c != null)
+            {
                 Found = c.Serial;
+                return new PyItem(c);
+            }
 
-            return new PyItem(c);
+            return null;
         });
 
         /// <summary>
@@ -2940,7 +2944,7 @@ namespace ClassicUO.LegionScripting
         /// <summary>
         /// Check if the global cooldown is currently active. This applies to actions like moving or using items,
         /// and prevents new actions from executing until the cooldown has expired.
-        /// 
+        ///
         /// Example:
         /// ```py
         /// if API.IsGlobalCooldownActive():
@@ -3037,7 +3041,7 @@ namespace ClassicUO.LegionScripting
         {
             if (map < 0)
                 map = World.Map.Index;
-            
+
             TileMarkerManager.Instance.RemoveTile(x, y, map);
         });
 

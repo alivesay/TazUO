@@ -73,6 +73,8 @@ internal static class Mounts
         _mounts[0x3ED8] = new(0x060F, 0x3ED8, 0); // a black dog?
         _mounts[0x3ED9] = new(0x0610, 0x3ED9, 0); // a doberman?
         _mounts[0x3EDA] = new(0x0590, 0x3EDA, 9); // Frostmites Beetles
+        _mounts[0x3EDE] = new(0x0673, 0x3EDE, 0); // Clydesdale?
+        _mounts[0x3EDC] = new(0x0666, 0x3EDC, 0); // Moldering Ursine?
     }
 
     public static bool TryGet(ushort animId, out MountInfo mountInfo)

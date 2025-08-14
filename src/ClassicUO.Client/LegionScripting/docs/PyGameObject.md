@@ -9,6 +9,13 @@ description:  Base class for all Python-accessible game world objects.   Encapsu
 
 
 ## Properties
+### `Impassible`
+
+**Type:** `bool`
+
+ Check if the object is impassible or not based on item data.
+
+
 ### `__class__`
 
 **Type:** `string`

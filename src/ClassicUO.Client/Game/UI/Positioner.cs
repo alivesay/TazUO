@@ -219,6 +219,14 @@ public class Positioner
         return c;
     }
 
+    public Control PositionLeftOf(Control c, Control other, int padding = 5)
+    {
+        c.Y = other.Y;
+        c.X = other.X - c.Width - padding;
+
+        return c;
+    }
+
     public Control PositionExact(Control c, int x, int y)
     {
         c.X = x;

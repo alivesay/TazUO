@@ -11,9 +11,11 @@ using ClassicUO.Input;
 using ClassicUO.Network;
 using ClassicUO.Renderer;
 using ClassicUO.Resources;
-using ClassicUO.Utility.Collections;
 using ClassicUO.Utility.Platforms;
 using SDL2;
+using Control = ClassicUO.Game.UI.Controls.Control;
+using Label = ClassicUO.Game.UI.Controls.Label;
+using TextBox = ClassicUO.Game.UI.Controls.TextBox;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -49,7 +51,7 @@ namespace ClassicUO.Game.UI.Gumps
         private readonly WorldViewportGump _gump;
         private readonly LinkedList<ChatLineTime> _textEntries;
         private readonly AlphaBlendControl _trans;
-
+        private int lastAutoCompleteIndex = 0;
 
         public SystemChatControl(WorldViewportGump gump, int x, int y, int w, int h)
         {
@@ -66,7 +68,7 @@ namespace ClassicUO.Game.UI.Gumps
             TextBoxControl = new StbTextBox
             (
                 ProfileManager.CurrentProfile.ChatFont,
-                MAX_MESSAGE_LENGHT,
+                -1,
                 Width,
                 true,
                 FontStyle.BlackBorder | FontStyle.Fixed,
@@ -151,7 +153,6 @@ namespace ClassicUO.Game.UI.Gumps
                         case ChatMode.Default:
                             DisposeChatModePrefix();
                             TextBoxControl.Hue = ProfileManager.CurrentProfile.SpeechHue;
-                            TextBoxControl.ClearText();
 
                             break;
 
@@ -332,8 +333,8 @@ namespace ClassicUO.Game.UI.Gumps
                 lineToRemove.Value.Destroy();
                 _textEntries.Remove(lineToRemove);
             }
-            
-            
+
+
             var last = _textEntries.Last?.Value;
 
             if (last != null && last.Duplicate(text))
@@ -586,6 +587,25 @@ namespace ClassicUO.Game.UI.Gumps
                     _gump.World.MessageManager.PromptData = default;
 
                     break;
+
+                case SDL.SDL_Keycode.SDLK_TAB when _mode == ChatMode.Default:
+                    List<string> autoComplete = TextHistoryManager.GetAutocompleteSuggestions(TextBoxControl.Text, 5);
+                    if (autoComplete != null && autoComplete.Count > 0)
+                    {
+                        autoComplete.Insert(0, TextBoxControl.Text);
+                        void selected(string s)
+                        {
+                            TextBoxControl?.SetText(s);
+                        }
+
+                        SelectableItemListGump listGump = new SelectableItemListGump(autoComplete, selected, selected);
+                        var viewport = Client.Game.GetScene<GameScene>().Camera.GetViewport();
+                        listGump.X = viewport.X + 10;
+                        listGump.Y = viewport.Height - listGump.Height + viewport.Y - 20;
+                        UIManager.Add(listGump);
+                        listGump.SetKeyboardFocus();
+                    }
+                    break;
             }
         }
 
@@ -603,9 +623,17 @@ namespace ClassicUO.Game.UI.Gumps
                 return;
             }
 
-
             ChatMode sentMode = Mode;
+
             TextBoxControl.ClearText();
+
+            if (text.Length > MAX_MESSAGE_LENGHT)
+            {
+                GameActions.Print(World.Instance, "Message too long, sending the first 100 characters.");
+                TextBoxControl.SetText(text.Substring(MAX_MESSAGE_LENGHT));
+                text = text.Substring(0, MAX_MESSAGE_LENGHT);
+            }
+
             _messageHistory.Add(new Tuple<ChatMode, string>(Mode, text));
             _messageHistoryIndex = _messageHistory.Count;
             Mode = ChatMode.Default;
@@ -629,6 +657,8 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     case ChatMode.Default:
                         GameActions.Say(text, ProfileManager.CurrentProfile.SpeechHue);
+
+                        TextHistoryManager.AddToHistoryIfCommand(text);
 
                         break;
 

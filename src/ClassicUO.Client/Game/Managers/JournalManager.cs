@@ -22,6 +22,9 @@ namespace ClassicUO.Game.Managers
 
         public void Add(string text, ushort hue, string name, TextType type, bool isunicode = true, MessageType messageType = MessageType.Regular)
         {
+            if (JournalFilterManager.Instance.IgnoreMessage(text))
+                return;
+
             JournalEntry entry = Entries.Count >= Constants.MAX_JOURNAL_HISTORY_COUNT ? Entries.RemoveFromFront() : new JournalEntry();
 
             byte font = (byte) (isunicode ? 0 : 9);

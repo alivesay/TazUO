@@ -13,6 +13,7 @@ using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Input;
+using LScript;
 
 namespace ClassicUO.LegionScripting
 {
@@ -306,8 +307,19 @@ namespace ClassicUO.LegionScripting
                                 // Create ScriptFile object pointing to the saved file
                                 ScriptFile f = new ScriptFile(World, LegionScripting.ScriptPath, GHFileObject.name);
                                 UIManager.Add(new ScriptEditor(World, f));
-                                
+
                                 GameActions.Print(World, $"Downloaded script: {GHFileObject.name}");
+
+                                var scriptManager = UIManager.GetGump<ScriptManagerGump>();
+                                if(scriptManager != null)
+                                {
+                                    scriptManager.Refresh();
+                                }
+                                else
+                                {
+                                    ScriptManagerGump g = new ScriptManagerGump(World);
+                                    UIManager.Add(g);
+                                }
                             }
                             catch (Exception ex)
                             {

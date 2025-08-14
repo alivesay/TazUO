@@ -74,6 +74,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             CurrentCounterBarGump = this;
             IsLocked = ProfileManager.CurrentProfile.CounterGumpLocked;
+            CanCloseWithRightClick = false;
         }
 
         public override GumpType GumpType => GumpType.CounterBar;
@@ -83,7 +84,6 @@ namespace ClassicUO.Game.UI.Gumps
             CanMove = true;
             AcceptMouseInput = true;
             AcceptKeyboardInput = false;
-            CanCloseWithRightClick = false;
             WantUpdateSize = false;
             Width = _rectSize * _columns + 1;
             Height = _rectSize * _rows + 1;
@@ -334,6 +334,12 @@ namespace ClassicUO.Game.UI.Gumps
 
             IsEnabled = IsVisible = ProfileManager.CurrentProfile.CounterBarEnabled;
             IsLocked = ProfileManager.CurrentProfile.CounterGumpLocked;
+        }
+
+        protected override void OnLockedChanged()
+        {
+            base.OnLockedChanged();
+            CanCloseWithRightClick = false;
         }
 
         public override void Dispose()

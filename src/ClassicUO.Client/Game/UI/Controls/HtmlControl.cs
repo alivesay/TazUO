@@ -20,6 +20,13 @@ namespace ClassicUO.Game.UI.Controls
 
         public HtmlControl(List<string> parts, string[] lines) : this()
         {
+            if (parts.Count < 8)
+            {
+                Log.Error("Invalid HTML Control data. Expected 8 parts, got " + parts.Count + " parts.");
+                Log.Error(string.Join(", ", parts));
+                return;
+            }
+
             X = int.Parse(parts[1]);
             Y = int.Parse(parts[2]);
             Width = int.Parse(parts[3]);

@@ -1,6 +1,5 @@
 ﻿// SPDX-License-Identifier: BSD-2-Clause
 
-
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -38,7 +37,7 @@ namespace ClassicUO.Game.Managers
             prop.NameCliloc = namecliloc;
 
             EventSink.InvokeOPLOnReceive(null, new OPLEventArgs(serial, name, data));
-            
+
             GridHighlightData.ProcessItemOpl(serial);
         }
 
@@ -317,7 +316,7 @@ namespace ClassicUO.Game.Managers
 
                 // Remove any color tags like /c[#...]
                 string cleaned = RegexHelper.GetRegex(@"/c\[[#a-zA-Z0-9]+\]", RegexOptions.IgnoreCase).Replace(line, "").Replace("/cd", "").Trim();
-                
+
                 // Extract numbers
                 MatchCollection matches = RegexHelper.GetRegex(@"-?\d+(\.\d+)?").Matches(cleaned);
 
@@ -329,7 +328,7 @@ namespace ClassicUO.Game.Managers
                 }
 
                 // Remove all numbers and symbols from the cleaned string to isolate the name
-                Name = RegexHelper.GetRegex(@"[-+]?\d+(\.\d+)?[%]?(/[ ]*\d+)?", RegexOptions.IgnoreCase).Replace(cleaned, "").Trim();
+                Name = RegexHelper.GetRegex(@"[-+]?\d+(\.\d+)?[%]?([- ]*\d+)?", RegexOptions.IgnoreCase).Replace(cleaned, "").Trim();
 
                 // Fallback if something went wrong
                 if (string.IsNullOrWhiteSpace(Name))

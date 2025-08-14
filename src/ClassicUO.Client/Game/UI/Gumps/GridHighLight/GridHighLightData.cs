@@ -31,7 +31,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 allConfigs = setup.Select(entry => new GridHighlightData(entry)).ToArray();
                 return allConfigs;
             }
-            private set => allConfigs = value;
+            set => allConfigs = value;
         }
 
         public string Name
@@ -112,6 +112,21 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             ProfileManager.CurrentProfile.GridHighlightSetup.Remove(_entry);
             allConfigs = null;
         }
+
+        public void Move(bool up)
+        {
+            var list = ProfileManager.CurrentProfile.GridHighlightSetup;
+            int index = list.IndexOf(_entry);
+            if (index == -1) return; // Not found
+
+            // Prevent moving out of bounds
+            if (up && index == 0) return;
+            if (!up && index == list.Count - 1) return;
+
+            list.RemoveAt(index);
+            list.Insert(up ? index - 1 : index + 1, _entry);
+        }
+
 
         public static void ProcessItemOpl(uint value)
         {

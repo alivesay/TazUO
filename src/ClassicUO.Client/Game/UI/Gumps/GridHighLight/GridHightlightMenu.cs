@@ -1,22 +1,18 @@
 ﻿using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
-using ClassicUO.Renderer;
 using ClassicUO.Utility.Logging;
-using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using ClassicUO.Game.Data;
 
 namespace ClassicUO.Game.UI.Gumps.GridHighLight
 {
     internal class GridHighlightMenu : NineSliceGump
     {
-        private const int WIDTH = 350, HEIGHT = 500;
+        private const int WIDTH = 370, HEIGHT = 500;
         private SettingsSection highlightSection;
         private ScrollArea highlightSectionScroll;
 
@@ -103,55 +99,25 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
 
         private Area NewAreaSection(int keyLoc, int y)
         {
+            Positioner pos = new Positioner(0, 0, 0, 0);
             GridHighlightData data = GridHighlightData.GetGridHighlightData(keyLoc);
             Area area = new Area() { Y = y, X = BorderSize };
-            area.Width = highlightSectionScroll.Width - 18;
+            area.Width = highlightSectionScroll.Width - 18 - 15;
             area.Height = 150;
             y = 0;
             int spaceBetween = 7;
 
-            InputField _name;
-            area.Add(_name = new InputField(0x0BB8, 0xFF, 0xFFFF, true, area.Width - 105, 20)
-                {
-                    X = 0,
-                    Y = y,
-                    AcceptKeyboardInput = true
-                }
-            );
-            _name.SetText(data.Name);
-            CancellationTokenSource cts = new CancellationTokenSource();
-            _name.TextChanged += async (s, e) =>
-            {
-                cts.Cancel();
-                cts = new CancellationTokenSource();
-                var token = cts.Token;
-
-                try
-                {
-                    await Task.Delay(500, token);
-                    if (!token.IsCancellationRequested)
-                    {
-                        var tVal = _name.Text;
-                        if (_name.Text == tVal)
-                        {
-                            data.Name = _name.Text;
-                        }
-                    }
-                }
-                catch (TaskCanceledException) { }
-            };
-
             ModernColorPicker.HueDisplay hueDisplay;
-            area.Add(hueDisplay = new ModernColorPicker.HueDisplay(data.Hue, null, true) { X = area.Width - 98 - spaceBetween, Y = y });
+            area.Add(hueDisplay = new ModernColorPicker.HueDisplay(data.Hue, null, true) { Y = y });
             hueDisplay.SetTooltip("Select grid highlight hue");
             hueDisplay.HueChanged += (s, e) =>
             {
                 data.Hue = hueDisplay.Hue;
             };
 
-            NiceButton _button;
-            area.Add(_button = new NiceButton(area.Width - 20 - 60 - spaceBetween, y, 60, 20, ButtonAction.Activate, "Properties") { IsSelectable = false });
-            _button.MouseUp += (s, e) =>
+            NiceButton  _propertiesButton;
+            area.Add( _propertiesButton = new NiceButton(0, y, 60, 20, ButtonAction.Activate, "Properties") { IsSelectable = false });
+             _propertiesButton.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
                 {
@@ -161,17 +127,59 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             };
 
             NiceButton _del;
-            area.Add(_del = new NiceButton(area.Width - 20 - spaceBetween, y, 20, 20, ButtonAction.Activate, "X") { IsSelectable = false });
+            area.Add(_del = new NiceButton(0, y, 20, 20, ButtonAction.Activate, "X") { IsSelectable = false });
             _del.SetTooltip("Delete this highlight configuration");
             _del.MouseUp += (s, e) =>
             {
                 if (e.Button == Input.MouseButtonType.Left)
                 {
                     data.Delete();
-                    Dispose();
-                    UIManager.Add(new GridHighlightMenu(X, Y));
+                    BuildGump();
                 }
             };
+
+            NiceButton _moveUp;
+            area.Add(_moveUp = new NiceButton(0, y, 40, 20, ButtonAction.Activate, "Up") { IsSelectable = false });
+            _moveUp.SetTooltip("Move this up in the list");
+            _moveUp.MouseUp += (s, e) =>
+            {
+                if (e.Button == Input.MouseButtonType.Left)
+                {
+                    data.Move(true);
+                    GridHighlightData.AllConfigs = null;
+                    BuildGump();
+                }
+            };
+
+            NiceButton _moveDown;
+            area.Add(_moveDown = new NiceButton(area.Width - 40, y, 40, 20, ButtonAction.Activate, "Down") { IsSelectable = false });
+            _moveDown.SetTooltip("Move this down in the list");
+            _moveDown.MouseUp += (s, e) =>
+            {
+                if (e.Button == Input.MouseButtonType.Left)
+                {
+                    data.Move(false);
+                    GridHighlightData.AllConfigs = null;
+                    BuildGump();
+                }
+            };
+
+            pos.PositionLeftOf(_moveUp, _moveDown);
+            pos.PositionLeftOf( _del, _moveUp);
+            pos.PositionLeftOf( _propertiesButton, _del);
+            pos.PositionLeftOf(hueDisplay,  _propertiesButton);
+
+            InputField _name;
+            area.Add(_name = new InputField(0x0BB8, 0xFF, 0xFFFF, true, hueDisplay.X - spaceBetween, 20)
+                {
+                    X = 0,
+                    Y = y,
+                    AcceptKeyboardInput = true
+                }
+            );
+            _name.SetText(data.Name);
+            _name.TextChanged += (s, e) => data.Name = _name.Text;
+
             area.ForceSizeUpdate(false);
             return area;
         }

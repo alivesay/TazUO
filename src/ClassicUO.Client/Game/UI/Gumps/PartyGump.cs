@@ -62,7 +62,7 @@ namespace ClassicUO.Game.UI.Gumps
         public override void Update()
         {
             base.Update();
-            
+
             // Update health bars for party members
             for (int i = 0; i < 10; i++)
             {
@@ -117,7 +117,7 @@ namespace ClassicUO.Game.UI.Gumps
             int buttonAreaWidth = isLeader ? 90 : 60; // Space for Msg + Kick or just Msg
             int nameAreaWidth = entryAreaWidth - buttonAreaWidth - 120; // Reserve 120 for health bar
             int entryStartX = BorderSize + (entryAreaWidth - (buttonAreaWidth + nameAreaWidth + 120)) / 2;
-            
+
             // Header labels with TTF font and orange color aligned with buttons
             var msgLabel = TextBox.GetOne("Msg", TrueTypeLoader.EMBEDDED_FONT, 14, Color.Orange, TextBox.RTLOptions.Default());
             msgLabel.X = entryStartX;
@@ -145,11 +145,11 @@ namespace ClassicUO.Game.UI.Gumps
             bool isMemeber = World.Party.Leader != 0 && World.Party.Leader != World.Player;
 
             int yPtr = BorderSize + 35;
-            
+
             for (int i = 0; i < 10; i++)
             {
                 int currentX = entryStartX;
-                
+
                 // Msg button
                 Add
                 (
@@ -201,8 +201,8 @@ namespace ClassicUO.Game.UI.Gumps
                     (
                         name,
                         false,
-                        0x0386,
-                        font: 2,
+                        0xFFFF,
+                        font: 0,
                         maxwidth: nameAreaWidth - 10,
                         align: TEXT_ALIGN_TYPE.TS_CENTER
                     )
@@ -218,7 +218,7 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (World.Mobiles.TryGetValue(World.Party.Members[i].Serial, out var mobile))
                     {
-                        _healthBars[i] = new SimpleProgressBar("#333333", "#FF0000", 110, 18)
+                        _healthBars[i] = new SimpleProgressBar("#FF1010", "#0000FF", 110, 18)
                         {
                             X = currentX,
                             Y = yPtr + 3
@@ -294,6 +294,10 @@ namespace ClassicUO.Game.UI.Gumps
                     }
                     else
                     {
+                        if(!UIManager.SystemChat.IsActive)
+                            UIManager.SystemChat.IsActive = true;
+                        UIManager.SystemChat.TextBoxControl.ClearText();
+                        UIManager.SystemChat.Mode = ChatMode.Default;
                         UIManager.SystemChat.TextBoxControl.SetText("/");
                     }
 
@@ -363,8 +367,10 @@ namespace ClassicUO.Game.UI.Gumps
                         }
                         else
                         {
-                            //UIManager.SystemChat.textBox.SetText($"/{index + 1}");
-                            //UIManager.SystemChat.Mode = ChatMode.Party;
+                            if(!UIManager.SystemChat.IsActive)
+                                UIManager.SystemChat.IsActive = true;
+                            UIManager.SystemChat.TextBoxControl.ClearText();
+                            UIManager.SystemChat.Mode = ChatMode.Default;
                             UIManager.SystemChat.TextBoxControl.SetText($"/{index + 1} ");
                         }
                     }

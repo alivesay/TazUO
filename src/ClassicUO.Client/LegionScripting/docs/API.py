@@ -81,6 +81,7 @@ class PyEntity:
         pass
 
 class PyGameObject:
+    Impassible: bool = None
     __class__: str = None
     X: int = None
     Y: int = None

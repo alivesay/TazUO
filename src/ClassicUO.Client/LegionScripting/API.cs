@@ -918,9 +918,10 @@ namespace ClassicUO.LegionScripting
                     Item item = m.FindItemByLayer(matchedLayer);
 
                     if (item != null)
+                    {
                         Found = item.Serial;
-
-                    return new PyItem(item);
+                        return new PyItem(item);
+                    }
                 }
 
                 return null;

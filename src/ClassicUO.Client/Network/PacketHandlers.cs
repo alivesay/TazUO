@@ -559,6 +559,10 @@ namespace ClassicUO.Network
                         )
                         {
                             Client.Game.SetWindowTitle(World.Player.Name);
+                            if (ProfileManager.CurrentProfile?.EnableTitleBarStats == true)
+                            {
+                                TitleBarStatsManager.ForceUpdate();
+                            }
                         }
 
                         ushort str = p.ReadUInt16BE();
@@ -725,6 +729,7 @@ namespace ClassicUO.Network
                     UoAssist.SignalHits();
                     UoAssist.SignalStamina();
                     UoAssist.SignalMana();
+                    TitleBarStatsManager.UpdateTitleBar();
                 }
             }
         }
@@ -1894,6 +1899,7 @@ namespace ClassicUO.Network
                     UoAssist.SignalHits();
                     UoAssist.SignalStamina();
                     UoAssist.SignalMana();
+                    TitleBarStatsManager.UpdateTitleBar();
                 }
             }
         }
@@ -3453,6 +3459,10 @@ namespace ClassicUO.Network
                 )
                 {
                     Client.Game.SetWindowTitle(name);
+                    if (ProfileManager.CurrentProfile?.EnableTitleBarStats == true)
+                    {
+                        TitleBarStatsManager.ForceUpdate();
+                    }
                 }
 
                 UIManager.GetGump<NameOverheadGump>(serial)?.SetName();
@@ -3606,6 +3616,7 @@ namespace ClassicUO.Network
             {
                 UoAssist.SignalHits();
                 SpellVisualRangeManager.Instance.ClearCasting();
+                TitleBarStatsManager.UpdateTitleBar();
             }
         }
 
@@ -3624,6 +3635,7 @@ namespace ClassicUO.Network
             if (mobile == World.Player)
             {
                 UoAssist.SignalMana();
+                TitleBarStatsManager.UpdateTitleBar();
             }
         }
 
@@ -3642,6 +3654,7 @@ namespace ClassicUO.Network
             if (mobile == World.Player)
             {
                 UoAssist.SignalStamina();
+                TitleBarStatsManager.UpdateTitleBar();
             }
         }
 

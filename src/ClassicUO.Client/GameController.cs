@@ -130,8 +130,8 @@ namespace ClassicUO
             UO.Load(this);
 
             PNGLoader.Instance.GraphicsDevice = GraphicsDevice;
-            System.Threading.Tasks.Task loadResourceAssets = PNGLoader.Instance.LoadResourceAssets(Client.Game.UO.Gumps.GetGumpsLoader);
-            
+            PNGLoader.Instance.LoadResourceAssets(Client.Game.UO.Gumps.GetGumpsLoader);
+
             Audio.Initialize();
             // TODO: temporary fix to avoid crash when laoding plugins
             Settings.GlobalSettings.Encryption = (byte)NetClient.Load(UO.FileManager.Version, (EncryptionType)Settings.GlobalSettings.Encryption);
@@ -146,7 +146,6 @@ namespace ClassicUO
             _pluginsInitialized = true;
 
             Log.Trace("Done!");
-            loadResourceAssets.Wait(10000);
 
             UIManager.World = UO.World;
 

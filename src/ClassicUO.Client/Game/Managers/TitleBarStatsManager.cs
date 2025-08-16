@@ -20,8 +20,8 @@ namespace ClassicUO.Game.Managers
             {
                 return;
             }
-            
-            if (!ProfileManager.CurrentProfile.EnableTitleBarStats || World.Player == null)
+
+            if (!ProfileManager.CurrentProfile.EnableTitleBarStats || World.Instance.Player == null)
             {
                 return;
             }
@@ -34,29 +34,29 @@ namespace ClassicUO.Game.Managers
             }
 
             // Check if stats have changed
-            if (World.Player.Hits == _lastHits &&
-                World.Player.HitsMax == _lastHitsMax &&
-                World.Player.Mana == _lastMana &&
-                World.Player.ManaMax == _lastManaMax &&
-                World.Player.Stamina == _lastStamina &&
-                World.Player.StaminaMax == _lastStaminaMax)
+            if (World.Instance.Player.Hits == _lastHits &&
+                World.Instance.Player.HitsMax == _lastHitsMax &&
+                World.Instance.Player.Mana == _lastMana &&
+                World.Instance.Player.ManaMax == _lastManaMax &&
+                World.Instance.Player.Stamina == _lastStamina &&
+                World.Instance.Player.StaminaMax == _lastStaminaMax)
             {
                 return;
             }
 
             // Update cached values
-            _lastHits = World.Player.Hits;
-            _lastHitsMax = World.Player.HitsMax;
-            _lastMana = World.Player.Mana;
-            _lastManaMax = World.Player.ManaMax;
-            _lastStamina = World.Player.Stamina;
-            _lastStaminaMax = World.Player.StaminaMax;
+            _lastHits = World.Instance.Player.Hits;
+            _lastHitsMax = World.Instance.Player.HitsMax;
+            _lastMana = World.Instance.Player.Mana;
+            _lastManaMax = World.Instance.Player.ManaMax;
+            _lastStamina = World.Instance.Player.Stamina;
+            _lastStaminaMax = World.Instance.Player.StaminaMax;
             _lastUpdate = currentTime;
 
             string statsText = GenerateStatsText();
-            string title = string.IsNullOrEmpty(World.Player.Name) ?
+            string title = string.IsNullOrEmpty(World.Instance.Player.Name) ?
                 statsText :
-                $"{World.Player.Name} - {statsText}";
+                $"{World.Instance.Player.Name} - {statsText}";
 
             Client.Game.SetWindowTitle(title);
         }
@@ -67,26 +67,26 @@ namespace ClassicUO.Game.Managers
             {
                 return string.Empty;
             }
-            
+
             switch (ProfileManager.CurrentProfile.TitleBarStatsMode)
             {
                 case TitleBarStatsMode.Text:
-                    return $"HP {World.Player.Hits}/{World.Player.HitsMax}, MP {World.Player.Mana}/{World.Player.ManaMax}, SP {World.Player.Stamina}/{World.Player.StaminaMax}";
+                    return $"HP {World.Instance.Player.Hits}/{World.Instance.Player.HitsMax}, MP {World.Instance.Player.Mana}/{World.Instance.Player.ManaMax}, SP {World.Instance.Player.Stamina}/{World.Instance.Player.StaminaMax}";
 
                 case TitleBarStatsMode.Percent:
-                    int hpPercent = World.Player.HitsMax > 0 ? (World.Player.Hits * 100) / World.Player.HitsMax : 0;
-                    int mpPercent = World.Player.ManaMax > 0 ? (World.Player.Mana * 100) / World.Player.ManaMax : 0;
-                    int spPercent = World.Player.StaminaMax > 0 ? (World.Player.Stamina * 100) / World.Player.StaminaMax : 0;
+                    int hpPercent = World.Instance.Player.HitsMax > 0 ? (World.Instance.Player.Hits * 100) / World.Instance.Player.HitsMax : 0;
+                    int mpPercent = World.Instance.Player.ManaMax > 0 ? (World.Instance.Player.Mana * 100) / World.Instance.Player.ManaMax : 0;
+                    int spPercent = World.Instance.Player.StaminaMax > 0 ? (World.Instance.Player.Stamina * 100) / World.Instance.Player.StaminaMax : 0;
                     return $"HP {hpPercent}%, MP {mpPercent}%, SP {spPercent}%";
 
                 case TitleBarStatsMode.ProgressBar:
-                    string hpBar = GenerateProgressBar(World.Player.Hits, World.Player.HitsMax);
-                    string mpBar = GenerateProgressBar(World.Player.Mana, World.Player.ManaMax);
-                    string spBar = GenerateProgressBar(World.Player.Stamina, World.Player.StaminaMax);
+                    string hpBar = GenerateProgressBar(World.Instance.Player.Hits, World.Instance.Player.HitsMax);
+                    string mpBar = GenerateProgressBar(World.Instance.Player.Mana, World.Instance.Player.ManaMax);
+                    string spBar = GenerateProgressBar(World.Instance.Player.Stamina, World.Instance.Player.StaminaMax);
                     return $"HP {hpBar} MP {mpBar} SP {spBar}";
 
                 default:
-                    return $"HP {World.Player.Hits}/{World.Player.HitsMax}, MP {World.Player.Mana}/{World.Player.ManaMax}, SP {World.Player.Stamina}/{World.Player.StaminaMax}"; // Fallback to text mode
+                    return $"HP {World.Instance.Player.Hits}/{World.Instance.Player.HitsMax}, MP {World.Instance.Player.Mana}/{World.Instance.Player.ManaMax}, SP {World.Instance.Player.Stamina}/{World.Instance.Player.StaminaMax}"; // Fallback to text mode
             }
         }
 
@@ -146,8 +146,8 @@ namespace ClassicUO.Game.Managers
             {
                 return string.Empty;
             }
-            
-            if (World.Player == null)
+
+            if (World.Instance.Player == null)
             {
                 // Use sample values for preview
                 switch (ProfileManager.CurrentProfile.TitleBarStatsMode)
@@ -164,9 +164,9 @@ namespace ClassicUO.Game.Managers
             }
 
             string statsText = GenerateStatsText();
-            return string.IsNullOrEmpty(World.Player.Name) ?
+            return string.IsNullOrEmpty(World.Instance.Player.Name) ?
                 statsText :
-                $"{World.Player.Name} - {statsText}";
+                $"{World.Instance.Player.Name} - {statsText}";
         }
     }
 

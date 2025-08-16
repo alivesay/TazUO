@@ -112,6 +112,7 @@ namespace ClassicUO.Game.Managers
             }
         }
 
+        [Obsolete("Obsolete")]
         private void MigrateFromLegacyFormat()
         {
             string legacyPath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Profiles", "TileMarkers.bin");
@@ -151,9 +152,9 @@ namespace ClassicUO.Game.Managers
 
         private void UpdateLiveTilesAt(int x, int y, int map, ushort hue)
         {
-            if (World.Map == null || World.Map.Index != map) return;
+            if (World.Instance.Map == null || World.Instance.Map.Index != map) return;
 
-            var chunk = World.Map.GetChunk(x, y, false);
+            var chunk = World.Instance.Map.GetChunk(x, y, false);
             if (chunk == null) return;
 
             // Get all tiles at this location and update their hue

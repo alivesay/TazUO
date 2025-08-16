@@ -80,6 +80,35 @@ namespace ClassicUO.Game.Scenes
             _world = world;
             _useItemQueue = new UseItemQueue(world);
             _moveItemQueue = new MoveItemQueue(_world);
+
+            SDL.SDL_SetWindowMinimumSize(Client.Game.Window.Handle, 640, 480);
+
+            Camera.Zoom = ProfileManager.CurrentProfile.DefaultScale;
+            Camera.Bounds.X = Math.Max(0, ProfileManager.CurrentProfile.GameWindowPosition.X);
+            Camera.Bounds.Y = Math.Max(0, ProfileManager.CurrentProfile.GameWindowPosition.Y);
+            Camera.Bounds.Width = Math.Max(640, ProfileManager.CurrentProfile.GameWindowSize.X);
+            Camera.Bounds.Height = Math.Max(480, ProfileManager.CurrentProfile.GameWindowSize.Y);
+
+            Client.Game.Window.AllowUserResizing = true;
+
+            if (ProfileManager.CurrentProfile.WindowBorderless)
+            {
+                Client.Game.SetWindowBorderless(true);
+            }
+            else if (Settings.GlobalSettings.IsWindowMaximized)
+            {
+                Client.Game.MaximizeWindow();
+            }
+            else if (Settings.GlobalSettings.WindowSize.HasValue)
+            {
+                int w = Settings.GlobalSettings.WindowSize.Value.X;
+                int h = Settings.GlobalSettings.WindowSize.Value.Y;
+
+                w = Math.Max(640, w);
+                h = Math.Max(480, h);
+
+                Client.Game.SetWindowSize(w, h);
+            }
         }
         private long _nextProfileSave;
 
@@ -110,34 +139,6 @@ namespace ClassicUO.Game.Scenes
 
         public GameScene()
         {
-            SDL.SDL_SetWindowMinimumSize(Client.Game.Window.Handle, 640, 480);
-
-            Camera.Zoom = ProfileManager.CurrentProfile.DefaultScale;
-            Camera.Bounds.X = Math.Max(0, ProfileManager.CurrentProfile.GameWindowPosition.X);
-            Camera.Bounds.Y = Math.Max(0, ProfileManager.CurrentProfile.GameWindowPosition.Y);
-            Camera.Bounds.Width = Math.Max(0, ProfileManager.CurrentProfile.GameWindowSize.X);
-            Camera.Bounds.Height = Math.Max(0, ProfileManager.CurrentProfile.GameWindowSize.Y);
-
-            Client.Game.Window.AllowUserResizing = true;
-
-            if (ProfileManager.CurrentProfile.WindowBorderless)
-            {
-                Client.Game.SetWindowBorderless(true);
-            }
-            else if (Settings.GlobalSettings.IsWindowMaximized)
-            {
-                Client.Game.MaximizeWindow();
-            }
-            else if (Settings.GlobalSettings.WindowSize.HasValue)
-            {
-                int w = Settings.GlobalSettings.WindowSize.Value.X;
-                int h = Settings.GlobalSettings.WindowSize.Value.Y;
-
-                w = Math.Max(640, w);
-                h = Math.Max(480, h);
-
-                Client.Game.SetWindowSize(w, h);
-            }
         }
 
         public void DoubleClickDelayed(uint serial)
@@ -148,7 +149,7 @@ namespace ClassicUO.Game.Scenes
         public override void Load()
         {
             base.Load();
-            
+
             GridContainerSaveData.Instance.Load();
 
             Client.Game.UO.GameCursor.ItemHold.Clear();
@@ -428,7 +429,7 @@ namespace ClassicUO.Game.Scenes
             if (DisconnectionRequested)
             {
                 Client.Game.SetScene(new LoginScene(_world));
-                
+
                 return;
             }
             if (Settings.GlobalSettings.Reconnect)

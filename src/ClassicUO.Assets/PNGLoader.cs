@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Assets
 {
@@ -76,6 +77,10 @@ namespace ClassicUO.Assets
                     FileStream titleStream = File.OpenRead(fullImagePath);
                     Texture2D tempTexture = Texture2D.FromStream(GraphicsDevice, titleStream);
                     titleStream.Close();
+                    
+                    if (tempTexture == null)
+                        return new GumpInfo();
+                        
                     FixPNGAlpha(ref tempTexture);
 
                     uint[] pixels = GetPixels(tempTexture);
@@ -128,6 +133,10 @@ namespace ClassicUO.Assets
                     {
                         tempTexture = Texture2D.FromStream(GraphicsDevice, titleStream);
                     }
+                    
+                    if (tempTexture == null)
+                        return new ArtInfo();
+                        
                     FixPNGAlpha(ref tempTexture);
 
                     uint[] pixels = GetPixels(tempTexture);
@@ -212,104 +221,116 @@ namespace ClassicUO.Assets
             }
         }
 
-        public Task LoadResourceAssets(GumpsLoader gumps)
+        public void LoadResourceAssets(GumpsLoader gumps)
         {
-            return Task.Run
-            (() =>
+            Log.Debug("Loading resource assets");
+
+            var assembly = GetType().Assembly;
+
+            //Load the custom gump art included with TUO
+            for (uint i = 40303; i <= 40312; i++)
+            {
+                //Check if the art already exists
+                var gumpInfo = LoadGumpTexture(i);
+
+                if (gumpInfo.Pixels.IsEmpty)
                 {
-                    var assembly = GetType().Assembly;
+                    gumpInfo = gumps.GetGump(i);
 
-                    //Load the custom gump art included with TUO
-                    for (uint i = 40303; i <= 40312; i++)
+                    if (!gumpInfo.Pixels.IsEmpty)
                     {
-                        //Check if the art already exists
-                        var gumpInfo = LoadGumpTexture(i);
+                        continue;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
 
-                        if (gumpInfo.Pixels.IsEmpty)
+                var resourceName = assembly.GetName().Name + $".gumpartassets.{i}.png";
+
+                try
+                {
+                    Stream stream = assembly.GetManifestResourceStream(resourceName);
+
+                    if (stream != null)
+                    {
+                        Texture2D tempTexture = Texture2D.FromStream(GraphicsDevice, stream);
+                        
+                        if (tempTexture == null)
                         {
-                            gumpInfo = gumps.GetGump(i);
+                            stream.Dispose();
+                            continue;
+                        }
+                        
+                        FixPNGAlpha(ref tempTexture);
 
-                            if (!gumpInfo.Pixels.IsEmpty)
-                            {
-                                continue;
-                            }
+                        uint[] pixels = GetPixels(tempTexture);
+                        int width = tempTexture.Width;
+                        int height = tempTexture.Height;
+                        gump_textureCache.Add(i, (pixels, width, height));
+                        tempTexture.Dispose();
+
+
+                        //Increase available gump id's
+                        if (gump_availableIDs != null)
+                        {
+                            uint[] availableIDs = new uint[gump_availableIDs.Length + 1];
+                            gump_availableIDs.CopyTo(availableIDs, 0);
+                            availableIDs[availableIDs.Length - 1] = i;
+                            gump_availableIDs = availableIDs;
                         }
                         else
                         {
-                            continue;
+                            gump_availableIDs = [i];
                         }
 
-                        var resourceName = assembly.GetName().Name + $".gumpartassets.{i}.png";
-
-                        try
-                        {
-                            Stream stream = assembly.GetManifestResourceStream(resourceName);
-
-                            if (stream != null)
-                            {
-                                Texture2D tempTexture = Texture2D.FromStream(GraphicsDevice, stream);
-                                FixPNGAlpha(ref tempTexture);
-                                
-                                uint[] pixels = GetPixels(tempTexture);
-                                int width = tempTexture.Width;
-                                int height = tempTexture.Height;
-                                gump_textureCache.Add(i, (pixels, width, height));
-                                tempTexture.Dispose();
-
-
-                                //Increase available gump id's
-                                if (gump_availableIDs != null)
-                                {
-                                    uint[] availableIDs = new uint[gump_availableIDs.Length + 1];
-                                    gump_availableIDs.CopyTo(availableIDs, 0);
-                                    availableIDs[availableIDs.Length - 1] = i;
-                                    gump_availableIDs = availableIDs;
-                                }
-                                else
-                                {
-                                    gump_availableIDs = [i];
-                                }
-
-                                stream.Dispose();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
-                    }
-
-                    //Load all embedded art in gumpartassets folder
-                    var resourceNames = assembly.GetManifestResourceNames();
-
-                    foreach (var resourceName in resourceNames)
-                    {
-                        string path = assembly.GetName().Name + ".gumpartassets.";
-
-                        if (resourceName.IndexOf(path) == 0 && resourceName.EndsWith(".png"))
-                        {
-                            var fName = resourceName.Substring(path.Length);
-
-                            try
-                            {
-                                Stream stream = assembly.GetManifestResourceStream(resourceName);
-
-                                if (stream != null)
-                                {
-                                    Texture2D texture = Texture2D.FromStream(GraphicsDevice, stream);
-                                    FixPNGAlpha(ref texture);
-                                    EmbeddedArt.Add(fName, texture);
-                                    stream.Dispose();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
-                        }
+                        stream.Dispose();
                     }
                 }
-            );
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            //Load all embedded art in gumpartassets folder
+            var resourceNames = assembly.GetManifestResourceNames();
+
+            foreach (var resourceName in resourceNames)
+            {
+                string path = assembly.GetName().Name + ".gumpartassets.";
+
+                if (resourceName.IndexOf(path) == 0 && resourceName.EndsWith(".png"))
+                {
+                    var fName = resourceName.Substring(path.Length);
+                    Log.Debug("Loading PNG: " + fName);
+
+                    try
+                    {
+                        Stream stream = assembly.GetManifestResourceStream(resourceName);
+
+                        if (stream != null)
+                        {
+                            Texture2D texture = Texture2D.FromStream(GraphicsDevice, stream);
+                            
+                            if (texture == null)
+                            {
+                                stream.Dispose();
+                                continue;
+                            }
+                            
+                            FixPNGAlpha(ref texture);
+                            EmbeddedArt.Add(fName, texture);
+                            stream.Dispose();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+            }
         }
 
         private static void FixPNGAlpha(ref Texture2D texture)

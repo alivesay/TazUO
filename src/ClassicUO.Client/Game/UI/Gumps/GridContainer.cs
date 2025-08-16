@@ -378,8 +378,8 @@ namespace ClassicUO.Game.UI.Gumps
 
         private ContextMenuControl GenSortContextMenu()
         {
-            var control = new ContextMenuControl();
-            
+            var control = new ContextMenuControl(this);
+
             control.Add(new ContextMenuItemEntry("Sort by Graphic + Hue", () =>
             {
                 sortMode = GridSortMode.GraphicAndHue;
@@ -1646,7 +1646,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             private static string GetItemName(Item item)
             {
-                if (World.OPL.TryGetNameAndData(item.Serial, out string name, out string data))
+                if (World.Instance.OPL.TryGetNameAndData(item.Serial, out string name, out string data))
                 {
                     return !string.IsNullOrEmpty(name) ? name : item.ItemData.Name;
                 }

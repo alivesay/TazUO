@@ -408,7 +408,7 @@ namespace ClassicUO.Game.UI.Gumps
                                 }
 
                                 Mode = ChatMode.Party;
-                                TextBoxControl.SetText($"{index} ");
+                                TextBoxControl.SetText($" ");
                             }
                             else
                             {

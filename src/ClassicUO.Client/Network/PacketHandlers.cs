@@ -531,6 +531,10 @@ sealed class PacketHandlers
                     )
                     {
                         Client.Game.SetWindowTitle(world.Player.Name);
+                            if (ProfileManager.CurrentProfile?.EnableTitleBarStats == true)
+                            {
+                                TitleBarStatsManager.ForceUpdate();
+                            }
                     }
 
                     ushort str = p.ReadUInt16BE();
@@ -700,6 +704,7 @@ sealed class PacketHandlers
                 world.UoAssist.SignalHits();
                 world.UoAssist.SignalStamina();
                 world.UoAssist.SignalMana();
+                    TitleBarStatsManager.UpdateTitleBar();
             }
         }
     }
@@ -1869,6 +1874,7 @@ sealed class PacketHandlers
                 world.UoAssist.SignalHits();
                 world.UoAssist.SignalStamina();
                 world.UoAssist.SignalMana();
+                    TitleBarStatsManager.UpdateTitleBar();
             }
         }
     }
@@ -3444,6 +3450,10 @@ sealed class PacketHandlers
             )
             {
                 Client.Game.SetWindowTitle(name);
+                    if (ProfileManager.CurrentProfile?.EnableTitleBarStats == true)
+                    {
+                        TitleBarStatsManager.ForceUpdate();
+                    }
             }
 
             UIManager.GetGump<NameOverheadGump>(serial)?.SetName();
@@ -3598,6 +3608,7 @@ sealed class PacketHandlers
         {
             world.UoAssist.SignalHits();
             SpellVisualRangeManager.Instance.ClearCasting();
+            TitleBarStatsManager.UpdateTitleBar();
         }
     }
 
@@ -3616,6 +3627,7 @@ sealed class PacketHandlers
         if (mobile == world.Player)
         {
             world.UoAssist.SignalMana();
+            TitleBarStatsManager.UpdateTitleBar();
         }
     }
 
@@ -3634,6 +3646,7 @@ sealed class PacketHandlers
         if (mobile == world.Player)
         {
             world.UoAssist.SignalStamina();
+            TitleBarStatsManager.UpdateTitleBar();
         }
     }
 

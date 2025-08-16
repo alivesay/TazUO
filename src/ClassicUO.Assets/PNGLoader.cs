@@ -16,10 +16,10 @@ namespace ClassicUO.Assets
         public Dictionary<string, Texture2D> EmbeddedArt = new Dictionary<string, Texture2D>();
 
         private uint[] gump_availableIDs;
-        private Dictionary<uint, Texture2D> gump_textureCache = new Dictionary<uint, Texture2D>();
+        private Dictionary<uint, (uint[] pixels, int width, int height)> gump_textureCache = new Dictionary<uint, (uint[], int, int)>();
 
         private uint[] art_availableIDs;
-        private Dictionary<uint, Texture2D> art_textureCache = new Dictionary<uint, Texture2D>();
+        private Dictionary<uint, (uint[] pixels, int width, int height)> art_textureCache = new Dictionary<uint, (uint[], int, int)>();
 
         public GraphicsDevice GraphicsDevice { set; get; }
 
@@ -57,42 +57,47 @@ namespace ClassicUO.Assets
             if (index == -1)
                 return new GumpInfo();
 
-            Texture2D texture;
+            if (gump_textureCache.TryGetValue(graphic, out var cached))
+            {
+                return new GumpInfo()
+                {
+                    Pixels = cached.pixels,
+                    Width = cached.width,
+                    Height = cached.height
+                };
+            }
 
-            gump_textureCache.TryGetValue(graphic, out texture);
-
-            if (exePath != null && texture == null && GraphicsDevice != null)
+            if (exePath != null && GraphicsDevice != null)
             {
                 string fullImagePath = Path.Combine(exePath, IMAGES_FOLDER, GUMP_EXTERNAL_FOLDER, ((int)graphic).ToString() + ".png");
 
                 if (File.Exists(fullImagePath))
                 {
                     FileStream titleStream = File.OpenRead(fullImagePath);
-                    texture = Texture2D.FromStream(GraphicsDevice, titleStream);
+                    Texture2D tempTexture = Texture2D.FromStream(GraphicsDevice, titleStream);
                     titleStream.Close();
-                    FixPNGAlpha(ref texture);
+                    FixPNGAlpha(ref tempTexture);
 
-                    gump_textureCache.Add(graphic, texture);
+                    uint[] pixels = GetPixels(tempTexture);
+                    int width = tempTexture.Width;
+                    int height = tempTexture.Height;
+                    gump_textureCache.Add(graphic, (pixels, width, height));
+                    tempTexture.Dispose();
+
+                    return new GumpInfo()
+                    {
+                        Pixels = pixels,
+                        Width = width,
+                        Height = height
+                    };
                 }
             }
 
-            if (texture == null)
-            {
-                return new GumpInfo();
-            }
-
-            return new GumpInfo()
-            {
-                Pixels = GetPixels(texture),
-                Width = texture.Width,
-                Height = texture.Height
-            };
+            return new GumpInfo();
         }
 
         public ArtInfo LoadArtTexture(uint graphic)
         {
-            Texture2D texture;
-
             if (art_availableIDs == null)
                 return new ArtInfo();
 
@@ -101,38 +106,46 @@ namespace ClassicUO.Assets
             if (index == -1)
                 return new ArtInfo();
 
-            art_textureCache.TryGetValue(graphic, out texture);
-
-            if (exePath != null && texture == null && GraphicsDevice != null)
+            if (art_textureCache.TryGetValue(graphic, out var cached))
             {
-                string fullImagePath = Path.Combine(exePath, IMAGES_FOLDER, ART_EXTERNAL_FOLDER, (graphic -= 0x4000).ToString() + ".png");
+                return new ArtInfo()
+                {
+                    Pixels = cached.pixels,
+                    Width = cached.width,
+                    Height = cached.height
+                };
+            }
+
+            if (exePath != null && GraphicsDevice != null)
+            {
+                uint fileGraphic = graphic - 0x4000;
+                string fullImagePath = Path.Combine(exePath, IMAGES_FOLDER, ART_EXTERNAL_FOLDER, fileGraphic.ToString() + ".png");
 
                 if (File.Exists(fullImagePath))
                 {
-                    FileStream titleStream = File.OpenRead(fullImagePath);
-                    texture = Texture2D.FromStream(GraphicsDevice, titleStream);
-                    titleStream.Close();
-                    Color[] buffer = new Color[texture.Width * texture.Height];
-                    texture.GetData(buffer);
+                    Texture2D tempTexture;
+                    using (FileStream titleStream = File.OpenRead(fullImagePath))
+                    {
+                        tempTexture = Texture2D.FromStream(GraphicsDevice, titleStream);
+                    }
+                    FixPNGAlpha(ref tempTexture);
 
-                    for (int i = 0; i < buffer.Length; i++)
-                        buffer[i] = Color.FromNonPremultiplied(buffer[i].R, buffer[i].G, buffer[i].B, buffer[i].A);
+                    uint[] pixels = GetPixels(tempTexture);
+                    int width = tempTexture.Width;
+                    int height = tempTexture.Height;
+                    art_textureCache.Add(graphic, (pixels, width, height));
+                    tempTexture.Dispose();
 
-                    texture.SetData(buffer);
-
-                    art_textureCache.Add(graphic, texture);
+                    return new ArtInfo()
+                    {
+                        Pixels = pixels,
+                        Width = width,
+                        Height = height
+                    };
                 }
             }
 
-            if (texture == null)
-                return new ArtInfo();
-
-            return new ArtInfo()
-            {
-                Pixels = GetPixels(texture),
-                Width = texture.Width,
-                Height = texture.Height,
-            };
+            return new ArtInfo();
         }
 
         private uint[] GetPixels(Texture2D texture)
@@ -142,17 +155,16 @@ namespace ClassicUO.Assets
                 return new uint[0];
             }
 
-            Span<uint> pixels = texture.Width * texture.Height <= 1024 ? stackalloc uint[1024] : stackalloc uint[texture.Width * texture.Height];
-
             Color[] pixelColors = new Color[texture.Width * texture.Height];
             texture.GetData<Color>(pixelColors);
 
+            uint[] pixels = new uint[pixelColors.Length];
             for (int i = 0; i < pixelColors.Length; i++)
             {
                 pixels[i] = pixelColors[i].PackedValue;
             }
 
-            return pixels.ToArray();
+            return pixels;
         }
 
         public void Load()
@@ -235,9 +247,14 @@ namespace ClassicUO.Assets
 
                             if (stream != null)
                             {
-                                Texture2D texture = Texture2D.FromStream(GraphicsDevice, stream);
-                                FixPNGAlpha(ref texture);
-                                gump_textureCache.Add(i, texture);
+                                Texture2D tempTexture = Texture2D.FromStream(GraphicsDevice, stream);
+                                FixPNGAlpha(ref tempTexture);
+                                
+                                uint[] pixels = GetPixels(tempTexture);
+                                int width = tempTexture.Width;
+                                int height = tempTexture.Height;
+                                gump_textureCache.Add(i, (pixels, width, height));
+                                tempTexture.Dispose();
 
 
                                 //Increase available gump id's
@@ -304,6 +321,22 @@ namespace ClassicUO.Assets
                 buffer[i] = Color.FromNonPremultiplied(buffer[i].R, buffer[i].G, buffer[i].B, buffer[i].A);
 
             texture.SetData(buffer);
+        }
+
+        public void ClearArtPixelCache(uint graphic)
+        {
+            art_textureCache.Remove(graphic);
+        }
+
+        public void ClearGumpPixelCache(uint graphic)
+        {
+            gump_textureCache.Remove(graphic);
+        }
+
+        public void ClearAllPixelCaches()
+        {
+            art_textureCache.Clear();
+            gump_textureCache.Clear();
         }
     }
 }

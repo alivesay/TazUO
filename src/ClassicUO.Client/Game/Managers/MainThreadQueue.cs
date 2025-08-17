@@ -41,21 +41,12 @@ public static class MainThreadQueue
     }
 
     /// <summary>
-    /// This will wait for the returned result.
+    /// This will not wait for the returned result.
     /// </summary>
     /// <param name="action"></param>
     public static void InvokeOnMainThread(Action action)
     {
-        var resultEvent = new ManualResetEvent(false);
-
-        void wrappedAction()
-        {
-            action();
-            resultEvent.Set();
-        }
-
-        QueuedActions.Enqueue(wrappedAction);
-        resultEvent.WaitOne();
+        QueuedActions.Enqueue(action);
     }
 
     public static void ProcessQueue()

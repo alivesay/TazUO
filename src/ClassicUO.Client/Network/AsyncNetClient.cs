@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Data;
 using System.IO;
+using System.Buffers;
 using SDL2;
 
 namespace ClassicUO.Network
@@ -99,7 +100,7 @@ namespace ClassicUO.Network
 
         private async Task ReceiveLoopAsync(CancellationToken cancellationToken)
         {
-            var buffer = new byte[4096];
+            var buffer = ArrayPool<byte>.Shared.Rent(4096);
 
             try
             {
@@ -135,7 +136,7 @@ namespace ClassicUO.Network
                 switch (socketEx.SocketErrorCode)
                 {
                     case SocketError.OperationAborted: OnError?.Invoke(this, SocketError.Success); break;
-                    default: 
+                    default:
                         Log.Error($"Socket error in receive loop: {socketEx.SocketErrorCode} - {socketEx.Message}");
                         OnError?.Invoke(this, socketEx.SocketErrorCode); break;
                 }
@@ -152,6 +153,10 @@ namespace ClassicUO.Network
                 Disconnect();
                 OnError?.Invoke(this, SocketError.SocketError);
             }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
 
         private bool _isDisconnecting;
@@ -161,7 +166,7 @@ namespace ClassicUO.Network
                 return;
 
             _isDisconnecting = true;
-            
+
             _cancellationTokenSource?.Cancel();
             _receiveTask?.Wait(5000);
             _stream?.Close();
@@ -249,7 +254,6 @@ namespace ClassicUO.Network
 
         public event EventHandler Connected;
         public event EventHandler<SocketError> Disconnected;
-        public static event EventHandler<byte[]> MessageReceived;
 
         public async Task<bool> Connect(string ip, ushort port, CancellationToken cancellationToken = new ())
         {
@@ -279,7 +283,7 @@ namespace ClassicUO.Network
                 return;
 
             _isDisconnecting = true;
-            
+
             SDL.SDL_CaptureMouse(SDL.SDL_bool.SDL_FALSE);
             _isCompressionEnabled = false;
             Statistics.Reset();
@@ -294,6 +298,8 @@ namespace ClassicUO.Network
                 }
                 catch { }
             }
+
+            ClearIncomingMessages();
 
             _socket.Disconnect();
             _huffman.Reset();
@@ -314,7 +320,7 @@ namespace ClassicUO.Network
                 try
                 {
                     // Process outgoing data
-                    ProcessSendAsync(cancellationToken);
+                    await ProcessSendAsync(cancellationToken);
 
                     // Update statistics
                     Statistics.Update();
@@ -360,30 +366,25 @@ namespace ClassicUO.Network
             }
         }
 
-        public void ProcessIncomingMessages()
+        public bool TryDequeuePacket(out byte[] packet)
         {
-            if (_cancellationTokenSource.IsCancellationRequested)
-            {
-                while (_incomingMessages.TryDequeue(out _))
-                {
-                }
+            return _incomingMessages.TryDequeue(out packet);
+        }
 
-                return;
-            }
-            
-            while (_incomingMessages.TryDequeue(out var message))
+        public void ClearIncomingMessages()
+        {
+            while (_incomingMessages.TryDequeue(out _))
             {
-                MessageReceived?.Invoke(this, message);
             }
         }
-        
+
         public void Send(Span<byte> message, bool ignorePlugin = false, bool skipEncryption = false)
         {
             if (!IsConnected || message == null || message.Length == 0)
             {
                 return;
             }
-            
+
             if (!ignorePlugin && !Plugin.ProcessSendPacket(ref message))
             {
                 return;
@@ -416,11 +417,13 @@ namespace ClassicUO.Network
             EncryptionHelper.Instance?.Decrypt(buffer, buffer, buffer.Length);
         }
 
-        //Not really async, but sends data async inside
-        private void ProcessSendAsync(CancellationToken cancellationToken)
+        private async Task ProcessSendAsync(CancellationToken cancellationToken)
         {
             if (!IsConnected)
                 return;
+
+            byte[] sendingBuffer = null;
+            int bytesToSend = 0;
 
             try
             {
@@ -428,17 +431,17 @@ namespace ClassicUO.Network
                 {
                     if (_sendStream.Length > 0)
                     {
-                        var sendingBuffer = new byte[4096];
-                        
-                        int size = Math.Max(sendingBuffer.Length, _sendStream.Length);
-                        
-                        var read = _sendStream.Dequeue(sendingBuffer, 0, size);
+                        sendingBuffer = new byte[4096];
 
-                        if (read > 0)
-                        {
-                            _socket.SendAsync(sendingBuffer, 0, read, cancellationToken);
-                        }
+                        int size = Math.Min(sendingBuffer.Length, _sendStream.Length);
+
+                        bytesToSend = _sendStream.Dequeue(sendingBuffer, 0, size);
                     }
+                }
+
+                if (bytesToSend > 0 && sendingBuffer != null)
+                {
+                    await _socket.SendAsync(sendingBuffer, 0, bytesToSend, cancellationToken);
                 }
             }
             catch (Exception ex)

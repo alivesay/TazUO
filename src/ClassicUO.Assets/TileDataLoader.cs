@@ -35,10 +35,10 @@ namespace ClassicUO.Assets
             int static_group = isold ? Marshal.SizeOf<StaticGroupOld>() : Marshal.SizeOf<StaticGroupNew>();
             int staticscount = (int) ((tileData.Length - LAND_SIZE * land_group) / static_group);
 
-            if (staticscount > 2048)
-            {
-                staticscount = 2048;
-            }
+            // if (staticscount > 2048)
+            // {
+            //     staticscount = 2048;
+            // }
 
             tileData.Seek(0, System.IO.SeekOrigin.Begin);
 

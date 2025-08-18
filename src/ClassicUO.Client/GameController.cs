@@ -88,7 +88,6 @@ namespace ClassicUO
 
         protected override void Initialize()
         {
-            AsyncNetClient.MessageReceived += SocketOnMessageReceived;
             if (GraphicManager.GraphicsDevice.Adapter.IsProfileSupported(GraphicsProfile.HiDef))
             {
                 GraphicManager.GraphicsProfile = GraphicsProfile.HiDef;
@@ -105,10 +104,17 @@ namespace ClassicUO
             base.Initialize();
         }
 
-        private void SocketOnMessageReceived(object sender, byte[] e)
+        private const int MAX_PACKETS_PER_FRAME = 25;
+
+        private void ProcessNetworkPackets()
         {
-            var c = PacketHandlers.Handler.ParsePackets(Client.Game.UO.World, e);
-            AsyncNetClient.Socket.Statistics.TotalPacketsReceived += (uint)c;
+            int packetsProcessed = 0;
+            while (packetsProcessed < MAX_PACKETS_PER_FRAME && AsyncNetClient.Socket.TryDequeuePacket(out byte[] message))
+            {
+                var c = PacketHandlers.Handler.ParsePackets(Client.Game.UO.World, message);
+                AsyncNetClient.Socket.Statistics.TotalPacketsReceived += (uint)c;
+                packetsProcessed++;
+            }
         }
 
         protected override void LoadContent()
@@ -377,7 +383,7 @@ namespace ClassicUO
             Profiler.ExitContext("Mouse");
 
             Profiler.EnterContext("Packets");
-            AsyncNetClient.Socket.ProcessIncomingMessages();
+            ProcessNetworkPackets();
             Profiler.ExitContext("Packets");
 
             Plugin.Tick();

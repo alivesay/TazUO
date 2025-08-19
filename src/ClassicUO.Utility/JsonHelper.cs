@@ -93,7 +93,6 @@ namespace ClassicUO.Utility
             catch (Exception e)
             {
                 Log.Error(e.ToString());
-                return false;
             }
 
             // Clean up temp file if it still exists

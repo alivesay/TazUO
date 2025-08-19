@@ -213,6 +213,7 @@ namespace ClassicUO.Game.Scenes
             SpellVisualRangeManager.Instance.OnSceneLoad();
             AutoLootManager.Instance.OnSceneLoad();
             DressAgentManager.Instance.Load();
+            FriendsListManager.Instance.OnSceneLoad();
             var _ = BandageManager.Instance;
 
             foreach (var xml in ProfileManager.CurrentProfile.AutoOpenXmlGumps)
@@ -426,6 +427,7 @@ namespace ClassicUO.Game.Scenes
             SpellVisualRangeManager.Instance.Save();
             SpellVisualRangeManager.Instance.OnSceneUnload();
             AutoLootManager.Instance.OnSceneUnload();
+            FriendsListManager.Instance.OnSceneUnload();
 
             NameOverHeadManager.Save();
 

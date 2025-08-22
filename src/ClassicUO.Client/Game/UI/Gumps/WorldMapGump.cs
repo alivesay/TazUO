@@ -75,8 +75,8 @@ namespace ClassicUO.Game.UI.Gumps
         private List<string> _hiddenMarkerFiles;
         private bool _isScrolling;
         private bool _isTopMost;
-        private readonly string _mapFilesPath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client");
-        private readonly string _mapIconsPath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", "MapIcons");
+        private readonly string[] _mapFilesPath = [Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client"), Settings.GlobalSettings.UltimaOnlineDirectory, Path.Combine(CUOEnviroment.ExecutablePath, "Data", FileSystemHelper.RemoveInvalidChars(World.ServerName))];
+        private readonly string[] _mapIconsPath = [Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", "MapIcons"), Settings.GlobalSettings.UltimaOnlineDirectory, Path.Combine(CUOEnviroment.ExecutablePath, "Data", FileSystemHelper.RemoveInvalidChars(World.ServerName))];
 
         public const string USER_MARKERS_FILE = "userMarkers";
         public static readonly string UserMarkersFilePath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", $"{USER_MARKERS_FILE}.usr");
@@ -1804,8 +1804,11 @@ namespace ClassicUO.Game.UI.Gumps
 
             _zoneSets.Clear();
 
-            List<string> zonefiles = [.. Directory.GetFiles(_mapFilesPath, "*.zones.json")];
-            zonefiles.AddRange(Directory.GetFiles(Settings.GlobalSettings.UltimaOnlineDirectory, "*.zones.json"));
+            List<string> zonefiles = new();
+            foreach (string s in _mapFilesPath)
+            {
+                zonefiles.AddRange(Directory.GetFiles(s, "*.zones.json"));
+            }
 
             foreach (string filename in zonefiles)
             {
@@ -1848,12 +1851,22 @@ namespace ClassicUO.Game.UI.Gumps
 
                     _markerIcons.Clear();
 
-                    if (!Directory.Exists(_mapIconsPath))
+                    List<string> mapIconPaths = new();
+                    List<string> mapIconPathsPngJpg = new();
+                    foreach (string s in _mapIconsPath)
                     {
-                        Directory.CreateDirectory(_mapIconsPath);
+                        if (!Directory.Exists(s))
+                        {
+                            Directory.CreateDirectory(s);
+                        }
+
+                        mapIconPaths.AddRange(Directory.GetFiles(s, "*.cur"));
+                        mapIconPaths.AddRange(Directory.GetFiles(s, "*.ico"));
+                        mapIconPathsPngJpg.AddRange(Directory.GetFiles(s, "*.png"));
+                        mapIconPathsPngJpg.AddRange(Directory.GetFiles(s, "*.jpg"));
                     }
 
-                    foreach (string icon in Directory.GetFiles(_mapIconsPath, "*.cur").Union(Directory.GetFiles(_mapIconsPath, "*.ico")))
+                    foreach (string icon in mapIconPaths)
                     {
                         FileStream fs = new FileStream(icon, FileMode.Open, FileAccess.Read);
                         MemoryStream ms = new MemoryStream();
@@ -1877,7 +1890,7 @@ namespace ClassicUO.Game.UI.Gumps
                         }
                     }
 
-                    foreach (string icon in Directory.GetFiles(_mapIconsPath, "*.png").Union(Directory.GetFiles(_mapIconsPath, "*.jpg")))
+                    foreach (string icon in mapIconPathsPngJpg)
                     {
                         FileStream fs = new FileStream(icon, FileMode.Open, FileAccess.Read);
                         MemoryStream ms = new MemoryStream();
@@ -1901,10 +1914,14 @@ namespace ClassicUO.Game.UI.Gumps
                         }
                     }
 
-                    List<string> mapFiles = new List<string> { UserMarkersFilePath };
-                    mapFiles.AddRange(Directory.GetFiles(_mapFilesPath, "*.map")
-                                        .Union(Directory.GetFiles(_mapFilesPath, "*.csv"))
-                                        .Union(Directory.GetFiles(_mapFilesPath, "*.xml")));
+                    List<string> mapFiles = new(){UserMarkersFilePath};
+
+                    foreach (string s in _mapFilesPath)
+                    {
+                        mapFiles.AddRange(Directory.GetFiles(s, "*.map"));
+                        mapFiles.AddRange(Directory.GetFiles(s, "*.csv"));
+                        mapFiles.AddRange(Directory.GetFiles(s, "*.xml"));
+                    }
 
                     _markerFiles.Clear();
 

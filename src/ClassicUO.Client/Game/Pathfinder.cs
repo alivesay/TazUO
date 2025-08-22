@@ -385,10 +385,11 @@ namespace ClassicUO.Game
             newX += _offsetX[direction];
             newY += _offsetY[direction];
 
-            foreach (PathObject o in _reusableList)
+            for (int i = 0; i < _reusableList.Count; i++)
             {
-                o.Return();
+                _reusableList[i]?.Return();
             }
+
             _reusableList.Clear();
 
             if (!CreateItemList(_reusableList, newX, newY, stepState) || _reusableList.Count == 0)

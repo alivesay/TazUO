@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `8/17/25`.*
+*This was generated on `8/22/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -1253,8 +1253,23 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `serial` | `uint` | ❌ No |  |
+| `serial` | `uint` | ✅ Yes | Defaults to saved mount |
 | `skipQueue` | `bool` | ✅ Yes | Defaults true, set to false to use a double click queue |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### SetMount
+`(serial)`
+ This will set your saved mount for this character.
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `serial` | `uint` | ❌ No |  |
 
 **Return Type:** `void` *(Does not return anything)*
 
@@ -2006,6 +2021,56 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | `y` | `int` | ❌ No |  |
 
 **Return Type:** `PyGameObject`
+
+---
+
+### GetStaticsAt
+`(x, y)`
+ Gets all static objects at a specific position (x, y coordinates).
+ This includes trees, vegetation, buildings, and other non-movable scenery.
+ Example:
+ ```py
+ statics = API.GetStaticsAt(1000, 1000)
+ for s in statics:
+     API.SysMsg(f"Static Graphic: {s.Graphic}, Z: {s.Z}")
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `x` | `int` | ❌ No | X coordinate |
+| `y` | `int` | ❌ No | Y coordinate |
+
+**Return Type:** `List<PyStatic>`
+
+---
+
+### GetStaticsInArea
+`(x1, y1, x2, y2)`
+ Gets all static objects within a rectangular area defined by coordinates.
+ This includes trees, vegetation, buildings, and other non-movable scenery.
+ Example:
+ ```py
+ statics = API.GetStaticsInArea(1000, 1000, 1010, 1010)
+ API.SysMsg(f"Found {len(statics)} statics in area")
+ for s in statics:
+     if s.IsVegetation:
+         API.SysMsg(f"Vegetation Graphic: {s.Graphic} at {s.X}, {s.Y}")
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `x1` | `int` | ❌ No | Starting X coordinate |
+| `y1` | `int` | ❌ No | Starting Y coordinate |
+| `x2` | `int` | ❌ No | Ending X coordinate |
+| `y2` | `int` | ❌ No | Ending Y coordinate |
+
+**Return Type:** `List<PyStatic>`
 
 ---
 

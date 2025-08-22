@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.Managers;
@@ -7,6 +8,7 @@ using ClassicUO.Game.UI.Controls;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
+using ClassicUO.Game.GameObjects;
 
 namespace ClassicUO.Game.UI.Gumps;
 
@@ -19,8 +21,8 @@ public class AssistantGump : BaseOptionsGump
     {
         profile = ProfileManager.CurrentProfile;
 
-        CenterXInScreen();
-        CenterYInScreen();
+        CenterXInViewPort();
+        CenterYInViewPort();
 
         Build();
     }
@@ -36,6 +38,10 @@ public class AssistantGump : BaseOptionsGump
         BuildSpellIndicator();
         BuildJournalFilter();
         BuildTitleBar();
+        BuildDressAgent();
+        BuildBandageAgent();
+        BuildFriendsList();
+        BuildOrganizer();
 
         ChangePage((int)PAGE.AutoLoot);
     }
@@ -137,6 +143,15 @@ public class AssistantGump : BaseOptionsGump
         PositionHelper.BlankLine();
 
         scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel(lang.GetTazUO.AutoBuyEnable, 0, profile.BuyAgentEnabled, b => profile.BuyAgentEnabled = b)));
+        PositionHelper.BlankLine();
+
+        Control c;
+        scroll.Add(c = PositionHelper.PositionControl(new SliderWithLabel("Max total items (0 = unlimited)", 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.BuyAgentMaxItems, (r) => { profile.BuyAgentMaxItems = r; })));
+        c.SetTooltip("Maximum total items to buy in a single transaction. Set to 0 for unlimited.");
+        PositionHelper.BlankLine();
+
+        scroll.Add(c = PositionHelper.PositionControl(new SliderWithLabel("Max unique items", 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.BuyAgentMaxUniques, (r) => { profile.BuyAgentMaxUniques = r; })));
+        c.SetTooltip("Maximum number of different items to buy in a single transaction.");
         PositionHelper.BlankLine();
 
         scroll.Add(PositionHelper.PositionControl(new BuyAgentConfigs(World, MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
@@ -485,6 +500,503 @@ public class AssistantGump : BaseOptionsGump
         scroll.Add(PositionHelper.PositionControl(TextBox.GetOne("Note: Progress bars use Unicode block characters (█▓▒░) and may not display correctly on all systems.", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(MainContent.RightWidth - 20))));
     }
 
+    private void BuildDressAgent()
+    {
+        var page = (int)PAGE.DressAgent;
+        MainContent.AddToLeft(CategoryButton("Dress Agent", page, MainContent.LeftWidth));
+
+        LeftSideMenuRightSideContent content = new LeftSideMenuRightSideContent(MainContent.RightWidth, MainContent.Height, (int)(MainContent.RightWidth * 0.3));
+        MainContent.AddToRight(content, false, page);
+
+        // Build character menu on the left
+        BuildDressAgentCharacterMenu(content);
+    }
+
+    private void BuildDressAgentCharacterMenu(LeftSideMenuRightSideContent content)
+    {
+        DressAgentManager.Instance.Load();
+
+        int pageBase = (int)PAGE.DressAgent + 10000; // Base page number for dress agent
+
+        // Current character
+        string currentCharacterName = ProfileManager.CurrentProfile?.CharacterName ?? "";
+        ModernButton currentCharButton = SubCategoryButton(currentCharacterName, pageBase, content.LeftWidth);
+        content.AddToLeft(currentCharButton);
+
+        // Build current character's configs page
+        BuildCharacterConfigsList(content, currentCharacterName, false, pageBase);
+
+        // Other characters
+        var otherCharacters = DressAgentManager.Instance.OtherCharacterConfigs.GroupBy(c => c.CharacterName).ToList();
+        int index = 0;
+        foreach (var characterGroup in otherCharacters)
+        {
+            index++;
+            int charPageBase = pageBase + 1000 + index;
+            ModernButton charButton = SubCategoryButton(characterGroup.Key, charPageBase, content.LeftWidth);
+            content.AddToLeft(charButton);
+
+            // Build other character's configs page
+            BuildCharacterConfigsList(content, characterGroup.Key, true, charPageBase);
+        }
+    }
+
+    private void BuildCharacterConfigsList(LeftSideMenuRightSideContent content, string characterName, bool readOnly, int page)
+    {
+        content.ResetRightSide();
+
+        // Character header
+        content.AddToRight(TextBox.GetOne($"Dress Configurations for: {characterName}", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE,
+            ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(content.RightWidth - 40)), true, page);
+
+        VBoxContainer configsList = new VBoxContainer(content.RightWidth - 40);
+
+        // Add "Create New Config" button for current character
+        if (!readOnly)
+        {
+            ModernButton createButton = new(0, 0, 200, 30, ButtonAction.Default, "+ Create New Config", ThemeSettings.BUTTON_FONT_COLOR);
+            createButton.MouseUp += (s, e) =>
+            {
+                string configName = $"Config {DressAgentManager.Instance.CurrentPlayerConfigs.Count + 1}";
+                var newConfig = DressAgentManager.Instance.CreateNewConfig(configName);
+                UIManager.Add(new DressAgentConfigGump(newConfig, readOnly));
+                configsList.Add(GenArea(newConfig));
+            };
+            configsList.Add(createButton);
+        }
+
+        // Get configs for this character
+        var configs = readOnly ?
+            DressAgentManager.Instance.OtherCharacterConfigs.Where(c => c.CharacterName == characterName).ToList() :
+            DressAgentManager.Instance.CurrentPlayerConfigs;
+
+        // Show configs list
+        foreach (var config in configs)
+        {
+            configsList.Add(GenArea(config));
+        }
+
+        if (configs.Count == 0)
+        {
+            string message = readOnly ?
+                "This character has no dress configurations." :
+                "No dress configurations yet. Create your first one!";
+            configsList.Add(TextBox.GetOne(message, ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE,
+                Color.Gray, TextBox.RTLOptions.Default()));
+        }
+
+        content.AddToRight(configsList, true, page);
+
+        Area GenArea(DressConfig config)
+        {
+            Area configArea = new Area { Width = content.RightWidth - 60, Height = 40 };
+
+            // Config name and item count
+            var configLabel = TextBox.GetOne($"{config.Name} ({config.Items.Count} items)",
+                ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default());
+            configLabel.Y = 5;
+            configArea.Add(configLabel);
+
+            // Edit button
+            ModernButton editButton = new(configArea.Width - 70, 4, 40, 25, ButtonAction.Default, "Edit", ThemeSettings.BUTTON_FONT_COLOR);
+            editButton.MouseUp += (s, e) =>
+            {
+                UIManager.Add(new DressAgentConfigGump(config, readOnly));
+            };
+            configArea.Add(editButton);
+
+            // Delete button for current character
+            if (!readOnly)
+            {
+                ModernButton deleteButton = new(configArea.Width - 25, 4, 20, 25, ButtonAction.Default, "X", Color.Red);
+                deleteButton.MouseUp += (s, e) =>
+                {
+                    DressAgentManager.Instance.DeleteConfig(config);
+                    configArea.Dispose();
+                };
+                configArea.Add(deleteButton);
+            }
+            configArea.ForceSizeUpdate();
+            return configArea;
+        }
+    }
+
+
+    private void BuildBandageAgent()
+    {
+        var page = (int)PAGE.BandageAgent;
+        MainContent.AddToLeft(CategoryButton("Auto Bandage", page, MainContent.LeftWidth));
+        MainContent.ResetRightSide();
+
+        ScrollArea scroll = new(0, 0, MainContent.RightWidth, MainContent.Height);
+        MainContent.AddToRight(scroll, false, page);
+        PositionHelper.Reset();
+
+        scroll.Add(PositionHelper.PositionControl(TextBox.GetOne("Automatically use bandages to heal when HP drops below threshold.", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(MainContent.RightWidth - 20))));
+        PositionHelper.BlankLine();
+
+        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Enable bandage agent", 0, profile.EnableBandageAgent, b => profile.EnableBandageAgent = b)));
+        PositionHelper.BlankLine();
+
+        Control c;
+        scroll.Add(c = PositionHelper.PositionControl(new InputFieldWithLabel("Bandage delay (ms)", ThemeSettings.INPUT_WIDTH, profile.BandageAgentDelay.ToString(), true, (s, e) =>
+        {
+            if (int.TryParse(((BaseOptionsGump.InputField.StbTextBox)s).Text, out int delay))
+            {
+                // Clamp delay to sensible bounds (50ms to 30 seconds)
+                if (delay >= 50 && delay <= 30000)
+                {
+                    profile.BandageAgentDelay = delay;
+                }
+            }
+        })));
+        c.SetTooltip("Delay between bandage attempts in milliseconds (50-30000)");
+        PositionHelper.BlankLine();
+
+        scroll.Add(c = PositionHelper.PositionControl(new SliderWithLabel("HP percentage threshold", 0, ThemeSettings.SLIDER_WIDTH, 10, 95, profile.BandageAgentHPPercentage, (r) => { profile.BandageAgentHPPercentage = r; })));
+        c.SetTooltip("Heal when HP drops below this percentage");
+        PositionHelper.BlankLine();
+
+        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Use bandaging buff instead of delay", 0, profile.BandageAgentCheckForBuff, b => profile.BandageAgentCheckForBuff = b)));
+        PositionHelper.BlankLine();
+
+        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Use new bandage packet", 0, profile.BandageAgentUseNewPacket, b => profile.BandageAgentUseNewPacket = b)));
+        PositionHelper.BlankLine();
+
+        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Bandage if Poisoned", 0, profile.BandageAgentCheckPoisoned, b => profile.BandageAgentCheckPoisoned = b)));
+        PositionHelper.BlankLine();
+
+        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Skip Bandage if Hidden", 0, profile.BandageAgentCheckHidden, b => profile.BandageAgentCheckHidden = b)));
+        PositionHelper.BlankLine();
+
+        InputFieldWithLabel bandageGraphicInput = new("Bandage graphic ID", ThemeSettings.INPUT_WIDTH, $"0x{profile.BandageAgentGraphic:X4}", true, (s, e) =>
+        {
+            string text = ((BaseOptionsGump.InputField.StbTextBox)s).Text;
+            ushort graphic;
+
+            // Try to parse as hex (0x prefix) or decimal
+            if (text.StartsWith("0x", StringComparison.OrdinalIgnoreCase) || text.StartsWith("0X", StringComparison.OrdinalIgnoreCase))
+            {
+                if (ushort.TryParse(text.Substring(2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out graphic))
+                {
+                    profile.BandageAgentGraphic = graphic;
+                }
+            }
+            else if (ushort.TryParse(text, out graphic))
+            {
+                profile.BandageAgentGraphic = graphic;
+            }
+        });
+        bandageGraphicInput.SetTooltip("Graphic ID of bandages to use (default: 0x0E21). Accepts hex (0x0E21) or decimal (3617)");
+        scroll.Add(PositionHelper.PositionControl(bandageGraphicInput));
+    }
+
+    private void BuildFriendsList()
+    {
+        var page = (int)PAGE.FriendsList;
+        MainContent.AddToLeft(CategoryButton("Friends List", page, MainContent.LeftWidth));
+        MainContent.ResetRightSide();
+
+        ScrollArea scroll = new(0, 0, MainContent.RightWidth, MainContent.Height);
+        MainContent.AddToRight(scroll, false, page);
+        PositionHelper.Reset();
+
+        scroll.Add(PositionHelper.PositionControl(TextBox.GetOne("Manage your friends list.", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(MainContent.RightWidth - 20))));
+        PositionHelper.BlankLine();
+
+        VBoxContainer friendsContainer = new(MainContent.RightWidth - 20);
+
+        ModernButton addByTargetButton;
+        scroll.Add(PositionHelper.PositionControl(addByTargetButton = new ModernButton(0, 0, 120, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Add by Target", ThemeSettings.BUTTON_FONT_COLOR)));
+        addByTargetButton.MouseUp += (s, e) =>
+        {
+            GameActions.Print(World, "Target a player to add to friends list");
+            TargetHelper.TargetObject(World, targeted =>
+            {
+                if (targeted != null && targeted is Mobile mobile)
+                {
+                    if (FriendsListManager.Instance.AddFriend(mobile))
+                    {
+                        GameActions.Print(World, $"Added {mobile.Name} to friends list");
+                        friendsContainer.Add(GenFriend(FriendsListManager.Instance.GetFriend(mobile)), true);
+                    }
+                    else
+                    {
+                        GameActions.Print(World, $"Could not add {mobile.Name} - already in friends list");
+                    }
+                }
+                else
+                {
+                    GameActions.Print(World, "Invalid target - must be a player");
+                }
+            });
+        };
+
+        PositionHelper.BlankLine();
+        PositionHelper.BlankLine();
+
+        scroll.Add(PositionHelper.PositionControl(TextBox.GetOne("Current Friends:", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default())));
+        PositionHelper.BlankLine();
+
+        // Display friends list
+        var friends = FriendsListManager.Instance.GetFriends();
+
+        scroll.Add(PositionHelper.PositionControl(friendsContainer));
+
+        if (friends.Count == 0)
+        {
+            friendsContainer.Add(TextBox.GetOne("No friends added yet.", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default()));
+        }
+
+        foreach (var friend in friends)
+        {
+            friendsContainer.Add(GenFriend(friend));
+        }
+
+        Area GenFriend(FriendEntry friend)
+            {
+                Area friendArea = new Area();
+                friendArea.Width = MainContent.RightWidth - 20;
+                friendArea.Height = 30;
+
+                // Friend name
+                TextBox nameText = TextBox.GetOne(friend.Name, ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default());
+                nameText.X = 5;
+                nameText.Y = 5;
+                friendArea.Add(nameText);
+
+                // Serial info (if not 0)
+                if (friend.Serial != 0)
+                {
+                    TextBox serialText = TextBox.GetOne($"(Serial: {friend.Serial})", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE - 2, Color.Gray, TextBox.RTLOptions.Default());
+                    serialText.X = nameText.Width + 15;
+                    serialText.Y = 7;
+                    friendArea.Add(serialText);
+                }
+
+                // Remove button
+                ModernButton removeButton = new ModernButton(MainContent.RightWidth - 160, 2, 150, 26, ButtonAction.Default, "Remove", ThemeSettings.BUTTON_FONT_COLOR);
+                removeButton.MouseUp += (s, e) =>
+                {
+                    bool removed = friend.Serial != 0
+                        ? FriendsListManager.Instance.RemoveFriend(friend.Serial)
+                        : FriendsListManager.Instance.RemoveFriend(friend.Name);
+                    if (removed)
+                    {
+                        GameActions.Print(World, $"Removed {friend.Name} from friends list");
+                        friendArea.Dispose();
+                    }
+                };
+                friendArea.Add(removeButton);
+
+                friendArea.ForceSizeUpdate();
+                return friendArea;
+            }
+    }
+
+    private void BuildOrganizer()
+    {
+        const int page = (int)PAGE.Organizer;
+
+        MainContent.AddToLeft(CategoryButton("Organizer", page, MainContent.LeftWidth));
+        MainContent.ResetRightSide();
+
+        // Left side content - organizer list
+        var leftSideContent = new LeftSideMenuRightSideContent(MainContent.RightWidth, MainContent.Height, (int)(MainContent.RightWidth * 0.28));
+        MainContent.AddToRight(leftSideContent, true, page);
+
+        // Add new organizer button
+        ModernButton addButton = new(0, 0, leftSideContent.LeftWidth, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Add Organizer", ThemeSettings.BUTTON_FONT_COLOR);
+        addButton.MouseUp += (sender, e) =>
+        {
+            var newConfig = OrganizerAgent.Instance?.NewOrganizerConfig();
+            if (newConfig != null)
+            {
+                var configButton = CreateOrganizerConfigButton(newConfig, leftSideContent);
+                leftSideContent.AddToLeft(configButton);
+                // Auto-select the new config
+                SelectOrganizerConfig(newConfig, leftSideContent, configButton);
+            }
+        };
+        leftSideContent.AddToLeft(addButton);
+
+        // Organizer configurations list
+        OrganizerConfig firstConfig = null;
+        if (OrganizerAgent.Instance?.OrganizerConfigs != null)
+        {
+            for (int i = 0; i < OrganizerAgent.Instance.OrganizerConfigs.Count; i++)
+            {
+                var config = OrganizerAgent.Instance.OrganizerConfigs[i];
+                if (firstConfig == null) firstConfig = config;
+
+                var configButton = CreateOrganizerConfigButton(config, leftSideContent);
+                leftSideContent.AddToLeft(configButton);
+            }
+        }
+    }
+
+    private ModernButton CreateOrganizerConfigButton(OrganizerConfig config, LeftSideMenuRightSideContent leftSideContent)
+    {
+        var button = new ModernButton(0, 0, leftSideContent.LeftWidth, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, config.Name, ThemeSettings.BUTTON_FONT_COLOR);
+        button.MouseUp += (sender, e) =>
+        {
+            SelectOrganizerConfig(config, leftSideContent, button);
+        };
+        return button;
+    }
+
+    private void SelectOrganizerConfig(OrganizerConfig config, LeftSideMenuRightSideContent leftSideContent, ModernButton button)
+    {
+        // Clear right side
+        leftSideContent.RightArea.Clear();
+        leftSideContent.ResetRightSide();
+
+        // Add configuration details to right side
+        BuildOrganizerConfigDetails(config, leftSideContent, button);
+    }
+
+    private void BuildOrganizerConfigDetails(OrganizerConfig config, LeftSideMenuRightSideContent leftSideContent, ModernButton button)
+    {
+        // Name input
+        InputFieldWithLabel nameInput = null;
+        nameInput = new InputFieldWithLabel("Name", ThemeSettings.INPUT_WIDTH, config.Name, false, (s, e) =>
+        {
+            config.Name = nameInput.Text;
+            button.TextLabel.SetText(nameInput.Text);
+        });
+        leftSideContent.AddToRight(nameInput);
+
+        // Enabled checkbox
+        var enabledCheckbox = new CheckboxWithLabel("Enabled", 0, config.Enabled, b => config.Enabled = b)
+        {
+            X = nameInput.X + nameInput.Width + 10,
+            Y = nameInput.Y
+        };
+        leftSideContent.AddToRight(enabledCheckbox, false);
+
+        // Target bag button
+        ModernButton bagButton = new(0, 0, 150, 26, ButtonAction.Default, "Set Destination Bag", ThemeSettings.BUTTON_FONT_COLOR);
+        bagButton.MouseUp += (s, e) =>
+        {
+            TargetHelper.TargetObject(World, (obj) =>
+            {
+                if (!SerialHelper.IsItem(obj))
+                {
+                    GameActions.Print(World.Instance, "Only items can be added!");
+                    return;
+                }
+                config.TargetBagSerial = obj.Serial;
+                GameActions.Print(World, $"Target bag set to {obj.Serial:X}");
+            });
+        };
+        leftSideContent.AddToRight(bagButton);
+
+        // Current target bag display
+        if (config.TargetBagSerial != 0)
+        {
+            leftSideContent.AddToRight(TextBox.GetOne($"Current target: {config.TargetBagSerial:X}", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE - 1, Color.Gray, TextBox.RTLOptions.Default()));
+        }
+
+        // Run organizer button
+        ModernButton runButton = new(0, 0, 150, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Run Organizer", ThemeSettings.BUTTON_FONT_COLOR);
+        runButton.MouseUp += (sender, e) =>
+        {
+            OrganizerAgent.Instance?.RunOrganizer(config.Name);
+        };
+        leftSideContent.AddToRight(runButton);
+
+        // Delete organizer button
+        ModernButton deleteButton = new(0, 0, 150, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Delete Organizer", Color.Red)
+        {
+            X = runButton.X + runButton.Width + 10,
+            Y = runButton.Y
+        };
+        deleteButton.MouseUp += (sender, e) =>
+        {
+            OrganizerAgent.Instance?.DeleteConfig(config);
+            button.Dispose();
+        };
+        leftSideContent.AddToRight(deleteButton, false);
+
+        // Items to organize label
+        Control c;
+        leftSideContent.AddToRight(c = TextBox.GetOne("Items to organize:", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, Color.White, TextBox.RTLOptions.Default()));
+
+        // Add item button with targeting
+        ModernButton addItemButton = new(0, 0, 120, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Add Item", ThemeSettings.BUTTON_FONT_COLOR)
+        {
+            X = leftSideContent.RightWidth - 145,
+            Y = c.Y - 15
+        };
+        addItemButton.MouseUp += (sender, e) =>
+        {
+            TargetHelper.TargetObject(World, (obj) =>
+            {
+                if (!SerialHelper.IsItem(obj))
+                {
+                    GameActions.Print(World.Instance, "Only items can be added!");
+                    return;
+                }
+
+                var newItemConfig = config.NewItemConfig();
+                newItemConfig.Graphic = obj.Graphic;
+                newItemConfig.Hue = obj.Hue;
+
+                GameActions.Print(World, $"Added item: Graphic {obj.Graphic:X}, Hue {obj.Hue:X}");
+
+                // Refresh the right side to show the new item
+                SelectOrganizerConfig(config, leftSideContent, button);
+            });
+        };
+        leftSideContent.AddToRight(addItemButton, false);
+
+        // Item configurations list
+        foreach (var itemConfig in config.ItemConfigs)
+        {
+            var itemArea = CreateOrganizerItemConfigArea(itemConfig, config, leftSideContent, button);
+            leftSideContent.AddToRight(itemArea);
+        }
+    }
+
+    private Control CreateOrganizerItemConfigArea(OrganizerItemConfig itemConfig, OrganizerConfig parentConfig, LeftSideMenuRightSideContent leftSideContent, ModernButton button)
+    {
+        var itemArea = new Area() { Width = leftSideContent.RightArea.Width - 20, AcceptMouseInput = false };
+        Control c;
+
+        var rsp = new ResizableStaticPic(itemConfig.Graphic, 50, 50) { Hue = (ushort)(itemConfig.Hue == ushort.MaxValue ? 0 : itemConfig.Hue) };
+        itemArea.Add(rsp);
+
+        // Item info display
+        var itemText = $"Graphic: {itemConfig.Graphic:X4}, Hue: {(itemConfig.Hue == ushort.MaxValue ? "ANY" : itemConfig.Hue.ToString())}";
+        itemArea.Add(c = TextBox.GetOne(itemText, ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, Color.White, TextBox.RTLOptions.Default()));
+        c.X = rsp.Width + 10;
+        c.Y = (rsp.Height - c.Height) / 2;
+
+        // Enabled checkbox
+        var enabledCheckbox = new CheckboxWithLabel("Enabled", 0, itemConfig.Enabled, b => itemConfig.Enabled = b)
+        {
+            X = itemArea.Width - 130
+        };
+        enabledCheckbox.Y = (rsp.Height - enabledCheckbox.Height) / 2;
+        itemArea.Add(enabledCheckbox);
+
+        // Delete button
+        ModernButton deleteButton = new(0, 0, 100, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Delete Item", Color.Red)
+        {
+            X = enabledCheckbox.X - 110
+        };
+        deleteButton.Y = (rsp.Height - deleteButton.Height) / 2;
+        deleteButton.MouseUp += (sender, e) =>
+        {
+            parentConfig.DeleteItemConfig(itemConfig);
+            // Refresh the right side to remove the deleted item
+            SelectOrganizerConfig(parentConfig, leftSideContent, button);
+        };
+        itemArea.Add(deleteButton);
+        itemArea.ForceSizeUpdate();
+        return itemArea;
+    }
+
     public enum PAGE
     {
         None,
@@ -496,7 +1008,11 @@ public class AssistantGump : BaseOptionsGump
         HUD,
         SpellIndicator,
         JournalFilter,
-        TitleBar
+        TitleBar,
+        DressAgent,
+        BandageAgent,
+        FriendsList,
+        Organizer
     }
 
     #region CustomControls
@@ -810,7 +1326,7 @@ public class AssistantGump : BaseOptionsGump
     }
     private class SellAgentConfigs : Control
     {
-        private DataBox _dataBox;
+        private VBoxContainer _container;
 
         public SellAgentConfigs(World world, int width)
         {
@@ -818,18 +1334,19 @@ public class AssistantGump : BaseOptionsGump
             CanMove = true;
             Width = width;
 
-            Add(_dataBox = new DataBox(0, 0, width, 0));
+            Add(_container = new VBoxContainer(width));
 
             ModernButton b;
-            _dataBox.Add(b = new ModernButton(0, 0, 100, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Add entry", ThemeSettings.BUTTON_FONT_COLOR));
+            _container.Add(b = new ModernButton(0, 0, 100, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Add entry", ThemeSettings.BUTTON_FONT_COLOR));
 
             b.MouseUp += (s, e) =>
             {
-                _dataBox.Insert(3, GenConfigEntry(BuySellAgent.Instance.NewSellConfig(), width));
-                RearrangeDataBox();
+                var newEntry = GenConfigEntry(BuySellAgent.Instance.NewSellConfig(), width);
+                _container.Add(newEntry);
+                RefreshLayout();
             };
 
-            _dataBox.Add(b = new ModernButton(0, 0, 150, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Target item", ThemeSettings.BUTTON_FONT_COLOR));
+            _container.Add(b = new ModernButton(0, 0, 150, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Target item", ThemeSettings.BUTTON_FONT_COLOR));
 
             b.MouseUp += (s, e) =>
             {
@@ -842,8 +1359,9 @@ public class AssistantGump : BaseOptionsGump
                         var sc = BuySellAgent.Instance.NewSellConfig();
                         sc.Graphic = e.Graphic;
                         sc.Hue = e.Hue;
-                        _dataBox.Insert(3, GenConfigEntry(sc, width));
-                        RearrangeDataBox();
+                        var newEntry = GenConfigEntry(sc, width);
+                        _container.Add(newEntry);
+                        RefreshLayout();
                     }
                 );
             };
@@ -855,28 +1373,32 @@ public class AssistantGump : BaseOptionsGump
             titles.Add(tempTextBox1);
 
             tempTextBox1 = TextBox.GetOne("Hue", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default());
-            tempTextBox1.X = ((width - 90 - 60) / 3) + 55;
+            tempTextBox1.X = ((width - 90 - 60) / 5) + 55;
             titles.Add(tempTextBox1);
 
             tempTextBox1 = TextBox.GetOne("Max Amount", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default());
-            tempTextBox1.X = (((width - 90 - 60) / 3) * 2) + 60;
+            tempTextBox1.X = (((width - 90 - 60) / 5) * 2) + 60;
+            titles.Add(tempTextBox1);
+
+            tempTextBox1 = TextBox.GetOne("Min on Hand", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default());
+            tempTextBox1.X = (((width - 90 - 60) / 5) * 3) + 65;
             titles.Add(tempTextBox1);
 
             titles.ForceSizeUpdate();
-            _dataBox.Add(titles);
+            _container.Add(titles);
 
             if (BuySellAgent.Instance.SellConfigs != null)
                 foreach (var item in BuySellAgent.Instance.SellConfigs)
                 {
-                    _dataBox.Add(GenConfigEntry(item, width));
+                    _container.Add(GenConfigEntry(item, width));
                 }
 
-            RearrangeDataBox();
+            RefreshLayout();
         }
 
         private Control GenConfigEntry(BuySellItemConfig itemConfig, int width)
         {
-            int ewidth = (width - 90 - 60) / 3;
+            int ewidth = (width - 90 - 60) / 5; // Divide by 5 instead of 3 for smaller inputs
 
             Area area = new Area()
             {
@@ -970,6 +1492,26 @@ public class AssistantGump : BaseOptionsGump
             area.Add(maxInput);
             x += maxInput.Width + 5;
 
+            InputField restockInput = new InputField
+            (
+                ewidth, 50, 100, -1, itemConfig.RestockUpTo.ToString(), false, (s, e) =>
+                {
+                    InputField.StbTextBox restockInput = (InputField.StbTextBox)s;
+
+                    if (ushort.TryParse(restockInput.Text, out var ng))
+                    {
+                        itemConfig.RestockUpTo = ng;
+                    }
+                }
+            )
+            {
+                X = x
+            };
+
+            restockInput.SetTooltip("Minimum amount to keep on hand (0 = disabled)");
+            area.Add(restockInput);
+            x += restockInput.Width + 5;
+
             CheckboxWithLabel enabled = new CheckboxWithLabel(isChecked: itemConfig.Enabled, valueChanged: (e) => { itemConfig.Enabled = e; })
             {
                 X = x
@@ -998,24 +1540,24 @@ public class AssistantGump : BaseOptionsGump
                 if (e.Button == Input.MouseButtonType.Left)
                 {
                     BuySellAgent.Instance?.DeleteConfig(itemConfig);
+                    _container.Remove(area);
                     area.Dispose();
-                    RearrangeDataBox();
+                    RefreshLayout();
                 }
             };
 
             return area;
         }
 
-        private void RearrangeDataBox()
+        private void RefreshLayout()
         {
-            _dataBox.ReArrangeChildren();
-            _dataBox.ForceSizeUpdate();
-            Height = _dataBox.Height;
+            _container.ForceSizeUpdate();
+            Height = _container.Height;
         }
     }
     private class BuyAgentConfigs : Control
     {
-        private DataBox _dataBox;
+        private VBoxContainer _container;
 
         public BuyAgentConfigs(World world, int width)
         {
@@ -1023,18 +1565,19 @@ public class AssistantGump : BaseOptionsGump
             CanMove = true;
             Width = width;
 
-            Add(_dataBox = new DataBox(0, 0, width, 0));
+            Add(_container = new VBoxContainer(width));
 
             ModernButton b;
-            _dataBox.Add(b = new ModernButton(0, 0, 100, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Add entry", ThemeSettings.BUTTON_FONT_COLOR));
+            _container.Add(b = new ModernButton(0, 0, 100, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Add entry", ThemeSettings.BUTTON_FONT_COLOR));
 
             b.MouseUp += (s, e) =>
             {
-                _dataBox.Insert(3, GenConfigEntry(BuySellAgent.Instance.NewBuyConfig(), width));
-                RearrangeDataBox();
+                var newEntry = GenConfigEntry(BuySellAgent.Instance.NewBuyConfig(), width);
+                _container.Add(newEntry);
+                RefreshLayout();
             };
 
-            _dataBox.Add(b = new ModernButton(0, 0, 150, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Target item", ThemeSettings.BUTTON_FONT_COLOR));
+            _container.Add(b = new ModernButton(0, 0, 150, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Target item", ThemeSettings.BUTTON_FONT_COLOR));
 
             b.MouseUp += (s, e) =>
             {
@@ -1047,8 +1590,9 @@ public class AssistantGump : BaseOptionsGump
                         var sc = BuySellAgent.Instance.NewBuyConfig();
                         sc.Graphic = e.Graphic;
                         sc.Hue = e.Hue;
-                        _dataBox.Insert(3, GenConfigEntry(sc, width));
-                        RearrangeDataBox();
+                        var newEntry = GenConfigEntry(sc, width);
+                        _container.Add(newEntry);
+                        RefreshLayout();
                     }
                 );
             };
@@ -1056,33 +1600,36 @@ public class AssistantGump : BaseOptionsGump
             Area titles = new Area(false);
 
             TextBox tempTextBox1 = TextBox.GetOne("Graphic", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(null));
-
             tempTextBox1.X = 50;
             titles.Add(tempTextBox1);
 
             tempTextBox1 = TextBox.GetOne("Hue", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(null));
-            tempTextBox1.X = ((width - 90 - 60) / 3) + 55;
+            tempTextBox1.X = 50 + ((width - 90 - 60) / 5) + 5;
             titles.Add(tempTextBox1);
 
             tempTextBox1 = TextBox.GetOne("Max Amount", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(null));
-            tempTextBox1.X = (((width - 90 - 60) / 3) * 2) + 60;
+            tempTextBox1.X = 50 + (((width - 90 - 60) / 5) * 2) + 10;
+            titles.Add(tempTextBox1);
+
+            tempTextBox1 = TextBox.GetOne("Restock Up To", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(null));
+            tempTextBox1.X = 50 + (((width - 90 - 60) / 5) * 3) + 15;
             titles.Add(tempTextBox1);
 
             titles.ForceSizeUpdate();
-            _dataBox.Add(titles);
+            _container.Add(titles);
 
             if (BuySellAgent.Instance.BuyConfigs != null)
                 foreach (var item in BuySellAgent.Instance.BuyConfigs)
                 {
-                    _dataBox.Add(GenConfigEntry(item, width));
+                    _container.Add(GenConfigEntry(item, width));
                 }
 
-            RearrangeDataBox();
+            RefreshLayout();
         }
 
         private Control GenConfigEntry(BuySellItemConfig itemConfig, int width)
         {
-            int ewidth = (width - 90 - 60) / 3;
+            int ewidth = (width - 90 - 60) / 5; // Divide by 5 instead of 3 for smaller inputs
 
             Area area = new Area()
             {
@@ -1176,6 +1723,26 @@ public class AssistantGump : BaseOptionsGump
             area.Add(maxInput);
             x += maxInput.Width + 5;
 
+            InputField restockInput = new InputField
+            (
+                ewidth, 50, 100, -1, itemConfig.RestockUpTo.ToString(), false, (s, e) =>
+                {
+                    InputField.StbTextBox restockInput = (InputField.StbTextBox)s;
+
+                    if (ushort.TryParse(restockInput.Text, out var ng))
+                    {
+                        itemConfig.RestockUpTo = ng;
+                    }
+                }
+            )
+            {
+                X = x
+            };
+
+            restockInput.SetTooltip("Restock up to this amount (0 = disabled)");
+            area.Add(restockInput);
+            x += restockInput.Width + 5;
+
             CheckboxWithLabel enabled = new CheckboxWithLabel(isChecked: itemConfig.Enabled, valueChanged: (e) => { itemConfig.Enabled = e; })
             {
                 X = x
@@ -1204,19 +1771,19 @@ public class AssistantGump : BaseOptionsGump
                 if (e.Button == Input.MouseButtonType.Left)
                 {
                     BuySellAgent.Instance?.DeleteConfig(itemConfig);
+                    _container.Remove(area);
                     area.Dispose();
-                    RearrangeDataBox();
+                    RefreshLayout();
                 }
             };
 
             return area;
         }
 
-        private void RearrangeDataBox()
+        private void RefreshLayout()
         {
-            _dataBox.ReArrangeChildren();
-            _dataBox.ForceSizeUpdate();
-            Height = _dataBox.Height;
+            _container.ForceSizeUpdate();
+            Height = _container.Height;
         }
     }
     private class GraphicFilterConfigs : Control

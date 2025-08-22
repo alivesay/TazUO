@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 using System;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
@@ -810,9 +810,9 @@ internal static class GameActions
         return true;
     }
 
-    internal static void DropItem(uint serial, int x, int y, int z, uint container)
+    internal static void DropItem(uint serial, int x, int y, int z, uint container, bool force = false)
     {
-        if (Client.Game.UO.GameCursor.ItemHold.Enabled && !Client.Game.UO.GameCursor.ItemHold.IsFixedPosition && (Client.Game.UO.GameCursor.ItemHold.Serial != container || Client.Game.UO.GameCursor.ItemHold.ItemData.IsStackable))
+        if (force || (Client.Game.UO.GameCursor.ItemHold.Enabled && !Client.Game.UO.GameCursor.ItemHold.IsFixedPosition && (Client.Game.UO.GameCursor.ItemHold.Serial != container || Client.Game.UO.GameCursor.ItemHold.ItemData.IsStackable)))
         {
             if (Client.Game.UO.Version >= ClientVersion.CV_6017)
             {
@@ -850,6 +850,7 @@ internal static class GameActions
 
             Client.Game.UO.GameCursor.ItemHold.Enabled = false;
             Client.Game.UO.GameCursor.ItemHold.Dropped = true;
+            Client.Game.UO.GameCursor.ItemHold.Clear();
         }
     }
 

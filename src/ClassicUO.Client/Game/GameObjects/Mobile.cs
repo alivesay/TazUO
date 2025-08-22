@@ -155,7 +155,7 @@ namespace ClassicUO.Game.GameObjects
         {
             get
             {
-                Item it = FindItemByLayer(Layer.Mount);
+                Item it = Mount;
 
                 if (it != null && !IsDrivingBoat && it.GetGraphicForAnimation() != 0xFFFF)
                 {
@@ -172,7 +172,7 @@ namespace ClassicUO.Game.GameObjects
         {
             get
             {
-                Item it = FindItemByLayer(Layer.Mount);
+                Item it = Mount;
 
                 return it != null && it.Graphic == 0x3E96;
             }

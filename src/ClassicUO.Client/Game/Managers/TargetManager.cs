@@ -29,6 +29,7 @@ namespace ClassicUO.Game.Managers
         SetTargetClientSide = 3,
         Grab,
         SetGrabBag,
+        SetMount,
         HueCommandTarget,
         IgnorePlayerTarget,
         MoveItemContainer,
@@ -125,6 +126,28 @@ namespace ClassicUO.Game.Managers
             IsSet = false;
         }
     }
+    
+    public class AutoTargetInfo
+    {
+        public uint TargetSerial { get; set; }
+        public TargetType ExpectedTargetType { get; set; }
+        public CursorTarget ExpectedCursorTarget { get; set; }
+        public bool IsSet => TargetSerial != 0;
+
+        public void Set(uint serial, TargetType targetType, CursorTarget cursorTarget)
+        {
+            TargetSerial = serial;
+            ExpectedTargetType = targetType;
+            ExpectedCursorTarget = cursorTarget;
+        }
+
+        public void Clear()
+        {
+            TargetSerial = 0;
+            ExpectedTargetType = TargetType.Cancel;
+            ExpectedCursorTarget = CursorTarget.Invalid;
+        }
+    }
 
     public sealed class TargetManager
     {
@@ -177,6 +200,7 @@ namespace ClassicUO.Game.Managers
 
         public readonly LastTargetInfo LastTargetInfo = new LastTargetInfo();
 
+        public static readonly AutoTargetInfo NextAutoTarget = new AutoTargetInfo();
 
         public MultiTargetInfo MultiTargetInfo { get; private set; }
 
@@ -234,6 +258,11 @@ namespace ClassicUO.Game.Managers
             // to send the last active cursorID, so update cursor data later
 
             _targetCursorId = cursorID;
+        }
+
+        public static void SetAutoTarget(uint serial, TargetType targetType, CursorTarget cursorTarget)
+        {
+            NextAutoTarget.Set(serial, targetType, cursorTarget);
         }
 
         public void CancelTarget()
@@ -409,7 +438,7 @@ namespace ClassicUO.Game.Managers
 
                             if (SerialHelper.IsMobile(serial) && LastTargetInfo.Serial != serial)
                             {
-                                GameActions.RequestMobileStatus(_world,serial);
+                                GameActions.RequestMobileStatus(_world, serial);
                             }
                         }
 
@@ -423,7 +452,7 @@ namespace ClassicUO.Game.Managers
 
                         if (SerialHelper.IsItem(serial))
                         {
-                            GameActions.GrabItem(_world, serial, ((Item) entity).Amount);
+                            GameActions.GrabItem(_world, serial, ((Item)entity).Amount);
                         }
 
                         ClearTargetingWithoutTargetCancelPacket();
@@ -439,6 +468,26 @@ namespace ClassicUO.Game.Managers
                         }
 
                         ClearTargetingWithoutTargetCancelPacket();
+
+                        return;
+
+                    case CursorTarget.SetMount:
+
+                        if (SerialHelper.IsMobile(serial))
+                        {
+                            ProfileManager.CurrentProfile.SavedMountSerial = serial;
+                            Entity mount = _world.Get(serial);
+                            string mountName = mount?.Name ?? "mount";
+                            GameActions.Print(_world, $"Mount set: {mountName} (Serial: {serial})", 48);
+                        }
+                        else
+                        {
+                            GameActions.Print(_world, "You must target a mobile/creature to set as your mount.", 32);
+                        }
+
+                        ClearTargetingWithoutTargetCancelPacket();
+
+                        return;
 
                         return;
                     case CursorTarget.SetFavoriteMoveBag:
@@ -458,7 +507,7 @@ namespace ClassicUO.Game.Managers
                         }
                         else
                         {
-                            GameActions.Print(_world,"That is not a valid item.");
+                            GameActions.Print(_world, "That is not a valid item.");
                         }
 
                         ClearTargetingWithoutTargetCancelPacket();
@@ -474,6 +523,25 @@ namespace ClassicUO.Game.Managers
                         if (SerialHelper.IsItem(serial))
                         {
                             MultiItemMoveGump.OnContainerTarget(_world, serial);
+                        }
+                        ClearTargetingWithoutTargetCancelPacket();
+                        return;
+                }
+            }
+            else
+            {
+                // Handle cases where entity is null but we still want to use the serial
+                switch (TargetingState)
+                {
+                    case CursorTarget.SetMount:
+                        if (SerialHelper.IsMobile(serial))
+                        {
+                            ProfileManager.CurrentProfile.SavedMountSerial = serial;
+                            GameActions.Print(_world, $"Mount set (Serial: {serial})", 48);
+                        }
+                        else
+                        {
+                            GameActions.Print(_world, "You must target a mobile/creature to set as your mount.", 32);
                         }
                         ClearTargetingWithoutTargetCancelPacket();
                         return;

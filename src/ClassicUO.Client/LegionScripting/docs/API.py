@@ -151,6 +151,11 @@ class PyProfile:
     AutoLootEnabled: bool = None
 
 class PyStatic:
+    IsImpassible: bool = None
+    Graphic: int = None
+    IsVegetation: bool = None
+    X: int = None
+    Y: int = None
     __class__: str = None
 
 JournalEntries = None
@@ -881,13 +886,20 @@ def Dismount(skipQueue: bool = True) -> None:
     """
     pass
 
-def Mount(serial: int, skipQueue: bool = True) -> None:
+def Mount(serial: int = 1337, skipQueue: bool = True) -> None:
     """
      Attempt to mount(double click)
      Example:
      ```py
      API.Mount(0x12345678)
      ```
+    
+    """
+    pass
+
+def SetMount(serial: int) -> None:
+    """
+     This will set your saved mount for this character.
     
     """
     pass
@@ -1372,6 +1384,36 @@ def GetTile(x: int, y: int) -> PyGameObject:
      tile = API.GetTile(1414, 1515)
      if tile:
        API.SysMsg(f"Found a tile with graphic: {tile.Graphic}")
+     ```
+    
+    """
+    pass
+
+def GetStaticsAt(x: int, y: int) -> list[Any]:
+    """
+     Gets all static objects at a specific position (x, y coordinates).
+     This includes trees, vegetation, buildings, and other non-movable scenery.
+     Example:
+     ```py
+     statics = API.GetStaticsAt(1000, 1000)
+     for s in statics:
+         API.SysMsg(f"Static Graphic: {s.Graphic}, Z: {s.Z}")
+     ```
+    
+    """
+    pass
+
+def GetStaticsInArea(x1: int, y1: int, x2: int, y2: int) -> list[Any]:
+    """
+     Gets all static objects within a rectangular area defined by coordinates.
+     This includes trees, vegetation, buildings, and other non-movable scenery.
+     Example:
+     ```py
+     statics = API.GetStaticsInArea(1000, 1000, 1010, 1010)
+     API.SysMsg(f"Found {len(statics)} statics in area")
+     for s in statics:
+         if s.IsVegetation:
+             API.SysMsg(f"Vegetation Graphic: {s.Graphic} at {s.X}, {s.Y}")
      ```
     
     """

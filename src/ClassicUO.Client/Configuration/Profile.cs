@@ -132,6 +132,17 @@ namespace ClassicUO.Configuration
         public bool EnableMousewheelScaleZoom { get; set; }
         public bool RestoreScaleAfterUnpressCtrl { get; set; }
         public bool BandageSelfOld { get; set; } = true;
+
+        // Bandage Agent Settings
+        public bool EnableBandageAgent { get; set; } = false;
+        public int BandageAgentDelay { get; set; } = 3000;
+        public bool BandageAgentCheckForBuff { get; set; } = false;
+        public ushort BandageAgentGraphic { get; set; } = 0x0E21;
+        public bool BandageAgentUseNewPacket { get; set; } = true;
+        public bool BandageAgentCheckHidden { get; set; } = false;
+        public bool BandageAgentCheckPoisoned { get; set; } = false;
+        public int BandageAgentHPPercentage { get; set; } = 80;
+
         public bool EnableDeathScreen { get; set; } = true;
         public bool EnableBlackWhiteEffect { get; set; } = true;
         public ushort HiddenBodyHue { get; set; } = 0x038E;
@@ -482,6 +493,8 @@ namespace ClassicUO.Configuration
 
         public int TextBorderSize { get; set; } = 1;
 
+        public uint SavedMountSerial { get; set; } = 0;
+
         public bool UseModernShopGump { get; set; } = false;
 
         public int MaxJournalEntries { get; set; } = 250;
@@ -604,6 +617,8 @@ namespace ClassicUO.Configuration
         public int SellAgentMaxUniques { get; set; } = 50;
         public int SellAgentMaxItems { get; set; } = 0;
         public bool BuyAgentEnabled { get; set; }
+        public int BuyAgentMaxUniques { get; set; } = 50;
+        public int BuyAgentMaxItems { get; set; } = 0;
         public bool DisableTargetingGridContainers { get; set; }
         public bool ControllerEnabled { get; set; } = true;
         public bool EnableScavenger { get; set; } = true;

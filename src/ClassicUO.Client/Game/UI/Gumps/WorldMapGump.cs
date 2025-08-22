@@ -532,9 +532,9 @@ public class WorldMapGump : ResizableGump
                     {
                         markerFile.Hidden = !markerFile.Hidden;
 
-                        if (!markerFile.Hidden)
-                        {
-                            string hiddenFile = _hiddenMarkerFiles.SingleOrDefault(x => x.Equals(markerFile.Name));
+                            if (!markerFile.Hidden)
+                            {
+                                string hiddenFile = _hiddenMarkerFiles.FirstOrDefault(x => x.Equals(markerFile.Name));
 
                             if (!string.IsNullOrEmpty(hiddenFile))
                             {

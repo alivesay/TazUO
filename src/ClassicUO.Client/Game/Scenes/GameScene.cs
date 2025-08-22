@@ -183,6 +183,9 @@ namespace ClassicUO.Game.Scenes
             SpellDefinition.LoadCustomSpells(_world);
             SpellVisualRangeManager.Instance.OnSceneLoad();
             AutoLootManager.Instance.OnSceneLoad();
+            DressAgentManager.Instance.Load();
+            FriendsListManager.Instance.OnSceneLoad();
+            var _ = BandageManager.Instance;
 
             foreach (var xml in ProfileManager.CurrentProfile.AutoOpenXmlGumps)
             {
@@ -192,6 +195,7 @@ namespace ClassicUO.Game.Scenes
             PersistentVars.Load();
             LegionScripting.LegionScripting.Init(_world);
             BuySellAgent.Load();
+            OrganizerAgent.Load();
             GraphicsReplacement.Load();
             SpellBarManager.Load();
             if(ProfileManager.CurrentProfile.EnableCaveBorder)
@@ -349,6 +353,7 @@ namespace ClassicUO.Game.Scenes
 
             GraphicsReplacement.Save();
             BuySellAgent.Unload();
+            OrganizerAgent.Unload();
 
             PersistentVars.Unload();
             LegionScripting.LegionScripting.Unload();
@@ -387,6 +392,7 @@ namespace ClassicUO.Game.Scenes
             SpellVisualRangeManager.Instance.Save();
             SpellVisualRangeManager.Instance.OnSceneUnload();
             AutoLootManager.Instance.OnSceneUnload();
+            FriendsListManager.Instance.OnSceneUnload();
 
             NameOverHeadManager.Save();
 

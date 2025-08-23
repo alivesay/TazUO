@@ -165,7 +165,9 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
 
                         if (config.LootOnMatch)
                         {
-                            AutoLootManager.Instance.LootItem(data.item);
+                            var root = World.Items.Get(data.item.RootContainer);
+                            if (root != null && root.IsCorpse)
+                                AutoLootManager.Instance.LootItem(data.item);
                         }
                     }
                 }

@@ -75,8 +75,8 @@ namespace ClassicUO.Game.UI.Gumps
         private List<string> _hiddenMarkerFiles;
         private bool _isScrolling;
         private bool _isTopMost;
-        private readonly string[] _mapFilesPath = [Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client"), Settings.GlobalSettings.UltimaOnlineDirectory, Path.Combine(CUOEnviroment.ExecutablePath, "Data", FileSystemHelper.RemoveInvalidChars(World.ServerName))];
-        private readonly string[] _mapIconsPath = [Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", "MapIcons"), Settings.GlobalSettings.UltimaOnlineDirectory, Path.Combine(CUOEnviroment.ExecutablePath, "Data", FileSystemHelper.RemoveInvalidChars(World.ServerName))];
+        private readonly string[] _mapFilesPath = [Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client"), Path.Combine(Settings.GlobalSettings.UltimaOnlineDirectory, "MapMarkers"), Path.Combine(CUOEnviroment.ExecutablePath, "Data", FileSystemHelper.RemoveInvalidChars(World.ServerName), "MapMarkers")];
+        private readonly string[] _mapIconsPath = [Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", "MapIcons"), Path.Combine(Settings.GlobalSettings.UltimaOnlineDirectory, "MapIcons"), Path.Combine(CUOEnviroment.ExecutablePath, "Data", FileSystemHelper.RemoveInvalidChars(World.ServerName), "MapIcons")];
 
         public const string USER_MARKERS_FILE = "userMarkers";
         public static readonly string UserMarkersFilePath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", $"{USER_MARKERS_FILE}.usr");

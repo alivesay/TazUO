@@ -1807,7 +1807,8 @@ namespace ClassicUO.Game.UI.Gumps
             List<string> zonefiles = new();
             foreach (string s in _mapFilesPath)
             {
-                zonefiles.AddRange(Directory.GetFiles(s, "*.zones.json"));
+                if(Directory.Exists(s))
+                    zonefiles.AddRange(Directory.GetFiles(s, "*.zones.json"));
             }
 
             foreach (string filename in zonefiles)
@@ -1918,6 +1919,8 @@ namespace ClassicUO.Game.UI.Gumps
 
                     foreach (string s in _mapFilesPath)
                     {
+                        if(!Directory.Exists(s)) continue;
+
                         mapFiles.AddRange(Directory.GetFiles(s, "*.map"));
                         mapFiles.AddRange(Directory.GetFiles(s, "*.csv"));
                         mapFiles.AddRange(Directory.GetFiles(s, "*.xml"));

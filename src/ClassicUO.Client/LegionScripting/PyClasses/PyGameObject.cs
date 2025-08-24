@@ -38,22 +38,22 @@ public class PyGameObject
     /// <summary>
     /// The X-coordinate of the object in the game world.
     /// </summary>
-    public readonly ushort X;
+    public ushort X;
 
     /// <summary>
     /// The Y-coordinate of the object in the game world.
     /// </summary>
-    public readonly ushort Y;
+    public ushort Y;
 
     /// <summary>
     /// The Z-coordinate (elevation) of the object in the game world.
     /// </summary>
-    public readonly sbyte Z;
+    public sbyte Z;
 
     /// <summary>
     /// The graphic ID of the object, representing its visual appearance.
     /// </summary>
-    public readonly ushort Graphic;
+    public ushort Graphic;
 
     /// <summary>
     /// The hue (color tint) applied to the object.
@@ -85,7 +85,7 @@ public class PyGameObject
         X = gameObject.X;
         Y = gameObject.Y;
         Z = gameObject.Z;
-        Graphic = gameObject.Graphic;
+        Graphic = gameObject.OriginalGraphic;
         Hue = gameObject.Hue;
     }
 

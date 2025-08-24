@@ -43,8 +43,9 @@ public class WorldMapGump : ResizableGump
 {
     public const string USER_MARKERS_FILE = "userMarkers";
 
-    private static readonly string _mapFilesPath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client");
-    private static readonly string _mapIconsPath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", "MapIcons");
+    private static readonly string[] _mapFilesPath = [Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client"), Path.Combine(Settings.GlobalSettings.UltimaOnlineDirectory, "MapMarkers"), Path.Combine(CUOEnviroment.ExecutablePath, "Data", FileSystemHelper.RemoveInvalidChars(World.Instance.ServerName), "MapMarkers")];
+    private static readonly string[] _mapIconsPath = [Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", "MapIcons"), Path.Combine(Settings.GlobalSettings.UltimaOnlineDirectory, "MapIcons"), Path.Combine(CUOEnviroment.ExecutablePath, "Data", FileSystemHelper.RemoveInvalidChars(World.Instance.ServerName), "MapIcons")];
+
     private static readonly string _mapsCachePath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", "MapsCache");
     private static readonly string UserMarkersFilePath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Client", $"{USER_MARKERS_FILE}.usr");
     private static readonly Dictionary<string, string> _mapCache = new();
@@ -1575,8 +1576,12 @@ public class WorldMapGump : ResizableGump
 
         _zoneSets.Clear();
 
-        List<string> zonefiles = [.. Directory.GetFiles(_mapFilesPath, "*.zones.json")];
-        zonefiles.AddRange(Directory.GetFiles(Settings.GlobalSettings.UltimaOnlineDirectory, "*.zones.json"));
+            List<string> zonefiles = new();
+            foreach (string s in _mapFilesPath)
+            {
+                if(Directory.Exists(s))
+                    zonefiles.AddRange(Directory.GetFiles(s, "*.zones.json"));
+            }
 
         foreach (string filename in zonefiles)
         {
@@ -1619,17 +1624,27 @@ public class WorldMapGump : ResizableGump
 
                 _markerIcons.Clear();
 
-                if (!Directory.Exists(_mapIconsPath))
-                {
-                    Directory.CreateDirectory(_mapIconsPath);
-                }
+                    List<string> mapIconPaths = new();
+                    List<string> mapIconPathsPngJpg = new();
+                    foreach (string s in _mapIconsPath)
+                    {
+                        if (!Directory.Exists(s))
+                        {
+                            Directory.CreateDirectory(s);
+                        }
 
-                foreach (string icon in Directory.GetFiles(_mapIconsPath, "*.cur").Union(Directory.GetFiles(_mapIconsPath, "*.ico")))
-                {
-                    FileStream fs = new FileStream(icon, FileMode.Open, FileAccess.Read);
-                    MemoryStream ms = new MemoryStream();
-                    fs.CopyTo(ms);
-                    ms.Seek(0, SeekOrigin.Begin);
+                        mapIconPaths.AddRange(Directory.GetFiles(s, "*.cur"));
+                        mapIconPaths.AddRange(Directory.GetFiles(s, "*.ico"));
+                        mapIconPathsPngJpg.AddRange(Directory.GetFiles(s, "*.png"));
+                        mapIconPathsPngJpg.AddRange(Directory.GetFiles(s, "*.jpg"));
+                    }
+
+                    foreach (string icon in mapIconPaths)
+                    {
+                        FileStream fs = new FileStream(icon, FileMode.Open, FileAccess.Read);
+                        MemoryStream ms = new MemoryStream();
+                        fs.CopyTo(ms);
+                        ms.Seek(0, SeekOrigin.Begin);
 
                     try
                     {
@@ -1648,12 +1663,12 @@ public class WorldMapGump : ResizableGump
                     }
                 }
 
-                foreach (string icon in Directory.GetFiles(_mapIconsPath, "*.png").Union(Directory.GetFiles(_mapIconsPath, "*.jpg")))
-                {
-                    FileStream fs = new FileStream(icon, FileMode.Open, FileAccess.Read);
-                    MemoryStream ms = new MemoryStream();
-                    fs.CopyTo(ms);
-                    ms.Seek(0, SeekOrigin.Begin);
+                    foreach (string icon in mapIconPathsPngJpg)
+                    {
+                        FileStream fs = new FileStream(icon, FileMode.Open, FileAccess.Read);
+                        MemoryStream ms = new MemoryStream();
+                        fs.CopyTo(ms);
+                        ms.Seek(0, SeekOrigin.Begin);
 
                     try
                     {
@@ -1672,10 +1687,16 @@ public class WorldMapGump : ResizableGump
                     }
                 }
 
-                List<string> mapFiles = new List<string> { UserMarkersFilePath };
-                mapFiles.AddRange(Directory.GetFiles(_mapFilesPath, "*.map")
-                                    .Union(Directory.GetFiles(_mapFilesPath, "*.csv"))
-                                    .Union(Directory.GetFiles(_mapFilesPath, "*.xml")));
+                    List<string> mapFiles = new(){UserMarkersFilePath};
+
+                    foreach (string s in _mapFilesPath)
+                    {
+                        if(!Directory.Exists(s)) continue;
+
+                        mapFiles.AddRange(Directory.GetFiles(s, "*.map"));
+                        mapFiles.AddRange(Directory.GetFiles(s, "*.csv"));
+                        mapFiles.AddRange(Directory.GetFiles(s, "*.xml"));
+                    }
 
                 _markerFiles.Clear();
 

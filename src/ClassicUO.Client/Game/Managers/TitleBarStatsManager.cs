@@ -6,14 +6,6 @@ namespace ClassicUO.Game.Managers
 {
     public static class TitleBarStatsManager
     {
-        private static uint _lastUpdate = 0;
-        private static ushort _lastHits = 0;
-        private static ushort _lastHitsMax = 0;
-        private static ushort _lastMana = 0;
-        private static ushort _lastManaMax = 0;
-        private static ushort _lastStamina = 0;
-        private static ushort _lastStaminaMax = 0;
-
         public static void UpdateTitleBar()
         {
             if (ProfileManager.CurrentProfile == null)
@@ -25,33 +17,6 @@ namespace ClassicUO.Game.Managers
             {
                 return;
             }
-
-            uint currentTime = (uint)Time.Ticks;
-            uint delta = currentTime - _lastUpdate;
-            if (delta < (uint)ProfileManager.CurrentProfile.TitleBarUpdateInterval)
-            {
-                return;
-            }
-
-            // Check if stats have changed
-            if (World.Instance.Player.Hits == _lastHits &&
-                World.Instance.Player.HitsMax == _lastHitsMax &&
-                World.Instance.Player.Mana == _lastMana &&
-                World.Instance.Player.ManaMax == _lastManaMax &&
-                World.Instance.Player.Stamina == _lastStamina &&
-                World.Instance.Player.StaminaMax == _lastStaminaMax)
-            {
-                return;
-            }
-
-            // Update cached values
-            _lastHits = World.Instance.Player.Hits;
-            _lastHitsMax = World.Instance.Player.HitsMax;
-            _lastMana = World.Instance.Player.Mana;
-            _lastManaMax = World.Instance.Player.ManaMax;
-            _lastStamina = World.Instance.Player.Stamina;
-            _lastStaminaMax = World.Instance.Player.StaminaMax;
-            _lastUpdate = currentTime;
 
             string statsText = GenerateStatsText();
             string title = string.IsNullOrEmpty(World.Instance.Player.Name) ?
@@ -130,13 +95,6 @@ namespace ClassicUO.Game.Managers
 
         public static void ForceUpdate()
         {
-            _lastUpdate = 0;
-            _lastHits = 0;
-            _lastHitsMax = 0;
-            _lastMana = 0;
-            _lastManaMax = 0;
-            _lastStamina = 0;
-            _lastStaminaMax = 0;
             UpdateTitleBar();
         }
 

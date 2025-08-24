@@ -11,6 +11,7 @@ using ClassicUO.Input;
 using ClassicUO.Network;
 using ClassicUO.Renderer;
 using ClassicUO.Resources;
+using ClassicUO.Utility.Logging;
 using ClassicUO.Utility.Platforms;
 using SDL2;
 using Control = ClassicUO.Game.UI.Controls.Control;
@@ -32,7 +33,9 @@ namespace ClassicUO.Game.UI.Gumps
         ClientCommand,
         UOAMChat,
         Prompt,
-        UOChat
+        UOChat,
+        ServUOCommand,
+        PolCommand
     }
 
     public class SystemChatControl : Control
@@ -52,6 +55,7 @@ namespace ClassicUO.Game.UI.Gumps
         private readonly LinkedList<ChatLineTime> _textEntries;
         private readonly AlphaBlendControl _trans;
         private int lastAutoCompleteIndex = 0;
+        private string command = string.Empty;
 
         public SystemChatControl(WorldViewportGump gump, int x, int y, int w, int h)
         {
@@ -203,6 +207,16 @@ namespace ClassicUO.Game.UI.Gumps
                             AppendChatModePrefix(ResGumps.Chat, ProfileManager.CurrentProfile.ChatMessageHue, TextBoxControl.Text);
 
                             break;
+
+                        case ChatMode.ServUOCommand:
+                            DisposeChatModePrefix();
+                            AppendChatModePrefix($"[{command}", 32, null);
+                            break;
+
+                        case ChatMode.PolCommand:
+                            DisposeChatModePrefix();
+                            AppendChatModePrefix($".{command}", 32, null);
+                            break;
                     }
                 }
             }
@@ -325,6 +339,20 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
+        private string ExtractCommand(string text)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length < 2)
+                return string.Empty;
+
+            int pos = 1;
+            while (pos < text.Length && text[pos] != ' ')
+            {
+                pos++;
+            }
+
+            return pos > 1 ? text.Substring(1, pos - 1) : string.Empty;
+        }
+
         public void AddLine(string text, byte font, ushort hue, bool isunicode)
         {
             if (_textEntries.Count >= 30)
@@ -379,12 +407,11 @@ namespace ClassicUO.Game.UI.Gumps
                 first = next;
             }
 
-
-
             if (Mode == ChatMode.Default && IsActive)
             {
                 if (TextBoxControl.Text.Length > 0)
                 {
+                    string text = TextBoxControl.Text;
                     switch (TextBoxControl.Text[0])
                     {
                         case '/':
@@ -451,6 +478,22 @@ namespace ClassicUO.Game.UI.Gumps
                         case '!' when TextBoxControl.Text.Length > 1 && TextBoxControl.Text[1] == ' ':
                             Mode = ChatMode.Yell;
 
+                            break;
+
+                        case '[' when text.Length > 1 && text.Contains(" "):
+                            int bracketSpaceIndex = text.IndexOf(' ');
+                            command = text.Substring(1, bracketSpaceIndex - 1);
+                            Mode = ChatMode.ServUOCommand;
+                            // Remove the command from the textbox, keep parameters
+                            TextBoxControl.SetText(text.Substring(bracketSpaceIndex));
+                            break;
+
+                        case '.' when text.Length > 1 && text.Contains(" "):
+                            int dotSpaceIndex = text.IndexOf(' ');
+                            command = text.Substring(1, dotSpaceIndex - 1);
+                            Mode = ChatMode.PolCommand;
+                            // Remove the command from the textbox, keep parameters
+                            TextBoxControl.SetText(text.Substring(dotSpaceIndex));
                             break;
                     }
                 }
@@ -624,19 +667,22 @@ namespace ClassicUO.Game.UI.Gumps
             }
 
             ChatMode sentMode = Mode;
-
+            Mode = ChatMode.Default;
             TextBoxControl.ClearText();
+
+            bool sendAgain = false;
 
             if (text.Length > MAX_MESSAGE_LENGHT)
             {
                 GameActions.Print(World.Instance, "Message too long, sending the first 100 characters.");
+                Mode = sentMode;
                 TextBoxControl.SetText(text.Substring(MAX_MESSAGE_LENGHT));
                 text = text.Substring(0, MAX_MESSAGE_LENGHT);
+                sendAgain = true;
             }
 
-            _messageHistory.Add(new Tuple<ChatMode, string>(Mode, text));
+            _messageHistory.Add(new Tuple<ChatMode, string>(sentMode, text));
             _messageHistoryIndex = _messageHistory.Count;
-            Mode = ChatMode.Default;
 
             if (_gump.World.MessageManager.PromptData.Prompt != ConsolePrompt.None)
             {
@@ -896,10 +942,30 @@ namespace ClassicUO.Game.UI.Gumps
                         NetClient.Socket.Send_ChatMessageCommand(text);
 
                         break;
+
+                    case ChatMode.ServUOCommand:
+                        if (!text.StartsWith(" "))
+                            text = " " + text;
+                        GameActions.Say($"[{command}{text}", ProfileManager.CurrentProfile.SpeechHue);
+                        TextHistoryManager.AddToHistoryIfCommand($"[{command} {text}");
+
+                        break;
+
+                    case ChatMode.PolCommand:
+                        if (!text.StartsWith(" "))
+                            text = " " + text;
+                        GameActions.Say($".{command}{text}", ProfileManager.CurrentProfile.SpeechHue);
+                        TextHistoryManager.AddToHistoryIfCommand($".{command} {text}");
+
+                        break;
                 }
             }
 
-            DisposeChatModePrefix();
+            if(!sendAgain)
+            {
+                DisposeChatModePrefix();
+                command = string.Empty;
+            }
         }
 
         private class ChatLineTime

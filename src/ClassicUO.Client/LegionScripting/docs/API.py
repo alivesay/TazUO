@@ -152,10 +152,7 @@ class PyProfile:
 
 class PyStatic:
     IsImpassible: bool = None
-    Graphic: int = None
     IsVegetation: bool = None
-    X: int = None
-    Y: int = None
     __class__: str = None
 
 JournalEntries = None

@@ -321,6 +321,9 @@ namespace ClassicUO.Game.Managers
                 return;
             }
 
+            // Record action for script recording
+            ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordTarget(serial);
+
             Entity entity = _world.InGame ? _world.Get(serial) : null;
 
             if (entity != null)
@@ -555,6 +558,9 @@ namespace ClassicUO.Game.Managers
             {
                 return;
             }
+
+            // Record action for script recording
+            ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordTargetLocation(x, y, z, graphic);
 
             if (graphic == 0)
             {

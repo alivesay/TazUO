@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using ClassicUO.Game.UI.Gumps.Login;
+using ClassicUO.LegionScripting;
+using Constants = ClassicUO.Game.Constants;
 
 namespace ClassicUO.Network;
 sealed class PacketHandlers
@@ -363,7 +365,7 @@ sealed class PacketHandlers
             var cursorTarget = (CursorTarget)p.ReadUInt8();
             var cursorId = p.ReadUInt32BE();
             var targetType = (TargetType)p.ReadUInt8();
-            
+
             world.TargetManager.SetTargeting(cursorTarget, cursorId, targetType);
 
             if (world.Party.PartyHealTimer < Time.Ticks && world.Party.PartyHealTarget != 0)
@@ -382,7 +384,7 @@ sealed class PacketHandlers
                     // Auto-target the stored serial
                     world.TargetManager.Target(TargetManager.NextAutoTarget.TargetSerial);
                 }
-                
+
                 // Always clear after any target cursor (no queuing)
                 TargetManager.NextAutoTarget.Clear();
             }
@@ -6791,6 +6793,8 @@ sealed class PacketHandlers
         string[] lines
     )
     {
+            ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordWaitForGump(gumpID.ToString());
+            ScriptingInfoGump.AddOrUpdateInfo("Last Gump Opened", gumpID);
         List<string> cmdlist = _parser.GetTokens(layout);
         int cmdlen = cmdlist.Count;
 

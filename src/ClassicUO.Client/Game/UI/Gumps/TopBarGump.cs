@@ -166,7 +166,7 @@ namespace ClassicUO.Game.UI.Gumps
                 Y = 1,
                 FontCenter = true
             }, 1);
-            lscript.MouseUp += (s, e) => { UIManager.Add(new LegionScripting.ScriptManagerGump(world)); };
+            lscript.MouseUp += (s, e) => { UIManager.Add(new LegionScripting.ScriptManagerGump()); };
             startX += largeWidth + 1;
 
             RighClickableButton moreMenu;

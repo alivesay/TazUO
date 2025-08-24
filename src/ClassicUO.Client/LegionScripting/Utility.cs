@@ -153,8 +153,29 @@ internal static class Utility
             default: break;
         }
 
-        return finalLayer;
-    }
+            return finalLayer;
+        }
+
+        /// <summary>
+        /// Get string from a Direction
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public static string GetDirectionString(Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.North: return "north";
+                case Direction.Right: return "northeast";
+                case Direction.East: return "east";
+                case Direction.Down: return "southeast";
+                case Direction.South: return "south";
+                case Direction.Left: return "southwest";
+                case Direction.West: return "west";
+                case Direction.Up: return "northwest";
+                default: return "none";
+            }
+        }
 
     /// <summary>
     /// Get Direction from a string
@@ -273,7 +294,7 @@ internal static class Utility
             byte g = Convert.ToByte(color.Substring(3, 2), 16);
             byte b = Convert.ToByte(color.Substring(5, 2), 16);
 
-            return new Color(r, g, b);
+                return new Color(r, g, b);
         }
 
         return Color.Black;

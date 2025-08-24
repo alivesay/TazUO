@@ -318,7 +318,7 @@ namespace ClassicUO.LegionScripting
                                 }
                                 else
                                 {
-                                    ScriptManagerGump g = new ScriptManagerGump(World);
+                                    ScriptManagerGump g = new ScriptManagerGump();
                                     UIManager.Add(g);
                                 }
                             }

@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using ClassicUO.Assets;
 using ClassicUO.Game;
+using ClassicUO.Game.Data;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Game.UI.Gumps;
@@ -14,10 +15,9 @@ using Microsoft.Xna.Framework;
 
 namespace ClassicUO.LegionScripting
 {
-    public class ScriptManagerGump : ResizableGump
+    public class ScriptManagerGump : NineSliceGump
     {
-        private AlphaBlendControl background;
-        private ScrollArea scrollArea;
+        private ModernScrollArea scrollArea;
         private NiceButton refresh;
         private TextBox title;
         internal const int GROUPINDENT = 10;
@@ -30,25 +30,20 @@ namespace ClassicUO.LegionScripting
         public override GumpType GumpType => GumpType.ScriptManager;
         public static bool RefreshContent = false;
         public const string NOGROUPTEXT = "No group";
-        public ScriptManagerGump(World world) : base(world, lastWidth, lastHeight, MIN_WIDTH, 200, 0, 0)
+        public ScriptManagerGump() : base(World.Instance, lastX, lastY, lastWidth, lastHeight, ModernUIConstants.ModernUIPanel, ModernUIConstants.ModernUIPanel_BoderSize, true, MIN_WIDTH, 200)
         {
-            X = lastX;
-            Y = lastY;
             CanCloseWithRightClick = true;
             AcceptMouseInput = true;
             CanMove = true;
-            AnchorType = ANCHOR_TYPE.DISABLED;
             LegionScripting.LoadScriptsFromFile();
 
-            Add(background = new AlphaBlendControl(0.77f) { X = BorderControl.BorderSize, Y = BorderControl.BorderSize });
-
-            title = TextBox.GetOne("Script Manager", TrueTypeLoader.EMBEDDED_FONT, 18, Color.DarkOrange, TextBox.RTLOptions.Default(Width - 2 * BorderControl.BorderSize));
-            title.X = BorderControl.BorderSize;
-            title.Y = BorderControl.BorderSize;
+            title = TextBox.GetOne("Script Manager", TrueTypeLoader.EMBEDDED_FONT, 18, Color.DarkOrange, TextBox.RTLOptions.Default(Width - 2 * BorderSize));
+            title.X = BorderSize;
+            title.Y = BorderSize;
             title.AcceptMouseInput = false;
             Add(title);
 
-            Add(refresh = new NiceButton(Width - REFRESH_BUTTON_WIDTH - BorderControl.BorderSize, BorderControl.BorderSize, REFRESH_BUTTON_WIDTH, 25, ButtonAction.Default, "Menu")
+            Add(refresh = new NiceButton(Width - REFRESH_BUTTON_WIDTH - BorderSize, BorderSize, REFRESH_BUTTON_WIDTH, 25, ButtonAction.Default, "Menu")
             {
                 IsSelectable = false
             });
@@ -62,13 +57,21 @@ namespace ClassicUO.LegionScripting
             {
                 UIManager.Add(new ScriptBrowser(World));
             }));
+            refresh.ContextMenu.Add(new ContextMenuItemEntry("Script Recording", () =>
+            {
+                UIManager.Add(new ScriptRecordingGump());
+            }));
+            refresh.ContextMenu.Add(new ContextMenuItemEntry("Scripting Info", () =>
+            {
+                ScriptingInfoGump.Show();
+            }));
 
             refresh.MouseDown += (s, e) =>
             {
                 refresh.ContextMenu?.Show();
             };
 
-            Add(scrollArea = new ScrollArea(BorderControl.BorderSize, refresh.Height + refresh.Y, Width - (BorderControl.BorderSize * 2), Height - (BorderControl.BorderSize * 2) - 25, true));
+            Add(scrollArea = new ModernScrollArea(BorderSize, refresh.Height + refresh.Y, Width - (BorderSize * 2), Height - (BorderSize * 2) - 25));
             scrollArea.ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways;
 
             BuildGump();
@@ -79,15 +82,15 @@ namespace ClassicUO.LegionScripting
                 CenterYInViewPort();
             }
 
-            ResizeWindow(new Point(lastWidth, lastHeight));
-            OnResize();
+            OnResizeComplete();
         }
 
         public void Refresh()
         {
             Dispose();
-            ScriptManagerGump g = new ScriptManagerGump(World) { X = X, Y = Y };
-            g.ResizeWindow(new Point(Width, Height));
+            ScriptManagerGump g = new ScriptManagerGump() { X = X, Y = Y };
+            g.Width = Width;
+            g.Height = Height;
             UIManager.Add(g);
         }
 
@@ -117,7 +120,7 @@ namespace ClassicUO.LegionScripting
 
             foreach (var group in groupsMap)
             {
-                var g = new GroupControl(World, this, group.Key == "" ? NOGROUPTEXT : group.Key, Width - scrollArea.ScrollBarWidth() - 2 - GROUPINDENT) { Y = y };
+                var g = new GroupControl(World, this, group.Key == "" ? NOGROUPTEXT : group.Key, Width - 12 - 2 - GROUPINDENT) { Y = y }; // ModernScrollArea uses SCROLLBAR_WIDTH = 12
                 g.GroupExpandedShrunk += GroupExpandedShrunk;
                 g.AddGroups(group.Value);
 
@@ -143,43 +146,43 @@ namespace ClassicUO.LegionScripting
             {
                 RefreshContent = false;
                 Dispose();
-                ScriptManagerGump g = new ScriptManagerGump(World) { X = X, Y = Y };
-                g.ResizeWindow(new Point(Width, Height));
+                ScriptManagerGump g = new ScriptManagerGump() { X = X, Y = Y };
+                g.Width = Width;
+                g.Height = Height;
                 UIManager.Add(g);
             }
         }
         public override void Restore(XmlElement xml)
         {
             base.Restore(xml);
-            Point savedSize = new Point(Width, Height);
 
             if (int.TryParse(xml.GetAttribute("rw"), out int width) && width > 0)
-                savedSize.X = width;
+                Width = width;
 
             if (int.TryParse(xml.GetAttribute("rh"), out int height) && height > 0)
-                savedSize.Y = height;
-
-            ResizeWindow(savedSize);
+                Height = height;
 
             int.TryParse(xml.GetAttribute("x"), out X);
             int.TryParse(xml.GetAttribute("y"), out Y);
+
+            OnResizeComplete();
         }
-        public override void OnResize()
+        protected override void OnResize(int oldWidth, int oldHeight, int newWidth, int newHeight)
         {
-            base.OnResize();
+            base.OnResize(oldWidth, oldHeight, newWidth, newHeight);
+            OnResizeComplete();
+        }
 
-            if (background != null) //Quick check to see if the gump has been built yet
+        private void OnResizeComplete()
+        {
+            if (title != null) //Quick check to see if the gump has been built yet
             {
-                background.Width = Width - (BorderControl.BorderSize * 2);
-                background.Height = Height - (BorderControl.BorderSize * 2);
+                title.Width = Width - REFRESH_BUTTON_WIDTH - (BorderSize * 2);
 
-                title.Width = Width - REFRESH_BUTTON_WIDTH - (BorderControl.BorderSize * 2);
+                refresh.X = Width - BorderSize - refresh.Width;
 
-                refresh.X = Width - BorderControl.BorderSize - refresh.Width;
-
-                scrollArea.Width = Width - (BorderControl.BorderSize * 2);
-                scrollArea.Height = Height - BorderControl.BorderSize - (refresh.Y + refresh.Height);
-                scrollArea.UpdateScrollbarPosition();
+                scrollArea.UpdateWidth(Width - (BorderSize * 2));
+                scrollArea.UpdateHeight(Height - BorderSize - (refresh.Y + refresh.Height));
 
                 RepositionChildren();
             }
@@ -205,7 +208,7 @@ namespace ClassicUO.LegionScripting
 
                 if (c is GroupControl gc)
                 {
-                    gc.UpdateSize(scrollArea.Width - scrollArea.ScrollBarWidth() - 2);
+                    gc.UpdateSize(scrollArea.Width - 12 - 2); // ModernScrollArea uses SCROLLBAR_WIDTH = 12
                 }
             }
         }
@@ -272,7 +275,6 @@ while True:
 
                 label = TextBox.GetOne(group + "  ", TrueTypeLoader.EMBEDDED_FONT, 16, Color.White, TextBox.RTLOptions.Default());
                 label.AcceptMouseInput = false;
-                Add(label);
                 label.X = expand.X + expand.Width;
                 label.Y = (HEIGHT - label.Height) / 2;
 
@@ -364,7 +366,6 @@ while True:
                         options.ContextMenu.Show();
                 };
 
-                Add(new AlphaBlendControl(0.35f) { Height = HEIGHT, Width = label.Width + expand.Width + options.Width });
                 Add(expand);
                 Add(label);
                 Add(options);
@@ -631,9 +632,9 @@ while True:
             private void SetBGColors()
             {
                 if (Script.IsPlaying || (Script.GetScript != null && Script.GetScript.IsPlaying))
-                    background.BaseColor = Color.DarkGreen;
+                    background.BaseColor = Color.DarkOliveGreen;
                 else
-                    background.BaseColor = Color.DarkRed;
+                    background.BaseColor = Color.DarkSlateBlue;
 
                 playstop.TextLabel.Text = playStopText;
             }

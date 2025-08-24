@@ -1078,6 +1078,7 @@ namespace ClassicUO.Game.Managers
                     if (m != null)
                     {
                         GameActions.DoubleClickQueued(_world.Player);
+                        ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordDismount();
                     }
                     break;
 
@@ -1088,6 +1089,7 @@ namespace ClassicUO.Game.Managers
                         if (mount != null)
                         {
                             GameActions.DoubleClickQueued(ProfileManager.CurrentProfile.SavedMountSerial);
+                            ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordMount(mount);
                         }
                         else
                         {

@@ -25,7 +25,7 @@ namespace ClassicUO.Game.Managers
         private static Queue<uint> lootItems = new ();
         private List<AutoLootConfigEntry> autoLootItems = new ();
         private bool loaded = false;
-        private readonly string savePath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Profiles", "AutoLoot.json");
+        private readonly string savePath = Path.Combine(ProfileManager.ProfilePath, "AutoLoot.json");
         private long nextLootTime = Time.Ticks;
         private long nextClearRecents = Time.Ticks + 5000;
         private ProgressBarGump progressBarGump;
@@ -326,6 +326,10 @@ namespace ClassicUO.Game.Managers
 
             Task.Factory.StartNew(() =>
             {
+                var oldPath = Path.Combine(CUOEnviroment.ExecutablePath, "Data", "Profiles", "AutoLoot.json");
+                if(File.Exists(oldPath))
+                    File.Move(oldPath, savePath);
+
                 if (!File.Exists(savePath))
                 {
                     autoLootItems = new List<AutoLootConfigEntry>();

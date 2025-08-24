@@ -989,6 +989,13 @@ public class AssistantGump : BaseOptionsGump
         return itemArea;
     }
 
+    public override void Dispose()
+    {
+        base.Dispose();
+        DressAgentManager.Instance.Save();
+        OrganizerAgent.Instance.Save();
+    }
+
     public enum PAGE
     {
         None,

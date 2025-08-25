@@ -19,7 +19,7 @@ namespace ClassicUO.Game.Managers
 
         private static string GetDataPath()
         {
-            var dataPath = Path.Combine(CUOEnviroment.ExecutablePath, "Data");
+            var dataPath = ProfileManager.ProfilePath;
             if (!Directory.Exists(dataPath))
                 Directory.CreateDirectory(dataPath);
             return dataPath;
@@ -28,7 +28,12 @@ namespace ClassicUO.Game.Managers
         public static void Load()
         {
             Instance = new OrganizerAgent();
-            if (JsonHelper.Load<List<OrganizerConfig>>(Path.Combine(GetDataPath(), "OrganizerConfig.json"), OrganizerAgentContext.Default.ListOrganizerConfig, out var configs))
+            var newPath = Path.Combine(GetDataPath(), "OrganizerConfig.json");
+            var oldPath = Path.Combine(CUOEnviroment.ExecutablePath, "Data");
+            if(File.Exists(oldPath))
+                File.Move(oldPath, newPath);
+
+            if (JsonHelper.Load<List<OrganizerConfig>>(newPath, OrganizerAgentContext.Default.ListOrganizerConfig, out var configs))
                 Instance.OrganizerConfigs = configs;
 
             // Register organizer commands if they don't already exist

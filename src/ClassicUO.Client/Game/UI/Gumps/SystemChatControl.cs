@@ -674,10 +674,21 @@ namespace ClassicUO.Game.UI.Gumps
 
             if (text.Length > MAX_MESSAGE_LENGHT)
             {
-                GameActions.Print(World.Instance, "Message too long, sending the first 100 characters.");
+                int cutoffIndex = MAX_MESSAGE_LENGHT;
+
+                // Find the last space within the limit
+                int lastSpaceIndex = text.LastIndexOf(' ', MAX_MESSAGE_LENGHT - 1);
+
+                // If we found a space within the limit, use it as the cutoff
+                if (lastSpaceIndex > 0)
+                {
+                    cutoffIndex = lastSpaceIndex;
+                }
+
+                GameActions.Print(World.Instance, "Message too long, sending the first " + cutoffIndex + " characters.");
                 Mode = sentMode;
-                TextBoxControl.SetText(text.Substring(MAX_MESSAGE_LENGHT));
-                text = text.Substring(0, MAX_MESSAGE_LENGHT);
+                TextBoxControl.SetText(text.Substring(cutoffIndex).TrimStart());
+                text = text.Substring(0, cutoffIndex);
                 sendAgain = true;
             }
 

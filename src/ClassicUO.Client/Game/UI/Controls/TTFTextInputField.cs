@@ -68,7 +68,7 @@ namespace ClassicUO.Game.UI.Controls
 
             return true;
         }
-        
+
         /// <summary>
         /// Set to null to remove placeholder
         /// </summary>
@@ -110,7 +110,7 @@ namespace ClassicUO.Game.UI.Controls
         {
             TextBox.SetText(text);
         }
-        
+
         public override void OnKeyboardReturn(int textID, string text)
         {
             base.OnKeyboardReturn(textID, text);
@@ -141,7 +141,7 @@ namespace ClassicUO.Game.UI.Controls
                 _maxCharCount = max_char_count;
 
                 Stb = new TextEdit(this);
-                
+
                 Stb.SingleLine = !multiline;
                 _rendererText = Controls.TextBox.GetOne(string.Empty, TrueTypeLoader.EMBEDDED_FONT, FONT_SIZE, Color.White,
                     new TextBox.RTLOptions() { Width = maxWidth > 0 ? maxWidth : null, SupportsCommands = false, IgnoreColorCommands = true, CalculateGlyphs = true, MultiLine = true });
@@ -166,11 +166,11 @@ namespace ClassicUO.Game.UI.Controls
 
                     return;
                 }
-                
+
                 _placeHolder = Controls.TextBox.GetOne(text, TrueTypeLoader.EMBEDDED_FONT, FONT_SIZE, Color.Gray, Controls.TextBox.RTLOptions.Default());
                 _placeHolder.Alpha = 0.75f;
             }
-            
+
             public void UpdateSize(int width, int height)
             {
                 Width = width;
@@ -398,6 +398,12 @@ namespace ClassicUO.Game.UI.Controls
             {
                 base.OnFocusEnter();
                 CaretIndex = Text?.Length ?? 0;
+
+                if (SDL.SDL_IsTextInputActive() == SDL.SDL_bool.SDL_FALSE) {
+                    SDL.SDL_StartTextInput();
+                    SDL.SDL_Rect textRect = new() { x = ScreenCoordinateX, y = ScreenCoordinateY, w = Width, h = Height };
+                    SDL.SDL_SetTextInputRect(ref textRect);
+                }
             }
 
             internal override void OnFocusLost()
@@ -405,6 +411,10 @@ namespace ClassicUO.Game.UI.Controls
                 if (Stb != null)
                 {
                     Stb.SelectStart = Stb.SelectEnd = 0;
+                }
+
+                if (SDL.SDL_IsTextInputActive() == SDL.SDL_bool.SDL_TRUE) {
+                    SDL.SDL_StopTextInput();
                 }
 
                 base.OnFocusLost();
@@ -916,7 +926,7 @@ namespace ClassicUO.Game.UI.Controls
                         _rendererText.Draw(batcher, slideX, y);
                         DrawCaret(batcher, slideX, y);
                     }
-                    
+
                     batcher.ClipEnd();
                 }
 

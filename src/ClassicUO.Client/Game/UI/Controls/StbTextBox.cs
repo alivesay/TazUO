@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using System;
 using System.Collections.Generic;
@@ -230,7 +230,7 @@ namespace ClassicUO.Game.UI.Controls
                         value = value.Substring(0, _maxCharCount);
                     }
                 }
-            
+
                 _rendererText.Text = value;
             }
         }
@@ -495,6 +495,12 @@ namespace ClassicUO.Game.UI.Controls
         {
             base.OnFocusEnter();
             CaretIndex = Text?.Length ?? 0;
+
+            if (SDL.SDL_IsTextInputActive() == SDL.SDL_bool.SDL_FALSE) {
+                SDL.SDL_StartTextInput();
+                SDL.SDL_Rect textRect = new() { x = ScreenCoordinateX, y = ScreenCoordinateY, w = Width, h = Height };
+                SDL.SDL_SetTextInputRect(ref textRect);
+            }
         }
 
         internal override void OnFocusLost()
@@ -502,6 +508,10 @@ namespace ClassicUO.Game.UI.Controls
             if (Stb != null)
             {
                 Stb.SelectStart = Stb.SelectEnd = 0;
+            }
+
+            if (SDL.SDL_IsTextInputActive() == SDL.SDL_bool.SDL_TRUE) {
+                SDL.SDL_StopTextInput();
             }
 
             base.OnFocusLost();

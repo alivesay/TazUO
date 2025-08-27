@@ -1936,7 +1936,7 @@ namespace ClassicUO.Game.UI.Gumps
                             } catch { }
                         }
 
-                        if (!add) return;
+                        if (!add) continue;
 
                         mapFiles.AddRange(Directory.GetFiles(s, "*.map"));
                         mapFiles.AddRange(Directory.GetFiles(s, "*.csv"));

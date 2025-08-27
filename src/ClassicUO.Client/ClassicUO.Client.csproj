@@ -5,8 +5,8 @@
     <ApplicationIcon>cuoicon.ico</ApplicationIcon>
     <AssemblyName>TazUO</AssemblyName>
     <RootNamespace>ClassicUO</RootNamespace>
-    <AssemblyVersion>4.3.28</AssemblyVersion>
-    <FileVersion>4.3.28</FileVersion>
+    <AssemblyVersion>4.3.30</AssemblyVersion>
+    <FileVersion>4.3.30</FileVersion>
     <PackageProjectUrl>https://github.com/PlayTazUO/TazUO</PackageProjectUrl>
     <PublishAot>false</PublishAot>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -156,6 +156,10 @@
     <Exec Command='dotnet run --project ../APIToMarkdown/APIToMarkdown.csproj "$(ProjectDir)/LegionScripting/docs" $(DocFileArgs)' />
   </Target>
 
+  <Target Name="CreateVersionFile" AfterTargets="Build">
+    <WriteLinesToFile File="$(TargetDir)v.txt" Lines="$(AssemblyVersion)" Overwrite="true" />
+  </Target>
+
   <Target Name="CopyExternalDeps_build" AfterTargets="Build">
     <ItemGroup>
       <MonockickstartPath Include="$(ProjectDir)..\..\tools\monokickstart\*.*" />
@@ -170,6 +174,10 @@
     <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(TargetDir)\vulkan\icd.d\" SkipUnchangedFiles="true" />
 
     <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(TargetDir)\" SkipUnchangedFiles="true" Condition="$(TargetFramework.StartsWith('net4'))" />
+  </Target>
+
+  <Target Name="CreateVersionFile_publish" AfterTargets="Publish">
+    <WriteLinesToFile File="$(PublishDir)v.txt" Lines="$(AssemblyVersion)" Overwrite="true" />
   </Target>
 
   <Target Name="CopyExternalDeps_publish" AfterTargets="Publish">

@@ -106,8 +106,8 @@ namespace ClassicUO.Game.UI
                 World.TargetManager.SetTargeting(CursorTarget.SetGrabBag, 0, TargetType.Neutral);
             };
 
-            Add(_scrollArea = new ModernScrollArea(0, _lootButton.Y + _lootButton.Height, Width, Height - _lootButton.Y - _lootButton.Height) 
-            { 
+            Add(_scrollArea = new ModernScrollArea(0, _lootButton.Y + _lootButton.Height, Width, Height - _lootButton.Y - _lootButton.Height)
+            {
                 ScrollbarBehaviour = ScrollbarBehaviour.ShowAlways
             });
 
@@ -362,7 +362,6 @@ namespace ClassicUO.Game.UI
         private AlphaBlendControl alphaBG;
         private Item currentItem;
         private int index;
-        private readonly Texture2D borderTexture;
         private World world;
 
         private ushort bgHue
@@ -388,7 +387,6 @@ namespace ClassicUO.Game.UI
             }
             this.world = world;
 
-            borderTexture = SolidColorTextureCache.GetTexture(Color.White);
             CanMove = true;
             AcceptMouseInput = true;
             Width = NearbyLootGump.WIDTH - 12; //-12 for modern scroll bar
@@ -541,7 +539,8 @@ namespace ClassicUO.Game.UI
                 int bx = x + 6;
                 int by = y + 6;
 
-                Vector3 borderHueVec = ShaderHueTranslator.GetHueVector(currentItem.HighlightHue, false, 0.8f);
+                Vector3 borderHueVec = new Vector3(1, 0, 1);
+                var borderTexture = SolidColorTextureCache.GetTexture(currentItem.HighlightColor);
 
                 batcher.Draw( //Top bar
                     borderTexture,

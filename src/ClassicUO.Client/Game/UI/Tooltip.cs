@@ -1,4 +1,4 @@
-﻿// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
@@ -113,7 +113,10 @@ namespace ClassicUO.Game.UI
                 }
 
                 if (_textBox.Width > 600)
+                {
                     _textBox.Width = 600;
+                    _textBox.Update();
+                }
 
                 IsEnabled = true;
             }

@@ -157,7 +157,8 @@ namespace ClassicUO.Game.UI.Gumps
             // Search Field
             Add(_searchTextBox = new SearchTextBoxControl(WIDTH / 2 - 150, 40));
 
-            DrawArea(_markerFiles[_categoryId].IsEditable);
+            if (_markerFiles.Count > 0)
+                DrawArea(_markerFiles[_categoryId].IsEditable);
 
             var initX = 0;
             foreach (var file in _markerFiles)
@@ -431,7 +432,7 @@ namespace ClassicUO.Game.UI.Gumps
                         _iconTexture?.Dispose();
                         _iconTexture = new DrawTexture(editedMarker.MarkerIcon);
                     }
-                        
+
 
                     EditMarkerEvent.Raise();
                 }

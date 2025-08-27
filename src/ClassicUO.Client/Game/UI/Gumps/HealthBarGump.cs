@@ -208,6 +208,7 @@ namespace ClassicUO.Game.UI.Gumps
             else if (_canChangeName && !_targetBroke)
             {
                 _textBox.IsEditable = true;
+                _textBox.IsFocused = false;
                 _textBox.SetKeyboardFocus();
             }
 

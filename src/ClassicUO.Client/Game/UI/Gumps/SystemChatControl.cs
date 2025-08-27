@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.Managers;
@@ -339,20 +340,6 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        private string ExtractCommand(string text)
-        {
-            if (string.IsNullOrEmpty(text) || text.Length < 2)
-                return string.Empty;
-
-            int pos = 1;
-            while (pos < text.Length && text[pos] != ' ')
-            {
-                pos++;
-            }
-
-            return pos > 1 ? text.Substring(1, pos - 1) : string.Empty;
-        }
-
         public void AddLine(string text, byte font, ushort hue, bool isunicode)
         {
             if (_textEntries.Count >= 30)
@@ -672,6 +659,21 @@ namespace ClassicUO.Game.UI.Gumps
 
             bool sendAgain = false;
 
+            var fullText = text;
+            var modMode = sentMode;
+            if (sentMode == ChatMode.ServUOCommand || sentMode == ChatMode.PolCommand)
+            {
+                var prefix = sentMode == ChatMode.ServUOCommand ? "[" : ".";
+                fullText = $"{prefix}{command} {text}";
+                modMode = ChatMode.Default;
+            }
+            if(_messageHistory.Count < 1 || (_messageHistory[_messageHistory.Count - 1].Item1 != sentMode || _messageHistory[_messageHistory.Count - 1].Item2 != fullText))
+            {
+                //Add to history if last message was not the same
+                _messageHistory.Add(new Tuple<ChatMode, string>(modMode, fullText));
+                _messageHistoryIndex = _messageHistory.Count;
+            }
+
             if (text.Length > MAX_MESSAGE_LENGHT)
             {
                 int cutoffIndex = MAX_MESSAGE_LENGHT;
@@ -691,10 +693,7 @@ namespace ClassicUO.Game.UI.Gumps
                 text = text.Substring(0, cutoffIndex);
                 sendAgain = true;
             }
-
-            _messageHistory.Add(new Tuple<ChatMode, string>(sentMode, text));
-            _messageHistoryIndex = _messageHistory.Count;
-
+            
             if (_gump.World.MessageManager.PromptData.Prompt != ConsolePrompt.None)
             {
                 if (_gump.World.MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)

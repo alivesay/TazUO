@@ -12,6 +12,7 @@ using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ClassicUO.Game.Scenes;
+using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -28,6 +29,7 @@ namespace ClassicUO.Game.UI.Gumps
         private Texture2D _borderColor = SolidColorTextureCache.GetTexture(Color.Black);
                 private Vector2 _textDrawOffset = Vector2.Zero;
         private static int currentHeight = 22;
+        private static readonly int COLLISION_SPACING = 2;
 
         public static int CurrentHeight
         {
@@ -45,7 +47,7 @@ namespace ClassicUO.Game.UI.Gumps
                 currentHeight = value;
             }
         }
-        
+
         public new UILayer LayerOrder {
             get
             {
@@ -62,7 +64,7 @@ namespace ClassicUO.Game.UI.Gumps
             CanMove = false;
             AcceptMouseInput = true;
             CanCloseWithRightClick = true;
-            
+
             Entity entity = World.Get(serial);
 
             if (entity == null)
@@ -497,6 +499,70 @@ namespace ClassicUO.Game.UI.Gumps
             base.OnMouseExit(x, y);
         }
 
+        private static List<NameOverheadGump> GetAllVisibleNameOverheads()
+        {
+            var result = new List<NameOverheadGump>();
+
+            for (var node = UIManager.Gumps.First; node != null; node = node.Next)
+            {
+                if (node.Value is NameOverheadGump nameGump &&
+                    !nameGump.IsDisposed &&
+                    nameGump.IsVisible)
+                {
+                    result.Add(nameGump);
+                }
+            }
+
+            return result;
+        }
+
+        private Rectangle GetBounds(int x, int y, int width, int height)
+        {
+            return new Rectangle(x, y, width, height);
+        }
+
+        private Point AdjustPositionToAvoidOverlap(int originalX, int originalY)
+        {
+            if (!ProfileManager.CurrentProfile.NamePlateAvoidOverlap)
+            {
+                return new Point(originalX, originalY);
+            }
+
+            var allNameOverheads = GetAllVisibleNameOverheads();
+            var adjustedX = originalX;
+            var adjustedY = originalY;
+            var maxIterations = 10;
+            var iterations = 0;
+
+            while (iterations < maxIterations)
+            {
+                var proposedBounds = GetBounds(adjustedX, adjustedY, Width, Height);
+                bool hasCollision = false;
+
+                foreach (var other in allNameOverheads)
+                {
+                    if (other == this || other.LocalSerial == this.LocalSerial)
+                        continue;
+
+                    var otherBounds = GetBounds(other.X, other.Y, other.Width, other.Height);
+
+                    if (proposedBounds.Intersects(otherBounds))
+                    {
+                        adjustedY = otherBounds.Bottom + COLLISION_SPACING;
+                        hasCollision = true;
+                        break;
+                    }
+                }
+
+                if (!hasCollision)
+                    break;
+
+                iterations++;
+            }
+
+            return new Point(adjustedX, adjustedY);
+        }
+
         public override void Update()
         {
             base.Update();
@@ -727,6 +793,10 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 return false;
             }
+
+            var adjustedPos = AdjustPositionToAvoidOverlap(x, y);
+            x = adjustedPos.X;
+            y = adjustedPos.Y;
 
             X = x;
             Y = y;

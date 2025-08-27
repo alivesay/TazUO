@@ -1628,8 +1628,8 @@ public class WorldMapGump : ResizableGump
                     List<string> mapIconPathsPngJpg = new();
                     foreach (string s in _mapIconsPath)
                     {
-                        bool add = false;
-                        if (!Directory.Exists(s))
+                        bool add = Directory.Exists(s);
+                        if (!add)
                         {
                             try
                             {
@@ -1698,8 +1698,8 @@ public class WorldMapGump : ResizableGump
 
                     foreach (string s in _mapFilesPath)
                     {
-                        bool add = false;
-                        if (!Directory.Exists(s))
+                        bool add = Directory.Exists(s);
+                        if (!add)
                         {
                             try
                             {
@@ -1708,7 +1708,7 @@ public class WorldMapGump : ResizableGump
                             } catch { }
                         }
 
-                        if (!add) return;
+                        if (!add) continue;
 
                         mapFiles.AddRange(Directory.GetFiles(s, "*.map"));
                         mapFiles.AddRange(Directory.GetFiles(s, "*.csv"));

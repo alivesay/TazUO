@@ -544,7 +544,7 @@ namespace ClassicUO.Game.UI.Gumps
 
         protected override void UpdateContents()
         {
-            if (InvalidateContents && !IsDisposed && IsVisible)
+            if (InvalidateContents && !IsDisposed)
                 UpdateItems();
         }
 

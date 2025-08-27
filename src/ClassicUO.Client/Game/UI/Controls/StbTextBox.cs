@@ -2,7 +2,7 @@
 
 // Copyright (c) 2021, andreakarasho
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 1. Redistributions of source code must retain the above copyright
@@ -16,7 +16,7 @@
 // 4. Neither the name of the copyright holder nor the
 //    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -260,7 +260,7 @@ namespace ClassicUO.Game.UI.Controls
                         value = value.Substring(0, _maxCharCount);
                     }
                 }
-            
+
                 _rendererText.Text = value;
             }
         }
@@ -525,6 +525,12 @@ namespace ClassicUO.Game.UI.Controls
         {
             base.OnFocusEnter();
             CaretIndex = Text?.Length ?? 0;
+
+            if (SDL.SDL_IsTextInputActive() == SDL.SDL_bool.SDL_FALSE) {
+                SDL.SDL_StartTextInput();
+                SDL.SDL_Rect textRect = new() { x = ScreenCoordinateX, y = ScreenCoordinateY, w = Width, h = Height };
+                SDL.SDL_SetTextInputRect(ref textRect);
+            }
         }
 
         internal override void OnFocusLost()
@@ -532,6 +538,10 @@ namespace ClassicUO.Game.UI.Controls
             if (Stb != null)
             {
                 Stb.SelectStart = Stb.SelectEnd = 0;
+            }
+
+            if (SDL.SDL_IsTextInputActive() == SDL.SDL_bool.SDL_TRUE) {
+                SDL.SDL_StopTextInput();
             }
 
             base.OnFocusLost();
@@ -1006,7 +1016,7 @@ namespace ClassicUO.Game.UI.Controls
 
                             int endX = 0;
 
-                            // calculate width 
+                            // calculate width
                             for (int k = 0; k < count; k++)
                             {
                                 endX += _rendererText.GetCharWidth(info.Data[startSelectionIndex + k].Item);

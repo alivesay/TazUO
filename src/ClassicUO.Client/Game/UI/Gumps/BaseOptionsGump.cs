@@ -1184,6 +1184,12 @@ public class BaseOptionsGump : Gump
             {
                 base.OnFocusEnter();
                 CaretIndex = Text?.Length ?? 0;
+
+                if (SDL.SDL_IsTextInputActive() == SDL.SDL_bool.SDL_FALSE) {
+                    SDL.SDL_StartTextInput();
+                    SDL.SDL_Rect textRect = new() { x = ScreenCoordinateX, y = ScreenCoordinateY, w = Width, h = Height };
+                    SDL.SDL_SetTextInputRect(ref textRect);
+                }
             }
 
             internal override void OnFocusLost()
@@ -1191,6 +1197,10 @@ public class BaseOptionsGump : Gump
                 if (Stb != null)
                 {
                     Stb.SelectStart = Stb.SelectEnd = 0;
+                }
+
+                if (SDL.SDL_IsTextInputActive() == SDL.SDL_bool.SDL_TRUE) {
+                    SDL.SDL_StopTextInput();
                 }
 
                 base.OnFocusLost();

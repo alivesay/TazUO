@@ -2356,11 +2356,11 @@ sealed class PacketHandlers
             LoginScene.Instance?.Dispose();
             LoginGump.Instance?.Dispose();
 
-                GameActions.RequestMobileStatus(world, world.Player);
-                NetClient.Socket.Send_OpenChat("");
+            GameActions.RequestMobileStatus(world, world.Player);
+            NetClient.Socket.Send_OpenChat("");
 
-                NetClient.Socket.Send_SkillsRequest(world.Player);
-                scene.DoubleClickDelayed(world.Player);
+            NetClient.Socket.Send_SkillsRequest(world.Player);
+            scene.DoubleClickDelayed(world.Player | 0x8000_0000);
 
             if (Client.Game.UO.Version >= Utility.ClientVersion.CV_306E)
             {
@@ -2372,10 +2372,10 @@ sealed class PacketHandlers
                 NetClient.Socket.Send_ClientViewRange(world.ClientViewRange);
             }
 
-                // Reset the global action cooldown here because, for some reason, immediately
-                // sending multiple actions (e.g. reopening paperdoll and reopening containers)
-                // results in the server telling the client it must wait to perform actions.
-                GlobalActionCooldown.BeginCooldown();
+            // Reset the global action cooldown here because, for some reason, immediately
+            // sending multiple actions (e.g. reopening paperdoll and reopening containers)
+            // results in the server telling the client it must wait to perform actions.
+            GlobalActionCooldown.BeginCooldown();
             List<Gump> gumps = ProfileManager.CurrentProfile.ReadGumps(
                 world,
                 ProfileManager.ProfilePath
@@ -6336,7 +6336,7 @@ sealed class PacketHandlers
             world.RemoveItemFromContainer(item);
             item.Container = containerSerial;
         }
-            
+
         container.PushToBack(item);
 
         if (SerialHelper.IsMobile(containerSerial))
@@ -6847,7 +6847,7 @@ sealed class PacketHandlers
                 IsFromServer = true
             };
         }
-            
+
             gump.PacketGumpText = string.Join("\n", lines);
 
         int group = 0;

@@ -660,6 +660,7 @@ namespace ClassicUO.Configuration
         public bool DisableGrayEnemies { get; set; }
         public bool EnablePostProcessingEffects { get; set; }
         public ushort PostProcessingType { get; set; }
+        public bool DisableHotkeys { get; set; }
 
         private long lastSave;
         public void Save(string path, bool saveGumps = true)

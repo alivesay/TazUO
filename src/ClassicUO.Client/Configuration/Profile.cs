@@ -658,6 +658,8 @@ namespace ClassicUO.Configuration
         public bool ForceHouseTransparency { get; set; }
         public ulong HideHudGumpFlags { get; set; }
         public bool DisableGrayEnemies { get; set; }
+        public bool EnablePostProcessingEffects { get; set; }
+        public ushort PostProcessingType { get; set; }
 
         private long lastSave;
         public void Save(string path, bool saveGumps = true)

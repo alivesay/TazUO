@@ -1054,6 +1054,29 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
                 (new CheckboxWithLabel(lang.GetVideo.AnimWater, isChecked: profile.AnimatedWaterEffect, valueChanged: (b) => { profile.AnimatedWaterEffect = b; }), true, page);
 
+            content.BlankLine();
+
+            content.AddToRight(new CheckboxWithLabel("Enable post processing effects", 0, profile.EnablePostProcessingEffects, (b) =>
+            {
+                profile.EnablePostProcessingEffects = b;
+                Client.Game.GetScene<GameScene>()?.SetPostProcessingSettings();
+            }), true, page);
+
+            content.BlankLine();
+
+            content.AddToRight(
+                new ComboBoxWithLabel(
+                    "Processing type",
+                    150,
+                    ThemeSettings.COMBO_BOX_WIDTH,
+                    ["point", "linear", "anisotropic", "xbr"],
+                    profile.PostProcessingType,
+                    (s, n) =>
+                {
+                    profile.PostProcessingType = (ushort)s;
+                    Client.Game.GetScene<GameScene>()?.SetPostProcessingSettings();
+                } ), true, page);;
+
             #endregion
 
             #region Shadows

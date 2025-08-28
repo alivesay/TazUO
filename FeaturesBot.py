@@ -5,6 +5,30 @@ import os
 motd = [
 """
 ```ini
+[ Scavenger ]
+```
+> TazUO added a scavenger to pick up those pesky items on the ground. \n
+See more -> <https://tazuo.org/wiki/tazuoscavenger>
+""",
+
+"""
+```ini
+[ Dress Agent ]
+```
+> TazUO added a dress agent to protect everyone else from your bad outfits. \n
+See more -> <https://tazuo.org/wiki/tazuodressagent>
+""",
+
+"""
+```ini
+[ Organizer Agent ]
+```
+> TazUO added an organizer agent to help clean up your mess. \n
+See more -> <https://tazuo.org/wiki/organizer-agent>
+""",
+
+"""
+```ini
 [ Auto Bandage ]
 ```
 > TazUO added auto bandaging to keep you healed. \n
@@ -55,7 +79,7 @@ Top Menu -> More -> Tools -> Quick spell cast
 [ Python Scripting ]
 ```
 > TazUO added built-in pthon scripting to the client. \n
-See more -> <https://tazuo.org/wiki/tazuolegion-scripting>
+See more -> <https://tazuo.org/wiki/legion-scripting>
 """,
 
 """
@@ -63,7 +87,7 @@ See more -> <https://tazuo.org/wiki/tazuolegion-scripting>
 [ Legion Scripting ]
 ```
 > TazUO added a custom scripting language similar to UOSteam built directly into the client. \n
-See more -> <https://tazuo.org/wiki/tazuolegion-scripting>
+See more -> <https://tazuo.org/wiki/legion-scripting/>
 """,
 
 """

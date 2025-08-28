@@ -1218,7 +1218,7 @@ namespace ClassicUO.Game.Scenes
             if (use_render_target)
             {
                 batcher.GraphicsDevice.SetRenderTarget(_world_render_target);
-                batcher.GraphicsDevice.Clear(ClearOptions.Target, Color.Black, 0f, 0);
+                batcher.GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1f, 0);
             }
             else
             {
@@ -1481,7 +1481,7 @@ namespace ClassicUO.Game.Scenes
                     worldW, worldH,
                     false,
                     SurfaceFormat.Color,
-                    DepthFormat.None,
+                    DepthFormat.Depth24Stencil8,
                     0,
                     RenderTargetUsage.DiscardContents
                 );

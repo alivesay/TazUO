@@ -138,6 +138,8 @@ namespace ClassicUO
             PNGLoader.Instance.GraphicsDevice = GraphicsDevice;
             PNGLoader.Instance.LoadResourceAssets(Client.Game.UO.Gumps.GetGumpsLoader);
 
+            Game.UI.ImGuiManager.Initialize(this);
+
             Audio.Initialize();
             // TODO: temporary fix to avoid crash when laoding plugins
             Settings.GlobalSettings.Encryption = (byte)NetClient.Load(UO.FileManager.Version, (EncryptionType)Settings.GlobalSettings.Encryption);
@@ -164,6 +166,7 @@ namespace ClassicUO
 
         protected override void UnloadContent()
         {
+            Game.UI.ImGuiManager.Dispose();
             DiscordManager.Instance.BeginDisconnect();
             SDL_GetWindowBordersSize(Window.Handle, out int top, out int left, out _, out _);
 
@@ -518,11 +521,11 @@ namespace ClassicUO
             UO.GameCursor?.Draw(_uoSpriteBatch);
             _uoSpriteBatch.End();
 
+            Game.UI.ImGuiManager.Update(gameTime);
+
             base.Draw(gameTime);
 
             Plugin.ProcessDrawCmdList(GraphicsDevice);
-
-            base.Draw(gameTime);
         }
 
         protected override bool BeginDraw()

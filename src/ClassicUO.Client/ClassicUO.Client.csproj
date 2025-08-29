@@ -40,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Game\UI\ImGuiControls\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 
@@ -104,6 +105,7 @@
 
   <ItemGroup>
     <PackageReference Include="IronPython" Version="3.4.2" />
+    <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
   </ItemGroup>
 
   <ItemGroup>

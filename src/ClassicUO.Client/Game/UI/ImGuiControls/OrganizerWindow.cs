@@ -1,11 +1,8 @@
 using ClassicUO.Game.Managers;
-using ClassicUO.Utility;
-using ClassicUO.Game;
-using ClassicUO.Game.GameObjects;
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace ClassicUO.Game.UI.ImGuiControls
 {
@@ -13,7 +10,6 @@ namespace ClassicUO.Game.UI.ImGuiControls
     {
         private int _selectedConfigIndex = -1;
         private OrganizerConfig _selectedConfig = null;
-        private string _newConfigName = "";
         private string _addItemGraphicInput = "";
         private string _addItemHueInput = "";
         private bool _showAddItemManual = false;
@@ -32,9 +28,9 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
 
             // Main layout: left panel for organizer list, right panel for details
-            if (ImGui.BeginTable("OrganizerTable", 2, ImGuiTableFlags.SizingFixedFit, new System.Numerics.Vector2(650, 250)))
+            if (ImGui.BeginTable("OrganizerTable", 2, ImGuiTableFlags.Resizable))
             {
-                ImGui.TableSetupColumn("Organizers", ImGuiTableColumnFlags.WidthFixed, 275);
+                ImGui.TableSetupColumn("Organizers", ImGuiTableColumnFlags.WidthFixed);
                 ImGui.TableSetupColumn("Details", ImGuiTableColumnFlags.WidthStretch);
 
                 ImGui.TableNextRow();
@@ -51,19 +47,13 @@ namespace ClassicUO.Game.UI.ImGuiControls
         private void DrawOrganizerList()
         {
             ImGui.Text("Organizers");
-            ImGui.Separator();
 
             // Add new organizer
-            ImGui.InputText("##NewOrganizerName", ref _newConfigName, 100);
             ImGui.SameLine();
+            ImGui.Separator();
             if (ImGui.Button("Add Organizer"))
             {
                 var newConfig = OrganizerAgent.Instance.NewOrganizerConfig();
-                if (!string.IsNullOrEmpty(_newConfigName))
-                {
-                    newConfig.Name = _newConfigName;
-                }
-                _newConfigName = "";
                 _selectedConfigIndex = OrganizerAgent.Instance.OrganizerConfigs.IndexOf(newConfig);
                 _selectedConfig = newConfig;
             }
@@ -111,8 +101,8 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 return;
             }
 
-            ImGui.Text($"Organizer Details: {_selectedConfig.Name}");
-            ImGui.Separator();
+            // ImGui.Text($"Organizer Details: {_selectedConfig.Name}");
+            // ImGui.Separator();
 
             // Name input
             string name = _selectedConfig.Name;
@@ -123,7 +113,8 @@ namespace ClassicUO.Game.UI.ImGuiControls
 
             ImGui.SameLine();
             bool enabled = _selectedConfig.Enabled;
-            ImGui.Checkbox("Enabled", ref enabled);
+            if(ImGui.Checkbox("Enabled", ref enabled))
+                _selectedConfig.Enabled = enabled;
 
             // Action buttons
             if (ImGui.Button("Run Organizer"))
@@ -159,12 +150,13 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 return;
             }
             ImGui.PopStyleColor();
-
+            ImGui.NewLine();
             ImGui.Separator();
 
             // Container settings
             DrawContainerSettings();
 
+            ImGui.NewLine();
             ImGui.Separator();
 
             // Items section
@@ -209,18 +201,18 @@ namespace ClassicUO.Game.UI.ImGuiControls
             // Display current containers
             if (_selectedConfig.SourceContSerial != 0)
             {
-                var sourceItem = World.Instance.Items.Get(_selectedConfig.SourceContSerial);
-                ImGui.Text($"Source: {sourceItem?.Name ?? "Unknown"} ({_selectedConfig.SourceContSerial:X})");
+                ImGui.Text($"Source: ({_selectedConfig.SourceContSerial:X})");
             }
             else
             {
                 ImGui.TextColored(new System.Numerics.Vector4(0.0f, 1.0f, 0.0f, 1.0f), "Source: Your backpack");
             }
 
+            ImGui.SameLine();
+
             if (_selectedConfig.DestContSerial != 0)
             {
-                var destItem = World.Instance.Items.Get(_selectedConfig.DestContSerial);
-                ImGui.Text($"Destination: {destItem?.Name ?? "Unknown"} ({_selectedConfig.DestContSerial:X})");
+                ImGui.Text($"Destination: ({_selectedConfig.DestContSerial:X})");
             }
             else
             {
@@ -286,13 +278,13 @@ namespace ClassicUO.Game.UI.ImGuiControls
             ImGui.Separator();
 
             // Items table
-            if (ImGui.BeginTable("ItemsTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
+            if (ImGui.BeginTable("ItemsTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, 300)))
             {
                 ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, 70);
                 ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, 70);
                 ImGui.TableSetupColumn("Amount", ImGuiTableColumnFlags.WidthFixed, 70);
                 ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthFixed, 70);
-                ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 70);
+                ImGui.TableSetupColumn("Del", ImGuiTableColumnFlags.WidthFixed, 70);
                 ImGui.TableHeadersRow();
 
                 for (int i = _selectedConfig.ItemConfigs.Count - 1; i >= 0; i--)
@@ -301,11 +293,20 @@ namespace ClassicUO.Game.UI.ImGuiControls
                     ImGui.TableNextRow();
 
                     ImGui.TableSetColumnIndex(0);
-                    ImGui.Text($"{itemConfig.Graphic:X4}");
+                    if (!DrawArt(itemConfig.Graphic, new Vector2(50, 50)))
+                        ImGui.Text($"{itemConfig.Graphic:X4}");
 
                     ImGui.TableSetColumnIndex(1);
                     string hueText = itemConfig.Hue == ushort.MaxValue ? "ANY" : itemConfig.Hue.ToString();
-                    ImGui.Text(hueText);
+                    if (ImGui.InputText($"##Hue{i}", ref hueText, 5))
+                    {
+                        if (ushort.TryParse(hueText, System.Globalization.NumberStyles.HexNumber, null, out ushort hue))
+                            itemConfig.Hue = hue == 0xFFFF ? ushort.MaxValue : hue;
+                        else if (hueText == "ANY")
+                            itemConfig.Hue = ushort.MaxValue;
+                    }
+
+                    SetTooltip("Set to ANY to match any hue.");
 
                     ImGui.TableSetColumnIndex(2);
                     int amount = itemConfig.Amount;
@@ -313,14 +314,16 @@ namespace ClassicUO.Game.UI.ImGuiControls
                     {
                         itemConfig.Amount = (ushort)Math.Max(0, Math.Min(65535, amount));
                     }
+
                     if (ImGui.IsItemHovered())
                     {
-                        ImGui.SetTooltip("0 = move all items");
+                        ImGui.SetTooltip("This takes into account the items in the destination container.\n(0 = move all items)");
                     }
 
                     ImGui.TableSetColumnIndex(3);
                     bool enabled = itemConfig.Enabled;
-                    ImGui.Checkbox($"##Enabled{i}", ref enabled);
+                    if (ImGui.Checkbox($"##Enabled{i}", ref enabled))
+                        itemConfig.Enabled = enabled;
 
                     ImGui.TableSetColumnIndex(4);
                     ImGui.PushStyleColor(ImGuiCol.Button, new System.Numerics.Vector4(0.8f, 0.2f, 0.2f, 1.0f));
@@ -328,6 +331,12 @@ namespace ClassicUO.Game.UI.ImGuiControls
                     {
                         _selectedConfig.DeleteItemConfig(itemConfig);
                     }
+
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.SetTooltip("Delete this item");
+                    }
+
                     ImGui.PopStyleColor();
                 }
 

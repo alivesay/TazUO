@@ -10,6 +10,7 @@ using ClassicUO.Resources;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using ClassicUO.Game.GameObjects;
+using ClassicUO.Game.UI.ImGuiControls;
 using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.UI.Gumps;
@@ -831,7 +832,14 @@ public class AssistantGump : BaseOptionsGump
     private void BuildOrganizer()
     {
         const int page = (int)PAGE.Organizer;
+        ModernButton orgButton = new(0, 0, MainContent.LeftWidth, 40, ButtonAction.Default, "Organizer", ThemeSettings.BUTTON_FONT_COLOR);
+        orgButton.MouseUp += (s, e) =>
+        {
+            ImGuiManager.AddWindow(new OrganizerWindow());
+        };
 
+        MainContent.AddToLeft(orgButton);
+        return;
         MainContent.AddToLeft(CategoryButton("Organizer", page, MainContent.LeftWidth));
         MainContent.ResetRightSide();
 

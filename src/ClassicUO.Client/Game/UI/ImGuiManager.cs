@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using ClassicUO.Assets;
 using ImGuiNET.SampleProgram.XNA;
 using ClassicUO.Game.UI.ImGuiControls;
 
@@ -17,8 +18,10 @@ namespace ClassicUO.Game.UI
         private static bool _showDemoWindow;
         private static bool _showDebugWindow = true;
         private static readonly List<ImGuiWindow> _windows = new List<ImGuiWindow>();
+        private static Microsoft.Xna.Framework.Game _game;
 
         public static bool IsInitialized => _isInitialized;
+        public static ImGuiRenderer Renderer => _imGuiRenderer;
 
         public static void AddWindow(ImGuiWindow window)
         {
@@ -44,6 +47,19 @@ namespace ClassicUO.Game.UI
 
         private static void SetDarkTheme()
         {
+            var io = ImGui.GetIO();
+            unsafe
+            {
+                fixed (byte* fontPtr = TrueTypeLoader.Instance.ImGuiFont)
+                {
+                    ImGui.GetIO().Fonts.AddFontFromMemoryTTF(
+                        (IntPtr)fontPtr,
+                        TrueTypeLoader.Instance.ImGuiFont.Length,
+                        16.0f // font size
+                    );
+                }
+            }
+
             var style = ImGui.GetStyle();
 
             // Style settings
@@ -105,12 +121,15 @@ namespace ClassicUO.Game.UI
 
         public static void Initialize(Microsoft.Xna.Framework.Game game)
         {
-            return; //Disable for now, basic implementation is done
+            //return; //Disable for now, basic implementation is done
+
+            _game = game;
             try
             {
                 _imGuiRenderer = new ImGuiRenderer(game);
-                _imGuiRenderer.RebuildFontAtlas();
                 SetDarkTheme();
+                _imGuiRenderer.RebuildFontAtlas();
+
                 _isInitialized = true;
                 Log.Info("ImGui initialized successfully");
             }
@@ -128,7 +147,8 @@ namespace ClassicUO.Game.UI
 
             try
             {
-                _imGuiRenderer.BeforeLayout(gameTime);
+                if (!_imGuiRenderer.BeforeLayout(gameTime))
+                    return;
 
                 DrawImGui();
 

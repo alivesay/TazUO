@@ -26,6 +26,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using ImGuiNET;
 using SDL2;
 using static SDL2.SDL;
 
@@ -615,6 +616,7 @@ namespace ClassicUO
                     break;
 
                 case SDL_EventType.SDL_KEYDOWN:
+                    if (ImGuiManager.IsInitialized && ImGui.GetIO().WantCaptureKeyboard) break;
 
                     Keyboard.OnKeyDown(sdlEvent->key);
 
@@ -643,6 +645,7 @@ namespace ClassicUO
                     break;
 
                 case SDL_EventType.SDL_KEYUP:
+                    if (ImGuiManager.IsInitialized && ImGui.GetIO().WantCaptureKeyboard) break;
 
                     Keyboard.OnKeyUp(sdlEvent->key);
                     UIManager.KeyboardFocusControl?.InvokeKeyUp(
@@ -686,6 +689,7 @@ namespace ClassicUO
                     break;
 
                 case SDL_EventType.SDL_TEXTINPUT:
+                    if (ImGuiManager.IsInitialized && ImGui.GetIO().WantCaptureKeyboard) break;
 
                     if (_ignoreNextTextInput)
                     {
@@ -733,6 +737,8 @@ namespace ClassicUO
                     break;
 
                 case SDL_EventType.SDL_MOUSEWHEEL:
+                    if (ImGuiManager.IsInitialized && ImGui.GetIO().WantCaptureMouse) break;
+
                     Mouse.Update();
                     bool isScrolledUp = sdlEvent->wheel.y > 0;
 
@@ -747,6 +753,8 @@ namespace ClassicUO
 
                 case SDL_EventType.SDL_MOUSEBUTTONDOWN:
                     {
+                        if (ImGuiManager.IsInitialized && ImGui.GetIO().WantCaptureMouse) break;
+
                         SDL_MouseButtonEvent mouse = sdlEvent->button;
 
                         // The values in MouseButtonType are chosen to exactly match the SDL values
@@ -847,6 +855,8 @@ namespace ClassicUO
 
                 case SDL_EventType.SDL_MOUSEBUTTONUP:
                     {
+                        if (ImGuiManager.IsInitialized && ImGui.GetIO().WantCaptureMouse) break;
+
                         SDL_MouseButtonEvent mouse = sdlEvent->button;
 
                         // The values in MouseButtonType are chosen to exactly match the SDL values

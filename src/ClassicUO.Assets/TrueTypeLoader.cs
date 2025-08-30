@@ -2,7 +2,7 @@
 
 // Copyright (c) 2021, jaedan
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 1. Redistributions of source code must retain the above copyright
@@ -16,7 +16,7 @@
 // 4. Neither the name of the copyright holder nor the
 //    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -52,6 +52,8 @@ namespace ClassicUO.Assets
 
         private static TrueTypeLoader _instance;
         public static TrueTypeLoader Instance => _instance ??= new TrueTypeLoader();
+
+        public byte[] ImGuiFont;
 
         public void Load()
         {
@@ -105,11 +107,16 @@ namespace ClassicUO.Assets
 #if DEBUG
                         Log.Trace($"Loaded embedded font: {fname}");
 #endif
-
                         var memoryStream = new MemoryStream();
                         stream.CopyTo(memoryStream);
+
+                        var filebytes = memoryStream.ToArray();
+
+                        if (fname == EMBEDDED_FONT) //Special case for ImGui
+                            ImGuiFont = filebytes;
+
                         var fontSystem = new FontSystem(settings);
-                        fontSystem.AddFont(memoryStream.ToArray());
+                        fontSystem.AddFont(filebytes);
                         _fonts[fname] = fontSystem;
                     }
             }

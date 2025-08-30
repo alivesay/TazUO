@@ -38,7 +38,6 @@ namespace ImGuiNET.SampleProgram.XNA
 
         // Input
         private int _scrollWheelValue;
-        private int _horizontalScrollWheelValue;
         private readonly float WHEEL_DELTA = 120;
         private Keys[] _allKeys = Enum.GetValues<Keys>();
 
@@ -118,13 +117,19 @@ namespace ImGuiNET.SampleProgram.XNA
         /// <summary>
         /// Sets up ImGui for a new frame, should be called at frame start
         /// </summary>
-        public virtual void BeforeLayout(GameTime gameTime)
+        public virtual bool BeforeLayout(GameTime gameTime)
         {
-            ImGui.GetIO().DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (dt < 0) return false;
+
+            ImGui.GetIO().DeltaTime = dt;
 
             UpdateInput();
 
             ImGui.NewFrame();
+
+            return true;
         }
 
         /// <summary>
@@ -195,12 +200,10 @@ namespace ImGuiNET.SampleProgram.XNA
             io.AddMouseButtonEvent(3, mouse.XButton1 == ButtonState.Pressed);
             io.AddMouseButtonEvent(4, mouse.XButton2 == ButtonState.Pressed);
 
-            //TODO: Figure out exactly how to use this, mouse doesn't contain a horizontal value.
             io.AddMouseWheelEvent(
-                (mouse.ScrollWheelValue - _horizontalScrollWheelValue) / WHEEL_DELTA,
+                0f,
                 (mouse.ScrollWheelValue - _scrollWheelValue) / WHEEL_DELTA);
             _scrollWheelValue = mouse.ScrollWheelValue;
-            _horizontalScrollWheelValue = mouse.ScrollWheelValue;
 
             foreach (var key in _allKeys)
             {

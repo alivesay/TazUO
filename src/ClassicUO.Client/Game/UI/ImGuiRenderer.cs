@@ -121,7 +121,7 @@ namespace ImGuiNET.SampleProgram.XNA
         {
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (dt < 0) return false;
+            if (dt <= 0) return false;
 
             ImGui.GetIO().DeltaTime = dt;
 

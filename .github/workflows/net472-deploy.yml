@@ -107,6 +107,7 @@ jobs:
 
     - name: Discord Github Updates
       uses: tsickert/discord-webhook@v7.0.0
+      continue-on-error: true
       with:
         webhook-url: ${{ secrets.DISCORDWEBHOOK }}
         content: |

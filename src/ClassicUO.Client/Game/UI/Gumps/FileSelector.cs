@@ -175,6 +175,29 @@ namespace ClassicUO.Game.UI.Gumps
                     dirButtonUp.MouseDoubleClick += (sender, e) => NavigateToDirectory(dirp);
                     _scrollVBox.Add(dirButtonUp);
                 }
+                else
+                {
+                    // We're at root, show available drives
+                    try
+                    {
+                        var drives = DriveInfo.GetDrives();
+                        foreach (var drive in drives.Where(d => d.IsReady))
+                        {
+                            var driveName = $"{drive.Name} ({drive.DriveType})";
+                            var driveButton = new NiceButton(0, 0, BUTTON_WIDTH, 20, ButtonAction.Default, driveName,
+                                align: TEXT_ALIGN_TYPE.TS_LEFT, hue: 692);
+                            
+                            if (_type == FileSelectorType.Directory)
+                                driveButton.MouseUp += (sender, e) => SelectFile(drive.RootDirectory.FullName);
+                            driveButton.MouseDoubleClick += (sender, e) => NavigateToDirectory(drive.RootDirectory.FullName);
+                            _scrollVBox.Add(driveButton);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _statusLabel.Text = $"Error loading drives: {ex.Message}";
+                    }
+                }
 
                 if (!Directory.Exists(_currentPath))
                 {

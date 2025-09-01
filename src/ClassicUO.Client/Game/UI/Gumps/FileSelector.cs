@@ -165,14 +165,16 @@ namespace ClassicUO.Game.UI.Gumps
                 _scrollVBox.Add(dirButtonUp);
 
                 var parent = Directory.GetParent(_currentPath);
-                if(parent == null) return;
-                var dirp = parent.FullName;
-                dirButtonUp = new NiceButton(0, 0, BUTTON_WIDTH, 20, ButtonAction.Default, $"(Parent Dir)",
-                    align: TEXT_ALIGN_TYPE.TS_LEFT, hue: 693);
-                if (_type == FileSelectorType.Directory)
-                    dirButtonUp.MouseUp += (sender, e) => SelectFile(dirp);
-                dirButtonUp.MouseDoubleClick += (sender, e) => NavigateToDirectory(dirp);
-                _scrollVBox.Add(dirButtonUp);
+                if(parent != null)
+                {
+                    var dirp = parent.FullName;
+                    dirButtonUp = new NiceButton(0, 0, BUTTON_WIDTH, 20, ButtonAction.Default, $"(Parent Dir)",
+                        align: TEXT_ALIGN_TYPE.TS_LEFT, hue: 693);
+                    if (_type == FileSelectorType.Directory)
+                        dirButtonUp.MouseUp += (sender, e) => SelectFile(dirp);
+                    dirButtonUp.MouseDoubleClick += (sender, e) => NavigateToDirectory(dirp);
+                    _scrollVBox.Add(dirButtonUp);
+                }
 
                 if (!Directory.Exists(_currentPath))
                 {

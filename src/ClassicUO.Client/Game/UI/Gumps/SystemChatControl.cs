@@ -212,11 +212,13 @@ namespace ClassicUO.Game.UI.Gumps
                         case ChatMode.ServUOCommand:
                             DisposeChatModePrefix();
                             AppendChatModePrefix($"[{command}", 32, null);
+                            TextBoxControl.Hue = ProfileManager.CurrentProfile.SpeechHue;
                             break;
 
                         case ChatMode.PolCommand:
                             DisposeChatModePrefix();
                             AppendChatModePrefix($".{command}", 32, null);
+                            TextBoxControl.Hue = ProfileManager.CurrentProfile.SpeechHue;
                             break;
                     }
                 }

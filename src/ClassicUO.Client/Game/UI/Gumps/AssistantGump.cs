@@ -696,6 +696,9 @@ public class AssistantGump : BaseOptionsGump
         scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Skip Bandage if Hidden", 0, profile.BandageAgentCheckHidden, b => profile.BandageAgentCheckHidden = b)));
         PositionHelper.BlankLine();
 
+        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Skip Bandage if yellow hits", 0, profile.BandageAgentCheckInvul, b => profile.BandageAgentCheckInvul = b)));
+        PositionHelper.BlankLine();
+
         InputFieldWithLabel bandageGraphicInput = new("Bandage graphic ID", ThemeSettings.INPUT_WIDTH, $"0x{profile.BandageAgentGraphic:X4}", true, (s, e) =>
         {
             string text = ((BaseOptionsGump.InputField.StbTextBox)s).Text;

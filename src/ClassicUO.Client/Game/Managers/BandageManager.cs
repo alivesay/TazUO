@@ -20,6 +20,7 @@ namespace ClassicUO.Game.Managers
         private int hpPercentageThreshold => ProfileManager.CurrentProfile?.BandageAgentHPPercentage ?? 80;
         public bool UseOnPoisoned => ProfileManager.CurrentProfile?.BandageAgentCheckPoisoned ?? false;
         public bool CheckHidden => ProfileManager.CurrentProfile?.BandageAgentCheckHidden ?? false;
+        public bool CheckInvul => ProfileManager.CurrentProfile?.BandageAgentCheckInvul ?? false;
         public bool HasBandagingBuff { get; set; } = false;
 
         private BandageManager()
@@ -55,21 +56,22 @@ namespace ClassicUO.Game.Managers
 
         private void OnHpChanged(int oldHp, int newHp)
         {
-            if (World.Player == null || !isEnabled)
+            var player = World.Player;
+            if (player == null || !isEnabled)
                 return;
 
-            // Guard against divide-by-zero
-            if (World.Player.HitsMax <= 0)
+            // Guard against divide-by-zero and invul
+            if (player.HitsMax <= 0 || (CheckInvul && player.IsYellowHits))
                 return;
 
-            var currentHpPercentage = (int)((double)newHp / World.Player.HitsMax * 100);
+            var currentHpPercentage = (int)((double)newHp / player.HitsMax * 100);
 
             // Check for hidden status
-            if (CheckHidden && World.Player.IsHidden)
+            if (CheckHidden && player.IsHidden)
                 return;
 
             // Check for poison status #thanks taz
-            if ((!UseOnPoisoned || !World.Player.IsPoisoned) &&
+            if ((!UseOnPoisoned || !player.IsPoisoned) &&
                 currentHpPercentage >= hpPercentageThreshold)
                 return;
 

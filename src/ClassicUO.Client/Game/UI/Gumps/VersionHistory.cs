@@ -10,6 +10,50 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private static string[] updateTexts =
         {
+            "/c[white][4.4.0]/cd\n" +
+            """
+            - Improved draw times for mobiles
+            - Better tooltip override handling in settings
+            - Auto complete(press tab) while typing
+            - Added a Journal Filter assistant feature([wiki](<https://github.com/PlayTazUO/TazUO/wiki/Journal-Filters>))
+            - Reworked grid container highlight menu to be resizable
+            - Can move grid highlights up and down the list now
+            - You can now type unlimited length in the chat box, anything past 100 characters will be sent the next time you hit enter
+            - Added a title bar status feature([wiki](<https://github.com/PlayTazUO/TazUO/wiki/Title-Bar-Status>))
+            - Added auto bandaging ([wiki](<https://github.com/PlayTazUO/TazUO/wiki/Auto-Bandage>))
+            - Added Mount and Setmount macros
+            - Added Dress and Undress agent
+            - Added friends list manager(For future use with api and other things)
+            - Added organizer agent
+            - Auto loot from grid highlight matches
+
+            ### Minor changes
+            - Removed old options gump
+            - Some currency formatting for trade currencies(1,000,000)
+            - Grid containers now show more than 125 items if the container has more items in it
+            - Added a couple missing mounts from OSI
+            - Added a new scroll bar control for future gump usage
+            - Can now sort by name in grid containers(When names are available to the client)
+            - Can now deselect items from the multi move gump( @nesci0471 )
+            - Scavenger now works without moving, also checks if an item is movable first and has a delay before retrying the same item again.
+            - Journal entries where the name and text are the same will only show the text(For example: a bird: a bird is now just a  bird)
+            - World map now also loads map files from UO folder, and TazUO/Data/ServerName
+            - Can now pathfind to objects instead of just surfaces( Lichz )
+            - Added more gumps to hide hud feature
+            - Zoom changes(Increase max, lower min, finer stepping for more precise control)
+            - Nameplates have an optional no-overlap toggle
+            - Autoloot now has import/export buttons
+            - Grid highlighting will now user colors intead of hues
+            - Bug fixes
+
+            ### Python API Changes
+            - Added `.Impassible` to PyGameObject
+            - Fixed FindLayer returning an empty item when no item was found
+            - Added `GetMultisAt`, `GetMultisInArea`, `PreTarget` `CancelPreTarget`
+            - Fixed a bug where API calls that don't need to wait for a return value were still waiting
+            """ +
+            "\n",
+
             "/c[white][4.3.0]/cd\n" +
             "- Added hud toggle to macros and assistant menu\n" +
             "- Added resync macro\n" +

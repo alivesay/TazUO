@@ -142,6 +142,7 @@ namespace ClassicUO.Configuration
         public bool BandageAgentCheckHidden { get; set; } = false;
         public bool BandageAgentCheckPoisoned { get; set; } = false;
         public int BandageAgentHPPercentage { get; set; } = 80;
+        public bool BandageAgentCheckInvul { get; set; } = true;
 
         public bool EnableDeathScreen { get; set; } = true;
         public bool EnableBlackWhiteEffect { get; set; } = true;
@@ -632,6 +633,9 @@ namespace ClassicUO.Configuration
         public bool ForceHouseTransparency { get; set; }
         public ulong HideHudGumpFlags { get; set; }
         public bool DisableGrayEnemies { get; set; }
+        public bool EnablePostProcessingEffects { get; set; }
+        public ushort PostProcessingType { get; set; }
+        public bool DisableHotkeys { get; set; }
 
         private long lastSave;
         internal void Save(World world, string path, bool saveGumps = true)

@@ -28,10 +28,10 @@ public class SpellBarManager
     {
         if (!enabled)
             return SpellDefinition.EmptySpell;
-        
+
         if(SpellBarRows.Count <= row || row < 0) return SpellDefinition.EmptySpell;
         if(SpellBarRows[row].SpellSlot.Length <= col || col < 0) return SpellDefinition.EmptySpell;
-        
+
         return SpellBarRows[row].SpellSlot[col];
     }
 
@@ -45,20 +45,20 @@ public class SpellBarManager
     {
         var hotKey = (SDL.SDL_Keycode)spellBarSettings.HotKeys[slot];
         var hotMod = (SDL.SDL_Keymod)spellBarSettings.KeyMod[slot];
-        
+
         return KeysTranslator.TryGetKey(hotKey, hotMod);
     }
-    
+
     public static void ControllerInput(SDL.SDL_GameControllerButton button)
     {
-        if (!enabled || !spellBarSettings.Enabled)
+        if (!enabled || !spellBarSettings.Enabled || ProfileManager.CurrentProfile.DisableHotkeys)
             return;
-        
+
         for (int i = 0; i < 10; i++) //Currently 10 spells per row supported
         {
             if (spellBarSettings.ControllerButtons.Length <= 0)
                 return;
-            
+
             if(Controller.AreButtonsPressed(spellBarSettings.ControllerButtons[i]))
                 UseSlot(CurrentRow, i);
         }
@@ -66,7 +66,7 @@ public class SpellBarManager
 
     public static void KeyPress(SDL.SDL_Keycode key, SDL.SDL_Keymod mod)
     {
-        if (!enabled || !spellBarSettings.Enabled)
+        if (!enabled || !spellBarSettings.Enabled || ProfileManager.CurrentProfile.DisableHotkeys)
             return;
 
         for (int i = 0; i < 10; i++)
@@ -99,12 +99,12 @@ public class SpellBarManager
     {
         if (!enabled || !spellBarSettings.Enabled)
             return;
-        
+
         var spell = GetSpell(row, col);
 
         if (spell == null || spell == SpellDefinition.EmptySpell)
             return;
-        
+
         GameActions.CastSpell(spell.ID);
     }
 
@@ -119,7 +119,7 @@ public class SpellBarManager
     }
 
     public static SDL.SDL_Keycode[] GetHotKeys() => spellBarSettings.HotKeys.Select(x => (SDL.SDL_Keycode)x).ToArray();
-    
+
     public static SDL.SDL_Keymod[] GetModKeys() => spellBarSettings.KeyMod.Select(x=>(SDL.SDL_Keymod)x).ToArray();
 
     public static void SetButtons(int slot, SDL.SDL_Keymod mod, SDL.SDL_Keycode key, SDL.SDL_GameControllerButton[] controllerButtons)
@@ -141,7 +141,7 @@ public class SpellBarManager
     {
         if(spellBarSettings == null)
             spellBarSettings = new SpellBarSettings();
-        
+
         spellBarSettings.Enabled = !spellBarSettings.Enabled;
         return spellBarSettings.Enabled;
     }
@@ -150,7 +150,7 @@ public class SpellBarManager
     {
         if (!enabled || !spellBarSettings.Enabled)
             return;
-        
+
         if (string.IsNullOrEmpty(name))
             return;
 
@@ -175,10 +175,10 @@ public class SpellBarManager
     {
         if (!enabled || !spellBarSettings.Enabled)
             return;
-        
+
         if (string.IsNullOrEmpty(name))
             return;
-        
+
         string path = Path.Combine(presetPath, name + ".json");
         if (!File.Exists(path))
             return;
@@ -202,14 +202,14 @@ public class SpellBarManager
     {
         if (!enabled || !spellBarSettings.Enabled)
             return [];
-        
+
         if (!Directory.Exists(presetPath))
             return [];
-        
+
         string[] files = Directory.GetFiles(presetPath, "*.json");
         return files.Select(x => Path.GetFileNameWithoutExtension(x)).ToArray();
     }
-    
+
     public static void Load()
     {
         charPath = ProfileManager.ProfilePath;
@@ -246,10 +246,10 @@ public class SpellBarManager
                 Log.Error(e.ToString());
             }
         }
-        
+
         if(spellBarSettings == null)
             spellBarSettings = new SpellBarSettings();
-        
+
         enabled = true;
     }
 
@@ -276,7 +276,7 @@ public class SpellBarRow()
 {
     [JsonIgnore]
     public SpellDefinition[] SpellSlot = new SpellDefinition[10];
-    
+
     public int[] SpellSlotIds {
         get
         {
@@ -298,9 +298,9 @@ public class SpellBarRow()
             }
         }
     }
-    
+
     public ushort RowHue { get; set; }
-    
+
     public SpellBarRow SetSpell(int slot, SpellDefinition spell)
     {
         SpellSlot[slot] = spell;
@@ -312,14 +312,14 @@ public class SpellBarRow()
 public class SpellBarSettings
 {
     public bool Enabled { get; set; }
-    
+
     public int CurrentRow { get; set; } = 0;
-    
-    public int[] HotKeys { get; set; } = [(int)SDL.SDL_Keycode.SDLK_F1, (int)SDL.SDL_Keycode.SDLK_F2, (int)SDL.SDL_Keycode.SDLK_F3, (int)SDL.SDL_Keycode.SDLK_F4, (int)SDL.SDL_Keycode.SDLK_F5, 
+
+    public int[] HotKeys { get; set; } = [(int)SDL.SDL_Keycode.SDLK_F1, (int)SDL.SDL_Keycode.SDLK_F2, (int)SDL.SDL_Keycode.SDLK_F3, (int)SDL.SDL_Keycode.SDLK_F4, (int)SDL.SDL_Keycode.SDLK_F5,
         (int)SDL.SDL_Keycode.SDLK_F6, (int)SDL.SDL_Keycode.SDLK_F7, (int)SDL.SDL_Keycode.SDLK_F8, (int)SDL.SDL_Keycode.SDLK_F9, (int)SDL.SDL_Keycode.SDLK_F10];
-    
+
     public int[] KeyMod { get; set; } = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    
+
     public int[][] ControllerButtons { get; set; } = [[-1],[-1],[-1],[-1],[-1],[-1],[-1],[-1],[-1],[-1]];
 }
 

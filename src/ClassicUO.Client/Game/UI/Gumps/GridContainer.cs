@@ -1187,9 +1187,33 @@ namespace ClassicUO.Game.UI.Gumps
             public override bool Draw(UltimaBatcher2D batcher, int x, int y)
             {
                 bool itemNull = _item == null;
-                if (!itemNull && _item.ItemData.Layer > 0 && hit.MouseIsOver && Keyboard.Ctrl && (toolTipThis == null || toolTipThis.IsDisposed) && (toolTipitem1 == null || toolTipitem1.IsDisposed) && (toolTipitem2 == null || toolTipitem2.IsDisposed))
+                if (!itemNull && Keyboard.Ctrl && _item.ItemData.Layer > 0 && hit.MouseIsOver && (toolTipThis == null || toolTipThis.IsDisposed) && (toolTipitem1 == null || toolTipitem1.IsDisposed) && (toolTipitem2 == null || toolTipitem2.IsDisposed))
                 {
                     Item compItem = world.Player.FindItemByLayer((Layer)_item.ItemData.Layer);
+                    Item compItem2 = null;
+
+                    // For weapons, also check the opposite layer for comparison
+                    if ((Layer)_item.ItemData.Layer == Layer.OneHanded)
+                    {
+                        compItem2 = world.Player.FindItemByLayer(Layer.TwoHanded);
+                        // If no one-handed item equipped, use two-handed as primary comparison
+                        if (compItem == null && compItem2 != null)
+                        {
+                            compItem = compItem2;
+                            compItem2 = null;
+                        }
+                    }
+                    else if ((Layer)_item.ItemData.Layer == Layer.TwoHanded)
+                    {
+                        compItem2 = world.Player.FindItemByLayer(Layer.OneHanded);
+                        // If no two-handed item equipped, use one-handed as primary comparison
+                        if (compItem == null && compItem2 != null)
+                        {
+                            compItem = compItem2;
+                            compItem2 = null;
+                        }
+                    }
+
                     if (compItem != null && (Layer)_item.ItemData.Layer != Layer.Backpack)
                     {
                         hit.ClearTooltip();
@@ -1208,25 +1232,11 @@ namespace ClassicUO.Game.UI.Gumps
                                 GameActions.Print(world,compileToolTip);
                         }
 
-                        if ((Layer)_item.ItemData.Layer == Layer.OneHanded)
+                        // Add second weapon comparison if both hands have weapons
+                        if (compItem2 != null)
                         {
-                            Item compItem2 = world.Player.FindItemByLayer(Layer.TwoHanded);
-                            if (compItem2 != null)
-                            {
-                                toolTipitem2 = new CustomToolTip(world, compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
-                                //UIManager.Add(toolTipitem2);
-                                toolTipList.Add(toolTipitem2);
-                            }
-                        }
-                        else if ((Layer)_item.ItemData.Layer == Layer.TwoHanded)
-                        {
-                            Item compItem2 = world.Player.FindItemByLayer(Layer.OneHanded);
-                            if (compItem2 != null)
-                            {
-                                toolTipitem2 = new CustomToolTip(world, compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
-                                //UIManager.Add(toolTipitem2);
-                                toolTipList.Add(toolTipitem2);
-                            }
+                            toolTipitem2 = new CustomToolTip(world, compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, hit, "<basefont color=\"orange\">Equipped Item<br>");
+                            toolTipList.Add(toolTipitem2);
                         }
 
                         MultipleToolTipGump multipleToolTipGump = new MultipleToolTipGump(world, Mouse.Position.X + 10, Mouse.Position.Y + 10, toolTipList.ToArray(), hit);

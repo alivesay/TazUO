@@ -1185,6 +1185,11 @@ namespace ClassicUO.Game.Scenes
                 {
                     if (macro.Items is MacroObject mac)
                     {
+                        if (ProfileManager.CurrentProfile.DisableHotkeys && mac.Code != MacroType.ToggleHotkeys)
+                        {
+                            return false;
+                        }
+
                         ExecuteMacro(mac);
 
                         return true;
@@ -1438,6 +1443,8 @@ namespace ClassicUO.Game.Scenes
 
             if (CanExecuteMacro())
             {
+                SpellBarManager.KeyPress(e.keysym.sym, e.keysym.mod);
+
                 Macro macro = _world.Macros.FindMacro(
                     e.keysym.sym,
                     Keyboard.Alt,
@@ -1449,7 +1456,10 @@ namespace ClassicUO.Game.Scenes
                 {
                     if (macro.Items is MacroObject mac)
                     {
-                        if (mac.Code == MacroType.LookAtMouse)
+                        if (ProfileManager.CurrentProfile.DisableHotkeys && mac.Code != MacroType.ToggleHotkeys)
+                        { //Disable hotkeys for all macros unless it's the toggle hotkey macro
+                        }
+                        else if (mac.Code == MacroType.LookAtMouse)
                         {
                             Client.Game.Scene.Camera.PeekingToMouse = true;
 
@@ -1691,15 +1701,25 @@ namespace ClassicUO.Game.Scenes
         internal override void OnControllerButtonDown(SDL.SDL_ControllerButtonEvent e)
         {
             base.OnControllerButtonDown(e);
-
-            SpellBarManager.ControllerInput((SDL.SDL_GameControllerButton)e.button);
-
-            if (_world.InGame && (UIManager.KeyboardFocusControl == UIManager.SystemChat.TextBoxControl || UIManager.KeyboardFocusControl == null))
+            if (!_world.InGame)
             {
+                return;
+            }
+
+            if (CanExecuteMacro())
+            {
+                SpellBarManager.ControllerInput((SDL.SDL_GameControllerButton)e.button);
+
                 Macro macro = _world.Macros.FindMacro((SDL.SDL_GameControllerButton)e.button);
                 if (macro != null && macro.Items is MacroObject mac)
                 {
-                    ExecuteMacro(mac);
+                    if (ProfileManager.CurrentProfile.DisableHotkeys && mac.Code != MacroType.ToggleHotkeys)
+                    {
+                    }
+                    else
+                    {
+                        ExecuteMacro(mac);
+                    }
                 }
             }
         }
@@ -1707,7 +1727,7 @@ namespace ClassicUO.Game.Scenes
         private bool CanExecuteMacro()
         {
             return UIManager.KeyboardFocusControl == UIManager.SystemChat.TextBoxControl
-                && UIManager.SystemChat.Mode >= ChatMode.Default;
+                    && UIManager.SystemChat.Mode >= ChatMode.Default;
         }
 
         private void ExecuteMacro(MacroObject macro)

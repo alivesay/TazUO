@@ -106,15 +106,16 @@ jobs:
 
       - name: Discord Github Updates
         uses: tsickert/discord-webhook@v7.0.0
+        continue-on-error: true
         with:
           webhook-url: ${{ secrets.DISCORDWEBHOOK }}
           content: |
             # v${{ env.VERSION }} is available.
 
-            [Download here](<https://github.com/bittiez/TazUO/releases/latest>)  
+            [Download here](<https://github.com/bittiez/TazUO/releases/latest>)
             Or use the [launcher](<https://github.com/bittiez/TUO-Launcher/releases/latest>)
 
-            # Release notes 
+            # Release notes
             `These are automatically generated`
             ${{ steps.release_notes.outputs.RELEASE_NOTES }}
 
@@ -132,8 +133,8 @@ jobs:
           artifacts: "${{ env.CUO_OUTPUT_PATH }}/${{ env.CUO_ZIP_NAME }}"
           name: "v${{ env.VERSION }}"
           body: |
-            These are built automatically on the main branch. 
-            This is version v${{ env.VERSION }} 
+            These are built automatically on the main branch.
+            This is version v${{ env.VERSION }}
 
             # Release notes
             ${{ steps.release_notes.outputs.RELEASE_NOTES }}

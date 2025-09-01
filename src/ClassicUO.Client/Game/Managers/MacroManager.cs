@@ -2108,6 +2108,11 @@ namespace ClassicUO.Game.Managers
                 case MacroType.Resync:
                     AsyncNetClient.Socket.Send_Resync();
                     break;
+
+                case MacroType.ToggleHotkeys:
+                    ProfileManager.CurrentProfile.DisableHotkeys = !ProfileManager.CurrentProfile.DisableHotkeys;
+                    GameActions.Print($"Hotkeys {(ProfileManager.CurrentProfile.DisableHotkeys ? "disabled" : "enabled")}.");
+                    break;
             }
 
             return result;
@@ -2741,6 +2746,7 @@ namespace ClassicUO.Game.Managers
         SetMount,
         AddFriend,
         RemoveFriend,
+        ToggleHotkeys,
     }
 
     public enum MacroSubType

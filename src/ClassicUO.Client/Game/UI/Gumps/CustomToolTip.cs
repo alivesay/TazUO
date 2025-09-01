@@ -74,6 +74,7 @@ namespace ClassicUO.Game.UI.Gumps
                         finalString = Managers.ToolTipOverrideData.ProcessTooltipText(World, item.Serial, compareTo == null ? uint.MinValue : compareTo.Serial);
                         if (finalString == null)
                             finalString = FormatTooltip(name, data);
+                        finalString = prepend + finalString + append;
                     }
 
                     text?.Dispose();

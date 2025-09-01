@@ -77,7 +77,7 @@ namespace ClassicUO.Game.UI.Gumps
                 Width,
                 true,
                 FontStyle.BlackBorder | FontStyle.Fixed,
-                33
+                ProfileManager.CurrentProfile.SpeechHue
             )
             {
                 X = CHAT_X_OFFSET,
@@ -231,6 +231,7 @@ namespace ClassicUO.Game.UI.Gumps
             TextBoxControl.SetKeyboardFocus();
             TextBoxControl.IsEditable = _isActive;
             _trans.IsVisible = _isActive;
+            _trans.Alpha = ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.HideChatGradient ? 0.0f : 0.5f;
         }
 
         public void ToggleChatVisibility()
@@ -489,13 +490,6 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 Mode = ChatMode.UOAMChat;
             }
-
-            if (ProfileManager.CurrentProfile.SpeechHue != TextBoxControl.Hue)
-            {
-                TextBoxControl.Hue = ProfileManager.CurrentProfile.SpeechHue;
-            }
-
-            _trans.Alpha = ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.HideChatGradient ? 0.0f : 0.5f;
 
             base.Update();
         }

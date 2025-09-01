@@ -651,7 +651,13 @@ namespace ClassicUO.Game.GameObjects
             { 0x3ED9, 0x0610 }, // a dobberman?
             { 0x3EDA, 0x0590 }, // Frostmites Beetles
             { 0x3EDE, 0x0673 }, //Clydesdale?
-            { 0x3EDC, 0x0666 } //Moldering Ursine?
+            { 0x3EDC, 0x0666 }, //Moldering Ursine?c
+            { 0x3EDB, 0x0611 }, // Manticore
+            { 0x3EDD, 0x0581 }, // Dragon_Hildebrandt
+            { 0x3EDF, 0x0676 }, // Horse_Elemental_Earth
+            { 0x3EE0, 0x0677 }, // Horse_Elemental_Fire
+            { 0x3EE1, 0x0678 }, // Horse_Elemental_Water
+            { 0x3EE2, 0x0679 }, // Horse_Elemental_Air
         };
 
         public override ushort GetGraphicForAnimation()

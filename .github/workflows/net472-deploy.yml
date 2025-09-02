@@ -37,7 +37,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: ${{ github.ref }}
+        ref: "legacy"
 
     - name: Extract Version
       shell: bash

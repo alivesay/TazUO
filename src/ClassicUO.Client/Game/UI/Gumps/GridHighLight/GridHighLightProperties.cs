@@ -79,6 +79,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 if (int.TryParse(minPropertiesInput.Text, out int val))
                 {
                     data.MinimumProperty = val;
+                    GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                 }
                 else
                 {
@@ -95,6 +96,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 if (int.TryParse(maxPropertiesInput.Text, out int val))
                 {
                     data.MaximumProperty = val;
+                    GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                 }
                 else
                 {
@@ -122,6 +124,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 {
                     data.ItemNames.Add("");
                     Build();
+                    GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                 }
             };
 
@@ -149,6 +152,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 {
                     data.Properties.Add(new GridHighlightProperty { Name = "", MinValue = -1, IsOptional = false });
                     Build();
+                    GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                 }
             };
 
@@ -173,8 +177,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                         cb.IsChecked = !otherCheckbox.IsChecked;
                     }
                 }
-
-                typeof(GridHighlightSlot).GetProperty("Other").SetValue(data.EquipmentSlots, otherCheckbox.IsChecked);
+                data.EquipmentSlots.Other = otherCheckbox.IsChecked;
             };
             mainScrollArea.Add(pos.PositionRightOf(new Label("Other / No Slot Assigned", true, 0xffff), otherCheckbox));
 
@@ -188,10 +191,10 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 bool isChecked = (bool)typeof(GridHighlightSlot).GetProperty(slotName).GetValue(data.EquipmentSlots);
 
                 Checkbox cb = new Checkbox(0x00D2, 0x00D3) { IsChecked = isChecked };
-                string currentSlotName = slotName;
                 cb.ValueChanged += (s, e) =>
                 {
                     typeof(GridHighlightSlot).GetProperty(slotName).SetValue(data.EquipmentSlots, cb.IsChecked);
+                    GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                 };
                 slotCheckboxes[slotName] = cb;
 
@@ -232,6 +235,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 {
                     data.ExcludeNegatives.Add("");
                     Build();
+                    GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                 }
             };
 
@@ -258,6 +262,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 {
                     data.RequiredRarities.Add("");
                     Build();
+                    GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                 }
             };
 

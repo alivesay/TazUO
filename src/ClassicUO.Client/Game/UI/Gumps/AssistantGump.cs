@@ -838,7 +838,8 @@ public class AssistantGump : BaseOptionsGump
         ModernButton orgButton = new(0, 0, MainContent.LeftWidth, 40, ButtonAction.Default, "Organizer", ThemeSettings.BUTTON_FONT_COLOR);
         orgButton.MouseUp += (s, e) =>
         {
-            ImGuiManager.AddWindow(new OrganizerWindow());
+            //OrganizerWindow.Show();
+            AssistantWindow.Show();
         };
 
         MainContent.AddToLeft(orgButton);

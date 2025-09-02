@@ -57,7 +57,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
         }
 
-        protected abstract void DrawContent();
+        public abstract void DrawContent();
 
         protected virtual void OnWindowClosed()
         {
@@ -95,6 +95,38 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
 
             return false;
+        }
+    }
+
+    public abstract class SingletonImGuiWindow<T> : ImGuiWindow where T : SingletonImGuiWindow<T>
+    {
+        public static T Instance { get; protected set; }
+
+        protected SingletonImGuiWindow(string title = "") : base(title)
+        {
+        }
+
+        public static SingletonImGuiWindow<T> GetInstance()
+        {
+            if(Instance != null) return Instance;
+
+            return Instance = (T)Activator.CreateInstance(typeof(T), true);
+        }
+
+        public static void Show()
+        {
+            if (Instance != null)
+                ImGuiManager.RemoveWindow(Instance);
+
+            Instance = (T)Activator.CreateInstance(typeof(T), true);
+            ImGuiManager.AddWindow(Instance);
+        }
+
+        public override void Dispose()
+        {
+            if (Instance == this)
+                Instance = null;
+            base.Dispose();
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace ClassicUO.Game.UI.ImGuiControls
 {
-    public class OrganizerWindow : ImGuiWindow
+    public class OrganizerWindow : SingletonImGuiWindow<OrganizerWindow>
     {
         private int _selectedConfigIndex = -1;
         private OrganizerConfig _selectedConfig = null;
@@ -14,12 +14,12 @@ namespace ClassicUO.Game.UI.ImGuiControls
         private string _addItemHueInput = "";
         private bool _showAddItemManual = false;
 
-        public OrganizerWindow() : base("Organizer")
+        private OrganizerWindow() : base("Organizer")
         {
             WindowFlags = ImGuiWindowFlags.AlwaysAutoResize;
         }
 
-        protected override void DrawContent()
+        public override void DrawContent()
         {
             if (OrganizerAgent.Instance == null)
             {
@@ -95,7 +95,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
 
         private void DrawOrganizerDetails()
         {
-            if (_selectedConfig == null)
+            if (_selectedConfig == null || _selectedConfigIndex == -1)
             {
                 ImGui.Text("Select an organizer to view details");
                 return;
@@ -145,9 +145,8 @@ namespace ClassicUO.Game.UI.ImGuiControls
             if (ImGui.Button("Delete"))
             {
                 OrganizerAgent.Instance?.DeleteConfig(_selectedConfig);
-                _selectedConfig = null;
+                //_selectedConfig = null;
                 _selectedConfigIndex = -1;
-                return;
             }
             ImGui.PopStyleColor();
             ImGui.NewLine();

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ClassicUO.Network;
 
 namespace ClassicUO.Game.UI.Gumps.GridHighLight
 {
@@ -198,6 +199,15 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
             }
 
             return data;
+        }
+
+        public static void RecheckMatchStatus()
+        {
+            foreach (var kvp in World.Items)
+            {
+                if (kvp.Value.OnGround || kvp.Value.IsMulti) continue;
+                ProcessItemOpl(kvp.Key);
+            }
         }
 
         public bool IsMatch(ItemPropertiesData itemData)

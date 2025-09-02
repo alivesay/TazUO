@@ -67,6 +67,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                     if (e.Button == Input.MouseButtonType.Left)
                     {
                         ImportGridHighlightSettings();
+                        GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                     }
                 };
 
@@ -118,6 +119,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                     {
                         data.HighlightColor = selectedColor;
                         data.Hue = (ushort)(selectedColor.R + (selectedColor.G << 8) + (selectedColor.B << 16));
+                        GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                     });
                 }
             };
@@ -142,6 +144,7 @@ namespace ClassicUO.Game.UI.Gumps.GridHighLight
                 {
                     data.Delete();
                     BuildGump();
+                    GridHighlightData.RecheckMatchStatus(); //Request new opl data and re-check item matches
                 }
             };
 

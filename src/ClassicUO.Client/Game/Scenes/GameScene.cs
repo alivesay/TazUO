@@ -96,7 +96,7 @@ namespace ClassicUO.Game.Scenes
 
         private uint _timeToPlaceMultiInHouseCustomization;
         private bool _use_render_target = false;
-        private int _max_texture_size = 4096;
+        private int _max_texture_size = 8192;
         private static string _filterMode = "linear"; // "point" | "linear" | "anisotropic" | "xbr"
         private string _currentFilter;
         private Effect _postFx;

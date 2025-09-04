@@ -1276,7 +1276,7 @@ namespace ClassicUO.Game.Scenes
             if (use_render_target)
             {
                 batcher.GraphicsDevice.SetRenderTarget(_world_render_target);
-                batcher.GraphicsDevice.Clear(ClearOptions.Target, Color.Black, 0f, 0);
+                batcher.GraphicsDevice.Clear(ClearOptions.Target, Color.Black, 1f, 0);
             }
 
             batcher.SetSampler(SamplerState.PointClamp);

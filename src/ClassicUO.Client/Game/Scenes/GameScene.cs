@@ -474,6 +474,8 @@ namespace ClassicUO.Game.Scenes
             NetClient.Socket.Disconnect();
             _light_render_target?.Dispose();
             _world_render_target?.Dispose();
+            _xbr?.Dispose();
+            _xbr = null;
 
             CommandManager.UnRegisterAll();
             Weather.Reset();

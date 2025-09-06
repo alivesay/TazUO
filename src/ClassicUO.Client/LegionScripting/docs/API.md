@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `8/24/25`.*
+*This was generated on `9/5/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -781,6 +781,21 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 ---
 
+### PromptResponse
+`(message)`
+ Send a response to a server prompt(Like renaming a rune for example).
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `message` | `string` | ❌ No |  |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
 ### FindItem
 `(serial)`
  Try to get an item by its serial.
@@ -1432,6 +1447,33 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 ---
 
+### TargetResource
+`(itemSerial, resource)`
+ This will attempt to use an item and target a resource, some servers may not support this.
+ ```
+ 0: ore
+ 1: sand
+ 2: wood
+ 3: graves
+ 4: red_mushrooms
+ ```
+ Example:
+ ```py
+ API.TargetResource(MY_SHOVEL_SERIAL, 0)
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `itemSerial` | `uint` | ❌ No |  |
+| `resource` | `uint` | ❌ No |  |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
 ### CancelTarget
 
  Cancel targeting.
@@ -1707,6 +1749,29 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 ---
 
+### WaitForGump
+`(ID, delay)`
+ Wait for a server-side gump.
+ Example:
+ ```py
+ if API.WaitForGump(1951773915):
+   API.HeadMsg("SUCCESS", API.Player, 62)
+ else:
+  API.HeadMsg("FAILURE", API.Player, 32)
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `ID` | `uint` | ✅ Yes |  |
+| `delay` | `double` | ✅ Yes | Seconds to wait |
+
+**Return Type:** `bool`
+
+---
+
 ### ToggleFly
 
  Toggle flying if you are a gargoyle.
@@ -1769,7 +1834,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 ---
 
 ### InJournal
-`(msg)`
+`(msg, clearMatches)`
  Check if your journal contains a message.
  Example:
  ```py
@@ -1783,13 +1848,14 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `msg` | `string` | ❌ No | The message to check for. Can be regex, prepend your msg with $ |
+| `clearMatches` | `bool` | ✅ Yes |  |
 
 **Return Type:** `bool`
 
 ---
 
 ### InJournalAny
-`(msgs)`
+`(msgs, clearMatches)`
  Check if the journal contains *any* of the strings in this list.
  Can be regex, prepend your msgs with $
  Example:
@@ -1804,19 +1870,51 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `msgs` | `IList<string>` | ❌ No |  |
+| `clearMatches` | `bool` | ✅ Yes |  |
 
 **Return Type:** `bool`
 
 ---
 
-### ClearJournal
+### GetJournalEntries
+`(seconds, matchingText)`
+ Get all the journal entires in the last X seconds.
+ matchingText supports regex with $ prepended.
+ Example:
+ ```py
+ list = API.GetJournalEntries(30)
+ if list:
+   for entry in list:
+     entry.Text # Do something with this
+ ```
 
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `seconds` | `double` | ❌ No |  |
+| `matchingText` | `string` | ✅ Yes | Only add if text matches |
+
+**Return Type:** `PythonList`
+
+---
+
+### ClearJournal
+`(matchingEntries)`
  Clear your journal(This is specific for each script).
+ Supports regex matching if prefixed with $
  Example:
  ```py
  API.ClearJournal()
  ```
 
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `matchingEntries` | `string` | ✅ Yes | String or regex to match with. If this is set, only matching entries will be removed. |
 
 **Return Type:** `void` *(Does not return anything)*
 
@@ -2887,6 +2985,27 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | `x` | `int` | ❌ No |  |
 | `y` | `int` | ❌ No |  |
 | `map` | `int` | ✅ Yes |  |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### TrackingArrow
+`(x, y, identifier)`
+ Create a tracking arrow pointing towards a location.
+ Set x or y to a negative value to close existing tracker arrow.
+ ```py
+ API.TrackingArrow(400, 400)
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `x` | `int` | ❌ No |  |
+| `y` | `int` | ❌ No |  |
+| `identifier` | `uint` | ✅ Yes | An identified number if you want multiple arrows. |
 
 **Return Type:** `void` *(Does not return anything)*
 

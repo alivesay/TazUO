@@ -4734,5 +4734,18 @@ namespace ClassicUO.Network
             socket.Send(writer.BufferWritten);
             writer.Dispose();
         }
+
+        public static void Send_TargetByResource(this AsyncNetClient socket, uint serial, uint resourceType)
+        {
+            const byte ID = 0xBF;
+
+            var writer = new StackDataWriter(11);
+
+            writer.WriteUInt8(ID);
+            writer.WriteZero(2);
+            writer.WriteUInt16BE(0x30); // command
+            writer.WriteUInt32BE(serial); // Tools
+            writer.WriteUInt16BE((ushort)resourceType); // Resource type
+        }
     }
 }

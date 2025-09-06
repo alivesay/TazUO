@@ -10,6 +10,22 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private static string[] updateTexts =
         {
+            "/c[white][4.5.0]/cd\n" +
+            """
+            - Check for yellow hits before bandaging
+            - Added some missing OSI mounts
+            - Show other drives in file selector(When you navigate to root)
+            - Grid highlights will re-check items when making changes to configs
+            - Minor improvements to grid container ui interactions
+            - Several new python API changes
+
+            ## Bug fixes
+            - Fix for in-game file selector without a parent folder
+            - Improved nameplate jumping when moving and using avoid overlap
+            - Fix chat command hue
+            """ +
+            "\n"
+            ,
             "/c[white][4.4.0]/cd\n" +
             """
             - Improved draw times for mobiles

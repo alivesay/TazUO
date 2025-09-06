@@ -105,13 +105,14 @@ namespace ClassicUO.Game.Managers
         {
             List<Macro> list = GetAllMacros();
 
+            string tempPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
             string path = Path.Combine(ProfileManager.ProfilePath, "macros.xml");
 
-            if (!File.Exists(path))
+            if (!File.Exists(tempPath))
             {
                 try
                 {
-                    File.Create(path).Close();
+                    File.Create(tempPath).Close();
                 }
                 catch (Exception)
                 {
@@ -119,23 +120,30 @@ namespace ClassicUO.Game.Managers
                 }
             }
 
-            using (XmlTextWriter xml = new XmlTextWriter(path, Encoding.UTF8)
+            try
             {
-                Formatting = Formatting.Indented,
-                IndentChar = '\t',
-                Indentation = 1
-            })
-            {
-                xml.WriteStartDocument(true);
-                xml.WriteStartElement("macros");
-
-                foreach (Macro macro in list)
+                using (XmlTextWriter xml = new XmlTextWriter(tempPath, Encoding.UTF8) { Formatting = Formatting.Indented, IndentChar = '\t', Indentation = 1 })
                 {
-                    macro.Save(xml);
+                    xml.WriteStartDocument(true);
+                    xml.WriteStartElement("macros");
+
+                    foreach (Macro macro in list)
+                    {
+                        macro.Save(xml);
+                    }
+
+                    xml.WriteEndElement();
+                    xml.WriteEndDocument();
                 }
 
-                xml.WriteEndElement();
-                xml.WriteEndDocument();
+                if(File.Exists(path))
+                    File.Delete(path);
+                File.Move(tempPath, path);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                Log.Error("Failed to save macros.");
             }
         }
 

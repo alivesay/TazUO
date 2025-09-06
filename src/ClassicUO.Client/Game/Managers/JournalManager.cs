@@ -137,5 +137,7 @@ namespace ClassicUO.Game.Managers
         public TextType TextType;
         public DateTime Time;
         public MessageType MessageType;
+
+        public bool Disposed; //Added for py API usage
     }
 }

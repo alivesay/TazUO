@@ -16,6 +16,7 @@ using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Input;
 using ClassicUO.LegionScripting.PyClasses;
 using ClassicUO.Network;
+using ClassicUO.Utility;
 using FontStashSharp.RichText;
 using IronPython.Runtime;
 using Microsoft.Scripting.Hosting;
@@ -803,6 +804,27 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         /// <param name="message"></param>
         public void EmoteMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.EmoteHue, MessageType.Emote); });
+
+        /// <summary>
+        /// Send a response to a server prompt(Like renaming a rune for example).
+        /// </summary>
+        /// <param name="message"></param>
+        public void PromptResponse(string message) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
+            if (World.MessageManager.PromptData.Prompt != ConsolePrompt.None)
+            {
+                if (World.MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
+                {
+                    NetClient.Socket.Send_ASCIIPromptResponse(World, message, message.Length < 1);
+                }
+                else if (World.MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
+                {
+                    NetClient.Socket.Send_UnicodePromptResponse(World, message, Settings.GlobalSettings.Language, message.Length < 1);
+                }
+
+                World.MessageManager.PromptData = default;
+            }
+        });
 
         /// <summary>
         /// Try to get an item by its serial.
@@ -1600,6 +1622,27 @@ namespace ClassicUO.LegionScripting
         );
 
         /// <summary>
+        /// This will attempt to use an item and target a resource, some servers may not support this.
+        /// ```
+        /// 0: ore
+        /// 1: sand
+        /// 2: wood
+        /// 3: graves
+        /// 4: red_mushrooms
+        /// ```
+        /// Example:
+        /// ```py
+        /// API.TargetResource(MY_SHOVEL_SERIAL, 0)
+        /// ```
+        /// </summary>
+        /// <param name="itemSerial"></param>
+        /// <param name="resource"></param>
+        public void TargetResource(uint itemSerial, uint resource) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
+            AsyncNetClient.Socket.Send_TargetByResource(itemSerial, resource);
+        });
+
+        /// <summary>
         /// Cancel targeting.
         /// Example:
         /// ```py
@@ -1950,6 +1993,35 @@ namespace ClassicUO.LegionScripting
         );
 
         /// <summary>
+        /// Wait for a server-side gump.
+        /// Example:
+        /// ```py
+        /// if API.WaitForGump(1951773915):
+        ///   API.HeadMsg("SUCCESS", API.Player, 62)
+        /// else:
+        ///  API.HeadMsg("FAILURE", API.Player, 32)
+        /// ```
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="delay">Seconds to wait</param>
+        /// <returns></returns>
+        public bool WaitForGump(uint ID = uint.MaxValue, double delay = 5)
+        {
+            var expire = DateTime.UtcNow.AddSeconds(delay);
+
+            if (ID == uint.MaxValue)
+                ID = World.Player.LastGumpID;
+
+            while (!MainThreadQueue.InvokeOnMainThread(() => UIManager.GetGumpServer(ID) != null))
+            {
+                if (DateTime.UtcNow > expire)
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Toggle flying if you are a gargoyle.
         /// Example:
         /// ```py
@@ -2022,18 +2094,28 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         /// <param name="msg">The message to check for. Can be regex, prepend your msg with $</param>
         /// <returns>True if message was found</returns>
-        public bool InJournal(string msg)
+        public bool InJournal(string msg, bool clearMatches = false)
         {
             if (string.IsNullOrEmpty(msg))
                 return false;
 
             foreach (var je in JournalEntries.ToArray())
             {
+                if (je.Disposed) continue;
+
                 if (msg.StartsWith("$") && Regex.IsMatch(je.Text, msg.Substring(1)))
+                {
+                    if (clearMatches)
+                        je.Disposed = true;
                     return true;
+                }
 
                 if (je.Text.Contains(msg))
+                {
+                    if (clearMatches)
+                        je.Disposed = true;
                     return true;
+                }
             }
 
             return false;
@@ -2049,21 +2131,32 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="msgs"></param>
+        /// <param name="clearMatches"></param>
         /// <returns></returns>
-        public bool InJournalAny(IList<string> msgs)
+        public bool InJournalAny(IList<string> msgs, bool clearMatches = false)
         {
             if (msgs == null || msgs.Count == 0)
                 return false;
 
             foreach (var je in JournalEntries.ToArray())
             {
+                if(je.Disposed) continue;
+
                 foreach (var msg in msgs)
                 {
                     if (msg.StartsWith("$") && Regex.IsMatch(je.Text, msg.Substring(1)))
+                    {
+                        if (clearMatches)
+                            je.Disposed = true;
                         return true;
+                    }
 
                     if (je.Text.Contains(msg))
+                    {
+                        if (clearMatches)
+                            je.Disposed = true;
                         return true;
+                    }
                 }
             }
 
@@ -2071,16 +2164,96 @@ namespace ClassicUO.LegionScripting
         }
 
         /// <summary>
+        /// Get all the journal entires in the last X seconds.
+        /// matchingText supports regex with $ prepended.
+        /// Example:
+        /// ```py
+        /// list = API.GetJournalEntries(30)
+        /// if list:
+        ///   for entry in list:
+        ///     entry.Text # Do something with this
+        /// ```
+        /// </summary>
+        /// <param name="seconds"></param>
+        /// <param name="matchingText">Only add if text matches</param>
+        /// <returns>A list of JournalEntry's</returns>
+        public PythonList GetJournalEntries(double seconds, string matchingText = "")
+        {
+            PythonList entries = new PythonList();
+
+            DateTime cutoff = DateTime.UtcNow - TimeSpan.FromSeconds(30);
+
+            bool checkMatches = !string.IsNullOrEmpty(matchingText);
+
+            foreach (var je in JournalEntries)
+            {
+                if (je.Time < cutoff || je.Disposed)
+                    continue;
+
+                if (!checkMatches)
+                {
+                    entries.Add(je);
+                    continue;
+                }
+
+                if (matchingText.StartsWith("$") && RegexHelper.GetRegex(matchingText.Substring(1)).IsMatch(je.Text))
+                {
+                    entries.Add(je);
+                    continue;
+                }
+
+                if (je.Text.Contains(matchingText))
+                {
+                    entries.Add(je);
+                }
+            }
+
+            if (entries.Count > 0)
+                return entries;
+
+            return null;
+        }
+
+        /// <summary>
         /// Clear your journal(This is specific for each script).
+        /// Supports regex matching if prefixed with $
         /// Example:
         /// ```py
         /// API.ClearJournal()
         /// ```
         /// </summary>
-        public void ClearJournal()
+        /// <param name=""></param>
+        /// <param name="matchingEntries">String or regex to match with. If this is set, only matching entries will be removed.</param>
+        public void ClearJournal(string matchingEntries = "")
         {
-            while (JournalEntries.TryDequeue(out _))
+            if(string.IsNullOrEmpty(matchingEntries))
             {
+                while (JournalEntries.TryDequeue(out _))
+                {
+                }
+            }
+            else
+            {
+                ConcurrentQueue<JournalEntry> newQueue = new ();
+
+                foreach (var je in JournalEntries.ToArray())
+                {
+                    if (matchingEntries.StartsWith("$") && RegexHelper.GetRegex(matchingEntries.Substring(1)).IsMatch(je.Text))
+                    {
+                        je.Disposed = true;
+                        continue;
+                    }
+
+                    if (je.Text.Contains(matchingEntries))
+                    {
+                        je.Disposed = true;
+                        continue;
+                    }
+
+                    newQueue.Enqueue(je);
+                }
+
+                Interlocked.Exchange(ref journalEntries, newQueue);
             }
         }
 
@@ -3290,6 +3463,27 @@ namespace ClassicUO.LegionScripting
                 map = World.Map.Index;
 
             TileMarkerManager.Instance.RemoveTile(x, y, map);
+        });
+
+        /// <summary>
+        /// Create a tracking arrow pointing towards a location.
+        /// Set x or y to a negative value to close existing tracker arrow.
+        /// ```py
+        /// API.TrackingArrow(400, 400)
+        /// ```
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="identifier">An identified number if you want multiple arrows.</param>
+        public void TrackingArrow(int x, int y, uint identifier = uint.MaxValue) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
+            UIManager.GetGump<QuestArrowGump>(identifier)?.Dispose();
+
+            if(x > 0 && y > 0)
+            {
+                var arrow = new QuestArrowGump(World, identifier, x, y) { CanCloseWithRightClick = true };
+                UIManager.Add(arrow);
+            }
         });
 
         #endregion

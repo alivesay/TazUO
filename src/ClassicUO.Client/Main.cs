@@ -46,10 +46,10 @@ namespace ClassicUO
             Log.Start(LogTypes.All);
 
             //DllMap.Init();
-            
+
             CUOEnviroment.GameThread = Thread.CurrentThread;
             CUOEnviroment.GameThread.Name = "CUO_MAIN_THREAD";
-            
+
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
             {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
@@ -78,9 +78,9 @@ namespace ClassicUO
                 sb.AppendLine("######################## [END LOG] ########################");
                 sb.AppendLine();
                 sb.AppendLine();
-                
+
                 HtmlCrashLogGen.Generate(sb.ToString());
-                
+
                 Log.Panic(e.ExceptionObject.ToString());
                 string path = Path.Combine(CUOEnviroment.ExecutablePath, "Logs");
 
@@ -99,7 +99,7 @@ namespace ClassicUO
             {
                 Environment.SetEnvironmentVariable("FNA_GRAPHICS_ENABLE_HIGHDPI", "1");
             }
-            
+
             // NOTE: this is a workaroud to fix d3d11 on windows 11 + scale windows
             Environment.SetEnvironmentVariable("FNA3D_D3D11_FORCE_BITBLT", "1");
             Environment.SetEnvironmentVariable("FNA3D_BACKBUFFER_SCALE_NEAREST", "1");
@@ -508,9 +508,13 @@ namespace ClassicUO
         {
             string nativePath = Path.Combine(AppContext.BaseDirectory, GetPlatformFolder());
             foreach (var file in Directory.GetFiles(nativePath))
-                File.Copy(file, AppContext.BaseDirectory + Path.GetFileName(file), overwrite: true);
-
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, Path.GetFileName(file));
+                if (!File.Exists(path))
+                    File.Copy(file, path, overwrite: true);
+            }
         }
+
         private static string GetPlatformFolder()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

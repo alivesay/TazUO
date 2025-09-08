@@ -253,7 +253,8 @@ namespace ClassicUO.Game.Managers
                     //CreateAndLoadDataFile();
                     var assembly = GetType().Assembly;
 
-                    var resourceName = assembly.GetName().Name + ".Game.Managers.DefaultSpellIndicatorConfig.json";
+                    var resourceName = "ClassicUO.Game.Managers.DefaultSpellIndicatorConfig.json";
+
                     try
                     {
                         using Stream stream = assembly.GetManifestResourceStream(resourceName);

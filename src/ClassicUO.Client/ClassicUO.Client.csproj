@@ -94,11 +94,7 @@
     <DataFiles_osx-arm Include="$(ProjectDir)..\..\external\osx-arm\*.*" />
     <DataFiles_vulkan Include="$(ProjectDir)..\..\external\vulkan\icd.d\*.*" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Game\Managers\DefaultSpellIndicatorConfig.json" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <EmbeddedResource Include="Game\Managers\DefaultSpellIndicatorConfig.json" />
   </ItemGroup>
@@ -142,7 +138,7 @@
      $(RuntimeIdentifier.StartsWith('linux')) )
   ">true</_IsLinux>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <DocSourceFiles Include="$(ProjectDir)/LegionScripting/PyClasses/*.cs" />
     <DocSourceFiles Include="$(ProjectDir)/LegionScripting/API.cs" />

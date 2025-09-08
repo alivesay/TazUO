@@ -14,10 +14,6 @@ on:
       - 'appveyor.yml'
       - '**/README.md'
 
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   DOTNET_NOLOGO: false
   DOTNET_CLI_TELEMETRY_OPTOUT: 1

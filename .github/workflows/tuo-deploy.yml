@@ -8,10 +8,6 @@ on:
     types:
       - completed
 
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   CUO_OUTPUT_PATH: 'build/dist'
   CUO_PROJECT_PATH: "src/ClassicUO.Client/ClassicUO.Client.csproj"

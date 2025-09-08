@@ -181,6 +181,7 @@ namespace ClassicUO.Game.Scenes
         public override void Load()
         {
             base.Load();
+            Game.UI.ImGuiManager.Initialize(Client.Game);
 
             GridContainerSaveData.Instance.Load();
 

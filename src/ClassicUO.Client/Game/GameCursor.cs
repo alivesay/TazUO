@@ -626,7 +626,7 @@ namespace ClassicUO.Game
         {
             int war = _world.InGame && _world.Player.InWarMode ? 1 : 0;
 
-            if (ImGuiManager.IsInitialized && ImGui.GetIO().WantCaptureMouse) return _cursorData[war, 14];
+            if (ImGuiManager.IsInitialized && ImGui.GetIO().WantCaptureMouse) return _cursorData[war, 9];
 
             if (_world.TargetManager.IsTargeting)
             {

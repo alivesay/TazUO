@@ -139,8 +139,6 @@ namespace ClassicUO
             PNGLoader.Instance.GraphicsDevice = GraphicsDevice;
             PNGLoader.Instance.LoadResourceAssets(Client.Game.UO.Gumps.GetGumpsLoader);
 
-            Game.UI.ImGuiManager.Initialize(this);
-
             Audio.Initialize();
             // TODO: temporary fix to avoid crash when laoding plugins
             Settings.GlobalSettings.Encryption = (byte)NetClient.Load(UO.FileManager.Version, (EncryptionType)Settings.GlobalSettings.Encryption);

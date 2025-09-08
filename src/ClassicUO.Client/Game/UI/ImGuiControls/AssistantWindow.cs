@@ -7,13 +7,13 @@ namespace ClassicUO.Game.UI.ImGuiControls
 {
     public class AssistantWindow : SingletonImGuiWindow<AssistantWindow>
     {
-        private readonly List<TabItem> _tabs;
+        private readonly List<TabItem> _tabs = new();
         private int _selectedTabIndex = -1;
         private AssistantWindow() : base("Assistant")
         {
             WindowFlags = ImGuiWindowFlags.AlwaysAutoResize;
-            _tabs = new List<TabItem>();
 
+            AddTab("Auto Loot", DrawAutoLoot, AutoLootWindow.Show, () => AutoLootWindow.Instance?.Dispose() );
             AddTab("Organizer", DrawOrganizer, OrganizerWindow.Show, () => OrganizerWindow.Instance?.Dispose() );
             AddTab("Bandage Agent", DrawBandageAgent, BandageAgentWindow.Show, () => BandageAgentWindow.Instance?.Dispose() );
         }
@@ -25,6 +25,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 case AssistantGump.PAGE.None:
                     break;
                 case AssistantGump.PAGE.AutoLoot:
+                    _selectedTabIndex = 0;
                     break;
                 case AssistantGump.PAGE.AutoSell:
                     break;
@@ -45,12 +46,12 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 case AssistantGump.PAGE.DressAgent:
                     break;
                 case AssistantGump.PAGE.BandageAgent:
-                    _selectedTabIndex = 1;
+                    _selectedTabIndex = 2;
                     break;
                 case AssistantGump.PAGE.FriendsList:
                     break;
                 case AssistantGump.PAGE.Organizer:
-                    _selectedTabIndex = 0;
+                    _selectedTabIndex = 1;
                     break;
             }
         }
@@ -95,14 +96,14 @@ namespace ClassicUO.Game.UI.ImGuiControls
                         _selectedTabIndex = i;
                         tab.DrawContent?.Invoke();
 
-                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                        {
-                            if (tab.ShowFullWindow != null)
-                            {
-                                tab.ShowFullWindow.Invoke();
-                                RemoveTab(i);
-                            }
-                        }
+                        // if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                        // {
+                        //     if (tab.ShowFullWindow != null)
+                        //     {
+                        //         tab.ShowFullWindow.Invoke();
+                        //         RemoveTab(i);
+                        //     }
+                        // }
 
                         ImGui.EndTabItem();
                     }
@@ -111,6 +112,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
         }
 
+        private void DrawAutoLoot() => AutoLootWindow.GetInstance()?.DrawContent();
         private void DrawOrganizer() => OrganizerWindow.GetInstance()?.DrawContent();
         private void DrawBandageAgent() => BandageAgentWindow.GetInstance()?.DrawContent();
 

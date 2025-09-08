@@ -167,7 +167,6 @@ namespace ClassicUO
 
         protected override void UnloadContent()
         {
-            Game.UI.ImGuiManager.Dispose();
             DiscordManager.Instance.BeginDisconnect();
             SDL_GetWindowBordersSize(Window.Handle, out int top, out int left, out _, out _);
 

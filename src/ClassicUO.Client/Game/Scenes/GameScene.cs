@@ -172,7 +172,7 @@ namespace ClassicUO.Game.Scenes
         public GameScene()
         {
         }
-    
+
         public void DoubleClickDelayed(uint serial)
         {
             _useItemQueue.Add(serial);
@@ -375,7 +375,7 @@ namespace ClassicUO.Game.Scenes
             {
                 return;
             }
-
+            Game.UI.ImGuiManager.Dispose();
             GridContainerSaveData.Instance.Save();
             GridContainerSaveData.Reset();
             JournalFilterManager.Instance.Save();
@@ -1211,7 +1211,7 @@ namespace ClassicUO.Game.Scenes
                 srcRect = new Rectangle(srcX, srcY, srcW, srcH);
                 destRect = new Rectangle(0, 0, vpW, vpH);
             }
-            
+
             UpdatePostProcessState(gd);
 
             if (_postFx == _xbr && _xbr != null)
@@ -1311,7 +1311,7 @@ namespace ClassicUO.Game.Scenes
             {
                 batcher.GraphicsDevice.SetRenderTarget(null);
             }
-            
+
             //batcher.Begin();
             //hueVec.X = 0;
             //hueVec.Y = 1;
@@ -1483,7 +1483,7 @@ namespace ClassicUO.Game.Scenes
             int vh = Math.Max(1, Camera.Bounds.Height);
             int rtWidth = Math.Min(profile.GlobalScaling ? vw : (int)Math.Floor(vw * scale), _max_texture_size);
             int rtHeight = Math.Min(profile.GlobalScaling ? vh : (int)Math.Floor(vh * scale), _max_texture_size);
-            
+
             if (_use_render_target
                 && (_world_render_target == null
                     || _world_render_target.IsDisposed

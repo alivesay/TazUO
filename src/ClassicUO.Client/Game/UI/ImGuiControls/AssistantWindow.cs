@@ -1,6 +1,7 @@
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using ClassicUO.Game.UI.Gumps;
 
 namespace ClassicUO.Game.UI.ImGuiControls
 {
@@ -15,6 +16,43 @@ namespace ClassicUO.Game.UI.ImGuiControls
 
             AddTab("Organizer", DrawOrganizer, OrganizerWindow.Show, () => OrganizerWindow.Instance?.Dispose() );
             AddTab("Bandage Agent", DrawBandageAgent, BandageAgentWindow.Show, () => BandageAgentWindow.Instance?.Dispose() );
+        }
+
+        public void SelectTab(AssistantGump.PAGE page)
+        {
+            switch (page)
+            {
+                case AssistantGump.PAGE.None:
+                    break;
+                case AssistantGump.PAGE.AutoLoot:
+                    break;
+                case AssistantGump.PAGE.AutoSell:
+                    break;
+                case AssistantGump.PAGE.AutoBuy:
+                    break;
+                case AssistantGump.PAGE.MobileGraphicFilter:
+                    break;
+                case AssistantGump.PAGE.SpellBar:
+                    break;
+                case AssistantGump.PAGE.HUD:
+                    break;
+                case AssistantGump.PAGE.SpellIndicator:
+                    break;
+                case AssistantGump.PAGE.JournalFilter:
+                    break;
+                case AssistantGump.PAGE.TitleBar:
+                    break;
+                case AssistantGump.PAGE.DressAgent:
+                    break;
+                case AssistantGump.PAGE.BandageAgent:
+                    _selectedTabIndex = 1;
+                    break;
+                case AssistantGump.PAGE.FriendsList:
+                    break;
+                case AssistantGump.PAGE.Organizer:
+                    _selectedTabIndex = 0;
+                    break;
+            }
         }
 
         public void AddTab(string title, Action drawContent, Action showFullWindow, Action dispose)

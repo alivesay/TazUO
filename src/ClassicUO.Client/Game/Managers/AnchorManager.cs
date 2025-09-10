@@ -62,9 +62,11 @@ namespace ClassicUO.Game.Managers
 
         public void Save(XmlTextWriter writer)
         {
+            if(writer == null || reverseMap == null) return;
+
             foreach (AnchorGroup value in reverseMap.Values.Distinct())
             {
-                value.Save(writer);
+                value?.Save(writer);
             }
         }
 

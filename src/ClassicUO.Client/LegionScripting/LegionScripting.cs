@@ -35,6 +35,7 @@ namespace ClassicUO.LegionScripting
         private static List<ScriptFile> removeRunningScripts = new List<ScriptFile>();
         private static LScriptSettings lScriptSettings;
 
+        public static LScriptSettings LScriptSettings => lScriptSettings;
         public static List<ScriptFile> LoadedScripts = new List<ScriptFile>();
 
         public static event EventHandler<ScriptInfoEvent> ScriptStartedEvent;
@@ -871,7 +872,7 @@ namespace ClassicUO.LegionScripting
 
         public void SetupPythonEngine()
         {
-            if (pythonEngine != null)
+            if (pythonEngine != null && !LegionScripting.LScriptSettings.DisableModuleCache)
                 return;
 
             pythonEngine = Python.CreateEngine();

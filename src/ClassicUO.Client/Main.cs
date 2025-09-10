@@ -60,9 +60,10 @@ namespace ClassicUO
 #else
                 sb.AppendLine($"TazUO [STANDARD_BUILD] - {CUOEnviroment.Version} - {DateTime.Now}");
 #endif
+                sb.AppendLine($"Framework: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
                 sb.AppendLine
-                    ($"OS: {Environment.OSVersion.Platform} {(Environment.Is64BitOperatingSystem ? "x64" : "x86")}");
+                    ($"OS: {System.Runtime.InteropServices.RuntimeInformation.OSDescription} ({System.Runtime.InteropServices.RuntimeInformation.OSArchitecture})");
 
                 sb.AppendLine($"Thread: {Thread.CurrentThread.Name}");
                 sb.AppendLine();

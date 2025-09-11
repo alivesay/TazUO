@@ -508,12 +508,13 @@ namespace ClassicUO
         private static void CopyRequiredLibs()
         {
             string nativePath = Path.Combine(AppContext.BaseDirectory, GetPlatformFolder());
-            foreach (var file in Directory.GetFiles(nativePath))
-            {
-                var path = Path.Combine(AppContext.BaseDirectory, Path.GetFileName(file));
-                if (!File.Exists(path))
-                    File.Copy(file, path, overwrite: true);
-            }
+            if(Path.Exists(nativePath))
+                foreach (var file in Directory.GetFiles(nativePath))
+                {
+                    var path = Path.Combine(AppContext.BaseDirectory, Path.GetFileName(file));
+                    if (!File.Exists(path))
+                        File.Copy(file, path, overwrite: true);
+                }
         }
 
         private static string GetPlatformFolder()
@@ -524,8 +525,7 @@ namespace ClassicUO
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 return "lib64";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return "osx";
-                //return RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "osx-arm" : "osx";
+                return RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "osx-arm" : "osx";
 
             throw new PlatformNotSupportedException();
         }

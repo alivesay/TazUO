@@ -1150,6 +1150,15 @@ def ItemNameAndProps(serial: int, wait: bool = False, timeout: int = 10) -> str:
     """
     pass
 
+def RequestOPLData(serials: list[int]) -> None:
+    """
+     Requests Object Property List (OPL) data for the specified serials.
+     If the OPL data doesn't already exist, it will be requested from the server.
+     OPL consists of item name and tooltip text(properties).
+    
+    """
+    pass
+
 def HasGump(ID: int = 1337) -> int:
     """
      Check if a player has a server gump. Leave blank to check if they have any server gump.

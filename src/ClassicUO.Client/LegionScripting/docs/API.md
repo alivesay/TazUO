@@ -1669,6 +1669,23 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 ---
 
+### RequestOPLData
+`(serials)`
+ Requests Object Property List (OPL) data for the specified serials.
+ If the OPL data doesn't already exist, it will be requested from the server.
+ OPL consists of item name and tooltip text(properties).
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `serials` | `IList<uint>` | ❌ No | A list of object serials to request OPL data for |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
 ### HasGump
 `(ID)`
  Check if a player has a server gump. Leave blank to check if they have any server gump.

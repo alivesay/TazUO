@@ -1912,6 +1912,18 @@ namespace ClassicUO.LegionScripting
         }
 
         /// <summary>
+        /// Requests Object Property List (OPL) data for the specified serials.
+        /// If the OPL data doesn't already exist, it will be requested from the server.
+        /// OPL consists of item name and tooltip text(properties).
+        /// </summary>
+        /// <param name="serials">A list of object serials to request OPL data for</param>
+        public void RequestOPLData(IList<uint> serials) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
+            foreach (uint s in serials)
+                World.OPL.Contains(s); //Check if it already exists, if not request it
+        });        
+
+        /// <summary>
         /// Check if a player has a server gump. Leave blank to check if they have any server gump.
         /// Example:
         /// ```py

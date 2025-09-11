@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +17,7 @@ using Microsoft.Scripting.Hosting;
 using static ClassicUO.LegionScripting.Commands;
 using static ClassicUO.LegionScripting.Expressions;
 using System.Text.Json.Serialization;
+using Microsoft.Scripting;
 
 namespace ClassicUO.LegionScripting
 {
@@ -470,18 +471,20 @@ namespace ClassicUO.LegionScripting
 
             try
             {
-                script.pythonEngine.Execute(script.FileContentsJoined, script.pythonScope);
+                ScriptSource source = script.pythonEngine.CreateScriptSourceFromString(script.FileContentsJoined, script.FullPath, SourceCodeKind.File);
+                source.Execute(script.pythonScope);
             }
             catch (ThreadAbortException)
             {
             }
             catch (Exception e)
             {
-                var eo = script.pythonEngine.GetService<ExceptionOperations>();
+                ExceptionOperations eo = script.pythonEngine.GetService<ExceptionOperations>();
                 string error = eo.FormatException(e);
 
                 GameActions.Print(World, "Python Script Error:");
                 GameActions.Print(World, error);
+                Log.Debug(e.ToString());
             }
 
             //script.PythonScriptStopped();
@@ -714,7 +717,7 @@ namespace ClassicUO.LegionScripting
         {
             GameActions.Print(World, $"[{Interpreter.ActiveScript.CurrentLine}][LScript Warning]" + msg);
         }
-        
+
         public static void DownloadAPIPy()
         {
             Task.Run
@@ -832,7 +835,7 @@ namespace ClassicUO.LegionScripting
         {
             try
             {
-                var c = File.ReadAllLines(FullPath);
+                var c = File.ReadAllLines(FullPath, Encoding.UTF8);
                 FileContentsJoined = string.Join("\n", c);
                 if (ScriptType == ScriptType.Python)
                 {
@@ -900,6 +903,8 @@ namespace ClassicUO.LegionScripting
             scopedAPI?.CloseGumps();
             pythonScope = null;
             scopedAPI = null;
+            if (LegionScripting.LScriptSettings.DisableModuleCache)
+                pythonEngine = null;
         }
     }
 }

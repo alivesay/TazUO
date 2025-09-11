@@ -1457,17 +1457,19 @@ def FindMobile(serial: int) -> PyMobile:
     """
     pass
 
-def GetAllMobiles() -> list[PyMobile]:
+def GetAllMobiles(graphic: int | None = None, distance: int | None = None) -> list[PyMobile]:
     """
-     Return a list of all mobiles the client is aware of.
+     Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
      Example:
      ```py
+     # Get all mobiles
      mobiles = API.GetAllMobiles()
-     if mobiles:
-       API.SysMsg("Found " + str(len(mobiles)) + " mobiles!")
-       for mob in mobiles:
-         API.SysMsg(mob.Name)
-         API.Pause(0.5)
+     # Get all mobiles with graphic 400
+     humans = API.GetAllMobiles(400)
+     # Get all mobiles within 10 tiles
+     nearby = API.GetAllMobiles(distance=10)
+     # Get all humans within 5 tiles
+     nearby_humans = API.GetAllMobiles(400, 5)
      ```
     
     """

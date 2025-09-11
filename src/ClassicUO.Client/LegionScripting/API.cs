@@ -2227,7 +2227,7 @@ namespace ClassicUO.LegionScripting
         {
             PythonList entries = new PythonList();
 
-            DateTime cutoff = DateTime.UtcNow - TimeSpan.FromSeconds(30);
+            DateTime cutoff = DateTime.UtcNow - TimeSpan.FromSeconds(seconds);
 
             bool checkMatches = !string.IsNullOrEmpty(matchingText);
 
@@ -2536,19 +2536,34 @@ namespace ClassicUO.LegionScripting
         });
 
         /// <summary>
-        /// Return a list of all mobiles the client is aware of.
+        /// Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
         /// Example:
         /// ```py
+        /// # Get all mobiles
         /// mobiles = API.GetAllMobiles()
-        /// if mobiles:
-        ///   API.SysMsg("Found " + str(len(mobiles)) + " mobiles!")
-        ///   for mob in mobiles:
-        ///     API.SysMsg(mob.Name)
-        ///     API.Pause(0.5)
+        /// # Get all mobiles with graphic 400
+        /// humans = API.GetAllMobiles(400)
+        /// # Get all mobiles within 10 tiles
+        /// nearby = API.GetAllMobiles(distance=10)
+        /// # Get all humans within 5 tiles
+        /// nearby_humans = API.GetAllMobiles(400, 5)
         /// ```
         /// </summary>
+        /// <param name="graphic">Optional graphic ID to filter by</param>
+        /// <param name="distance">Optional maximum distance from player</param>
         /// <returns></returns>
-        public PyMobile[] GetAllMobiles() => MainThreadQueue.InvokeOnMainThread(() => { return World.Mobiles.Values.Select(m=>new PyMobile(m)).ToArray(); });
+        public PyMobile[] GetAllMobiles(ushort? graphic = null, int? distance = null) => MainThreadQueue.InvokeOnMainThread(() => 
+        { 
+            var mobiles = World.Mobiles.Values.AsEnumerable();
+            
+            if (graphic.HasValue)
+                mobiles = mobiles.Where(m => m.Graphic == graphic.Value);
+                
+            if (distance.HasValue)
+                mobiles = mobiles.Where(m => m.Distance <= distance.Value);
+                
+            return mobiles.Select(m => new PyMobile(m)).ToArray(); 
+        });
 
         /// <summary>
         /// Get the tile at a location.

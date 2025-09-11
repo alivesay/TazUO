@@ -474,6 +474,9 @@ namespace ClassicUO.LegionScripting
                 ScriptSource source = script.pythonEngine.CreateScriptSourceFromString(script.FileContentsJoined, script.FullPath, SourceCodeKind.File);
                 source?.Execute(script.pythonScope);
             }
+            catch (ThreadInterruptedException)
+            {
+            }
             catch (ThreadAbortException)
             {
             }

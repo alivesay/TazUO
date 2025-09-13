@@ -508,12 +508,29 @@ namespace ClassicUO
         private static void CopyRequiredLibs()
         {
             string nativePath = Path.Combine(AppContext.BaseDirectory, GetPlatformFolder());
-            if(Path.Exists(nativePath))
+            if(Directory.Exists(nativePath))
                 foreach (var file in Directory.GetFiles(nativePath))
                 {
                     var path = Path.Combine(AppContext.BaseDirectory, Path.GetFileName(file));
-                    if (!File.Exists(path))
-                        File.Copy(file, path, overwrite: true);
+                    bool copy = !File.Exists(path);
+
+                    if (!copy) //If file exists, see if they are *most likely* the same file
+                    {
+                        FileInfo existing = new(path);
+                        FileInfo newFile = new(file);
+
+                        if(existing.Length != newFile.Length)
+                            copy = true;
+                    }
+
+                    if (copy)
+                    {
+                        try
+                        {
+                            File.Copy(file, path, overwrite: true);
+                        }
+                        catch { }
+                    }
                 }
         }
 

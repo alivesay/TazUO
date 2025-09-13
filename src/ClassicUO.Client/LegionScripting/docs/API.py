@@ -120,6 +120,15 @@ class PyItem:
     Container: int = None
     __class__: str = None
 
+class PyJournalEntry:
+    Hue: int = None
+    Name: str = None
+    Text: str = None
+    TextType = None
+    Time: datetime = None
+    MessageType = None
+    Disposed: bool = None
+
 class PyLand:
     __class__: str = None
 

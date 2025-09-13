@@ -17,6 +17,7 @@ using Microsoft.Scripting.Hosting;
 using static ClassicUO.LegionScripting.Commands;
 using static ClassicUO.LegionScripting.Expressions;
 using System.Text.Json.Serialization;
+using ClassicUO.LegionScripting.PyClasses;
 using Microsoft.Scripting;
 
 namespace ClassicUO.LegionScripting
@@ -159,7 +160,14 @@ namespace ClassicUO.LegionScripting
                 if (script.ScriptType == ScriptType.LegionScript)
                     script.GetScript?.JournalEntryAdded(e);
                 else
-                    script.scopedAPI?.JournalEntries.Enqueue(e);
+                {
+                    script.scopedAPI?.JournalEntries.Enqueue(new PyJournalEntry(e));
+
+                    while (script.scopedAPI?.JournalEntries.Count > ProfileManager.CurrentProfile.MaxJournalEntries)
+                    {
+                        script.scopedAPI?.JournalEntries.TryDequeue(out _);
+                    }
+                }
             }
         }
 

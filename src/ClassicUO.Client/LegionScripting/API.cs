@@ -93,12 +93,12 @@ namespace ClassicUO.LegionScripting
         #endregion
 
         private ConcurrentBag<uint> ignoreList = new();
-        private ConcurrentQueue<JournalEntry> journalEntries = new();
+        private ConcurrentQueue<PyJournalEntry> journalEntries = new();
         private World World = Client.Game.UO.World;
         private Item backpack;
         private PlayerMobile player;
 
-        public ConcurrentQueue<JournalEntry> JournalEntries
+        public ConcurrentQueue<PyJournalEntry> JournalEntries
         {
             get { return journalEntries; }
         }
@@ -1921,7 +1921,7 @@ namespace ClassicUO.LegionScripting
         {
             foreach (uint s in serials)
                 World.OPL.Contains(s); //Check if it already exists, if not request it
-        });        
+        });
 
         /// <summary>
         /// Check if a player has a server gump. Leave blank to check if they have any server gump.
@@ -2292,7 +2292,7 @@ namespace ClassicUO.LegionScripting
             }
             else
             {
-                ConcurrentQueue<JournalEntry> newQueue = new ();
+                ConcurrentQueue<PyJournalEntry> newQueue = new ();
 
                 foreach (var je in JournalEntries.ToArray())
                 {
@@ -2564,17 +2564,17 @@ namespace ClassicUO.LegionScripting
         /// <param name="graphic">Optional graphic ID to filter by</param>
         /// <param name="distance">Optional maximum distance from player</param>
         /// <returns></returns>
-        public PyMobile[] GetAllMobiles(ushort? graphic = null, int? distance = null) => MainThreadQueue.InvokeOnMainThread(() => 
-        { 
+        public PyMobile[] GetAllMobiles(ushort? graphic = null, int? distance = null) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
             var mobiles = World.Mobiles.Values.AsEnumerable();
-            
+
             if (graphic.HasValue)
                 mobiles = mobiles.Where(m => m.Graphic == graphic.Value);
-                
+
             if (distance.HasValue)
                 mobiles = mobiles.Where(m => m.Distance <= distance.Value);
-                
-            return mobiles.Select(m => new PyMobile(m)).ToArray(); 
+
+            return mobiles.Select(m => new PyMobile(m)).ToArray();
         });
 
         /// <summary>

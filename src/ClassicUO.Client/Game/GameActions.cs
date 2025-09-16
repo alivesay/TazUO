@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+﻿// SPDX-License-Identifier: BSD-2-Clause
 using System;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
@@ -47,7 +47,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no durability gump was open</returns>
     internal static bool CloseDurabilityGump()
@@ -74,7 +74,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no nearby loot gump was open</returns>
     internal static bool CloseLegionScriptingGump()
@@ -91,7 +91,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no nearby loot gump was open</returns>
     internal static bool CloseNearbyLootGump()
@@ -121,7 +121,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="serial"></param>
     /// <returns>False if no paperdoll is open</returns>
@@ -179,7 +179,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no settings are open</returns>
     internal static bool CloseSettings()
@@ -225,7 +225,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no status gump open</returns>
     internal static bool CloseStatusBar()
@@ -246,7 +246,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no journals were open</returns>
     internal static bool CloseAllJournals()
@@ -265,7 +265,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="type"></param>
     /// <returns>False if no spell books of that type were open</returns>
@@ -286,7 +286,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no skill gumps were open</returns>
     internal static bool CloseSkills()
@@ -336,7 +336,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no mini map open</returns>
     internal static bool CloseMiniMap()
@@ -383,7 +383,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no world map is open</returns>
     internal static bool CloseWorldMap()
@@ -417,7 +417,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no chat was open</returns>
     internal static bool CloseChat()
@@ -484,7 +484,7 @@ internal static class GameActions
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns>False if no backpack was opened</returns>
     internal static bool CloseBackpack(World world)
@@ -691,7 +691,7 @@ internal static class GameActions
 
 
     internal static void Print(string message, ushort hue = 946, MessageType type = MessageType.Regular, byte font = 3, bool unicode = true) => Print(World.Instance, message, hue, type, font, unicode);
-    
+
     internal static void Print(World world, string message, ushort hue = 946, MessageType type = MessageType.Regular, byte font = 3, bool unicode = true)
     {
         if (type == MessageType.ChatSystem)
@@ -1015,15 +1015,15 @@ internal static class GameActions
             SpellVisualRangeManager.Instance.ClearCasting();
             Socket.Send_CastSpell(index);
 
-                // Record action for script recording
-                var name = SpellDefinition.FullIndexGetSpell(index).Name;
-                ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordCastSpell(name);
-                ScriptingInfoGump.AddOrUpdateInfo("Last Spell", name);
+            // Record action for script recording
+            var name = SpellDefinition.FullIndexGetSpell(index).Name;
+            ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordCastSpell(name);
+            ScriptingInfoGump.AddOrUpdateInfo("Last Spell", name);
         }
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="name">Can be a partial match</param>
     internal static bool CastSpellByName(string name)
@@ -1069,7 +1069,7 @@ internal static class GameActions
             {
                 Client.Game.GetScene<GameScene>().DisconnectionRequested = true;
                 Client.Game.SetScene(new LoginScene(world));
-                
+
                 Socket?.Disconnect();
                 Socket = new AsyncNetClient();
             }

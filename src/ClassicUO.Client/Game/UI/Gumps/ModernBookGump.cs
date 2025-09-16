@@ -122,7 +122,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             _forwardGumpPic.MouseUp += (sender, e) =>
             {
-                if (e.Button == MouseButtonType.Left && sender is Control ctrl)
+                if (e.Button == MouseButtonType.Left)
                 {
                     SetActivePage(ActivePage + 1);
                 }
@@ -130,7 +130,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             _forwardGumpPic.MouseDoubleClick += (sender, e) =>
             {
-                if (e.Button == MouseButtonType.Left && sender is Control ctrl)
+                if (e.Button == MouseButtonType.Left)
                 {
                     SetActivePage(MaxPage);
                 }
@@ -138,7 +138,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             _backwardGumpPic.MouseUp += (sender, e) =>
             {
-                if (e.Button == MouseButtonType.Left && sender is Control ctrl)
+                if (e.Button == MouseButtonType.Left)
                 {
                     SetActivePage(ActivePage - 1);
                 }
@@ -146,7 +146,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             _backwardGumpPic.MouseDoubleClick += (sender, e) =>
             {
-                if (e.Button == MouseButtonType.Left && sender is Control ctrl)
+                if (e.Button == MouseButtonType.Left)
                 {
                     SetActivePage(1);
                 }
@@ -229,6 +229,11 @@ namespace ClassicUO.Game.UI.Gumps
 
             ActivePage = 1;
             UpdatePageButtonVisibility();
+
+            // if(IsEditable)
+            // {
+            //     _bookPage.SetKeyboardFocus();
+            // }
 
             Client.Game.Audio.PlaySound(0x0055);
         }
@@ -580,6 +585,8 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     if (IsEditable)
                     {
+                        UIManager.KeyboardFocusControl = null;
+                        OnFocusEnter();
                         SetKeyboardFocus();
                     }
 

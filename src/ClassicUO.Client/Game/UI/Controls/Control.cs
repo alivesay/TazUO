@@ -26,6 +26,7 @@ namespace ClassicUO.Game.UI.Controls
         private Point _offset;
         private Control _parent;
         private float alpha = 1.0f;
+        private List<Control> _reusableDisposedList = new();
 
         protected Control(Control parent = null)
         {
@@ -376,10 +377,9 @@ namespace ClassicUO.Game.UI.Controls
                 return;
             }
 
-
             if (Children.Count != 0)
             {
-                List<Control> removalList = new List<Control>(); ;
+                bool hasDisposals = false;
                 int w = 0, h = 0;
 
                 for (int i = 0; i < Children.Count; i++)
@@ -398,7 +398,8 @@ namespace ClassicUO.Game.UI.Controls
 
                     if (c.IsDisposed)
                     {
-                        removalList.Add(c);
+                        _reusableDisposedList.Add(c);
+                        hasDisposals = true;
                         continue;
                     }
 
@@ -421,9 +422,9 @@ namespace ClassicUO.Game.UI.Controls
                     }
                 }
 
-                if (removalList.Count > 0)
+                if (hasDisposals)
                 {
-                    foreach (Control c in removalList)
+                    foreach (Control c in _reusableDisposedList)
                     {
                         if (Children.Contains(c))
                         {
@@ -431,6 +432,8 @@ namespace ClassicUO.Game.UI.Controls
                             Children.Remove(c);
                         }
                     }
+
+                    _reusableDisposedList.Clear();
                 }
 
                 if (WantUpdateSize && IsVisible)

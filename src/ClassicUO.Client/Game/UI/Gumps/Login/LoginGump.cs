@@ -570,6 +570,12 @@ namespace ClassicUO.Game.UI.Gumps.Login
                 return;
             }
 
+            if (World.Instance != null && World.Instance.InGame)
+            {
+                Dispose();
+                return;
+            }
+
             base.Update();
 
             if (_time < Time.Ticks)

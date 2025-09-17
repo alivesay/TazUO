@@ -9,6 +9,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
     {
         private readonly List<TabItem> _tabs = new();
         private int _selectedTabIndex = -1;
+        private int _preSelectIndex = -1;
         private AssistantWindow() : base("Assistant")
         {
             WindowFlags = ImGuiWindowFlags.AlwaysAutoResize;
@@ -25,7 +26,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 case AssistantGump.PAGE.None:
                     break;
                 case AssistantGump.PAGE.AutoLoot:
-                    _selectedTabIndex = 0;
+                    _preSelectIndex = 0;
                     break;
                 case AssistantGump.PAGE.AutoSell:
                     break;
@@ -46,12 +47,12 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 case AssistantGump.PAGE.DressAgent:
                     break;
                 case AssistantGump.PAGE.BandageAgent:
-                    _selectedTabIndex = 2;
+                    _preSelectIndex = 2;
                     break;
                 case AssistantGump.PAGE.FriendsList:
                     break;
                 case AssistantGump.PAGE.Organizer:
-                    _selectedTabIndex = 1;
+                    _preSelectIndex = 1;
                     break;
             }
         }
@@ -85,13 +86,16 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 return;
             }
 
+            bool open = true;
+
             // Draw tab bar
             if (ImGui.BeginTabBar("TabMenuTabs", ImGuiTabBarFlags.Reorderable))
             {
+                bool hasPreSelection = _preSelectIndex > -1;
                 for (int i = 0; i < _tabs.Count; i++)
                 {
-                    var tab = _tabs[i];
-                    if (ImGui.BeginTabItem(tab.Title))
+                    TabItem tab = _tabs[i];
+                    if (ImGui.BeginTabItem(tab.Title, ref open, (hasPreSelection && i == _preSelectIndex) ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None))
                     {
                         _selectedTabIndex = i;
                         tab.DrawContent?.Invoke();
@@ -108,6 +112,8 @@ namespace ClassicUO.Game.UI.ImGuiControls
                         ImGui.EndTabItem();
                     }
                 }
+                if (hasPreSelection)
+                    _preSelectIndex = -1;
                 ImGui.EndTabBar();
             }
         }

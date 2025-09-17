@@ -280,6 +280,7 @@ internal static class GameActions
                 g.Dispose();
                 return true;
             }
+            g = UIManager.GetGump<SpellbookGump>();
         }
 
         return false;

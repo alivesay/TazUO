@@ -1005,6 +1005,8 @@ public class WorldMapGump : ResizableGump
                 // );
                 //Pretty sure its abgr8888
                 surface = (SDL.SDL_Surface*)SDL.SDL_CreateSurface((int)bi_width, (int)bi_height, SDL.SDL_PixelFormat.SDL_PIXELFORMAT_ABGR8888);
+                // If issues arrise later, change to this and convert back down lower in method:
+                //surface = (SDL.SDL_Surface*)SDL.SDL_CreateSurface((int)bi_width, (int)bi_height, SDL.SDL_PixelFormat.SDL_PIXELFORMAT_BGRA8888);
 
                 if (bi_bit_count <= 8)
                 {
@@ -1149,7 +1151,7 @@ public class WorldMapGump : ResizableGump
                 texture.SetDataPointerEXT(0, new Rectangle(0, 0, surface->w, surface->h), surface->pixels, len);
 
                 //SDL.SDL_FreeSurface((IntPtr)surface);
-                SDL.SDL_free((IntPtr)surface);
+                SDL.SDL_DestroySurface((IntPtr)surface);
 
                 reader.Release();
 

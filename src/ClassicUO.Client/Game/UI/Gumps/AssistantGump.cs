@@ -60,7 +60,7 @@ public class AssistantGump : BaseOptionsGump
             if(e.Button == MouseButtonType.Left)
             {
                 AssistantWindow.Show();
-                AssistantWindow.Instance.SelectTab(PAGE.BandageAgent);
+                AssistantWindow.Instance.SelectTab(PAGE.AutoLoot);
             }
         };
 

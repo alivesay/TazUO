@@ -15,31 +15,31 @@ namespace ClassicUO.Input
         public static void OnKeyUp(SDL.SDL_KeyboardEvent e)
         {
             SDL.SDL_Keymod mod = e.mod & ~IgnoreKeyMod;
+            SDL.SDL_Keymod filtered = mod;
 
             if ((mod & (SDL.SDL_Keymod.SDL_KMOD_RALT | SDL.SDL_Keymod.SDL_KMOD_LCTRL)) == (SDL.SDL_Keymod.SDL_KMOD_RALT | SDL.SDL_Keymod.SDL_KMOD_LCTRL))
             {
-                e.key = (uint)SDL.SDL_Keycode.SDLK_UNKNOWN;
-                e.mod = SDL.SDL_Keymod.SDL_KMOD_NONE;
+                filtered = SDL.SDL_Keymod.SDL_KMOD_NONE;
             }
 
-            Shift = (e.mod & SDL.SDL_Keymod.SDL_KMOD_SHIFT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
-            Alt = (e.mod & SDL.SDL_Keymod.SDL_KMOD_ALT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
-            Ctrl = (e.mod & SDL.SDL_Keymod.SDL_KMOD_CTRL) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+            Shift = (filtered & SDL.SDL_Keymod.SDL_KMOD_SHIFT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+            Alt = (filtered & SDL.SDL_Keymod.SDL_KMOD_ALT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+            Ctrl = (filtered & SDL.SDL_Keymod.SDL_KMOD_CTRL) != SDL.SDL_Keymod.SDL_KMOD_NONE;
         }
 
         public static void OnKeyDown(SDL.SDL_KeyboardEvent e)
         {
             SDL.SDL_Keymod mod = e.mod & ~IgnoreKeyMod;
+            SDL.SDL_Keymod filtered = mod;
 
             if ((mod & (SDL.SDL_Keymod.SDL_KMOD_RALT | SDL.SDL_Keymod.SDL_KMOD_LCTRL)) == (SDL.SDL_Keymod.SDL_KMOD_RALT | SDL.SDL_Keymod.SDL_KMOD_LCTRL))
             {
-                e.key = (uint)SDL.SDL_Keycode.SDLK_UNKNOWN;
-                e.mod = SDL.SDL_Keymod.SDL_KMOD_NONE;
+                filtered = SDL.SDL_Keymod.SDL_KMOD_NONE;
             }
 
-            Shift = (e.mod & SDL.SDL_Keymod.SDL_KMOD_SHIFT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
-            Alt = (e.mod & SDL.SDL_Keymod.SDL_KMOD_ALT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
-            Ctrl = (e.mod & SDL.SDL_Keymod.SDL_KMOD_CTRL) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+            Shift = (filtered & SDL.SDL_Keymod.SDL_KMOD_SHIFT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+            Alt = (filtered & SDL.SDL_Keymod.SDL_KMOD_ALT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+            Ctrl = (filtered & SDL.SDL_Keymod.SDL_KMOD_CTRL) != SDL.SDL_Keymod.SDL_KMOD_NONE;
         }
     }
 }

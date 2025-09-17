@@ -105,7 +105,7 @@ namespace ClassicUO.Game.Managers
         {
             List<Macro> list = GetAllMacros();
 
-            string tempPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
+            string tempPath = Path.GetTempFileName();
             string path = Path.Combine(ProfileManager.ProfilePath, "macros.xml");
 
             if (!File.Exists(tempPath))

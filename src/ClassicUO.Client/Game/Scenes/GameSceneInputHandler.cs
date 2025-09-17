@@ -1325,8 +1325,6 @@ namespace ClassicUO.Game.Scenes
                 return;
             }
 
-            SpellBarManager.KeyPress(key, e.mod);
-
             if (key == SDL.SDL_Keycode.SDLK_ESCAPE && _world.TargetManager.IsTargeting)
             {
                 _world.TargetManager.CancelTarget();

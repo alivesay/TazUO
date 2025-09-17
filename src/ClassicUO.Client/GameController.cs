@@ -470,19 +470,6 @@ namespace ClassicUO
                 }
             }
 
-
-            for (var i = _queuedActions.Count - 1; i >= 0; i--)
-            {
-                (var time, var fn) = _queuedActions[i];
-
-                if (Time.Ticks > time)
-                {
-                    fn();
-                    _queuedActions.RemoveAt(i);
-                    break;
-                }
-            }
-
             base.Update(gameTime);
         }
 
@@ -901,7 +888,7 @@ namespace ClassicUO
                     else if (sdlEvent->gbutton.button == (byte)SDL.SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_STICK)
                     {
                         SDL_Event e = new();
-                        e.type = (uint)SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP;
+                        e.type = (uint)SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN;
                         e.button.button = (byte)MouseButtonType.Right;
                         SDL_PushEvent(ref e);
                     }
@@ -938,7 +925,7 @@ namespace ClassicUO
                     else if (sdlEvent->gbutton.button == (byte)SDL.SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_STICK)
                     {
                         SDL_Event e = new();
-                        e.type = (uint)SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN;
+                        e.type = (uint)SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP;
                         e.button.button = (byte)MouseButtonType.Right;
                         SDL_PushEvent(ref e);
                     }

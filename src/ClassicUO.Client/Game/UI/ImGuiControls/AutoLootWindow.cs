@@ -203,9 +203,8 @@ namespace ClassicUO.Game.UI.ImGuiControls
             if (lootEntries.Count == 0)
             {
                 ImGui.Text("No entries configured");
-                return;
             }
-
+            else
             // Table headers
             if (ImGui.BeginTable("AutoLootTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, 200)))
             {

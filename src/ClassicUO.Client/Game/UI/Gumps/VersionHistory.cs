@@ -10,6 +10,39 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private static string[] updateTexts =
         {
+            "/c[white][4.7.0]/cd\n" +
+            """
+            - Upgraded to latest FNA and SDL(Major changes on backend)
+            - Added missing shortblade abilities
+            - Autoloot is now in the new assistant menu
+
+            ## Other
+            - Better crash report information regarding OS and .Net frameworks
+            - Better url handling for opening links in the browser
+            - Added action delay config to autoloot menu
+            - Added option to block dismount in warmode
+
+            ## LegionPy
+            - Added disable module cache option to menu
+            - Minor back-end changes to python engine
+            - Fix for legion py imports - nesci
+            - Added optional graphic and distance to GetAllMobiles method
+            - Changed Legion Py journals to use a py specific journal entry
+            - Enforce max journal entries limitation on legion py journal entries(User-chosen max journal entries)
+
+            - Fixed script recorder using API.Cast instead of CastSpell
+
+            ## Bug fixes
+            - Added some safety net for a rare crash while saving anchored gumps
+            - Fix for ImGui display size occasional crash
+            - Fix for a crash during python script execution
+            - Fix for parrots on OSI - BCrowly
+            - Potential high memory usage with a lot of UI controls open
+            - Fix login gump still showing after logging in sometimes
+            - Fix books not allowing you to type when you first open them
+            """ +
+            "\n",
+
             "/c[white][4.5.0]/cd\n" +
             """
             - Check for yellow hits before bandaging
@@ -24,8 +57,8 @@ namespace ClassicUO.Game.UI.Gumps
             - Improved nameplate jumping when moving and using avoid overlap
             - Fix chat command hue
             """ +
-            "\n"
-            ,
+            "\n",
+
             "/c[white][4.4.0]/cd\n" +
             """
             - Improved draw times for mobiles
@@ -289,16 +322,7 @@ namespace ClassicUO.Game.UI.Gumps
             "- Bug fix for floating damage numbers\n" +
             "- Bug fix for health line color\n" +
             "- Fix skill progress bar positioning\n",
-            "/c[white][3.10.0]/cd\n" +
-            "- Added the option to download a spell indicator config from an external source\n" +
-            "- Added a simple auto loot system\n" +
-            "- Updated to ClassicUO's latest version\n" +
-            "- Auto sort is container specific now\n" +
-            "- InfoBar can now be resized and is using the new font rendering system\n" +
-            "- InfoBar font and font size can be customized now (TazUO->Misc)\n" +
-            "- Journal will now remember the last tab you were on\n" +
-            "- Upgraded item comparisons, see wiki on tooltip overrides for more info\n" +
-            "- Spell indicators can now be overridden with a per-character config",
+
             "\n\n/c[white]For further history please visit our discord."
         };
 

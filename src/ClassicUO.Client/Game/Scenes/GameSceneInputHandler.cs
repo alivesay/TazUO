@@ -932,6 +932,9 @@ namespace ClassicUO.Game.Scenes
                     }
                     else
                     {
+                        if (mob == _world.Player && _world.Player.InWarMode && ProfileManager.CurrentProfile.DisableDismountInWarMode)
+                            break;
+
                         GameActions.DoubleClick(_world, mob);
                     }
 

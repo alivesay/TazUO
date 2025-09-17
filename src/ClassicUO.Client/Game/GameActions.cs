@@ -13,7 +13,6 @@ using ClassicUO.Network;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
-using System;
 using static ClassicUO.Network.AsyncNetClient;
 
 namespace ClassicUO.Game;

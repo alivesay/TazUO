@@ -224,7 +224,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 case ButtonType.PlotCourse:
                 case ButtonType.StopPlotting:
-                    NetClient.Socket.Send_MapMessage(LocalSerial,
+                    AsyncNetClient.Socket.Send_MapMessage(LocalSerial,
                                                      6,
                                                      (byte)PlotState,
                                                      unchecked((ushort)-24),
@@ -235,7 +235,7 @@ namespace ClassicUO.Game.UI.Gumps
                     break;
 
                 case ButtonType.ClearCourse:
-                    NetClient.Socket.Send_MapMessage(LocalSerial,
+                    AsyncNetClient.Socket.Send_MapMessage(LocalSerial,
                                                      5,
                                                      0,
                                                      unchecked((ushort)-24),
@@ -294,7 +294,7 @@ namespace ClassicUO.Game.UI.Gumps
                     ushort x = (ushort)(e.X + 5);
                     ushort y = (ushort)e.Y;
 
-                    NetClient.Socket.Send_MapMessage(LocalSerial,
+                    AsyncNetClient.Socket.Send_MapMessage(LocalSerial,
                                                      1,
                                                      0,
                                                      x,

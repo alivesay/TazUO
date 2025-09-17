@@ -168,7 +168,7 @@ sealed class PacketHandlers
             return false;
         }
 
-        packetLen = NetClient.PacketsTable.GetPacketLength(packetID = buffer[0]);
+        packetLen = AsyncNetClient.PacketsTable.GetPacketLength(packetID = buffer[0]);
         packetOffset = 1;
 
         if (packetLen == -1)
@@ -322,14 +322,14 @@ sealed class PacketHandlers
             {
                 if (Handler._clilocRequests.Count != 0)
                 {
-                    NetClient.Socket.Send_MegaClilocRequest(Handler._clilocRequests);
+                    AsyncNetClient.Socket.Send_MegaClilocRequest(Handler._clilocRequests);
                 }
             }
             else
             {
                 foreach (uint serial in Handler._clilocRequests)
                 {
-                    NetClient.Socket.Send_MegaClilocRequest_Old(serial);
+                    AsyncNetClient.Socket.Send_MegaClilocRequest_Old(serial);
                 }
 
                 Handler._clilocRequests.Clear();
@@ -340,7 +340,7 @@ sealed class PacketHandlers
         {
             for (int i = 0; i < Handler._customHouseRequests.Count; ++i)
             {
-                NetClient.Socket.Send_CustomHouseDataRequest(Handler._customHouseRequests[i]);
+                AsyncNetClient.Socket.Send_CustomHouseDataRequest(Handler._customHouseRequests[i]);
             }
 
             Handler._customHouseRequests.Clear();
@@ -941,19 +941,19 @@ sealed class PacketHandlers
         {
             if (ProfileManager.CurrentProfile != null)
             {
-                NetClient.Socket.Send_GameWindowSize(
+                AsyncNetClient.Socket.Send_GameWindowSize(
                     (uint)Client.Game.Scene.Camera.Bounds.Width,
                     (uint)Client.Game.Scene.Camera.Bounds.Height
                 );
             }
 
-            NetClient.Socket.Send_Language(Settings.GlobalSettings.Language);
+            AsyncNetClient.Socket.Send_Language(Settings.GlobalSettings.Language);
         }
 
-        NetClient.Socket.Send_ClientVersion(Settings.GlobalSettings.ClientVersion);
+        AsyncNetClient.Socket.Send_ClientVersion(Settings.GlobalSettings.ClientVersion);
 
         GameActions.SingleClick(world, world.Player);
-        NetClient.Socket.Send_SkillsRequest(world.Player.Serial);
+        AsyncNetClient.Socket.Send_SkillsRequest(world.Player.Serial);
 
         if (world.Player.IsDead)
         {
@@ -965,13 +965,13 @@ sealed class PacketHandlers
             && ProfileManager.CurrentProfile != null
         )
         {
-            NetClient.Socket.Send_ShowPublicHouseContent(
+            AsyncNetClient.Socket.Send_ShowPublicHouseContent(
                 ProfileManager.CurrentProfile.ShowHouseContent
             );
         }
 
-        NetClient.Socket.Send_ToPlugins_AllSkills();
-        NetClient.Socket.Send_ToPlugins_AllSpells();
+        AsyncNetClient.Socket.Send_ToPlugins_AllSkills();
+        AsyncNetClient.Socket.Send_ToPlugins_AllSpells();
     }
 
     private static void Talk(World world, ref StackDataReader p)
@@ -1004,7 +1004,7 @@ sealed class PacketHandlers
             && name.StartsWith("SYSTEM")
         )
         {
-            NetClient.Socket.Send_ACKTalk();
+            AsyncNetClient.Socket.Send_ACKTalk();
 
             return;
         }
@@ -2351,19 +2351,19 @@ sealed class PacketHandlers
             LoginGump.Instance?.Dispose();
 
             GameActions.RequestMobileStatus(world, world.Player);
-            NetClient.Socket.Send_OpenChat("");
+            AsyncNetClient.Socket.Send_OpenChat("");
 
-            NetClient.Socket.Send_SkillsRequest(world.Player);
+            AsyncNetClient.Socket.Send_SkillsRequest(world.Player);
             scene.DoubleClickDelayed(world.Player | 0x8000_0000);
 
             if (Client.Game.UO.Version >= Utility.ClientVersion.CV_306E)
             {
-                NetClient.Socket.Send_ClientType();
+                AsyncNetClient.Socket.Send_ClientType();
             }
 
             if (Client.Game.UO.Version >= Utility.ClientVersion.CV_305D)
             {
-                NetClient.Socket.Send_ClientViewRange(world.ClientViewRange);
+                AsyncNetClient.Socket.Send_ClientViewRange(world.ClientViewRange);
             }
 
             // Reset the global action cooldown here because, for some reason, immediately
@@ -2786,7 +2786,7 @@ sealed class PacketHandlers
 
     private static void Ping(World world, ref StackDataReader p)
     {
-        NetClient.Socket.Statistics.PingReceived(p.ReadUInt8());
+        AsyncNetClient.Socket.Statistics.PingReceived(p.ReadUInt8());
     }
 
     private static void BuyList(World world, ref StackDataReader p)
@@ -3376,7 +3376,7 @@ sealed class PacketHandlers
                 }
             );
 
-            NetClient.Socket.Send_BookPageDataRequest(serial, 1);
+            AsyncNetClient.Socket.Send_BookPageDataRequest(serial, 1);
         }
         else
         {
@@ -3838,7 +3838,7 @@ sealed class PacketHandlers
                     0x00
             };
 
-            NetClient.Socket.Send(buffer);
+            AsyncNetClient.Socket.Send(buffer);
 
             return;
         }
@@ -4050,7 +4050,7 @@ sealed class PacketHandlers
                 p.Skip(4);
                 string username = p.ReadUnicodeBE();
                 world.ChatManager.ChatIsEnabled = ChatStatus.Enabled;
-                NetClient.Socket.Send_ChatJoinCommand("General");
+                AsyncNetClient.Socket.Send_ChatJoinCommand("General");
 
                 break;
 
@@ -4297,7 +4297,7 @@ sealed class PacketHandlers
 
     private static void ClientVersion(World world, ref StackDataReader p)
     {
-        NetClient.Socket.Send_ClientVersion(Settings.GlobalSettings.ClientVersion);
+        AsyncNetClient.Socket.Send_ClientVersion(Settings.GlobalSettings.ClientVersion);
     }
 
     private static void AssistVersion(World world, ref StackDataReader p)
@@ -4519,7 +4519,7 @@ sealed class PacketHandlers
 
                 strBuffer.Dispose();
 
-                NetClient.Socket.Send_MegaClilocRequest_Old(item);
+                AsyncNetClient.Socket.Send_MegaClilocRequest_Old(item);
 
                 break;
 
@@ -5076,7 +5076,7 @@ sealed class PacketHandlers
                 if (p.ReadBool())
                 {
                     // client can disconnect
-                    NetClient.Socket.Disconnect().Wait();
+                    AsyncNetClient.Socket.Disconnect().Wait();
                     Client.Game.SetScene(new LoginScene(world));
                 }
                 else
@@ -5920,7 +5920,7 @@ sealed class PacketHandlers
                 Client.Game.EnqueueAction(5000, () =>
                 {
                     Log.Info("Razor ACK sent");
-                    NetClient.Socket.Send_RazorACK();
+                    AsyncNetClient.Socket.Send_RazorACK();
                 });
 
                 break;
@@ -6353,7 +6353,7 @@ sealed class PacketHandlers
 
             if (gump != null)
             {
-                NetClient.Socket.Send_BulletinBoardRequestMessageSummary(
+                AsyncNetClient.Socket.Send_BulletinBoardRequestMessageSummary(
                     containerSerial,
                     serial
                 );

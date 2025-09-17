@@ -666,11 +666,11 @@ namespace ClassicUO.Game.Managers
 
                         if (type == CUSTOM_HOUSE_BUILD_TYPE.CHBT_ROOF)
                         {
-                            NetClient.Socket.Send_CustomHouseDeleteRoof(_world, place.Graphic, place.X - foundationItem.X, place.Y - foundationItem.Y, z);
+                            AsyncNetClient.Socket.Send_CustomHouseDeleteRoof(_world, place.Graphic, place.X - foundationItem.X, place.Y - foundationItem.Y, z);
                         }
                         else
                         {
-                            NetClient.Socket.Send_CustomHouseDeleteItem(_world, place.Graphic, place.X - foundationItem.X, place.Y - foundationItem.Y, z);
+                            AsyncNetClient.Socket.Send_CustomHouseDeleteItem(_world, place.Graphic, place.X - foundationItem.X, place.Y - foundationItem.Y, z);
                         }
 
                             foreach (Multi multiObject in multi.ToList())
@@ -724,7 +724,7 @@ namespace ClassicUO.Game.Managers
 
                                 if (graphic != 0)
                                 {
-                                    NetClient.Socket.Send_CustomHouseAddStair(_world, graphic, placeX - foundationItem.X, placeY - foundationItem.Y);
+                                    AsyncNetClient.Socket.Send_CustomHouseAddStair(_world, graphic, placeX - foundationItem.X, placeY - foundationItem.Y);
                                 }
                             }
                         }
@@ -798,11 +798,11 @@ namespace ClassicUO.Game.Managers
 
                                 if (type == CUSTOM_HOUSE_BUILD_TYPE.CHBT_ROOF)
                                 {
-                                    NetClient.Socket.Send_CustomHouseAddRoof(_world, item.Graphic, x, y, item.Z);
+                                    AsyncNetClient.Socket.Send_CustomHouseAddRoof(_world, item.Graphic, x, y, item.Z);
                                 }
                                 else
                                 {
-                                    NetClient.Socket.Send_CustomHouseAddItem(_world, item.Graphic, x, y);
+                                    AsyncNetClient.Socket.Send_CustomHouseAddItem(_world, item.Graphic, x, y);
                                 }
                             }
                         }

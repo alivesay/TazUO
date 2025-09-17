@@ -192,7 +192,7 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         if ((ushort) ((GumpPic) sender).LocalSerial == 0x5DDA && World.Player.Race == RaceType.GARGOYLE)
                         {
-                            NetClient.Socket.Send_ToggleGargoyleFlying();
+                            AsyncNetClient.Socket.Send_ToggleGargoyleFlying();
                             e.Result = true;
                         }
                     };

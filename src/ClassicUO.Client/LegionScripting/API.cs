@@ -441,8 +441,8 @@ namespace ClassicUO.LegionScripting
         (() =>
             {
                 PopupMenuGump.CloseNext = serial;
-                NetClient.Socket.Send_RequestPopupMenu(serial);
-                NetClient.Socket.Send_PopupMenuSelection(serial, entry);
+                AsyncNetClient.Socket.Send_RequestPopupMenu(serial);
+                AsyncNetClient.Socket.Send_PopupMenuSelection(serial, entry);
             }
         );
 
@@ -815,11 +815,11 @@ namespace ClassicUO.LegionScripting
             {
                 if (World.MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
                 {
-                    NetClient.Socket.Send_ASCIIPromptResponse(World, message, message.Length < 1);
+                    AsyncNetClient.Socket.Send_ASCIIPromptResponse(World, message, message.Length < 1);
                 }
                 else if (World.MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
                 {
-                    NetClient.Socket.Send_UnicodePromptResponse(World, message, Settings.GlobalSettings.Language, message.Length < 1);
+                    AsyncNetClient.Socket.Send_UnicodePromptResponse(World, message, Settings.GlobalSettings.Language, message.Length < 1);
                 }
 
                 World.MessageManager.PromptData = default;
@@ -2090,7 +2090,7 @@ namespace ClassicUO.LegionScripting
         (() =>
             {
                 if (World.Player.Race == RaceType.GARGOYLE)
-                    NetClient.Socket.Send_ToggleGargoyleFlying();
+                    AsyncNetClient.Socket.Send_ToggleGargoyleFlying();
             }
         );
 
@@ -2113,9 +2113,9 @@ namespace ClassicUO.LegionScripting
 
                         case "secondary": GameActions.UseSecondaryAbility(World); break;
 
-                        case "stun": NetClient.Socket.Send_StunRequest(); break;
+                        case "stun": AsyncNetClient.Socket.Send_StunRequest(); break;
 
-                        case "disarm": NetClient.Socket.Send_DisarmRequest(); break;
+                        case "disarm": AsyncNetClient.Socket.Send_DisarmRequest(); break;
                     }
                 }
             );
@@ -2387,9 +2387,9 @@ namespace ClassicUO.LegionScripting
         {
             switch (virtue.ToLower())
             {
-                case "honor": MainThreadQueue.InvokeOnMainThread(() => { NetClient.Socket.Send_InvokeVirtueRequest(0x01); }); break;
-                case "sacrifice": MainThreadQueue.InvokeOnMainThread(() => { NetClient.Socket.Send_InvokeVirtueRequest(0x02); }); break;
-                case "valor": MainThreadQueue.InvokeOnMainThread(() => { NetClient.Socket.Send_InvokeVirtueRequest(0x03); }); break;
+                case "honor": MainThreadQueue.InvokeOnMainThread(() => { AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x01); }); break;
+                case "sacrifice": MainThreadQueue.InvokeOnMainThread(() => { AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x02); }); break;
+                case "valor": MainThreadQueue.InvokeOnMainThread(() => { AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x03); }); break;
             }
         }
 

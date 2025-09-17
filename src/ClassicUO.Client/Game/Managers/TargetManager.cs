@@ -126,7 +126,7 @@ namespace ClassicUO.Game.Managers
             IsSet = false;
         }
     }
-    
+
     public class AutoTargetInfo
     {
         public uint TargetSerial { get; set; }
@@ -284,7 +284,7 @@ namespace ClassicUO.Game.Managers
 
             if (IsTargeting || TargetingType == TargetType.Cancel)
             {
-                NetClient.Socket.Send_TargetCancel(TargetingState, _targetCursorId, (byte)TargetingType);
+                AsyncNetClient.Socket.Send_TargetCancel(TargetingState, _targetCursorId, (byte)TargetingType);
                 IsTargeting = false;
             }
 
@@ -375,7 +375,7 @@ namespace ClassicUO.Game.Managers
                                         {
                                             if (s)
                                             {
-                                                NetClient.Socket.Send_TargetObject(entity,
+                                                AsyncNetClient.Socket.Send_TargetObject(entity,
                                                                                    entity.Graphic,
                                                                                    entity.X,
                                                                                    entity.Y,
@@ -431,7 +431,7 @@ namespace ClassicUO.Game.Managers
                             _lastDataBuffer[18] = (byte)entity.Graphic;
 
 
-                            NetClient.Socket.Send_TargetObject(entity,
+                            AsyncNetClient.Socket.Send_TargetObject(entity,
                                                                entity.Graphic,
                                                                entity.X,
                                                                entity.Y,
@@ -489,8 +489,6 @@ namespace ClassicUO.Game.Managers
                         }
 
                         ClearTargetingWithoutTargetCancelPacket();
-
-                        return;
 
                         return;
                     case CursorTarget.SetFavoriteMoveBag:
@@ -610,7 +608,7 @@ namespace ClassicUO.Game.Managers
             _lastDataBuffer[5] = (byte)_targetCursorId;
             _lastDataBuffer[6] = (byte)TargetingType;
 
-            NetClient.Socket.Send(_lastDataBuffer);
+            AsyncNetClient.Socket.Send(_lastDataBuffer);
             Mouse.CancelDoubleClick = true;
             ClearTargetingWithoutTargetCancelPacket();
         }
@@ -652,7 +650,7 @@ namespace ClassicUO.Game.Managers
 
 
 
-            NetClient.Socket.Send_TargetXYZ(graphic,
+            AsyncNetClient.Socket.Send_TargetXYZ(graphic,
                                             x,
                                             y,
                                             z,

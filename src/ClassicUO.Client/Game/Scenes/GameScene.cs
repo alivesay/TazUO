@@ -205,7 +205,7 @@ namespace ClassicUO.Game.Scenes
                 TopBarGump.Create(_world);
             }
 
-            NetClient.Socket.Disconnected += SocketOnDisconnected;
+            AsyncNetClient.Socket.Disconnected += SocketOnDisconnected;
             EventSink.MessageReceived += ChatOnMessageReceived;
             UIManager.ContainerScale = ProfileManager.CurrentProfile.ContainersScale / 100f;
 
@@ -435,8 +435,8 @@ namespace ClassicUO.Game.Scenes
 
             StaticFilters.CleanTreeTextures();
 
-            NetClient.Socket.Disconnected -= SocketOnDisconnected;
-            NetClient.Socket.Disconnect();
+            AsyncNetClient.Socket.Disconnected -= SocketOnDisconnected;
+            AsyncNetClient.Socket.Disconnect();
             _light_render_target?.Dispose();
             _world_render_target?.Dispose();
             _xbr?.Dispose();
@@ -846,14 +846,14 @@ namespace ClassicUO.Game.Scenes
 
             if (Time.Ticks > _timePing)
             {
-                NetClient.Socket.Statistics.SendPing();
+                AsyncNetClient.Socket.Statistics.SendPing();
                 _timePing = (long)Time.Ticks + 1000;
             }
 
-            if (currentProfile.ForceResyncOnHang && Time.Ticks - NetClient.Socket.Statistics.LastPingReceived > 5000 && Time.Ticks - _lastResync > 5000)
+            if (currentProfile.ForceResyncOnHang && Time.Ticks - AsyncNetClient.Socket.Statistics.LastPingReceived > 5000 && Time.Ticks - _lastResync > 5000)
             {
                 //Last ping > ~5 seconds
-                NetClient.Socket.Send_Resync();
+                AsyncNetClient.Socket.Send_Resync();
                 _lastResync = Time.Ticks;
                 GameActions.Print(_world, "Possible connection hang, resync attempted", 32, MessageType.System);
             }

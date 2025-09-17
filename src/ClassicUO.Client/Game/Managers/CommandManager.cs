@@ -7,17 +7,10 @@ using ClassicUO.Game.GameObjects;
 using ClassicUO.Input;
 using ClassicUO.Resources;
 using ClassicUO.Utility.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Configuration;
-using ClassicUO.LegionScripting;
-using ClassicUO.Game.UI.Gumps.SpellBar;
 using ClassicUO.LegionScripting;
 
 namespace ClassicUO.Game.Managers
@@ -31,7 +24,7 @@ namespace ClassicUO.Game.Managers
 
         public CommandManager(World world)
         {
-            _world = world; 
+            _world = world;
         }
 
         public void Initialize()

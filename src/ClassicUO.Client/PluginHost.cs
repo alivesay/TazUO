@@ -220,7 +220,7 @@ namespace ClassicUO
 
         static short getPacketLength(int id)
         {
-            return NetClient.PacketsTable.GetPacketLength(id);
+            return AsyncNetClient.PacketsTable.GetPacketLength(id);
         }
 
         static void setWindowTitle(IntPtr ptr)

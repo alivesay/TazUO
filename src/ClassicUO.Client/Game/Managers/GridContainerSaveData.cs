@@ -245,6 +245,7 @@ public class GridContainerSaveData
         }
         catch (Exception e)
         {
+            Log.Error(e.ToString());
             return false;
         }
     }

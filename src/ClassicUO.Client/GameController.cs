@@ -150,6 +150,30 @@ namespace ClassicUO
             // TODO: temporary fix to avoid crash when laoding plugins
             Settings.GlobalSettings.Encryption = (byte)AsyncNetClient.Load(UO.FileManager.Version, (EncryptionType)Settings.GlobalSettings.Encryption);
 
+            LoadPlugins();
+
+            UIManager.World = UO.World;
+
+            SetScene(new LoginScene(UO.World));
+#endif
+            SetWindowPositionBySettings();
+            new DiscordManager(UO.World); //Instance is set inside the constructor
+            DiscordManager.Instance.FromSavedToken();
+        }
+
+        private void LoadPlugins()
+        {
+            try
+            {
+                var artInfo = new CUO_API.ArtInfo();
+            }
+            catch
+            {
+                Log.Warn("CUO_API not available, skipping plugin loading.");
+                PluginHost = null;
+                return;
+            }
+
             Log.Trace("Loading plugins...");
             PluginHost?.Initialize();
 
@@ -160,14 +184,6 @@ namespace ClassicUO
             }
 
             Log.Trace("Done!");
-
-            UIManager.World = UO.World;
-
-            SetScene(new LoginScene(UO.World));
-#endif
-            SetWindowPositionBySettings();
-            new DiscordManager(UO.World); //Instance is set inside the constructor
-            DiscordManager.Instance.FromSavedToken();
         }
 
         protected override void UnloadContent()
@@ -183,7 +199,7 @@ namespace ClassicUO
             Audio?.StopMusic();
             Settings.GlobalSettings.Save();
 
-            if(_pluginsInitialized)
+            if (_pluginsInitialized)
                 Plugin.OnClosing();
 
             UO.Unload();
@@ -549,6 +565,12 @@ namespace ClassicUO
 
         private bool HandleSdlEvent(IntPtr userdata, SDL_Event* sdlEvent)
         {
+            if (sdlEvent == null)
+            {
+                Log.Error("SDL Event was null, this is an unexpected error.");
+                return false;
+            }
+            
             switch ((SDL_EventType)sdlEvent->type)
             {
                 case SDL_EventType.SDL_EVENT_AUDIO_DEVICE_ADDED:
@@ -568,12 +590,12 @@ namespace ClassicUO
                     break;
 
                 case SDL_EventType.SDL_EVENT_WINDOW_FOCUS_GAINED:
-                    if(_pluginsInitialized)
+                    if (_pluginsInitialized)
                         Plugin.OnFocusGained();
                     break;
 
                 case SDL_EventType.SDL_EVENT_WINDOW_FOCUS_LOST:
-                    if(_pluginsInitialized)
+                    if (_pluginsInitialized)
                         Plugin.OnFocusLost();
                     break;
 
@@ -705,7 +727,7 @@ namespace ClassicUO
                     Mouse.Update();
                     bool isScrolledUp = sdlEvent->wheel.y > 0;
 
-                    if(_pluginsInitialized)
+                    if (_pluginsInitialized)
                         Plugin.ProcessMouse(0, (int)sdlEvent->wheel.y);
 
                     if (!Scene.OnMouseWheel(isScrolledUp))
@@ -932,7 +954,7 @@ namespace ClassicUO
                     break;
 
                 case SDL_EventType.SDL_EVENT_GAMEPAD_AXIS_MOTION: //Work around because sdl doesn't see trigger buttons as buttons, they are axis probably for pressure support
-                    //GameActions.Print(typeof(SDL_GamepadButton).GetEnumName((SDL_GamepadButton)sdlEvent->gbutton.button));
+                                                                  //GameActions.Print(typeof(SDL_GamepadButton).GetEnumName((SDL_GamepadButton)sdlEvent->gbutton.button));
                     if (!IsActive)
                     {
                         break;

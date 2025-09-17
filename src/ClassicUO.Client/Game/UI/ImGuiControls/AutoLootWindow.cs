@@ -24,6 +24,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
         private string newGraphicInput = "";
         private string newHueInput = "";
         private string newRegexInput = "";
+        private int actionDelay = 1000;
 
         private List<AutoLootManager.AutoLootConfigEntry> lootEntries;
         private bool showAddEntry = false;
@@ -41,6 +42,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
             enableScavenger = profile.EnableScavenger;
             enableProgressBar = profile.EnableAutoLootProgressBar;
             autoLootHumanCorpses = profile.AutoLootHumanCorpses;
+            actionDelay = profile.MoveMultiObjectDelay;
 
             lootEntries = AutoLootManager.Instance.AutoLootList;
         }
@@ -60,6 +62,12 @@ namespace ClassicUO.Game.UI.ImGuiControls
             if (ImGui.Checkbox("Enable auto loot", ref enableAutoLoot))
             {
                 profile.EnableAutoLoot = enableAutoLoot;
+            }
+
+            if (ImGui.InputInt("Action Delay", ref actionDelay))
+            {
+                actionDelay = Math.Clamp(actionDelay, 10, 30000);
+                profile.MoveMultiObjectDelay = actionDelay;
             }
 
             if (ImGui.Checkbox("Enable scavenger", ref enableScavenger))
@@ -199,7 +207,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
 
             // Table headers
-            if (ImGui.BeginTable("AutoLootTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
+            if (ImGui.BeginTable("AutoLootTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, 200)))
             {
                 ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, 80);
                 ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, 80);

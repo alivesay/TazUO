@@ -76,11 +76,11 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 _time_to_update = Time.Ticks + 100;
 
-                if (NetClient.Socket.IsConnected)
+                if (AsyncNetClient.Socket.IsConnected)
                 {
-                    _ping = NetClient.Socket.Statistics.Ping;
-                    _deltaBytesReceived = NetClient.Socket.Statistics.DeltaBytesReceived;
-                    _deltaBytesSent = NetClient.Socket.Statistics.DeltaBytesSent;
+                    _ping = AsyncNetClient.Socket.Statistics.Ping;
+                    _deltaBytesReceived = AsyncNetClient.Socket.Statistics.DeltaBytesReceived;
+                    _deltaBytesSent = AsyncNetClient.Socket.Statistics.DeltaBytesSent;
                 }
 
                 Span<char> span = stackalloc char[128];

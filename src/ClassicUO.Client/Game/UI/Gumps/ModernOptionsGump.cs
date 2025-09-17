@@ -9,7 +9,7 @@ using ClassicUO.Renderer;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
-using SDL2;
+using SDL3;
 using StbTextEditSharp;
 using System;
 using System.Collections.Generic;
@@ -241,7 +241,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.MobileHPType, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.HPTypePerc, lang.GetGeneral.HPTypeBar, lang.GetGeneral.HPTypeNBoth }, profile.MobileHPType,
                     (s, n) => { profile.MobileHPType = s; }
@@ -251,7 +251,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.HPShowWhen, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.HPShowWhen_Always, lang.GetGeneral.HPShowWhen_Less100, lang.GetGeneral.HPShowWhen_Smart }, profile.MobileHPShowWhen,
                     (s, n) => { profile.MobileHPShowWhen = s; }
@@ -317,7 +317,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.AuraUnderFeet, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.AuraOptDisabled, lang.GetGeneral.AuroOptWarmode, lang.GetGeneral.AuraOptCtrlShift, lang.GetGeneral.AuraOptAlways },
                     profile.AuraUnderFeetType, (s, n) => { profile.AuraUnderFeetType = s; }
@@ -414,7 +414,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.CloseHPGumpsWhen, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.CloseHPOptDisable, lang.GetGeneral.CloseHPOptOOR, lang.GetGeneral.CloseHPOptDead, lang.GetGeneral.CloseHPOptBoth },
                     profile.CloseHealthBarType, (s, n) => { profile.CloseHealthBarType = s; }
@@ -426,7 +426,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 c = new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.GridLoot, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.GridLootOptDisable, lang.GetGeneral.GridLootOptOnly, lang.GetGeneral.GridLootOptBoth }, profile.GridLootType,
                     (s, n) => { profile.GridLootType = s; }
@@ -477,7 +477,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.COTType, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.COTTypeOptFull, lang.GetGeneral.COTTypeOptGrad, lang.GetGeneral.COTTypeOptModern }, profile.CircleOfTransparencyType,
                     (s, n) => { profile.CircleOfTransparencyType = s; }
@@ -522,7 +522,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.DragKeyMod, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt }, profile.DragSelectModifierKey,
                     (s, n) => { profile.DragSelectModifierKey = s; }
@@ -532,7 +532,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.DragPlayersOnly, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt },
                     profile.DragSelect_PlayersModifier, (s, n) => { profile.DragSelect_PlayersModifier = s; }
@@ -542,7 +542,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.DragMobsOnly, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt },
                     profile.DragSelect_MonstersModifier, (s, n) => { profile.DragSelect_MonstersModifier = s; }
@@ -552,7 +552,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.DragNameplatesOnly, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.SharedNone, lang.GetGeneral.SharedCtrl, lang.GetGeneral.SharedShift, lang.GetGeneral.SharedAlt },
                     profile.DragSelect_NameplateModifier, (s, n) => { profile.DragSelect_NameplateModifier = s; }
@@ -638,7 +638,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetGeneral.MagicFieldType, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetGeneral.MagicFieldOpt_Normal, lang.GetGeneral.MagicFieldOpt_Static, lang.GetGeneral.MagicFieldOpt_Tile }, profile.FieldsType,
                     (s, n) => { profile.FieldsType = s; }
@@ -1001,7 +1001,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetVideo.LightType, 0, ThemeSettings.COMBO_BOX_WIDTH, new string[] { lang.GetVideo.LightType_Absolute, lang.GetVideo.LightType_Minimum },
                     profile.LightLevelType, (s, n) => { profile.LightLevelType = s; }
                 ), true, page
@@ -1348,7 +1348,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToLeft
             (
                 c = new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetInfoBars.HighlightType, 0, ThemeSettings.COMBO_BOX_WIDTH,
                     new string[] { lang.GetInfoBars.HighLightOpt_TextColor, lang.GetInfoBars.HighLightOpt_ColoredBars }, profile.InfoBarHighlightType,
                     (i, s) => { profile.InfoBarHighlightType = i; }
@@ -2226,7 +2226,7 @@ namespace ClassicUO.Game.UI.Gumps
                 (
                     "",
                     new ComboBoxWithLabel
-                (World, 
+                (World,
                         lang.GetContainers.OverridePosition, 0, ThemeSettings.COMBO_BOX_WIDTH,
                         new string[]
                         {
@@ -2695,7 +2695,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetTazUO.SearchStyle, 0, ThemeSettings.COMBO_BOX_WIDTH, new string[] { lang.GetTazUO.OnlyShow, lang.GetTazUO.Highlight }, profile.GridContainerSearchMode,
                     (i, s) => { profile.GridContainerSearchMode = i; }
                 ), true, page
@@ -2729,7 +2729,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetTazUO.ContainerStyle, 0, ThemeSettings.COMBO_BOX_WIDTH, Enum.GetNames(typeof(GridContainer.BorderStyle)), profile.Grid_BorderStyle, (i, s) =>
                     {
                         profile.Grid_BorderStyle = i;
@@ -2850,7 +2850,7 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new ComboBoxWithLabel
-                (World, 
+                (World,
                     lang.GetTazUO.JournalStyle, 0, ThemeSettings.COMBO_BOX_WIDTH, Enum.GetNames(typeof(ResizableJournal.BorderStyle)), profile.JournalStyle, (i, s) =>
                     {
                         profile.JournalStyle = i;
@@ -3167,7 +3167,10 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.IgnoreStaminaCheck, 0, profile.IgnoreStaminaCheck, (b) => profile.IgnoreStaminaCheck = b), true, page);
 
             content.BlankLine();
-            content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.DisableGrayEnemies, 0, profile.DisableGrayEnemies, (b) => profile.DisableGrayEnemies = b), true, page);;
+            content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.DisableGrayEnemies, 0, profile.DisableGrayEnemies, (b) => profile.DisableGrayEnemies = b), true, page);
+
+            content.BlankLine();
+            content.AddToRight(new CheckboxWithLabel(lang.GetGeneral.DisableDismountWarmode, 0, profile.DisableDismountInWarMode, (b) => profile.DisableDismountInWarMode = b), true, page);
             #endregion
 
             #region Misc
@@ -4236,7 +4239,7 @@ namespace ClassicUO.Game.UI.Gumps
                 string[] dataVars = InfoBarManager.GetVars();
 
                 varStat = new ComboBoxWithLabel
-                (world, 
+                (world,
                     string.Empty, 0, 170, dataVars, (int)item.var, onOptionSelected: (i, s) =>
                     {
                         item.var = (InfoBarVars)i;
@@ -4638,21 +4641,21 @@ namespace ClassicUO.Game.UI.Gumps
                     _hotkeyBox.SetButtons(Macro.ControllerButtons);
                 }
 
-                SDL.SDL_Keymod mod = SDL.SDL_Keymod.KMOD_NONE;
+                SDL.SDL_Keymod mod = SDL.SDL_Keymod.SDL_KMOD_NONE;
 
                 if (Macro.Alt)
                 {
-                    mod |= SDL.SDL_Keymod.KMOD_ALT;
+                    mod |= SDL.SDL_Keymod.SDL_KMOD_ALT;
                 }
 
                 if (Macro.Shift)
                 {
-                    mod |= SDL.SDL_Keymod.KMOD_SHIFT;
+                    mod |= SDL.SDL_Keymod.SDL_KMOD_SHIFT;
                 }
 
                 if (Macro.Ctrl)
                 {
-                    mod |= SDL.SDL_Keymod.KMOD_CTRL;
+                    mod |= SDL.SDL_Keymod.SDL_KMOD_CTRL;
                 }
 
                 if (Macro.Key != SDL.SDL_Keycode.SDLK_UNKNOWN)
@@ -4671,9 +4674,9 @@ namespace ClassicUO.Game.UI.Gumps
 
             private void BoxOnHotkeyChanged(object sender, EventArgs e)
             {
-                bool shift = (_hotkeyBox.Mod & SDL.SDL_Keymod.KMOD_SHIFT) != SDL.SDL_Keymod.KMOD_NONE;
-                bool alt = (_hotkeyBox.Mod & SDL.SDL_Keymod.KMOD_ALT) != SDL.SDL_Keymod.KMOD_NONE;
-                bool ctrl = (_hotkeyBox.Mod & SDL.SDL_Keymod.KMOD_CTRL) != SDL.SDL_Keymod.KMOD_NONE;
+                bool shift = (_hotkeyBox.Mod & SDL.SDL_Keymod.SDL_KMOD_SHIFT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+                bool alt = (_hotkeyBox.Mod & SDL.SDL_Keymod.SDL_KMOD_ALT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+                bool ctrl = (_hotkeyBox.Mod & SDL.SDL_Keymod.SDL_KMOD_CTRL) != SDL.SDL_Keymod.SDL_KMOD_NONE;
 
                 if (_hotkeyBox.Key != SDL.SDL_Keycode.SDLK_UNKNOWN)
                 {
@@ -5203,21 +5206,21 @@ namespace ClassicUO.Game.UI.Gumps
 
                 if (Option.Key != SDL.SDL_Keycode.SDLK_UNKNOWN)
                 {
-                    SDL.SDL_Keymod mod = SDL.SDL_Keymod.KMOD_NONE;
+                    SDL.SDL_Keymod mod = SDL.SDL_Keymod.SDL_KMOD_NONE;
 
                     if (Option.Alt)
                     {
-                        mod |= SDL.SDL_Keymod.KMOD_ALT;
+                        mod |= SDL.SDL_Keymod.SDL_KMOD_ALT;
                     }
 
                     if (Option.Shift)
                     {
-                        mod |= SDL.SDL_Keymod.KMOD_SHIFT;
+                        mod |= SDL.SDL_Keymod.SDL_KMOD_SHIFT;
                     }
 
                     if (Option.Ctrl)
                     {
-                        mod |= SDL.SDL_Keymod.KMOD_CTRL;
+                        mod |= SDL.SDL_Keymod.SDL_KMOD_CTRL;
                     }
 
                     _hotkeyBox.SetKey(Option.Key, mod);
@@ -5226,9 +5229,9 @@ namespace ClassicUO.Game.UI.Gumps
 
             private void BoxOnHotkeyChanged(object sender, EventArgs e)
             {
-                bool shift = (_hotkeyBox.Mod & SDL.SDL_Keymod.KMOD_SHIFT) != SDL.SDL_Keymod.KMOD_NONE;
-                bool alt = (_hotkeyBox.Mod & SDL.SDL_Keymod.KMOD_ALT) != SDL.SDL_Keymod.KMOD_NONE;
-                bool ctrl = (_hotkeyBox.Mod & SDL.SDL_Keymod.KMOD_CTRL) != SDL.SDL_Keymod.KMOD_NONE;
+                bool shift = (_hotkeyBox.Mod & SDL.SDL_Keymod.SDL_KMOD_SHIFT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+                bool alt = (_hotkeyBox.Mod & SDL.SDL_Keymod.SDL_KMOD_ALT) != SDL.SDL_Keymod.SDL_KMOD_NONE;
+                bool ctrl = (_hotkeyBox.Mod & SDL.SDL_Keymod.SDL_KMOD_CTRL) != SDL.SDL_Keymod.SDL_KMOD_NONE;
 
                 if (_hotkeyBox.Key == SDL.SDL_Keycode.SDLK_UNKNOWN)
                     return;

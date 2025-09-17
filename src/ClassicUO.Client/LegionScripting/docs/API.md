@@ -21,12 +21,12 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `9/7/25`.*
+*This was generated on `9/17/25`.*
 
 ## Properties
 ### `JournalEntries`
 
-**Type:** `ConcurrentQueue<JournalEntry>`
+**Type:** `ConcurrentQueue<PyJournalEntry>`
 
 ### `Backpack`
 
@@ -1669,6 +1669,23 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 ---
 
+### RequestOPLData
+`(serials)`
+ Requests Object Property List (OPL) data for the specified serials.
+ If the OPL data doesn't already exist, it will be requested from the server.
+ OPL consists of item name and tooltip text(properties).
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `serials` | `IList<uint>` | ❌ No | A list of object serials to request OPL data for |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
 ### HasGump
 `(ID)`
  Check if a player has a server gump. Leave blank to check if they have any server gump.
@@ -2148,18 +2165,27 @@ You can now type `-updateapi` in game to download the latest API.py file.
 ---
 
 ### GetAllMobiles
-
- Return a list of all mobiles the client is aware of.
+`(graphic, distance)`
+ Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
  Example:
  ```py
+ # Get all mobiles
  mobiles = API.GetAllMobiles()
- if mobiles:
-   API.SysMsg("Found " + str(len(mobiles)) + " mobiles!")
-   for mob in mobiles:
-     API.SysMsg(mob.Name)
-     API.Pause(0.5)
+ # Get all mobiles with graphic 400
+ humans = API.GetAllMobiles(400)
+ # Get all mobiles within 10 tiles
+ nearby = API.GetAllMobiles(distance=10)
+ # Get all humans within 5 tiles
+ nearby_humans = API.GetAllMobiles(400, 5)
  ```
 
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `graphic` | `ushort?` | ✅ Yes | Optional graphic ID to filter by |
+| `distance` | `int?` | ✅ Yes | Optional maximum distance from player |
 
 **Return Type:** `PyMobile[]`
 

@@ -270,6 +270,7 @@ namespace ClassicUO.Game.Data
             { 0x0908, new (0x0908, Ability.WhirlwindAttack, Ability.Dismount) },
             { 0x4075, new (0x4075, Ability.WhirlwindAttack, Ability.Dismount) }, // Gargish Talwar
             { 0x4076, new (0x4076, Ability.ArmorIgnore, Ability.MortalStrike) }, // Shortblade
+            { 0x0907, new (0x0907, Ability.ArmorIgnore, Ability.MortalStrike) }, // Shortblade
             { 0x48AE, new (0x48AE, Ability.BleedAttack, Ability.InfectiousStrike) },
             { 0x48B0, new (0x48B0, Ability.BleedAttack, Ability.ConcussionBlow) }, // Gargish Battle Axe
             { 0x48B3, new (0x48B3, Ability.CrushingBlow, Ability.Dismount) },

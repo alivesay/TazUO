@@ -120,6 +120,15 @@ class PyItem:
     Container: int = None
     __class__: str = None
 
+class PyJournalEntry:
+    Hue: int = None
+    Name: str = None
+    Text: str = None
+    TextType = None
+    Time: datetime = None
+    MessageType = None
+    Disposed: bool = None
+
 class PyLand:
     __class__: str = None
 
@@ -1150,6 +1159,15 @@ def ItemNameAndProps(serial: int, wait: bool = False, timeout: int = 10) -> str:
     """
     pass
 
+def RequestOPLData(serials: list[int]) -> None:
+    """
+     Requests Object Property List (OPL) data for the specified serials.
+     If the OPL data doesn't already exist, it will be requested from the server.
+     OPL consists of item name and tooltip text(properties).
+    
+    """
+    pass
+
 def HasGump(ID: int = 1337) -> int:
     """
      Check if a player has a server gump. Leave blank to check if they have any server gump.
@@ -1457,17 +1475,19 @@ def FindMobile(serial: int) -> PyMobile:
     """
     pass
 
-def GetAllMobiles() -> list[PyMobile]:
+def GetAllMobiles(graphic: int | None = None, distance: int | None = None) -> list[PyMobile]:
     """
-     Return a list of all mobiles the client is aware of.
+     Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
      Example:
      ```py
+     # Get all mobiles
      mobiles = API.GetAllMobiles()
-     if mobiles:
-       API.SysMsg("Found " + str(len(mobiles)) + " mobiles!")
-       for mob in mobiles:
-         API.SysMsg(mob.Name)
-         API.Pause(0.5)
+     # Get all mobiles with graphic 400
+     humans = API.GetAllMobiles(400)
+     # Get all mobiles within 10 tiles
+     nearby = API.GetAllMobiles(distance=10)
+     # Get all humans within 5 tiles
+     nearby_humans = API.GetAllMobiles(400, 5)
      ```
     
     """

@@ -76,7 +76,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (LocalSerial != 0)
                     {
-                        NetClient.Socket.Send_DyeDataResponse(LocalSerial, _graphic, _box.SelectedHue);
+                        AsyncNetClient.Socket.Send_DyeDataResponse(LocalSerial, _graphic, _box.SelectedHue);
                     }
 
                     _okClicked?.Invoke(_box.SelectedHue);

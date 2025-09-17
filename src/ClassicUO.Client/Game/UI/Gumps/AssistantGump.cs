@@ -11,6 +11,7 @@ using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.UI.ImGuiControls;
+using ClassicUO.Input;
 using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.UI.Gumps;
@@ -53,79 +54,17 @@ public class AssistantGump : BaseOptionsGump
     {
         int page = (int)PAGE.AutoLoot;
 
-        MainContent.AddToLeft(CategoryButton("Auto loot", page, MainContent.LeftWidth));
-        MainContent.ResetRightSide();
-
-        ScrollArea scroll = new(0, 0, MainContent.RightWidth, MainContent.Height);
-        MainContent.AddToRight(scroll, false, page);
-        PositionHelper.Reset();
-
-        scroll.Add
-            (PositionHelper.PositionControl(new HttpClickableLink("Autoloot Wiki", "https://github.com/PlayTazUO/TazUO/wiki/TazUO.Simple-Auto-Loot", ThemeSettings.TEXT_FONT_COLOR)));
-
-        PositionHelper.BlankLine();
-
-        ModernButton b;
-        scroll.Add(PositionHelper.PositionControl(b = new ModernButton(0, 0, 200, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Set grab bag", ThemeSettings.BUTTON_FONT_COLOR)));
-        b.MouseUp += (s, e) =>
+        ModernButton button = new(0, 0, MainContent.LeftWidth, 40, ButtonAction.Default, "Auto loot", ThemeSettings.BUTTON_FONT_COLOR);
+        button.MouseUp += (_, e) =>
         {
-            GameActions.Print(World, ResGumps.TargetContainerToGrabItemsInto);
-            World.TargetManager.SetTargeting(CursorTarget.SetGrabBag, 0, TargetType.Neutral);
-        };
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel(lang.GetTazUO.AutoLootEnable, 0, profile.EnableAutoLoot, b => profile.EnableAutoLoot = b)));
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel(lang.GetTazUO.ScavengerEnable, 0, profile.EnableScavenger, b => profile.EnableScavenger = b)));
-        PositionHelper.BlankLine();
-
-        scroll.Add
-        (
-            PositionHelper.PositionControl
-                (new CheckboxWithLabel(lang.GetTazUO.AutoLootProgessBarEnable, 0, profile.EnableAutoLootProgressBar, b => profile.EnableAutoLootProgressBar = b))
-        );
-
-        PositionHelper.BlankLine();
-
-        scroll.Add
-            (PositionHelper.PositionControl(new CheckboxWithLabel(lang.GetTazUO.AutoLootHumanCorpses, 0, profile.AutoLootHumanCorpses, b => profile.AutoLootHumanCorpses = b)));
-
-        PositionHelper.BlankLine();
-
-        ModernButton exportButton, importButton, importOtherButton;
-
-        scroll.Add(PositionHelper.PositionControl(exportButton = new ModernButton(0, 0, 100, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Export JSON", ThemeSettings.BUTTON_FONT_COLOR)));
-        exportButton.MouseUp += (s, e) =>
-        {
-            FileSelector.ShowFileBrowser(World, FileSelectorType.Directory, null, null, (selectedPath) =>
+            if(e.Button == MouseButtonType.Left)
             {
-                if (string.IsNullOrWhiteSpace(selectedPath)) return;
-                string fileName = $"AutoLoot_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-                string fullPath = Path.Combine(selectedPath, fileName);
-                AutoLootManager.Instance.ExportToFile(fullPath);
-            }, "Export Autoloot Configuration");
+                AssistantWindow.Show();
+                AssistantWindow.Instance.SelectTab(PAGE.AutoLoot);
+            }
         };
 
-        scroll.Add(PositionHelper.ToRightOf(importButton = new ModernButton(0, 0, 100, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Import JSON", ThemeSettings.BUTTON_FONT_COLOR), exportButton));
-        importButton.MouseUp += (s, e) =>
-        {
-            FileSelector.ShowFileBrowser(World, FileSelectorType.File, null, new[] { "json" }, (selectedFile) =>
-            {
-                if (string.IsNullOrWhiteSpace(selectedFile)) return;
-                AutoLootManager.Instance.ImportFromFile(selectedFile);
-            }, "Import Autoloot Configuration");
-        };
-
-        scroll.Add(PositionHelper.ToRightOf(importOtherButton = new ModernButton(0, 0, 150, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "Import from Character", ThemeSettings.BUTTON_FONT_COLOR), importButton));
-        importOtherButton.MouseUp += (s, e) =>
-        {
-            ShowCharacterImportContextMenu();
-        };
-
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new AutoLootConfigs(World, MainContent.RightWidth - ThemeSettings.SCROLL_BAR_WIDTH - 10)));
+        MainContent.AddToLeft(button);
     }
 
     private void BuildAutoSell()
@@ -660,73 +599,18 @@ public class AssistantGump : BaseOptionsGump
     private void BuildBandageAgent()
     {
         var page = (int)PAGE.BandageAgent;
-        MainContent.AddToLeft(CategoryButton("Auto Bandage", page, MainContent.LeftWidth));
-        MainContent.ResetRightSide();
 
-        ScrollArea scroll = new(0, 0, MainContent.RightWidth, MainContent.Height);
-        MainContent.AddToRight(scroll, false, page);
-        PositionHelper.Reset();
-
-        scroll.Add(PositionHelper.PositionControl(TextBox.GetOne("Automatically use bandages to heal when HP drops below threshold.", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default(MainContent.RightWidth - 20))));
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Enable bandage agent", 0, profile.EnableBandageAgent, b => profile.EnableBandageAgent = b)));
-        PositionHelper.BlankLine();
-
-        Control c;
-        scroll.Add(c = PositionHelper.PositionControl(new InputFieldWithLabel("Bandage delay (ms)", ThemeSettings.INPUT_WIDTH, profile.BandageAgentDelay.ToString(), true, (s, e) =>
+        ModernButton button = new(0, 0, MainContent.LeftWidth, 40, ButtonAction.Default, "Auto Bandage", ThemeSettings.BUTTON_FONT_COLOR);
+        button.MouseUp += (_, e) =>
         {
-            if (int.TryParse(((BaseOptionsGump.InputField.StbTextBox)s).Text, out int delay))
+            if(e.Button == MouseButtonType.Left)
             {
-                // Clamp delay to sensible bounds (50ms to 30 seconds)
-                if (delay >= 50 && delay <= 30000)
-                {
-                    profile.BandageAgentDelay = delay;
-                }
+                AssistantWindow.Show();
+                AssistantWindow.Instance.SelectTab(PAGE.BandageAgent);
             }
-        })));
-        c.SetTooltip("Delay between bandage attempts in milliseconds (50-30000)");
-        PositionHelper.BlankLine();
+        };
 
-        scroll.Add(c = PositionHelper.PositionControl(new SliderWithLabel("HP percentage threshold", 0, ThemeSettings.SLIDER_WIDTH, 10, 95, profile.BandageAgentHPPercentage, (r) => { profile.BandageAgentHPPercentage = r; })));
-        c.SetTooltip("Heal when HP drops below this percentage");
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Use bandaging buff instead of delay", 0, profile.BandageAgentCheckForBuff, b => profile.BandageAgentCheckForBuff = b)));
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Use new bandage packet", 0, profile.BandageAgentUseNewPacket, b => profile.BandageAgentUseNewPacket = b)));
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Bandage if Poisoned", 0, profile.BandageAgentCheckPoisoned, b => profile.BandageAgentCheckPoisoned = b)));
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Skip Bandage if Hidden", 0, profile.BandageAgentCheckHidden, b => profile.BandageAgentCheckHidden = b)));
-        PositionHelper.BlankLine();
-
-        scroll.Add(PositionHelper.PositionControl(new CheckboxWithLabel("Skip Bandage if yellow hits", 0, profile.BandageAgentCheckInvul, b => profile.BandageAgentCheckInvul = b)));
-        PositionHelper.BlankLine();
-
-        InputFieldWithLabel bandageGraphicInput = new("Bandage graphic ID", ThemeSettings.INPUT_WIDTH, $"0x{profile.BandageAgentGraphic:X4}", true, (s, e) =>
-        {
-            string text = ((BaseOptionsGump.InputField.StbTextBox)s).Text;
-            ushort graphic;
-
-            // Try to parse as hex (0x prefix) or decimal
-            if (text.StartsWith("0x", StringComparison.OrdinalIgnoreCase) || text.StartsWith("0X", StringComparison.OrdinalIgnoreCase))
-            {
-                if (ushort.TryParse(text.Substring(2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out graphic))
-                {
-                    profile.BandageAgentGraphic = graphic;
-                }
-            }
-            else if (ushort.TryParse(text, out graphic))
-            {
-                profile.BandageAgentGraphic = graphic;
-            }
-        });
-        bandageGraphicInput.SetTooltip("Graphic ID of bandages to use (default: 0x0E21). Accepts hex (0x0E21) or decimal (3617)");
-        scroll.Add(PositionHelper.PositionControl(bandageGraphicInput));
+        MainContent.AddToLeft(button);
     }
 
     private void BuildFriendsList()
@@ -836,40 +720,16 @@ public class AssistantGump : BaseOptionsGump
     {
         const int page = (int)PAGE.Organizer;
         ModernButton orgButton = new(0, 0, MainContent.LeftWidth, 40, ButtonAction.Default, "Organizer", ThemeSettings.BUTTON_FONT_COLOR);
-        orgButton.MouseUp += (s, e) =>
+        orgButton.MouseUp += (_, e) =>
         {
-            //OrganizerWindow.Show();
-            AssistantWindow.Show();
+            if(e.Button == MouseButtonType.Left)
+            {
+                AssistantWindow.Show();
+                AssistantWindow.Instance.SelectTab(PAGE.Organizer);
+            }
         };
 
         MainContent.AddToLeft(orgButton);
-    }
-
-
-    private void ShowCharacterImportContextMenu()
-    {
-        var otherConfigs = AutoLootManager.Instance.GetOtherCharacterConfigs();
-
-        if (otherConfigs.Count == 0)
-        {
-            GameActions.Print("No other character autoloot configurations found.", 32);
-            return;
-        }
-
-        var contextMenu = new ContextMenuControl(this);
-
-        foreach (var characterConfig in otherConfigs.OrderBy(c => c.Key))
-        {
-            string characterName = characterConfig.Key;
-            var configs = characterConfig.Value;
-
-            contextMenu.Add($"{characterName} ({configs.Count} items)", () =>
-            {
-                AutoLootManager.Instance.ImportFromOtherCharacter(characterName, configs);
-            });
-        }
-
-        contextMenu.Show();
     }
 
     public override void Dispose()
@@ -1017,194 +877,6 @@ public class AssistantGump : BaseOptionsGump
             spellRangeInfo.FreezeCharacterWhileCasting = freezeWhileCasting.IsChecked;
             spellRangeInfo.ExpectTargetCursor = targetCursorExpected.IsChecked;
             SpellVisualRangeManager.Instance.DelayedSave();
-        }
-    }
-    private class AutoLootConfigs : Control
-    {
-        private DataBox _dataBox;
-
-        public AutoLootConfigs(World world, int width)
-        {
-            AcceptMouseInput = true;
-            CanMove = true;
-            Width = width;
-
-            Add(_dataBox = new DataBox(0, 0, width, 0));
-
-            ModernButton b;
-            _dataBox.Add(b = new ModernButton(0, 0, 100, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Add entry", ThemeSettings.BUTTON_FONT_COLOR));
-
-            b.MouseUp += (s, e) =>
-            {
-                var nl = AutoLootManager.Instance.AddAutoLootEntry();
-                _dataBox.Insert(2, GenConfigEntry(nl, width));
-                RearrangeDataBox();
-            };
-
-            _dataBox.Add(b = new ModernButton(0, 0, 200, ThemeSettings.CHECKBOX_SIZE, ButtonAction.Default, "+ Target item to add", ThemeSettings.BUTTON_FONT_COLOR));
-
-            b.MouseUp += (s, e) =>
-            {
-                TargetHelper.TargetObject
-                (world, (o) =>
-                    {
-                        if (o != null)
-                        {
-                            var nl = AutoLootManager.Instance.AddAutoLootEntry(o.Graphic, o.Hue, o.Name);
-
-                            if (_dataBox != null)
-                            {
-                                _dataBox.Insert(2, GenConfigEntry(nl, width));
-                                RearrangeDataBox();
-                            }
-                        }
-                    }
-                );
-            };
-
-            Area titles = new Area(false);
-            TextBox tempTextBox1 = TextBox.GetOne("Graphic", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default());
-            tempTextBox1.X = 55;
-            titles.Add(tempTextBox1);
-
-            tempTextBox1 = TextBox.GetOne("Hue", ThemeSettings.FONT, ThemeSettings.STANDARD_TEXT_SIZE, ThemeSettings.TEXT_FONT_COLOR, TextBox.RTLOptions.Default());
-            tempTextBox1.X = ((width - 90 - 50) >> 1) + 60;
-            titles.Add(tempTextBox1);
-
-            titles.ForceSizeUpdate();
-            _dataBox.Add(titles);
-
-            for (int i = 0; i < AutoLootManager.Instance.AutoLootList.Count; i++)
-            {
-                AutoLootManager.AutoLootConfigEntry autoLootItem = AutoLootManager.Instance.AutoLootList[i];
-                _dataBox.Add(GenConfigEntry(autoLootItem, width));
-            }
-
-            RearrangeDataBox();
-        }
-
-        private Control GenConfigEntry(AutoLootManager.AutoLootConfigEntry autoLootItem, int width)
-        {
-            int ewidth = (width - 90 - 60) >> 1;
-
-            Area area = new Area()
-            {
-                Width = width,
-                Height = 107
-            };
-
-            int x = 0;
-
-            if (autoLootItem.Graphic > 0)
-            {
-                ResizableStaticPic rsp;
-
-                area.Add
-                (
-                    rsp = new ResizableStaticPic((uint)autoLootItem.Graphic, 50, 50)
-                    {
-                        Hue = (ushort)(autoLootItem.Hue == ushort.MaxValue ? 0 : autoLootItem.Hue)
-                    }
-                );
-
-                rsp.SetTooltip(autoLootItem.Name);
-            }
-
-            x += 50;
-
-            InputField graphicInput = new InputField
-            (
-                ewidth, 50, 100, -1, autoLootItem.Graphic.ToString(), false, (s, e) =>
-                {
-                    InputField.StbTextBox graphicInput = (InputField.StbTextBox)s;
-
-                    if (graphicInput.Text.StartsWith("0x") && short.TryParse(graphicInput.Text.Substring(2), NumberStyles.AllowHexSpecifier, null, out var ngh))
-                    {
-                        autoLootItem.Graphic = ngh;
-                    }
-                    else if (int.TryParse(graphicInput.Text, out var ng))
-                    {
-                        autoLootItem.Graphic = ng;
-                    }
-                }
-            )
-            {
-                X = x
-            };
-
-            graphicInput.SetTooltip("Graphic");
-            area.Add(graphicInput);
-            x += graphicInput.Width + 5;
-
-
-            InputField hueInput = new InputField
-            (
-                ewidth, 50, 100, -1, autoLootItem.Hue == ushort.MaxValue ? "-1" : autoLootItem.Hue.ToString(), false, (s, e) =>
-                {
-                    InputField.StbTextBox hueInput = (InputField.StbTextBox)s;
-
-                    if (hueInput.Text == "-1")
-                    {
-                        autoLootItem.Hue = ushort.MaxValue;
-                    }
-                    else if (ushort.TryParse(hueInput.Text, out var ng))
-                    {
-                        autoLootItem.Hue = ng;
-                    }
-                }
-            )
-            {
-                X = x
-            };
-
-            hueInput.SetTooltip("Hue (-1 to match any)");
-            area.Add(hueInput);
-            x += hueInput.Width + 5;
-
-            NiceButton delete;
-
-            area.Add
-            (
-                delete = new NiceButton(x, 0, 90, 49, ButtonAction.Activate, "Delete")
-                {
-                    IsSelectable = false,
-                    DisplayBorder = true
-                }
-            );
-
-            delete.MouseUp += (s, e) =>
-            {
-                if (e.Button == Input.MouseButtonType.Left)
-                {
-                    AutoLootManager.Instance.TryRemoveAutoLootEntry(autoLootItem.UID);
-                    area.Dispose();
-                    RearrangeDataBox();
-                }
-            };
-
-            InputField regxInput = new InputField
-            (
-                width, 50, width, -1, autoLootItem.RegexSearch, false, (s, e) =>
-                {
-                    InputField.StbTextBox regxInput = (InputField.StbTextBox)s;
-                    autoLootItem.RegexSearch = string.IsNullOrEmpty(regxInput.Text) ? string.Empty : regxInput.Text;
-                }
-            )
-            {
-                Y = 52
-            };
-
-            regxInput.SetTooltip("Regex to match items against");
-            area.Add(regxInput);
-
-            return area;
-        }
-
-        private void RearrangeDataBox()
-        {
-            _dataBox.ReArrangeChildren();
-            _dataBox.ForceSizeUpdate();
-            Height = _dataBox.Height;
         }
     }
     private class SellAgentConfigs : Control

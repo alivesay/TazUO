@@ -160,6 +160,7 @@ namespace ClassicUO.Configuration
             public string AuraPartyColor { get; set; } = "Party aura color";
             public string IgnoreStaminaCheck { get; set; } = "Disable stamina check for movement";
             public string DisableGrayEnemies { get; set; } = "Don't make last target/enemies gray";
+            public string DisableDismountWarmode { get; set; } = "Prevent dismounting in combat";
             #endregion
 
             #region General->Gumps

@@ -14,7 +14,7 @@ using ClassicUO.Renderer;
 using ClassicUO.Resources;
 using ClassicUO.Utility.Logging;
 using ClassicUO.Utility.Platforms;
-using SDL2;
+using SDL3;
 using Control = ClassicUO.Game.UI.Controls.Control;
 using Label = ClassicUO.Game.UI.Controls.Label;
 using TextBox = ClassicUO.Game.UI.Controls.TextBox;
@@ -530,7 +530,7 @@ namespace ClassicUO.Game.UI.Gumps
         {
             switch (key)
             {
-                case SDL.SDL_Keycode.SDLK_q when Keyboard.Ctrl && _messageHistoryIndex > -1 && !ProfileManager.CurrentProfile.DisableCtrlQWBtn:
+                case SDL.SDL_Keycode.SDLK_Q when Keyboard.Ctrl && _messageHistoryIndex > -1 && !ProfileManager.CurrentProfile.DisableCtrlQWBtn:
 
                     GameScene scene = Client.Game.GetScene<GameScene>();
 
@@ -560,7 +560,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                     break;
 
-                case SDL.SDL_Keycode.SDLK_w when Keyboard.Ctrl && !ProfileManager.CurrentProfile.DisableCtrlQWBtn:
+                case SDL.SDL_Keycode.SDLK_W when Keyboard.Ctrl && !ProfileManager.CurrentProfile.DisableCtrlQWBtn:
 
                     scene = Client.Game.GetScene<GameScene>();
 
@@ -603,11 +603,11 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (_gump.World.MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
                     {
-                        NetClient.Socket.Send_ASCIIPromptResponse(_gump.World, string.Empty, true);
+                        AsyncNetClient.Socket.Send_ASCIIPromptResponse(_gump.World, string.Empty, true);
                     }
                     else if (_gump.World.MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
                     {
-                        NetClient.Socket.Send_UnicodePromptResponse(_gump.World, string.Empty, Settings.GlobalSettings.Language, true);
+                        AsyncNetClient.Socket.Send_UnicodePromptResponse(_gump.World, string.Empty, Settings.GlobalSettings.Language, true);
                     }
 
                     _gump.World.MessageManager.PromptData = default;
@@ -689,16 +689,16 @@ namespace ClassicUO.Game.UI.Gumps
                 text = text.Substring(0, cutoffIndex);
                 sendAgain = true;
             }
-            
+
             if (_gump.World.MessageManager.PromptData.Prompt != ConsolePrompt.None)
             {
                 if (_gump.World.MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
                 {
-                    NetClient.Socket.Send_ASCIIPromptResponse(_gump.World, text, text.Length < 1);
+                    AsyncNetClient.Socket.Send_ASCIIPromptResponse(_gump.World, text, text.Length < 1);
                 }
                 else if (_gump.World.MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
                 {
-                    NetClient.Socket.Send_UnicodePromptResponse(_gump.World, text, Settings.GlobalSettings.Language, text.Length < 1);
+                    AsyncNetClient.Socket.Send_UnicodePromptResponse(_gump.World, text, Settings.GlobalSettings.Language, text.Length < 1);
                 }
 
                 _gump.World.MessageManager.PromptData = default;
@@ -834,7 +834,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                                 if (_gump.World.Party.Leader == 0 && _gump.World.Party.Inviter != 0)
                                 {
-                                    NetClient.Socket.Send_PartyDecline(_gump.World.Party.Inviter);
+                                    AsyncNetClient.Socket.Send_PartyDecline(_gump.World.Party.Inviter);
                                     _gump.World.Party.Leader = 0;
                                     _gump.World.Party.Inviter = 0;
                                 }
@@ -940,12 +940,10 @@ namespace ClassicUO.Game.UI.Gumps
                         break;
 
                     case ChatMode.UOAMChat:
-                        _gump.World.UoAssist.SignalMessage(text);
-
                         break;
 
                     case ChatMode.UOChat:
-                        NetClient.Socket.Send_ChatMessageCommand(text);
+                        AsyncNetClient.Socket.Send_ChatMessageCommand(text);
 
                         break;
 

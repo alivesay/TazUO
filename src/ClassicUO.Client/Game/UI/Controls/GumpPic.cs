@@ -203,7 +203,7 @@ namespace ClassicUO.Game.UI.Controls
         {
             if (button == MouseButtonType.Left)
             {
-                NetClient.Socket.Send_VirtueGumpResponse(_world.Player, Graphic);
+                AsyncNetClient.Socket.Send_VirtueGumpResponse(_world.Player, Graphic);
 
                 return true;
             }

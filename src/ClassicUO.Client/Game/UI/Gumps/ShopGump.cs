@@ -598,11 +598,11 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (IsBuyGump)
                     {
-                        NetClient.Socket.Send_BuyRequest(LocalSerial, items);
+                        AsyncNetClient.Socket.Send_BuyRequest(LocalSerial, items);
                     }
                     else
                     {
-                        NetClient.Socket.Send_SellRequest(LocalSerial, items);
+                        AsyncNetClient.Socket.Send_SellRequest(LocalSerial, items);
                     }
 
                     Dispose();

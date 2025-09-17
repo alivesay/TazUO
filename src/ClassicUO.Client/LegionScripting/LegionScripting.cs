@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +17,8 @@ using Microsoft.Scripting.Hosting;
 using static ClassicUO.LegionScripting.Commands;
 using static ClassicUO.LegionScripting.Expressions;
 using System.Text.Json.Serialization;
+using ClassicUO.LegionScripting.PyClasses;
+using Microsoft.Scripting;
 
 namespace ClassicUO.LegionScripting
 {
@@ -35,6 +37,7 @@ namespace ClassicUO.LegionScripting
         private static List<ScriptFile> removeRunningScripts = new List<ScriptFile>();
         private static LScriptSettings lScriptSettings;
 
+        public static LScriptSettings LScriptSettings => lScriptSettings;
         public static List<ScriptFile> LoadedScripts = new List<ScriptFile>();
 
         public static event EventHandler<ScriptInfoEvent> ScriptStartedEvent;
@@ -157,7 +160,14 @@ namespace ClassicUO.LegionScripting
                 if (script.ScriptType == ScriptType.LegionScript)
                     script.GetScript?.JournalEntryAdded(e);
                 else
-                    script.scopedAPI?.JournalEntries.Enqueue(e);
+                {
+                    script.scopedAPI?.JournalEntries.Enqueue(new PyJournalEntry(e));
+
+                    while (script.scopedAPI?.JournalEntries.Count > ProfileManager.CurrentProfile.MaxJournalEntries)
+                    {
+                        script.scopedAPI?.JournalEntries.TryDequeue(out _);
+                    }
+                }
             }
         }
 
@@ -469,21 +479,27 @@ namespace ClassicUO.LegionScripting
 
             try
             {
-                script.pythonEngine.Execute(script.FileContentsJoined, script.pythonScope);
+                ScriptSource source = script.pythonEngine.CreateScriptSourceFromString(script.FileContentsJoined, script.FullPath, SourceCodeKind.File);
+                source?.Execute(script.pythonScope);
+            }
+            catch (ThreadInterruptedException)
+            {
             }
             catch (ThreadAbortException)
             {
             }
             catch (Exception e)
             {
-                var eo = script.pythonEngine.GetService<ExceptionOperations>();
-                string error = eo.FormatException(e);
+                ExceptionOperations eo = script.pythonEngine.GetService<ExceptionOperations>();
+                string error = e.Message;
+                if(eo != null)
+                    error = eo.FormatException(e);
 
                 GameActions.Print(World, "Python Script Error:");
                 GameActions.Print(World, error);
+                Log.Warn(e.ToString());
             }
 
-            //script.PythonScriptStopped();
             MainThreadQueue.EnqueueAction(() => { StopScript(script); });
         }
 
@@ -713,7 +729,7 @@ namespace ClassicUO.LegionScripting
         {
             GameActions.Print(World, $"[{Interpreter.ActiveScript.CurrentLine}][LScript Warning]" + msg);
         }
-        
+
         public static void DownloadAPIPy()
         {
             Task.Run
@@ -831,7 +847,7 @@ namespace ClassicUO.LegionScripting
         {
             try
             {
-                var c = File.ReadAllLines(FullPath);
+                var c = File.ReadAllLines(FullPath, Encoding.UTF8);
                 FileContentsJoined = string.Join("\n", c);
                 if (ScriptType == ScriptType.Python)
                 {
@@ -871,7 +887,7 @@ namespace ClassicUO.LegionScripting
 
         public void SetupPythonEngine()
         {
-            if (pythonEngine != null)
+            if (pythonEngine != null && !LegionScripting.LScriptSettings.DisableModuleCache)
                 return;
 
             pythonEngine = Python.CreateEngine();
@@ -899,6 +915,8 @@ namespace ClassicUO.LegionScripting
             scopedAPI?.CloseGumps();
             pythonScope = null;
             scopedAPI = null;
+            if (LegionScripting.LScriptSettings.DisableModuleCache)
+                pythonEngine = null;
         }
     }
 }

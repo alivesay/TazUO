@@ -5,8 +5,8 @@
     <ApplicationIcon>cuoicon.ico</ApplicationIcon>
     <AssemblyName>TazUO</AssemblyName>
     <RootNamespace>ClassicUO</RootNamespace>
-    <AssemblyVersion>4.6.0</AssemblyVersion>
-    <FileVersion>4.6.0</FileVersion>
+    <AssemblyVersion>4.7.0</AssemblyVersion>
+    <FileVersion>4.7.0</FileVersion>
     <PackageProjectUrl>https://github.com/PlayTazUO/TazUO</PackageProjectUrl>
     <PublishAot>false</PublishAot>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,10 +33,6 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>ClassicUO.UnitTests</_Parameter1>
     </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="System.IO.Compression" />
   </ItemGroup>
 
   <ItemGroup>
@@ -94,7 +90,7 @@
     <DataFiles_osx-arm Include="$(ProjectDir)..\..\external\osx-arm\*.*" />
     <DataFiles_vulkan Include="$(ProjectDir)..\..\external\vulkan\icd.d\*.*" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <EmbeddedResource Include="Game\Managers\DefaultSpellIndicatorConfig.json" />
   </ItemGroup>
@@ -159,10 +155,6 @@
   </Target>
 
   <Target Name="CopyExternalDeps_build" AfterTargets="Build">
-    <ItemGroup>
-      <MonockickstartPath Include="$(ProjectDir)..\..\tools\monokickstart\*.*" />
-    </ItemGroup>
-
     <Copy SourceFiles="@(DataFiles_iplib)" DestinationFiles="@(DataFiles_iplib -> '$(TargetDir)\iplib\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_x64)" DestinationFolder="$(TargetDir)\x64\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_win-arm)" DestinationFolder="$(TargetDir)\win-arm\" SkipUnchangedFiles="true" />
@@ -170,8 +162,6 @@
     <Copy SourceFiles="@(DataFiles_osx)" DestinationFolder="$(TargetDir)\osx\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_osx-arm)" DestinationFolder="$(TargetDir)\osx-arm\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(TargetDir)\vulkan\icd.d\" SkipUnchangedFiles="true" />
-
-    <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(TargetDir)\" SkipUnchangedFiles="true" Condition="$(TargetFramework.StartsWith('net4'))" />
   </Target>
 
   <Target Name="CreateVersionFile_publish" AfterTargets="Publish">
@@ -179,10 +169,6 @@
   </Target>
 
   <Target Name="CopyExternalDeps_publish" AfterTargets="Publish">
-    <ItemGroup>
-      <MonockickstartPath Include="$(ProjectDir)..\..\tools\monokickstart\*.*" />
-    </ItemGroup>
-
     <Copy SourceFiles="@(DataFiles_iplib)" DestinationFiles="@(DataFiles_iplib -> '$(PublishDir)\iplib\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_x64)" DestinationFolder="$(PublishDir)\x64\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_win-arm)" DestinationFolder="$(PublishDir)\win-arm\" SkipUnchangedFiles="true" />
@@ -190,8 +176,6 @@
     <Copy SourceFiles="@(DataFiles_osx)" DestinationFolder="$(PublishDir)\osx\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_vulkan)" DestinationFolder="$(PublishDir)\vulkan\icd.d\" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DataFiles_osx-arm)" DestinationFolder="$(PublishDir)\osx-arm\" SkipUnchangedFiles="true" />
-
-    <Copy SourceFiles="@(MonockickstartPath)" DestinationFolder="$(PublishDir)\" SkipUnchangedFiles="true" Condition="$(TargetFramework.StartsWith('net4'))" />
   </Target>
 
 </Project>

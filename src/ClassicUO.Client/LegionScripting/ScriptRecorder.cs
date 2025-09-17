@@ -410,7 +410,7 @@ namespace ClassicUO.LegionScripting
 
                     case "cast":
                         if (action.Parameters.TryGetValue("spell", out object spell))
-                            script.AppendLine($"API.Cast(\"{spell}\")");
+                            script.AppendLine($"API.CastSpell(\"{spell}\")");
                         break;
 
                     case "dragdrop":

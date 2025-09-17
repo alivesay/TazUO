@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using ClassicUO.Game.Data;
 using ClassicUO.Game.Managers;
@@ -279,7 +279,7 @@ namespace ClassicUO.Game.UI.Gumps
                     if (World.Party.Leader != 0)
                     {
                         World.Party.CanLoot = CanLoot;
-                        NetClient.Socket.Send_PartyChangeLootTypeRequest(CanLoot);
+                        AsyncNetClient.Socket.Send_PartyChangeLootTypeRequest(CanLoot);
                     }
                     RequestUpdateContents();
 
@@ -316,7 +316,7 @@ namespace ClassicUO.Game.UI.Gumps
                 case Buttons.Add:
                     if (World.Party.Leader == 0 || World.Party.Leader == World.Player)
                     {
-                        NetClient.Socket.Send_PartyInviteRequest();
+                        AsyncNetClient.Socket.Send_PartyInviteRequest();
                     }
 
                     break;
@@ -365,7 +365,7 @@ namespace ClassicUO.Game.UI.Gumps
                         }
                         else
                         {
-                            NetClient.Socket.Send_PartyRemoveRequest(World.Party.Members[index].Serial);
+                            AsyncNetClient.Socket.Send_PartyRemoveRequest(World.Party.Members[index].Serial);
                         }
                     }
 

@@ -15,8 +15,7 @@ namespace ClassicUO.Game.UI
     {
         private static ImGuiRenderer _imGuiRenderer;
         private static bool _isInitialized;
-        private static bool _showDemoWindow;
-        private static bool _showDebugWindow = true;
+        private static bool _hasWindows;
         private static readonly List<ImGuiWindow> _windows = new List<ImGuiWindow>();
         private static Microsoft.Xna.Framework.Game _game;
 
@@ -28,12 +27,14 @@ namespace ClassicUO.Game.UI
             if (window == null) return;
             if (!_windows.Contains(window))
                 _windows.Add(window);
+            _hasWindows = _windows.Count > 0;
         }
 
         public static void RemoveWindow(ImGuiWindow window)
         {
             if (window == null) return;
             _windows.Remove(window);
+            _hasWindows = _windows.Count > 0;
         }
 
         public static void RemoveAllWindows()
@@ -142,7 +143,7 @@ namespace ClassicUO.Game.UI
 
         public static void Update(GameTime gameTime)
         {
-            if (!_isInitialized)
+            if (!_isInitialized || !_hasWindows)
                 return;
 
             try
@@ -198,94 +199,6 @@ namespace ClassicUO.Game.UI
             // // Example custom window
             // DrawExampleWindow();
         }
-
-        private static void DrawDebugWindow()
-        {
-            if (ImGui.Begin("TazUO Debug", ref _showDebugWindow))
-            {
-                ImGui.Text($"TazUO Version: {CUOEnviroment.Version}");
-                ImGui.Text($"FPS: {CUOEnviroment.CurrentRefreshRate}");
-                ImGui.Separator();
-
-                if (ImGui.CollapsingHeader("Settings"))
-                {
-                    if (Settings.GlobalSettings != null)
-                    {
-                        ImGui.Text($"FPS Limit: {Settings.GlobalSettings.FPS}");
-                        ImGui.Text($"VSync: {Settings.GlobalSettings.FixedTimeStep}");
-                        if (ProfileManager.CurrentProfile != null)
-                        {
-                            ImGui.Text($"Window Size: {ProfileManager.CurrentProfile.WindowClientBounds}");
-                        }
-                    }
-                }
-
-                if (ImGui.CollapsingHeader("ImGui"))
-                {
-                    ImGui.Checkbox("Show Demo Window", ref _showDemoWindow);
-
-                    if (ImGui.Button("Test Notification"))
-                    {
-                        Log.Info("ImGui test notification triggered!");
-                    }
-                }
-
-                if (ImGui.CollapsingHeader("World"))
-                {
-                    var player = World.Instance.Player;
-                    if (player != null)
-                    {
-                        ImGui.Text($"Player Name: {player.Name}");
-                        ImGui.Text($"Player Position: {player.X}, {player.Y}, {player.Z}");
-                        ImGui.Text($"Player Health: {player.Hits}/{player.HitsMax}");
-                        ImGui.Text($"Player Mana: {player.Mana}/{player.ManaMax}");
-                        ImGui.Text($"Player Stamina: {player.Stamina}/{player.StaminaMax}");
-                    }
-                    else
-                    {
-                        ImGui.Text("Player: Not in game");
-                    }
-                }
-            }
-            ImGui.End();
-        }
-
-        private static void DrawExampleWindow()
-        {
-            if (ImGui.Begin("ImGui Example Window"))
-            {
-                ImGui.Text("Welcome to ImGui in TazUO!");
-                ImGui.Separator();
-
-                ImGui.Text("This is a basic example window to demonstrate ImGui integration.");
-
-                if (ImGui.Button("Test Button"))
-                {
-                    Log.Info("ImGui test button clicked!");
-                }
-
-                ImGui.SameLine();
-                if (ImGui.Button("Another Button"))
-                {
-                    Log.Info("Another ImGui button clicked!");
-                }
-
-                ImGui.Text($"Mouse Position: {ImGui.GetMousePos()}");
-                ImGui.Text($"Time: {DateTime.Now:HH:mm:ss}");
-
-                if (ImGui.CollapsingHeader("Advanced Controls"))
-                {
-                    ImGui.SliderFloat("Test Slider", ref _testSlider, 0.0f, 1.0f);
-                    ImGui.ColorEdit3("Test Color", ref _testColor);
-                    ImGui.Checkbox("Test Checkbox", ref _testCheckbox);
-                }
-            }
-            ImGui.End();
-        }
-
-        private static float _testSlider = 0.5f;
-        private static System.Numerics.Vector3 _testColor = new System.Numerics.Vector3(1.0f, 0.0f, 1.0f);
-        private static bool _testCheckbox = true;
 
         public static void Dispose()
         {

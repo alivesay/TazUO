@@ -483,7 +483,7 @@ namespace ClassicUO.LegionScripting
         }
         public static uint Ping(string expression, Argument[] args, bool quiet)
         {
-            return NetClient.Socket.Statistics.Ping;
+            return AsyncNetClient.Socket.Statistics.Ping;
         }
         public static bool IsPathfinding(string expression, Argument[] args, bool quiet) => World.Player.Pathfinder.AutoWalking;
         public static bool NearestCorpse(string expression, Argument[] args, bool quiet)

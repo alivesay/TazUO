@@ -9,7 +9,8 @@ using System.Collections.Concurrent;
 using System.Data;
 using System.IO;
 using System.Buffers;
-using SDL2;
+using ClassicUO.Utility;
+using SDL3;
 
 namespace ClassicUO.Network
 {
@@ -36,7 +37,7 @@ namespace ClassicUO.Network
                 _socket = new TcpClient();
                 _socket.NoDelay = true;
                 _cancellationTokenSource = new CancellationTokenSource();
-                
+
                 var connectTask = _socket.ConnectAsync(ip, port);
                 var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutS), _cancellationTokenSource.Token); // set your timeout here
 
@@ -197,6 +198,13 @@ namespace ClassicUO.Network
         private readonly ConcurrentQueue<byte[]> _incomingMessages = new();
         private Task _networkTask;
         private CancellationTokenSource _cancellationTokenSource = new();
+        public static PacketsTable PacketsTable { get; private set; }
+#nullable enable
+        public static EncryptionHelper? Encryption { get; private set; }
+#nullable disable
+        public static AsyncNetClient Socket { get; set; } = new AsyncNetClient();
+        public bool IsConnected => _socket != null && _socket.IsConnected;
+        public NetStatistics Statistics { get; }
 
         public AsyncNetClient()
         {
@@ -216,10 +224,25 @@ namespace ClassicUO.Network
             _socket.OnDataReceived += OnDataReceived;
         }
 
-        public static AsyncNetClient Socket { get; set; } = new AsyncNetClient();
+        public static EncryptionType Load(ClientVersion clientVersion, EncryptionType encryption)
+        {
+            PacketsTable = new PacketsTable(clientVersion);
 
-        public bool IsConnected => _socket != null && _socket.IsConnected;
-        public NetStatistics Statistics { get; }
+            if (encryption != 0)
+            {
+                Encryption = new EncryptionHelper(clientVersion);
+                Log.Trace("Calculating encryption by client version...");
+                Log.Trace($"encryption: {Encryption.EncryptionType}");
+
+                if (Encryption.EncryptionType != encryption)
+                {
+                    Log.Warn($"Encryption found: {Encryption.EncryptionType}");
+                    encryption = Encryption.EncryptionType;
+                }
+            }
+
+            return encryption;
+        }
 
         public uint LocalIP
         {
@@ -284,7 +307,7 @@ namespace ClassicUO.Network
 
             _isDisconnecting = true;
 
-            SDL.SDL_CaptureMouse(SDL.SDL_bool.SDL_FALSE);
+            SDL.SDL_CaptureMouse(false);
             _isCompressionEnabled = false;
             Statistics.Reset();
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+﻿// SPDX-License-Identifier: BSD-2-Clause
 
 using System.Collections.Generic;
 using ClassicUO.Configuration;
@@ -59,7 +59,7 @@ namespace ClassicUO.Game.Managers
             get
             {
                 return ((_world.ClientFeatures.Flags & CharacterListFlags.CLF_NEW_MOVEMENT_SYSTEM) == 0 || _ackReceived) &&
-                        (NetClient.Encryption == null || NetClient.Encryption.EncryptionType == 0) &&
+                        (AsyncNetClient.Encryption == null || AsyncNetClient.Encryption.EncryptionType == 0) &&
                         ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.WorldMapShowParty &&
                         UIManager.GetGump<WorldMapGump>() != null; // horrible, but works
             }
@@ -79,7 +79,7 @@ namespace ClassicUO.Game.Managers
                 Log.Warn("Server support new movement system. Can't use the 0xF0 packet to query guild/party position");
                 v = false;
             }
-            else if (NetClient.Encryption?.EncryptionType != 0 && !_ackReceived)
+            else if (AsyncNetClient.Encryption?.EncryptionType != 0 && !_ackReceived)
             {
                 Log.Warn("Server has encryption. Can't use the 0xF0 packet to query guild/party position");
                 v = false;
@@ -222,7 +222,7 @@ namespace ClassicUO.Game.Managers
                 //    return;
                 //}
 
-                NetClient.Socket.Send_QueryGuildPosition();
+                AsyncNetClient.Socket.Send_QueryGuildPosition();
 
                 if (_world.Party != null && _world.Party.Leader != 0)
                 {
@@ -234,7 +234,7 @@ namespace ClassicUO.Game.Managers
 
                             if (mob == null || mob.Distance > _world.ClientViewRange)
                             {
-                                NetClient.Socket.Send_QueryPartyPosition();
+                                AsyncNetClient.Socket.Send_QueryPartyPosition();
 
                                 break;
                             }

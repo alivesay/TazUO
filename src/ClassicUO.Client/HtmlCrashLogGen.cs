@@ -101,7 +101,7 @@ public static class HtmlCrashLogGen
             Log.Trace("Generating HTML Crash report...");
             var filePath = Path.GetTempFileName() + ".html";
             File.WriteAllText(filePath, html);
-            Utility.Platforms.PlatformHelper.LaunchBrowser(new Uri(filePath).AbsoluteUri);
+            Utility.Platforms.PlatformHelper.LaunchBrowser(new Uri(filePath).AbsoluteUri, true);
             Log.Trace($"Saved to [{filePath}]...");
         }
         catch (Exception e)

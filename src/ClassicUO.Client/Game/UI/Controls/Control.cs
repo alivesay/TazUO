@@ -9,7 +9,7 @@ using ClassicUO.Renderer;
 using ClassicUO.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using SDL2;
+using SDL3;
 using Keyboard = ClassicUO.Input.Keyboard;
 
 namespace ClassicUO.Game.UI.Controls
@@ -26,6 +26,7 @@ namespace ClassicUO.Game.UI.Controls
         private Point _offset;
         private Control _parent;
         private float alpha = 1.0f;
+        private List<Control> _reusableDisposedList = new();
 
         protected Control(Control parent = null)
         {
@@ -316,13 +317,13 @@ namespace ClassicUO.Game.UI.Controls
         /// </summary>
         /// <returns>int</returns>
         public int GetX() => X;
-        
+
         /// <summary>
         /// Used in python API
         /// </summary>
         /// <returns>int</returns>
         public int GetY() => Y;
-        
+
         public void UpdateOffset(int x, int y)
         {
             if (_offset.X != x || _offset.Y != y)
@@ -376,10 +377,9 @@ namespace ClassicUO.Game.UI.Controls
                 return;
             }
 
-
             if (Children.Count != 0)
             {
-                List<Control> removalList = new List<Control>(); ;
+                bool hasDisposals = false;
                 int w = 0, h = 0;
 
                 for (int i = 0; i < Children.Count; i++)
@@ -398,7 +398,8 @@ namespace ClassicUO.Game.UI.Controls
 
                     if (c.IsDisposed)
                     {
-                        removalList.Add(c);
+                        _reusableDisposedList.Add(c);
+                        hasDisposals = true;
                         continue;
                     }
 
@@ -421,9 +422,9 @@ namespace ClassicUO.Game.UI.Controls
                     }
                 }
 
-                if (removalList.Count > 0)
+                if (hasDisposals)
                 {
-                    foreach (Control c in removalList)
+                    foreach (Control c in _reusableDisposedList)
                     {
                         if (Children.Contains(c))
                         {
@@ -431,6 +432,8 @@ namespace ClassicUO.Game.UI.Controls
                             Children.Remove(c);
                         }
                     }
+
+                    _reusableDisposedList.Clear();
                 }
 
                 if (WantUpdateSize && IsVisible)
@@ -647,7 +650,7 @@ namespace ClassicUO.Game.UI.Controls
 
         internal event EventHandler<KeyboardEventArgs> KeyDown, KeyUp;
 
-        internal event EventHandler<SDL.SDL_GameControllerButton> ControllerButtonUp, ControllerButtonDown;
+        internal event EventHandler<SDL.SDL_GamepadButton> ControllerButtonUp, ControllerButtonDown;
 
 
         public void HitTest(int x, int y, ref Control res)
@@ -735,7 +738,7 @@ namespace ClassicUO.Game.UI.Controls
 
             return c;
         }
-        
+
         public void Insert(int index, Control c, int page = 0)
         {
             c.Page = 0;
@@ -860,9 +863,9 @@ namespace ClassicUO.Game.UI.Controls
             KeyUp?.Raise(arg);
         }
 
-        public void InvokeControllerButtonUp(SDL.SDL_GameControllerButton button) { OnControllerButtonUp(button); ControllerButtonUp?.Raise(button); }
+        public void InvokeControllerButtonUp(SDL.SDL_GamepadButton button) { OnControllerButtonUp(button); ControllerButtonUp?.Raise(button); }
 
-        public void InvokeControllerButtonDown(SDL.SDL_GameControllerButton button) { OnControllerButtonDown(button); ControllerButtonDown?.Raise(button); }
+        public void InvokeControllerButtonDown(SDL.SDL_GamepadButton button) { OnControllerButtonDown(button); ControllerButtonDown?.Raise(button); }
 
         public void InvokeMouseWheel(MouseEventType delta)
         {
@@ -953,9 +956,9 @@ namespace ClassicUO.Game.UI.Controls
             Parent?.OnKeyUp(key, mod);
         }
 
-        protected virtual void OnControllerButtonUp(SDL.SDL_GameControllerButton button) { }
+        protected virtual void OnControllerButtonUp(SDL.SDL_GamepadButton button) { }
 
-        protected virtual void OnControllerButtonDown(SDL.SDL_GameControllerButton button) { }
+        protected virtual void OnControllerButtonDown(SDL.SDL_GamepadButton button) { }
 
         public virtual bool Contains(int x, int y)
         {

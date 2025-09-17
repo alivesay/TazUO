@@ -93,12 +93,12 @@ namespace ClassicUO.LegionScripting
         #endregion
 
         private ConcurrentBag<uint> ignoreList = new();
-        private ConcurrentQueue<JournalEntry> journalEntries = new();
+        private ConcurrentQueue<PyJournalEntry> journalEntries = new();
         private World World = Client.Game.UO.World;
         private Item backpack;
         private PlayerMobile player;
 
-        public ConcurrentQueue<JournalEntry> JournalEntries
+        public ConcurrentQueue<PyJournalEntry> JournalEntries
         {
             get { return journalEntries; }
         }
@@ -441,8 +441,8 @@ namespace ClassicUO.LegionScripting
         (() =>
             {
                 PopupMenuGump.CloseNext = serial;
-                NetClient.Socket.Send_RequestPopupMenu(serial);
-                NetClient.Socket.Send_PopupMenuSelection(serial, entry);
+                AsyncNetClient.Socket.Send_RequestPopupMenu(serial);
+                AsyncNetClient.Socket.Send_PopupMenuSelection(serial, entry);
             }
         );
 
@@ -815,11 +815,11 @@ namespace ClassicUO.LegionScripting
             {
                 if (World.MessageManager.PromptData.Prompt == ConsolePrompt.ASCII)
                 {
-                    NetClient.Socket.Send_ASCIIPromptResponse(World, message, message.Length < 1);
+                    AsyncNetClient.Socket.Send_ASCIIPromptResponse(World, message, message.Length < 1);
                 }
                 else if (World.MessageManager.PromptData.Prompt == ConsolePrompt.Unicode)
                 {
-                    NetClient.Socket.Send_UnicodePromptResponse(World, message, Settings.GlobalSettings.Language, message.Length < 1);
+                    AsyncNetClient.Socket.Send_UnicodePromptResponse(World, message, Settings.GlobalSettings.Language, message.Length < 1);
                 }
 
                 World.MessageManager.PromptData = default;
@@ -1912,6 +1912,18 @@ namespace ClassicUO.LegionScripting
         }
 
         /// <summary>
+        /// Requests Object Property List (OPL) data for the specified serials.
+        /// If the OPL data doesn't already exist, it will be requested from the server.
+        /// OPL consists of item name and tooltip text(properties).
+        /// </summary>
+        /// <param name="serials">A list of object serials to request OPL data for</param>
+        public void RequestOPLData(IList<uint> serials) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
+            foreach (uint s in serials)
+                World.OPL.Contains(s); //Check if it already exists, if not request it
+        });
+
+        /// <summary>
         /// Check if a player has a server gump. Leave blank to check if they have any server gump.
         /// Example:
         /// ```py
@@ -2078,7 +2090,7 @@ namespace ClassicUO.LegionScripting
         (() =>
             {
                 if (World.Player.Race == RaceType.GARGOYLE)
-                    NetClient.Socket.Send_ToggleGargoyleFlying();
+                    AsyncNetClient.Socket.Send_ToggleGargoyleFlying();
             }
         );
 
@@ -2101,9 +2113,9 @@ namespace ClassicUO.LegionScripting
 
                         case "secondary": GameActions.UseSecondaryAbility(World); break;
 
-                        case "stun": NetClient.Socket.Send_StunRequest(); break;
+                        case "stun": AsyncNetClient.Socket.Send_StunRequest(); break;
 
-                        case "disarm": NetClient.Socket.Send_DisarmRequest(); break;
+                        case "disarm": AsyncNetClient.Socket.Send_DisarmRequest(); break;
                     }
                 }
             );
@@ -2227,7 +2239,7 @@ namespace ClassicUO.LegionScripting
         {
             PythonList entries = new PythonList();
 
-            DateTime cutoff = DateTime.UtcNow - TimeSpan.FromSeconds(30);
+            DateTime cutoff = DateTime.UtcNow - TimeSpan.FromSeconds(seconds);
 
             bool checkMatches = !string.IsNullOrEmpty(matchingText);
 
@@ -2280,7 +2292,7 @@ namespace ClassicUO.LegionScripting
             }
             else
             {
-                ConcurrentQueue<JournalEntry> newQueue = new ();
+                ConcurrentQueue<PyJournalEntry> newQueue = new ();
 
                 foreach (var je in JournalEntries.ToArray())
                 {
@@ -2375,9 +2387,9 @@ namespace ClassicUO.LegionScripting
         {
             switch (virtue.ToLower())
             {
-                case "honor": MainThreadQueue.InvokeOnMainThread(() => { NetClient.Socket.Send_InvokeVirtueRequest(0x01); }); break;
-                case "sacrifice": MainThreadQueue.InvokeOnMainThread(() => { NetClient.Socket.Send_InvokeVirtueRequest(0x02); }); break;
-                case "valor": MainThreadQueue.InvokeOnMainThread(() => { NetClient.Socket.Send_InvokeVirtueRequest(0x03); }); break;
+                case "honor": MainThreadQueue.InvokeOnMainThread(() => { AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x01); }); break;
+                case "sacrifice": MainThreadQueue.InvokeOnMainThread(() => { AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x02); }); break;
+                case "valor": MainThreadQueue.InvokeOnMainThread(() => { AsyncNetClient.Socket.Send_InvokeVirtueRequest(0x03); }); break;
             }
         }
 
@@ -2536,19 +2548,34 @@ namespace ClassicUO.LegionScripting
         });
 
         /// <summary>
-        /// Return a list of all mobiles the client is aware of.
+        /// Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
         /// Example:
         /// ```py
+        /// # Get all mobiles
         /// mobiles = API.GetAllMobiles()
-        /// if mobiles:
-        ///   API.SysMsg("Found " + str(len(mobiles)) + " mobiles!")
-        ///   for mob in mobiles:
-        ///     API.SysMsg(mob.Name)
-        ///     API.Pause(0.5)
+        /// # Get all mobiles with graphic 400
+        /// humans = API.GetAllMobiles(400)
+        /// # Get all mobiles within 10 tiles
+        /// nearby = API.GetAllMobiles(distance=10)
+        /// # Get all humans within 5 tiles
+        /// nearby_humans = API.GetAllMobiles(400, 5)
         /// ```
         /// </summary>
+        /// <param name="graphic">Optional graphic ID to filter by</param>
+        /// <param name="distance">Optional maximum distance from player</param>
         /// <returns></returns>
-        public PyMobile[] GetAllMobiles() => MainThreadQueue.InvokeOnMainThread(() => { return World.Mobiles.Values.Select(m=>new PyMobile(m)).ToArray(); });
+        public PyMobile[] GetAllMobiles(ushort? graphic = null, int? distance = null) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
+            var mobiles = World.Mobiles.Values.AsEnumerable();
+
+            if (graphic.HasValue)
+                mobiles = mobiles.Where(m => m.Graphic == graphic.Value);
+
+            if (distance.HasValue)
+                mobiles = mobiles.Where(m => m.Distance <= distance.Value);
+
+            return mobiles.Select(m => new PyMobile(m)).ToArray();
+        });
 
         /// <summary>
         /// Get the tile at a location.

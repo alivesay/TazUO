@@ -15,18 +15,30 @@ namespace ClassicUO.Utility.Platforms
         public static readonly bool IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
         public static readonly bool IsOSX = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
-        public static void LaunchBrowser(string url)
+        public static void LaunchBrowser(string url, bool localFile = false, bool retry = false)
         {
             try
             {
+                if(!localFile)
+                    if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri) || (uri.Scheme != "http" && uri.Scheme != "https"))
+                    {
+                        Log.Error($"Invalid URL format: {url}, trying with https://..");
+
+                        if(!retry)
+                            LaunchBrowser("https://" + url, true);
+
+                        return;
+                    }
+
                 if (IsWindows)
                 {
                     ProcessStartInfo psi = new ProcessStartInfo
                     {
-                        FileName = url,
-                        UseShellExecute = true
+                        FileName = "cmd",
+                        Arguments = $"/c start \"\" \"{url}\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
                     };
-
                     Process.Start(psi);
                 }
                 else if (IsOSX)

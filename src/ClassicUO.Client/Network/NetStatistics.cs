@@ -4,26 +4,13 @@ using System;
 
 namespace ClassicUO.Network
 {
-    public sealed class NetStatistics
+    public sealed class NetStatistics(AsyncNetClient socket)
     {
-        private readonly NetClient _socket;
-        private readonly AsyncNetClient _asocket;
         private uint _lastTotalBytesReceived, _lastTotalBytesSent, _lastTotalPacketsReceived, _lastTotalPacketsSent;
         private byte _pingIdx;
 
         private readonly uint[] _pings = new uint[5];
         private uint _startTickValue, _statisticsTimer;
-
-
-        public NetStatistics(NetClient socket)
-        {
-            _socket = socket;
-        }
-
-        public NetStatistics(AsyncNetClient socket)
-        {
-            _asocket = socket;
-        }
 
 
         public DateTime ConnectedFrom { get; set; }
@@ -79,27 +66,15 @@ namespace ClassicUO.Network
 
         public void SendPing()
         {
-            if(_socket != null)
+            if (socket != null)
             {
-                if (!_socket.IsConnected)
-                {
-                    return;
-                }
-
-                _startTickValue = Time.Ticks;
-                //_socket.Send_Ping(_pingIdx);
-                _pingIdx = (byte)((_pingIdx + 1) % _pings.Length);
-            }
-
-            if (_asocket != null)
-            {
-                 if (!_asocket.IsConnected)
+                 if (!socket.IsConnected)
                  {
                      return;
                  }
-                
+
                  _startTickValue = Time.Ticks;
-                 _asocket.Send_Ping(_pingIdx);
+                 socket.Send_Ping(_pingIdx);
                  _pingIdx = (byte)((_pingIdx + 1) % _pings.Length);
             }
         }

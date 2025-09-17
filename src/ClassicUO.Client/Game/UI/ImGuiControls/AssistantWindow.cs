@@ -1,20 +1,60 @@
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using ClassicUO.Game.UI.Gumps;
 
 namespace ClassicUO.Game.UI.ImGuiControls
 {
     public class AssistantWindow : SingletonImGuiWindow<AssistantWindow>
     {
-        private readonly List<TabItem> _tabs;
+        private readonly List<TabItem> _tabs = new();
         private int _selectedTabIndex = -1;
+        private int _preSelectIndex = -1;
         private AssistantWindow() : base("Assistant")
         {
             WindowFlags = ImGuiWindowFlags.AlwaysAutoResize;
-            _tabs = new List<TabItem>();
 
+            AddTab("Auto Loot", DrawAutoLoot, AutoLootWindow.Show, () => AutoLootWindow.Instance?.Dispose() );
             AddTab("Organizer", DrawOrganizer, OrganizerWindow.Show, () => OrganizerWindow.Instance?.Dispose() );
             AddTab("Bandage Agent", DrawBandageAgent, BandageAgentWindow.Show, () => BandageAgentWindow.Instance?.Dispose() );
+        }
+
+        public void SelectTab(AssistantGump.PAGE page)
+        {
+            switch (page)
+            {
+                case AssistantGump.PAGE.None:
+                    break;
+                case AssistantGump.PAGE.AutoLoot:
+                    _preSelectIndex = 0;
+                    break;
+                case AssistantGump.PAGE.AutoSell:
+                    break;
+                case AssistantGump.PAGE.AutoBuy:
+                    break;
+                case AssistantGump.PAGE.MobileGraphicFilter:
+                    break;
+                case AssistantGump.PAGE.SpellBar:
+                    break;
+                case AssistantGump.PAGE.HUD:
+                    break;
+                case AssistantGump.PAGE.SpellIndicator:
+                    break;
+                case AssistantGump.PAGE.JournalFilter:
+                    break;
+                case AssistantGump.PAGE.TitleBar:
+                    break;
+                case AssistantGump.PAGE.DressAgent:
+                    break;
+                case AssistantGump.PAGE.BandageAgent:
+                    _preSelectIndex = 2;
+                    break;
+                case AssistantGump.PAGE.FriendsList:
+                    break;
+                case AssistantGump.PAGE.Organizer:
+                    _preSelectIndex = 1;
+                    break;
+            }
         }
 
         public void AddTab(string title, Action drawContent, Action showFullWindow, Action dispose)
@@ -46,33 +86,39 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 return;
             }
 
+            bool open = true;
+
             // Draw tab bar
             if (ImGui.BeginTabBar("TabMenuTabs", ImGuiTabBarFlags.Reorderable))
             {
+                bool hasPreSelection = _preSelectIndex > -1;
                 for (int i = 0; i < _tabs.Count; i++)
                 {
-                    var tab = _tabs[i];
-                    if (ImGui.BeginTabItem(tab.Title))
+                    TabItem tab = _tabs[i];
+                    if (ImGui.BeginTabItem(tab.Title, ref open, (hasPreSelection && i == _preSelectIndex) ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None))
                     {
                         _selectedTabIndex = i;
                         tab.DrawContent?.Invoke();
 
-                        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                        {
-                            if (tab.ShowFullWindow != null)
-                            {
-                                tab.ShowFullWindow.Invoke();
-                                RemoveTab(i);
-                            }
-                        }
+                        // if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                        // {
+                        //     if (tab.ShowFullWindow != null)
+                        //     {
+                        //         tab.ShowFullWindow.Invoke();
+                        //         RemoveTab(i);
+                        //     }
+                        // }
 
                         ImGui.EndTabItem();
                     }
                 }
+                if (hasPreSelection)
+                    _preSelectIndex = -1;
                 ImGui.EndTabBar();
             }
         }
 
+        private void DrawAutoLoot() => AutoLootWindow.GetInstance()?.DrawContent();
         private void DrawOrganizer() => OrganizerWindow.GetInstance()?.DrawContent();
         private void DrawBandageAgent() => BandageAgentWindow.GetInstance()?.DrawContent();
 

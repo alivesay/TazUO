@@ -68,6 +68,15 @@ namespace ClassicUO.Game.UI.Gumps.Login
             LayerOrder = UILayer.Under;
         }
 
+        public override void Update()
+        {
+            base.Update();
+
+            if (World.Instance != null && World.Instance.InGame)
+            {
+                Dispose();
+            }
+        }
 
         public override void OnButtonClick(int buttonID)
         {

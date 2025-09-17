@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using ClassicUO.Configuration;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Input;
 using ClassicUO.Utility;
-using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.Managers
 {
@@ -17,7 +15,7 @@ namespace ClassicUO.Game.Managers
     {
         public static OrganizerAgent Instance { get; private set; }
 
-        public List<OrganizerConfig> OrganizerConfigs { get; private set; } = new List<OrganizerConfig>();
+        public List<OrganizerConfig> OrganizerConfigs { get; private set; } = new();
 
         private static string GetDataPath()
         {
@@ -47,7 +45,7 @@ namespace ClassicUO.Game.Managers
             // Check if commands already exist before registering
             if (!World.Instance.CommandManager.Commands.ContainsKey("organize"))
             {
-                World.Instance.CommandManager.Register("organize", (s) => 
+                World.Instance.CommandManager.Register("organize", (s) =>
                 {
                     if (s.Length == 1)
                     {
@@ -70,7 +68,7 @@ namespace ClassicUO.Game.Managers
 
             if (!World.Instance.CommandManager.Commands.ContainsKey("organizer"))
             {
-                World.Instance.CommandManager.Register("organizer", (s) => 
+                World.Instance.CommandManager.Register("organizer", (s) =>
                 {
                     if (s.Length == 1)
                     {
@@ -93,7 +91,7 @@ namespace ClassicUO.Game.Managers
 
             if (!World.Instance.CommandManager.Commands.ContainsKey("organizerlist"))
             {
-                World.Instance.CommandManager.Register("organizerlist", (s) => 
+                World.Instance.CommandManager.Register("organizerlist", (s) =>
                 {
                     Instance?.ListOrganizers();
                 });
@@ -177,7 +175,7 @@ namespace ClassicUO.Game.Managers
             var config = OrganizerConfigs.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             if (config == null) return;
             int index = OrganizerConfigs.IndexOf(config);
-            var macro = new Macro($"Organizer: {config.Name}", SDL2.SDL.SDL_Keycode.SDLK_UNKNOWN, false, false, false) { Items = new MacroObjectString(MacroType.ClientCommand, MacroSubType.MSC_NONE, $"organize {index}") };
+            var macro = new Macro($"Organizer: {config.Name}", SDL3.SDL.SDL_Keycode.SDLK_UNKNOWN, false, false, false) { Items = new MacroObjectString(MacroType.ClientCommand, MacroSubType.MSC_NONE, $"organize {index}") };
 
             macroManager.PushToBack(macro);
             UIManager.Add(new MacroButtonGump(World.Instance, macro, Mouse.Position.X, Mouse.Position.Y));
@@ -396,7 +394,7 @@ namespace ClassicUO.Game.Managers
 
     }
 
-    [JsonSerializable(typeof(List<OrganizerAgent>))]
+    [JsonSerializable(typeof(List<OrganizerConfig>))]
     internal partial class OrganizerAgentContext : JsonSerializerContext
     { }
 

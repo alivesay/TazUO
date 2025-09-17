@@ -8,7 +8,7 @@ using ClassicUO.Network;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
 using ClassicUO.Utility.Logging;
-using SDL2;
+using SDL3;
 using System;
 using System.Globalization;
 using System.IO;
@@ -60,9 +60,10 @@ namespace ClassicUO
 #else
                 sb.AppendLine($"TazUO [STANDARD_BUILD] - {CUOEnviroment.Version} - {DateTime.Now}");
 #endif
+                sb.AppendLine($"Framework: {System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription}");
 
                 sb.AppendLine
-                    ($"OS: {Environment.OSVersion.Platform} {(Environment.Is64BitOperatingSystem ? "x64" : "x86")}");
+                    ($"OS: {System.Runtime.InteropServices.RuntimeInformation.OSDescription} ({System.Runtime.InteropServices.RuntimeInformation.OSArchitecture})");
 
                 sb.AppendLine($"Thread: {Thread.CurrentThread.Name}");
                 sb.AppendLine();
@@ -507,12 +508,30 @@ namespace ClassicUO
         private static void CopyRequiredLibs()
         {
             string nativePath = Path.Combine(AppContext.BaseDirectory, GetPlatformFolder());
-            foreach (var file in Directory.GetFiles(nativePath))
-            {
-                var path = Path.Combine(AppContext.BaseDirectory, Path.GetFileName(file));
-                if (!File.Exists(path))
-                    File.Copy(file, path, overwrite: true);
-            }
+            if(Directory.Exists(nativePath))
+                foreach (var file in Directory.GetFiles(nativePath))
+                {
+                    var path = Path.Combine(AppContext.BaseDirectory, Path.GetFileName(file));
+                    bool copy = !File.Exists(path);
+
+                    if (!copy) //If file exists, see if they are *most likely* the same file
+                    {
+                        FileInfo existing = new(path);
+                        FileInfo newFile = new(file);
+
+                        if(existing.Length != newFile.Length)
+                            copy = true;
+                    }
+
+                    if (copy)
+                    {
+                        try
+                        {
+                            File.Copy(file, path, overwrite: true);
+                        }
+                        catch { }
+                    }
+                }
         }
 
         private static string GetPlatformFolder()
@@ -523,8 +542,7 @@ namespace ClassicUO
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 return "lib64";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return "osx";
-                //return RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "osx-arm" : "osx";
+                return RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "osx-arm" : "osx";
 
             throw new PlatformNotSupportedException();
         }

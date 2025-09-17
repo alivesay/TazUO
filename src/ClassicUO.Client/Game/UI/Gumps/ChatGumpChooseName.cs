@@ -153,7 +153,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 if (!string.IsNullOrWhiteSpace(_textBox.Text))
                 {
-                    NetClient.Socket.Send_OpenChat(_textBox.Text);
+                    AsyncNetClient.Socket.Send_OpenChat(_textBox.Text);
                 }
             }
 

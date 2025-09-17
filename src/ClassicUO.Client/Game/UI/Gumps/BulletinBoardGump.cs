@@ -419,7 +419,7 @@ namespace ClassicUO.Game.UI.Gumps
             switch ((ButtonType) buttonID)
             {
                 case ButtonType.Post:
-                    NetClient.Socket.Send_BulletinBoardPostMessage(LocalSerial, _msgSerial, _subjectTextbox.Text, _textBox.Text);
+                    AsyncNetClient.Socket.Send_BulletinBoardPostMessage(LocalSerial, _msgSerial, _subjectTextbox.Text, _textBox.Text);
 
                     Dispose();
 
@@ -446,7 +446,7 @@ namespace ClassicUO.Game.UI.Gumps
                     break;
 
                 case ButtonType.Remove:
-                    NetClient.Socket.Send_BulletinBoardRemoveMessage(LocalSerial, _msgSerial);
+                    AsyncNetClient.Socket.Send_BulletinBoardRemoveMessage(LocalSerial, _msgSerial);
                     Dispose();
 
                     break;
@@ -546,7 +546,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             if (root != null)
             {
-                NetClient.Socket.Send_BulletinBoardRequestMessage(root.LocalSerial, LocalSerial);
+                AsyncNetClient.Socket.Send_BulletinBoardRequestMessage(root.LocalSerial, LocalSerial);
             }
 
             return true;

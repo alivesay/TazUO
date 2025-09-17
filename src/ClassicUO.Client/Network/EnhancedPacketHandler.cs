@@ -43,7 +43,7 @@ public class EnhancedPacketHandler
             }
         }
         
-        NetClient.Socket.SendEnhancedPacket(); //Confirm we are ready to receive enhanced packets.
+        AsyncNetClient.Socket.SendEnhancedPacket(); //Confirm we are ready to receive enhanced packets.
     }
 
     private readonly Dictionary<ushort, EnhancedOnPacketBufferReader> _handlers = new();

@@ -14,11 +14,11 @@ public partial class LocationGoGump : Gump
      * Valid inputs:
      * 3123, 124
      * 123 4141
-     * 1331:745 
+     * 1331:745
      */
     [GeneratedRegex(@"^(?<X>\d+)\s*[,:\s]\s*(?<Y>\d+)$")]
     private static partial Regex PointCoordsRegex();
-    
+
     private readonly World _world;
     private readonly Action<int, int> _goTo;
 
@@ -53,7 +53,7 @@ public partial class LocationGoGump : Gump
                 Hue = 999
             }
         );
-        
+
         Label l = Add
         (
             new Label(_message, true, 0xFFFF, Width - 90, 0xFF)
@@ -101,7 +101,7 @@ public partial class LocationGoGump : Gump
                 ButtonAction = ButtonAction.Activate
             }
         );
-        
+
         Add
         (
             new Label("Examples:\n 1639, 1532\n 100o25'S,40o04'E\n 9 14'N 91 37'W", true, 0xFFFF, Width - 90, 0xFF)
@@ -132,11 +132,11 @@ public partial class LocationGoGump : Gump
             point.Y = int.Parse(match.Groups["Y"].Value);
             return true;
         }
-        catch(Exception e)
+        catch
         {
             // do nothing
         }
-        
+
         return false;
     }
 

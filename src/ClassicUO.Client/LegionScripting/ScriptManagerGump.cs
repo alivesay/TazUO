@@ -65,6 +65,10 @@ namespace ClassicUO.LegionScripting
             {
                 ScriptingInfoGump.Show();
             }));
+            refresh.ContextMenu.Add(new ContextMenuItemEntry("Disable Module Cache", () =>
+            {
+                LegionScripting.LScriptSettings.DisableModuleCache = !LegionScripting.LScriptSettings.DisableModuleCache;
+            }, true, LegionScripting.LScriptSettings.DisableModuleCache));
 
             refresh.MouseDown += (s, e) =>
             {

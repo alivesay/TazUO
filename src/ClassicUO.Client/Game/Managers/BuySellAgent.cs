@@ -165,7 +165,7 @@ namespace ClassicUO.Game.Managers
 
             if (buyList.Count == 0) return;
 
-            NetClient.Socket.Send_BuyRequest(shopSerial, buyList.ToArray());
+            AsyncNetClient.Socket.Send_BuyRequest(shopSerial, buyList.ToArray());
             GameActions.Print(Client.Game.UO.World, $"Purchased {total_count} items for {val} gold.");
             UIManager.GetGump(shopSerial)?.Dispose();
         }
@@ -277,7 +277,7 @@ namespace ClassicUO.Game.Managers
 
             if (sellList.Count == 0) return;
 
-            NetClient.Socket.Send_SellRequest(vendorSerial, sellList.ToArray());
+            AsyncNetClient.Socket.Send_SellRequest(vendorSerial, sellList.ToArray());
             GameActions.Print(Client.Game.UO.World, $"Sold {total_count} items for {val} gold.");
             UIManager.GetGump(vendorSerial)?.Dispose();
         }

@@ -14,10 +14,9 @@ using ClassicUO.Renderer;
 using ClassicUO.Resources;
 using ClassicUO.Utility;
 using ClassicUO.Utility.Logging;
-using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SDL2;
+using SDL3;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -172,7 +171,7 @@ namespace ClassicUO.Game.Scenes
         public GameScene()
         {
         }
-    
+
         public void DoubleClickDelayed(uint serial)
         {
             _useItemQueue.Add(serial);
@@ -181,6 +180,7 @@ namespace ClassicUO.Game.Scenes
         public override void Load()
         {
             base.Load();
+            Game.UI.ImGuiManager.Initialize(Client.Game);
 
             GridContainerSaveData.Instance.Load();
 
@@ -205,7 +205,7 @@ namespace ClassicUO.Game.Scenes
                 TopBarGump.Create(_world);
             }
 
-            NetClient.Socket.Disconnected += SocketOnDisconnected;
+            AsyncNetClient.Socket.Disconnected += SocketOnDisconnected;
             EventSink.MessageReceived += ChatOnMessageReceived;
             UIManager.ContainerScale = ProfileManager.CurrentProfile.ContainersScale / 100f;
 
@@ -375,7 +375,7 @@ namespace ClassicUO.Game.Scenes
             {
                 return;
             }
-
+            Game.UI.ImGuiManager.Dispose();
             GridContainerSaveData.Instance.Save();
             GridContainerSaveData.Reset();
             JournalFilterManager.Instance.Save();
@@ -435,8 +435,8 @@ namespace ClassicUO.Game.Scenes
 
             StaticFilters.CleanTreeTextures();
 
-            NetClient.Socket.Disconnected -= SocketOnDisconnected;
-            NetClient.Socket.Disconnect();
+            AsyncNetClient.Socket.Disconnected -= SocketOnDisconnected;
+            AsyncNetClient.Socket.Disconnect();
             _light_render_target?.Dispose();
             _world_render_target?.Dispose();
             _xbr?.Dispose();
@@ -846,14 +846,14 @@ namespace ClassicUO.Game.Scenes
 
             if (Time.Ticks > _timePing)
             {
-                NetClient.Socket.Statistics.SendPing();
+                AsyncNetClient.Socket.Statistics.SendPing();
                 _timePing = (long)Time.Ticks + 1000;
             }
 
-            if (currentProfile.ForceResyncOnHang && Time.Ticks - NetClient.Socket.Statistics.LastPingReceived > 5000 && Time.Ticks - _lastResync > 5000)
+            if (currentProfile.ForceResyncOnHang && Time.Ticks - AsyncNetClient.Socket.Statistics.LastPingReceived > 5000 && Time.Ticks - _lastResync > 5000)
             {
                 //Last ping > ~5 seconds
-                NetClient.Socket.Send_Resync();
+                AsyncNetClient.Socket.Send_Resync();
                 _lastResync = Time.Ticks;
                 GameActions.Print(_world, "Possible connection hang, resync attempted", 32, MessageType.System);
             }
@@ -1211,7 +1211,7 @@ namespace ClassicUO.Game.Scenes
                 srcRect = new Rectangle(srcX, srcY, srcW, srcH);
                 destRect = new Rectangle(0, 0, vpW, vpH);
             }
-            
+
             UpdatePostProcessState(gd);
 
             if (_postFx == _xbr && _xbr != null)
@@ -1311,7 +1311,7 @@ namespace ClassicUO.Game.Scenes
             {
                 batcher.GraphicsDevice.SetRenderTarget(null);
             }
-            
+
             //batcher.Begin();
             //hueVec.X = 0;
             //hueVec.Y = 1;
@@ -1483,7 +1483,7 @@ namespace ClassicUO.Game.Scenes
             int vh = Math.Max(1, Camera.Bounds.Height);
             int rtWidth = Math.Min(profile.GlobalScaling ? vw : (int)Math.Floor(vw * scale), _max_texture_size);
             int rtHeight = Math.Min(profile.GlobalScaling ? vh : (int)Math.Floor(vh * scale), _max_texture_size);
-            
+
             if (_use_render_target
                 && (_world_render_target == null
                     || _world_render_target.IsDisposed

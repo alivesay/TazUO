@@ -275,12 +275,12 @@ namespace ClassicUO.Game.UI.Gumps
 
                     if (isPurchase)
                     {
-                        NetClient.Socket.Send_BuyRequest(gumpSerial, item);
+                        AsyncNetClient.Socket.Send_BuyRequest(gumpSerial, item);
                         count -= quantity.Value;
                     }
                     else
                     {
-                        NetClient.Socket.Send_SellRequest(gumpSerial, item);
+                        AsyncNetClient.Socket.Send_SellRequest(gumpSerial, item);
                         count -= quantity.Value;
                     }
 
@@ -328,11 +328,11 @@ namespace ClassicUO.Game.UI.Gumps
 
                         if (isPurchase)
                         {
-                            NetClient.Socket.Send_BuyRequest(gumpSerial, item);
+                            AsyncNetClient.Socket.Send_BuyRequest(gumpSerial, item);
                         }
                         else
                         {
-                            NetClient.Socket.Send_SellRequest(gumpSerial, item);
+                            AsyncNetClient.Socket.Send_SellRequest(gumpSerial, item);
                         }
                         Dispose();
                     }

@@ -35,7 +35,7 @@ namespace ClassicUO.Configuration
 
         public static void Load(string servername, string username, string charactername)
         {
-            string path = FileSystemHelper.CreateFolderIfNotExists(RootPath, username, servername, charactername);
+            string path = FileSystemHelper.CreateFolderIfNotExists(RootPath, username.Trim(), servername.Trim(), charactername.Trim());
             string fileToLoad = Path.Combine(path, "profile.json");
 
             ProfilePath = path;

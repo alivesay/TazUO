@@ -5768,7 +5768,7 @@ sealed class PacketHandlers
 
                     string text = $"<left>{title}{description}{wtf}</left>";
                     bool alreadyExists = world.Player.IsBuffIconExists(ic);
-                    world.Player.AddBuff(ic, BuffTable.Table[iconID], timer, text);
+                    world.Player.AddBuff(ic, BuffTable.Table[iconID], timer, text, title);
 
                     if (!alreadyExists)
                     {

@@ -350,8 +350,11 @@ namespace ClassicUO
                         break;
 
                     case "profiler":
-                        Profiler.Enabled = bool.Parse(value);
-
+                        if(string.IsNullOrEmpty(value) || bool.TryParse(value, out bool profilerEnabled) && profilerEnabled)
+                        {
+                            Profiler.Enabled = true;
+                            Log.Info("Profiler enabled");
+                        }
                         break;
 
                     case "saveaccount":

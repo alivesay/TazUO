@@ -408,7 +408,7 @@ namespace ClassicUO.Network
                 return;
             }
 
-            if (!ignorePlugin && !Plugin.ProcessSendPacket(ref message))
+            if (!ignorePlugin && Plugin.Enabled && !Plugin.ProcessSendPacket(ref message))
             {
                 return;
             }

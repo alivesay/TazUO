@@ -188,7 +188,7 @@ namespace ClassicUO
 
         protected override void UnloadContent()
         {
-            DiscordManager.Instance.BeginDisconnect();
+            DiscordManager.Instance?.BeginDisconnect();
             SDL_GetWindowBordersSize(Window.Handle, out int top, out int left, out _, out _);
 
             Settings.GlobalSettings.WindowPosition = new Point(
@@ -203,7 +203,7 @@ namespace ClassicUO
                 Plugin.OnClosing();
 
             UO.Unload();
-            DiscordManager.Instance.FinalizeDisconnect();
+            DiscordManager.Instance?.FinalizeDisconnect();
             base.UnloadContent();
         }
 
@@ -570,7 +570,7 @@ namespace ClassicUO
                 Log.Error("SDL Event was null, this is an unexpected error.");
                 return false;
             }
-            
+
             switch ((SDL_EventType)sdlEvent->type)
             {
                 case SDL_EventType.SDL_EVENT_AUDIO_DEVICE_ADDED:

@@ -2641,11 +2641,19 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new SliderWithLabel
-                    (lang.GetTazUO.GridItemBorderOpacity, 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.GridBorderAlpha, (i) => { profile.GridBorderAlpha = (byte)i; }), true, page
+                    (lang.GetTazUO.GridItemBorderOpacity, 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.GridBorderAlpha, (i) =>
+                    {
+                        profile.GridBorderAlpha = (byte)i;
+                        GridContainer.GridItem.StaticGridContainerSettingUpdated();
+                    }), true, page
             );
 
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.BorderColor, profile.GridBorderHue, (h) => { profile.GridBorderHue = h; }), true, page);
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.BorderColor, profile.GridBorderHue, (h) =>
+            {
+                profile.GridBorderHue = h;
+                GridContainer.GridItem.StaticGridContainerSettingUpdated();
+            }), true, page);
             content.RemoveIndent();
 
             content.BlankLine();

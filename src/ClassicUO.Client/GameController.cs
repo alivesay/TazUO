@@ -21,6 +21,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -163,11 +164,11 @@ namespace ClassicUO
 
         private void LoadPlugins()
         {
-            try
-            {
-                var artInfo = new CUO_API.ArtInfo();
-            }
-            catch
+            var asm = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .FirstOrDefault(a => a.GetName().Name == "cuoapi");
+
+            if(asm == null)
             {
                 Log.Warn("CUO_API not available, skipping plugin loading.");
                 PluginHost = null;
@@ -425,7 +426,9 @@ namespace ClassicUO
             LegionScripting.LegionScripting.OnUpdate();
             Profiler.ExitContext("LScript");
 
+            Profiler.EnterContext("MTQ");
             MainThreadQueue.ProcessQueue();
+            Profiler.ExitContext("MTQ");
 
             if (Time.Ticks >= _nextSlowUpdate)
             {
@@ -471,7 +474,7 @@ namespace ClassicUO
             UO.GameCursor?.Update();
             Audio?.Update();
 
-            DiscordManager.Instance.Update();
+            DiscordManager.Instance?.Update();
 
 
             for (var i = _queuedActions.Count - 1; i >= 0; i--)
@@ -527,7 +530,9 @@ namespace ClassicUO
             UO.GameCursor?.Draw(_uoSpriteBatch);
             _uoSpriteBatch.End();
 
+            Profiler.EnterContext("ImGui");
             ImGuiManager.Update(gameTime);
+            Profiler.ExitContext("ImGui");
 
             base.Draw(gameTime);
 

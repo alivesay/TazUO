@@ -629,7 +629,6 @@ namespace ClassicUO.Configuration
         public bool SpellBar_ShowHotkeys { get; set; } = true;
         public byte ForcedHouseTransparency { get;  set; } = 40;
         public ushort ForcedTransparencyHouseTileHue { get; set; } = 0;
-
         public bool ForceHouseTransparency { get; set; }
         public ulong HideHudGumpFlags { get; set; }
         public bool DisableGrayEnemies { get; set; }

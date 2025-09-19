@@ -665,8 +665,13 @@ namespace ClassicUO.LegionScripting
         public bool BuffExists(string buffName) => MainThreadQueue.InvokeOnMainThread
         (() =>
             {
+                if (string.IsNullOrEmpty(buffName))
+                    return false;
+
                 foreach (BuffIcon buff in World.Player.BuffIcons.Values)
                 {
+                    if (buff == null) continue;
+
                     if (buff.Title.Contains(buffName))
                         return true;
                 }

@@ -884,14 +884,6 @@ namespace ClassicUO.Game.UI.Gumps
 
                 StaticGridContainerSettingUpdated();
 
-                if (_item != null)
-                {
-                    ref readonly var text = ref Client.Game.UO.Arts.GetArt((uint)_item.DisplayedGraphic);
-                    _texture = text.Texture;
-                    _bounds = text.UV;
-                    _rect = Client.Game.UO.Arts.GetRealArtBounds((uint)_item.DisplayedGraphic);
-                }
-
                 background = new AlphaBlendControl(0.25f)
                 {
                     Width = size,
@@ -949,6 +941,7 @@ namespace ClassicUO.Game.UI.Gumps
                     ItemGridLocked = false;
                     CanMove = true;
                     _hasItem = false;
+                    _shouldDraw = !_gridContainer.isCorpse;
                     return;
                 }
 
@@ -959,6 +952,7 @@ namespace ClassicUO.Game.UI.Gumps
                 _texture = text.Texture;
                 _bounds = text.UV;
                 _rect = Client.Game.UO.Arts.GetRealArtBounds(_item.DisplayedGraphic);
+                _shouldDraw = _texture != null;
 
                 LocalSerial = item.Serial;
                 int itemAmt = _item.ItemData.IsStackable ? _item.Amount : 1;
@@ -1210,10 +1204,11 @@ namespace ClassicUO.Game.UI.Gumps
             private bool _hasItem;
             private static readonly Vector3 _highLightHue = ShaderHueTranslator.GetHueVector(0x34, false, 1);
             private static Vector3 _borderHueVec;
+            private bool _shouldDraw;
 
             public override bool Draw(UltimaBatcher2D batcher, int x, int y)
             {
-                if (IsDisposed) return false;
+                if (!_shouldDraw || IsDisposed) return false;
 
                 if (_hasItem && Keyboard.Ctrl && _item.ItemData.Layer > 0 && MouseIsOver && (_toolTipThis == null || _toolTipThis.IsDisposed) && (_toolTipitem1 == null || _toolTipitem1.IsDisposed) && (_toolTipitem2 == null || _toolTipitem2.IsDisposed))
                 {

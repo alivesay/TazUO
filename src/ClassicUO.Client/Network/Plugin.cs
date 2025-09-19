@@ -13,11 +13,11 @@ using ClassicUO.Assets;
 using ClassicUO.Renderer.Batching;
 using ClassicUO.Utility.Logging;
 using ClassicUO.Utility.Platforms;
-using ClassicUO.Game.PluginAPI;
+using CUO_API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDL3;
-using ArtInfo = ClassicUO.Game.PluginAPI.ArtInfo;
+using ArtInfo = CUO_API.ArtInfo;
 
 namespace ClassicUO.Network
 {

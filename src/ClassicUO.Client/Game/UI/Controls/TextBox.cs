@@ -77,6 +77,15 @@ namespace ClassicUO.Game.UI.Controls
             if (_pool.Count > 0)
             {
                 TextBox tb = _pool.Dequeue();
+
+                while (!tb.IsDisposed || tb.Parent != null) //In case a text entry was added to the pool but is still in use somewhere
+                {
+                    if(_pool.Count > 0)
+                        tb = _pool.Dequeue();
+                    else
+                        return new TextBox(text, font, size, hue, options);
+                }
+
                 tb.SetDisposed(false);
                 tb._font = font;
                 tb._size = size;
@@ -307,6 +316,7 @@ namespace ClassicUO.Game.UI.Controls
             Alpha = 1f;
             _dirty = false;
             WantUpdateSize = false;
+            Parent = null;
         }
 
         private static readonly Regex _baseFontColorRegex = RegexHelper.GetRegex("<basefont color=\"?'?(?<color>.*?)\"?'?>", RegexOptions.Multiline | RegexOptions.IgnoreCase);

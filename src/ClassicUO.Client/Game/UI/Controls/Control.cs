@@ -1077,7 +1077,7 @@ namespace ClassicUO.Game.UI.Controls
             {
                 foreach (Control c in Children)
                 {
-                    c.Dispose();
+                    c?.Dispose();
                 }
 
                 Children.Clear();

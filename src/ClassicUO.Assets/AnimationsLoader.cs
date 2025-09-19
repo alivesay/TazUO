@@ -1178,12 +1178,12 @@ namespace ClassicUO.Assets
         {
             //ConvertBodyIfNeeded(ref animID);
 
-            if (animFlags.HasFlag(AnimationFlags.CalculateOffsetByLowGroup))
+            if ((animFlags & AnimationFlags.CalculateOffsetByLowGroup) != 0)
             {
                 animType = AnimationGroupsType.Animal;
             }
 
-            if (animFlags.HasFlag(AnimationFlags.CalculateOffsetLowGroupExtended))
+            if ((animFlags & AnimationFlags.CalculateOffsetLowGroupExtended) != 0)
             {
                 animType = AnimationGroupsType.Monster;
             }
@@ -1215,14 +1215,8 @@ namespace ClassicUO.Assets
                         {
                             return 8;
                         }
-                        {
-                            if (!isRunning)
-                            {
-                                return 8;
-                            }
 
-                            goto case AnimationGroupsType.Monster;
-                        }
+                        goto case AnimationGroupsType.Monster;
                     }
 
                 case AnimationGroupsType.Monster:

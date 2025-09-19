@@ -13,10 +13,11 @@ using ClassicUO.Assets;
 using ClassicUO.Renderer.Batching;
 using ClassicUO.Utility.Logging;
 using ClassicUO.Utility.Platforms;
-using CUO_API;
+using ClassicUO.Game.PluginAPI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDL3;
+using ArtInfo = ClassicUO.Game.PluginAPI.ArtInfo;
 
 namespace ClassicUO.Network
 {
@@ -461,7 +462,7 @@ namespace ClassicUO.Network
             return buffer != null;
         }
 
-        private static void GetStaticImage(ushort g, ref CUO_API.ArtInfo info)
+        private static void GetStaticImage(ushort g, ref ArtInfo info)
         {
             //Client.Game.UO.FileManager.Arts.TryGetEntryInfo(g, out long address, out long size, out long compressedsize);
             //info.Address = address;
@@ -818,7 +819,7 @@ namespace ClassicUO.Network
         internal static bool OnPluginSend_new(IntPtr buffer, ref int length)
         {
             if (!Enabled) return true;
-            
+
             if (buffer != IntPtr.Zero && length > 0)
             {
                 AsyncNetClient.Socket.Send(new Span<byte>((void*)buffer, length), true);

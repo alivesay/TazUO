@@ -164,17 +164,6 @@ namespace ClassicUO
 
         private void LoadPlugins()
         {
-            var asm = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .FirstOrDefault(a => a.GetName().Name == "cuoapi");
-
-            if(asm == null)
-            {
-                Log.Warn("CUO_API not available, skipping plugin loading.");
-                PluginHost = null;
-                return;
-            }
-
             Log.Trace("Loading plugins...");
             PluginHost?.Initialize();
 

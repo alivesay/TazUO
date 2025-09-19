@@ -5,8 +5,8 @@
     <ApplicationIcon>cuoicon.ico</ApplicationIcon>
     <AssemblyName>TazUO</AssemblyName>
     <RootNamespace>ClassicUO</RootNamespace>
-    <AssemblyVersion>4.7.3</AssemblyVersion>
-    <FileVersion>4.7.3</FileVersion>
+    <AssemblyVersion>4.7.4</AssemblyVersion>
+    <FileVersion>4.7.4</FileVersion>
     <PackageProjectUrl>https://github.com/PlayTazUO/TazUO</PackageProjectUrl>
     <PublishAot>false</PublishAot>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -100,11 +100,11 @@
     <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="cuoapi">
-      <HintPath>..\..\external\cuoapi\cuoapi.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+<!--  <ItemGroup>-->
+<!--    <Reference Include="cuoapi">-->
+<!--      <HintPath>..\..\external\cuoapi\cuoapi.dll</HintPath>-->
+<!--    </Reference>-->
+<!--  </ItemGroup>-->
 
   <PropertyGroup>
     <!-- Windows: use RuntimeIdentifier if set, otherwise fall back -->

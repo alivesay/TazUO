@@ -1120,9 +1120,9 @@ namespace ClassicUO.Game.Managers
 
                 case MacroType.AddFriend:
                     GameActions.Print(_world, "Target a player to add as a friend.", 62);
-                    _ = TargetHelper.TargetObject(_world, targeted =>
+                    _world.TargetManager.SetTargeting(targeted =>
                     {
-                        if (targeted != null && targeted is Mobile mobile && targeted.Serial != _world.Player.Serial)
+                        if (targeted != null && targeted is Mobile mobile && mobile.Serial != _world.Player.Serial)
                         {
                             if (FriendsListManager.Instance.AddFriend(mobile))
                             {
@@ -1135,7 +1135,7 @@ namespace ClassicUO.Game.Managers
                         }
                         else
                         {
-                            if (targeted.Serial == _world.Player.Serial)
+                            if (targeted is Entity entity && entity.Serial == _world.Player.Serial)
                             {
                                 GameActions.Print(_world, "You cannot add yourself as a friend", 33);
                             }
@@ -1149,9 +1149,9 @@ namespace ClassicUO.Game.Managers
 
                 case MacroType.RemoveFriend:
                     GameActions.Print(_world, "Target a friend to remove from your friend list.", 33);
-                    _ = TargetHelper.TargetObject(_world, targeted =>
+                    _world.TargetManager.SetTargeting(targeted =>
                     {
-                        if (targeted != null && targeted is Mobile mobile && targeted.Serial != _world.Player.Serial)
+                        if (targeted != null && targeted is Mobile mobile)
                         {
                             if (FriendsListManager.Instance.RemoveFriend(mobile))
                             {
@@ -1160,17 +1160,6 @@ namespace ClassicUO.Game.Managers
                             else
                             {
                                 GameActions.Print(_world, $"Could not remove {mobile.Name} - not in friends list", 33);
-                            }
-                        }
-                        else
-                        {
-                            if (targeted.Serial == _world.Player.Serial)
-                            {
-                                GameActions.Print(_world, "You cannot remove yourself as a friend", 33);
-                            }
-                            else
-                            {
-                                GameActions.Print(_world, "Invalid target - must be a player", 33);
                             }
                         }
                     });

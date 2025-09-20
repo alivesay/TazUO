@@ -633,7 +633,7 @@ public class AssistantGump : BaseOptionsGump
         addByTargetButton.MouseUp += (s, e) =>
         {
             GameActions.Print(World, "Target a player to add to friends list");
-            TargetHelper.TargetObject(World, targeted =>
+            World.TargetManager.SetTargeting(targeted =>
             {
                 if (targeted != null && targeted is Mobile mobile)
                 {
@@ -905,15 +905,14 @@ public class AssistantGump : BaseOptionsGump
 
             b.MouseUp += (s, e) =>
             {
-                TargetHelper.TargetObject
-                (world, (e) =>
+                world.TargetManager.SetTargeting((e) =>
                     {
-                        if (e == null)
+                        if (e == null || !(e is Entity entity))
                             return;
 
                         var sc = BuySellAgent.Instance.NewSellConfig();
-                        sc.Graphic = e.Graphic;
-                        sc.Hue = e.Hue;
+                        sc.Graphic = entity.Graphic;
+                        sc.Hue = entity.Hue;
                         var newEntry = GenConfigEntry(sc, width);
                         _container.Add(newEntry);
                         RefreshLayout();
@@ -1136,15 +1135,14 @@ public class AssistantGump : BaseOptionsGump
 
             b.MouseUp += (s, e) =>
             {
-                TargetHelper.TargetObject
-                (world, (e) =>
+                world.TargetManager.SetTargeting((e) =>
                     {
-                        if (e == null)
+                        if (e == null || !(e is Entity entity))
                             return;
 
                         var sc = BuySellAgent.Instance.NewBuyConfig();
-                        sc.Graphic = e.Graphic;
-                        sc.Hue = e.Hue;
+                        sc.Graphic = entity.Graphic;
+                        sc.Hue = entity.Hue;
                         var newEntry = GenConfigEntry(sc, width);
                         _container.Add(newEntry);
                         RefreshLayout();
@@ -1371,14 +1369,13 @@ public class AssistantGump : BaseOptionsGump
 
                 b.MouseUp += (s, e) =>
                 {
-                    TargetHelper.TargetObject
-                    (world, (e) =>
+                    world.TargetManager.SetTargeting((e) =>
                         {
-                            if (e == null)
+                            if (e == null || !(e is Entity entity))
                                 return;
 
                             // if (e == null || !SerialHelper.IsMobile(e)) return;
-                            var sc = GraphicsReplacement.NewFilter(e.Graphic, e.Graphic, e.Hue);
+                            var sc = GraphicsReplacement.NewFilter(entity.Graphic, entity.Graphic, entity.Hue);
 
                             if (sc != null && _dataBox != null)
                             {

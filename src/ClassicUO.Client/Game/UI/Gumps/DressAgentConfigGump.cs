@@ -1,4 +1,5 @@
 using ClassicUO.Game.Managers;
+using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.UI.Controls;
 using ClassicUO.Renderer;
 using Microsoft.Xna.Framework;
@@ -144,11 +145,11 @@ namespace ClassicUO.Game.UI.Gumps
                 AddButton("Add Item (Target)", () =>
                 {
                     GameActions.Print(World, "Target item to add to dress config");
-                    TargetHelper.TargetObject(World, (obj) =>
+                    World.TargetManager.SetTargeting((obj) =>
                     {
-                        if (obj != null && SerialHelper.IsItem(obj.Serial))
+                        if (obj != null && obj is Entity objEntity && SerialHelper.IsItem(objEntity.Serial))
                         {
-                            DressAgentManager.Instance.AddItemToConfig(_config, obj.Serial, obj.Name);
+                            DressAgentManager.Instance.AddItemToConfig(_config, objEntity.Serial, objEntity.Name);
                             RefreshItemsList();
                         }
                     });
@@ -169,12 +170,12 @@ namespace ClassicUO.Game.UI.Gumps
                 AddButton("Set Undress Bag", () =>
                 {
                     GameActions.Print(World, "Target container for undress items");
-                    TargetHelper.TargetObject(World, (obj) =>
+                    World.TargetManager.SetTargeting((obj) =>
                     {
-                        if (obj != null && SerialHelper.IsItem(obj.Serial))
+                        if (obj != null && obj is Entity objEntity && SerialHelper.IsItem(objEntity.Serial))
                         {
-                            DressAgentManager.Instance.SetUndressBag(_config, obj.Serial);
-                            GameActions.Print(World, $"Undress bag set to: {obj.Name}");
+                            DressAgentManager.Instance.SetUndressBag(_config, objEntity.Serial);
+                            GameActions.Print(World, $"Undress bag set to: {objEntity.Name}");
                             RefreshItemsList();
                         }
                     });

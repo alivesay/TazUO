@@ -1491,8 +1491,6 @@ def GetAllMobiles(graphic: int | None = None, distance: int | None = None, notor
      mobiles = API.GetAllMobiles()
      # Get all mobiles with graphic 400
      humans = API.GetAllMobiles(400)
-     # Get all mobiles within 10 tiles
-     nearby = API.GetAllMobiles(distance=10)
      # Get all humans within 5 tiles
      nearby_humans = API.GetAllMobiles(400, 5)
      # Get all enemies (murderers and criminals) within 15 tiles

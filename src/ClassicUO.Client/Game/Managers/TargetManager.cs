@@ -13,10 +13,6 @@ using ClassicUO.Utility;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using Microsoft.Xna.Framework;
-using System.IO;
-using System.Collections.Generic;
 
 namespace ClassicUO.Game.Managers
 {
@@ -35,11 +31,12 @@ namespace ClassicUO.Game.Managers
         MoveItemContainer,
         Internal,
         SetFavoriteMoveBag,
+        CallbackTarget
     }
 
     public class CursorType
     {
-        public static readonly uint Target = 6983686;
+        public const uint Target = 6983686;
     }
 
     public enum TargetType
@@ -154,6 +151,7 @@ namespace ClassicUO.Game.Managers
         private uint _targetCursorId, _lastAttack;
         private readonly World _world;
         private readonly byte[] _lastDataBuffer = new byte[19];
+        private Action<object> _targetCallback;
 
         public TargetManager(World world) { _world = world; }
 
@@ -226,10 +224,17 @@ namespace ClassicUO.Game.Managers
         {
             ClearTargetingWithoutTargetCancelPacket();
 
+            _targetCallback = null;
             TargetingState = 0;
             _targetCursorId = 0;
             MultiTargetInfo = null;
             TargetingType = 0;
+        }
+
+        public void SetTargeting(Action<object> callback, uint cursorId = CursorType.Target, TargetType cursorType = TargetType.Neutral)
+        {
+            _targetCallback = callback;
+            SetTargeting(CursorTarget.CallbackTarget, cursorId, cursorType);
         }
 
         public void SetTargeting(CursorTarget targeting, uint cursorID, TargetType cursorType)
@@ -280,6 +285,11 @@ namespace ClassicUO.Game.Managers
 
                     UIManager.GetGump<HouseCustomizationGump>()?.Update();
                 }
+            }
+
+            if (TargetingState == CursorTarget.CallbackTarget)
+            {
+                _targetCallback?.Invoke(null);
             }
 
             if (IsTargeting || TargetingType == TargetType.Cancel)
@@ -527,6 +537,11 @@ namespace ClassicUO.Game.Managers
                         }
                         ClearTargetingWithoutTargetCancelPacket();
                         return;
+                    case CursorTarget.CallbackTarget:
+                        _targetCallback?.Invoke(entity);
+
+                        ClearTargetingWithoutTargetCancelPacket();
+                        return;
                 }
             }
             else
@@ -559,6 +574,25 @@ namespace ClassicUO.Game.Managers
 
             // Record action for script recording
             ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordTargetLocation(x, y, z, graphic);
+
+            switch (TargetingState)
+            {
+                case CursorTarget.CallbackTarget:
+                    GameObject candidate = _world.Map.GetTile(x, y);
+
+                    while (candidate != null)
+                    {
+                        if (candidate.Graphic == graphic && candidate.Z == z)
+                        {
+                            _targetCallback?.Invoke(candidate);
+                            break;
+                        }
+                        candidate = candidate.TNext;
+                    }
+
+                    ClearTargetingWithoutTargetCancelPacket();
+                    return;
+            }
 
             if (graphic == 0)
             {

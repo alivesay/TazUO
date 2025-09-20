@@ -277,6 +277,13 @@ def Attack(serial: int) -> None:
     """
     pass
 
+def SetWarMode(enabled: bool) -> None:
+    """
+     Sets the player's war mode state (peace/war toggle).
+    
+    """
+    pass
+
 def BandageSelf() -> bool:
     """
      Attempt to bandage yourself. Older clients this will not work, you will need to find a bandage, use it, and target yourself.

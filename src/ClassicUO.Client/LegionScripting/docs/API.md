@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `9/17/25`.*
+*This was generated on `9/19/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -240,6 +240,21 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `serial` | `uint` | ❌ No |  |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### SetWarMode
+`(enabled)`
+ Sets the player's war mode state (peace/war toggle).
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `enabled` | `bool` | ❌ No | True to enable war mode, false to disable war mode |
 
 **Return Type:** `void` *(Does not return anything)*
 

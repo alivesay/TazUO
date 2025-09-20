@@ -301,6 +301,13 @@ namespace ClassicUO.LegionScripting
         /// <param name="serial"></param>
         public void Attack(uint serial) => MainThreadQueue.InvokeOnMainThread(() => GameActions.Attack(World, serial));
 
+
+        /// <summary>
+        /// Sets the player's war mode state (peace/war toggle).
+        /// </summary>
+        /// <param name="enabled">True to enable war mode, false to disable war mode</param>
+        public void SetWarMode(bool enabled) => MainThreadQueue.InvokeOnMainThread(() => GameActions.RequestWarMode(World.Player, enabled));
+
         /// <summary>
         /// Attempt to bandage yourself. Older clients this will not work, you will need to find a bandage, use it, and target yourself.
         /// Example:

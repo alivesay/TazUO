@@ -21,6 +21,7 @@ namespace ClassicUO.Game.UI.Controls
         private readonly FontStyle _fontStyle;
 
         private readonly int _maxCharCount = -1;
+        public bool StartSDLTextInput = true;
 
 
         public StbTextBox
@@ -497,11 +498,12 @@ namespace ClassicUO.Game.UI.Controls
 
             CaretIndex = Text?.Length ?? 0;
 
-            if (!SDL.SDL_TextInputActive(Client.Game.Window.Handle))
+            if (StartSDLTextInput && IsEditable && !SDL.SDL_TextInputActive(Client.Game.Window.Handle))
+            {
                 SDL.SDL_StartTextInput(Client.Game.Window.Handle);
-
-            SDL.SDL_Rect textRect = new() { x = ScreenCoordinateX, y = ScreenCoordinateY, w = Width, h = Height };
-            SDL.SDL_SetTextInputArea(Client.Game.Window.Handle, ref textRect, 0);
+                SDL.SDL_Rect textRect = new() { x = ScreenCoordinateX, y = ScreenCoordinateY, w = Width, h = Height };
+                SDL.SDL_SetTextInputArea(Client.Game.Window.Handle, ref textRect, 0);
+            }
         }
 
         internal override void OnFocusLost()

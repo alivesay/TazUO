@@ -498,6 +498,7 @@ namespace ClassicUO.Game.UI.Controls
 
             if (IsEditable && !SDL.SDL_TextInputActive(Client.Game.Window.Handle))
             {
+                SDL.SDL_SetHint(SDL.SDL_HINT_ENABLE_SCREEN_KEYBOARD, "0");
                 SDL.SDL_StartTextInput(Client.Game.Window.Handle);
                 SDL.SDL_Rect textRect = new() { x = ScreenCoordinateX, y = ScreenCoordinateY, w = Width, h = Height };
                 SDL.SDL_SetTextInputArea(Client.Game.Window.Handle, ref textRect, 0);

@@ -112,9 +112,6 @@ sealed class PacketHandlers
 
                 PacketLogger.Default?.Log(packetBuffer.AsSpan(0, packetlength), false);
 
-                // TODO: the pluging function should allow Span<byte> or unsafe type only.
-                // The current one is a bad style decision.
-                // It will be fixed once the new plugin system is done.
                 if (!allowPlugins || Plugin.ProcessRecvPacket(packetBuffer, ref packetlength))
                 {
                     AnalyzePacket(world, packetBuffer.AsSpan(0, packetlength), offset);

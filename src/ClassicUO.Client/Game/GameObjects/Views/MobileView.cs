@@ -30,6 +30,11 @@ namespace ClassicUO.Game.GameObjects
                 return false;
             }
 
+            var profile = _profile;
+            var player = World.Player;
+            var targetManager = World.TargetManager;
+            var auraManager = World.AuraManager;
+
             bool charSitting = false;
             ushort overridenHue = 0;
 
@@ -41,37 +46,37 @@ namespace ClassicUO.Game.GameObjects
             FrameInfo.Height = 0;
 
             posY -= 3;
-            int drawX = posX + (int)Offset.X;
-            int drawY = posY + (int)(Offset.Y - Offset.Z);
+            int drawX = posX + (int)Offset.X + 22;
+            int drawY = posY + (int)(Offset.Y - Offset.Z) + 22;
 
-            drawX += 22;
-            drawY += 22;
-
-            bool hasShadow = !IsDead && !IsHidden && ProfileManager.CurrentProfile.ShadowsEnabled;
+            // Cache boolean values
+            bool isDead = IsDead;
+            bool isHidden = IsHidden;
+            bool isPlayer = IsPlayer;
+            bool hasShadow = !isDead && !isHidden && profile.ShadowsEnabled;
             bool inParty = InParty;
+            bool isHuman = IsHuman;
+            bool isGargoyle = IsGargoyle;
+            bool isSelected = ReferenceEquals(SelectedObject.Object, this);
 
-            if (World.AuraManager.IsEnabled)
+            if (auraManager.IsEnabled)
             {
-                World.AuraManager.Draw(
+                auraManager.Draw(
                     batcher,
                     drawX,
                     drawY,
-                    ProfileManager.CurrentProfile.PartyAura && inParty
-                        ? ProfileManager.CurrentProfile.PartyAuraHue
+                    profile.PartyAura && inParty
+                        ? profile.PartyAuraHue
                         : Notoriety.GetHue(NotorietyFlag),
                     depth + 1f
                 );
             }
 
-            bool isHuman = IsHuman;
-            bool isGargoyle = IsGargoyle;
-            bool isSelected = ReferenceEquals(SelectedObject.Object, this);
-            var profile = ProfileManager.CurrentProfile;
-            float finalAlpha = IsPlayer && profile.PlayerConstantAlpha != 100 ? profile.PlayerConstantAlpha / 100f : AlphaHue / 255f;
-
+            float finalAlpha = isPlayer && profile.PlayerConstantAlpha != 100 ? profile.PlayerConstantAlpha / 100f : AlphaHue / 255f;
             Vector3 hueVec = ShaderHueTranslator.GetHueVector(0, false, finalAlpha);
 
-            if (profile.HighlightGameObjects && isSelected)
+            // Simplified hue override logic
+            if (isSelected && profile.HighlightGameObjects)
             {
                 overridenHue = Constants.HIGHLIGHT_CURRENT_OBJECT_HUE;
                 hueVec.Y = 1;
@@ -85,12 +90,12 @@ namespace ClassicUO.Game.GameObjects
                 overridenHue = Constants.OUT_RANGE_COLOR;
                 hueVec.Y = 1;
             }
-            else if (World.Player.IsDead && profile.EnableBlackWhiteEffect)
+            else if (player.IsDead && profile.EnableBlackWhiteEffect)
             {
                 overridenHue = Constants.DEAD_RANGE_COLOR;
                 hueVec.Y = 1;
             }
-            else if (IsHidden)
+            else if (isHidden)
             {
                 overridenHue = profile.HiddenBodyHue;
                 hueVec = ShaderHueTranslator.GetHueVector(0, false, (float)profile.HiddenBodyAlpha / 100);
@@ -99,42 +104,31 @@ namespace ClassicUO.Game.GameObjects
             {
                 overridenHue = 0;
 
-                if (IsDead)
+                if (isDead && !isHuman)
                 {
-                    if (!isHuman)
-                    {
-                        overridenHue = 0x0386;
-                    }
+                    overridenHue = 0x0386;
                 }
-                else
+                else if (!isDead)
                 {
-                    if (profile.HighlightMobilesByInvul)
+                    // Use single if-else chain instead of nested conditions
+                    if (profile.HighlightMobilesByInvul && NotorietyFlag != NotorietyFlag.Invulnerable && IsYellowHits)
                     {
-                        if (NotorietyFlag != NotorietyFlag.Invulnerable && IsYellowHits)
-                        {
-                            overridenHue = profile.InvulnerableHue;
-                        }
+                        overridenHue = profile.InvulnerableHue;
                     }
-                    else if (profile.HighlightMobilesByParalize)
+                    else if (profile.HighlightMobilesByParalize && IsParalyzed && NotorietyFlag != NotorietyFlag.Invulnerable)
                     {
-                        if (IsParalyzed && NotorietyFlag != NotorietyFlag.Invulnerable)
-                        {
-                            overridenHue = profile.ParalyzedHue;
-                        }
+                        overridenHue = profile.ParalyzedHue;
                     }
-                    else if (profile.HighlightMobilesByPoisoned)
+                    else if (profile.HighlightMobilesByPoisoned && IsPoisoned)
                     {
-                        if (IsPoisoned)
-                        {
-                            overridenHue = profile.PoisonHue;
-                        }
+                        overridenHue = profile.PoisonHue;
                     }
                 }
             }
 
-            if (!IsPlayer)
+            if (!isPlayer)
             {
-                if (World.TargetManager.IsTargeting && isSelected || (Serial == World.TargetManager.LastAttack && !profile.DisableGrayEnemies))
+                if ((targetManager.IsTargeting && isSelected) || (Serial == targetManager.LastAttack && !profile.DisableGrayEnemies))
                     overridenHue = Notoriety.GetHue(NotorietyFlag);
                 else if (inParty && profile.OverridePartyAndGuildHue)
                     overridenHue = profile.FriendHue;
@@ -344,13 +338,16 @@ namespace ClassicUO.Game.GameObjects
                 charSitting
             );
 
+            Profiler.EnterContext("SECTION 5");
             if (!IsEmpty)
             {
                 for (int i = 0; i < Constants.USED_LAYER_COUNT; i++)
                 {
                     Layer layer = LayerOrder.UsedLayers[layerDir, i];
 
+                    Profiler.EnterContext("FIND LAYER");
                     Item item = FindItemByLayer(layer);
+                    Profiler.ExitContext("FIND LAYER");
 
                     if (item == null)
                     {
@@ -364,10 +361,12 @@ namespace ClassicUO.Game.GameObjects
 
                     if (isHuman)
                     {
-                        if (profile.HiddenLayers.Contains((int)layer) && ((profile.HideLayersForSelf && IsPlayer) || !profile.HideLayersForSelf))
+                        Profiler.EnterContext("HIDDEN LAYERS");
+                        if (_profile.HiddenLayersEnabled && _profile.HiddenLayers.Contains((int)layer) && ((_profile.HideLayersForSelf && IsPlayer) || !_profile.HideLayersForSelf))
                         {
                             continue;
                         }
+                        Profiler.ExitContext("HIDDEN LAYERS");
 
                         if (IsCovered(this, layer))
                         {
@@ -383,6 +382,7 @@ namespace ClassicUO.Game.GameObjects
                                 FixGargoyleEquipments(ref graphic);
                             }
 
+                            Profiler.EnterContext("EQUIP_CONV");
                             if (
                                 Client.Game.UO.FileManager.Animations.EquipConversions.TryGetValue(
                                     Graphic,
@@ -396,6 +396,16 @@ namespace ClassicUO.Game.GameObjects
                                     graphic = data.Graphic;
                                 }
                             }
+                            Profiler.ExitContext("EQUIP_CONV");
+
+                            Profiler.EnterContext("EQUIP_DRAW");
+
+                            Profiler.EnterContext("GROUPFORANIM");
+                            var group = isGargoyle /*&& item.ItemData.IsWeapon*/
+                                        && seatData.Graphic == 0
+                                ? GetGroupForAnimation(this, graphic, true)
+                                : animGroup;
+                            Profiler.ExitContext("GROUPFORANIM");
 
                             DrawInternal(
                                 batcher,
@@ -408,10 +418,7 @@ namespace ClassicUO.Game.GameObjects
                                 animIndex,
                                 false,
                                 graphic,
-                                isGargoyle /*&& item.ItemData.IsWeapon*/
-                                && seatData.Graphic == 0
-                                    ? GetGroupForAnimation(this, graphic, true)
-                                    : animGroup,
+                                group,
                                 dir,
                                 isHuman,
                                 true,
@@ -422,14 +429,13 @@ namespace ClassicUO.Game.GameObjects
                                 overridenHue,
                                 charSitting
                             );
+                            Profiler.ExitContext("EQUIP_DRAW");
                         }
                         else
                         {
                             if (item.ItemData.IsLight)
                             {
-                                Client.Game
-                                    .GetScene<GameScene>()
-                                    .AddLight(this, item, drawX, drawY);
+                                GameScene.Instance?.AddLight(this, item, drawX, drawY);
                             }
                         }
 
@@ -439,7 +445,7 @@ namespace ClassicUO.Game.GameObjects
                     {
                         if (item.ItemData.IsLight)
                         {
-                            Client.Game.GetScene<GameScene>().AddLight(this, item, drawX, drawY);
+                            GameScene.Instance?.AddLight(this, item, drawX, drawY);
                         }
                     }
                 }
@@ -449,7 +455,7 @@ namespace ClassicUO.Game.GameObjects
             FrameInfo.Y = Math.Abs(FrameInfo.Y);
             FrameInfo.Width = FrameInfo.X + FrameInfo.Width;
             FrameInfo.Height = FrameInfo.Y + FrameInfo.Height;
-
+            Profiler.ExitContext("SECTION 5");
             return true;
         }
 

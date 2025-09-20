@@ -617,6 +617,7 @@ namespace ClassicUO.Configuration
             public string VisibleLayers { get; set; } = "Visible Layers";
             public string VisLayersInfo { get; set; } = "These settings are to hide layers on in-game mobiles. Check the box to hide that layer.";
             public string OnlyForYourself { get; set; } = "Only for yourself";
+            public string HiddenLayersEnabled { get; set; } = "Enable visible layer system";
             #endregion
         }
     }

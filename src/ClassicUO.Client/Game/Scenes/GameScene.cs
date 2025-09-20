@@ -27,6 +27,8 @@ namespace ClassicUO.Game.Scenes
 {
     public partial class GameScene : Scene
     {
+        public static GameScene Instance { get; private set; }
+
         private static readonly Lazy<BlendState> _darknessBlend = new Lazy<BlendState>(() =>
         {
             BlendState state = new BlendState();
@@ -117,6 +119,8 @@ namespace ClassicUO.Game.Scenes
             }
 
             SetPostProcessingSettings();
+
+            Instance = this;
         }
 
         public void SetPostProcessingSettings()
@@ -373,8 +377,14 @@ namespace ClassicUO.Game.Scenes
         {
             if (IsDestroyed)
             {
+                if(Instance == this)
+                    Instance = null;
+
                 return;
             }
+
+            Instance = null;
+
             Game.UI.ImGuiManager.Dispose();
             GridContainerSaveData.Instance.Save();
             GridContainerSaveData.Reset();
@@ -690,7 +700,9 @@ namespace ClassicUO.Game.Scenes
                 FoliageIndex = 1;
             }
 
+            Profiler.EnterContext("GetViewPort");
             GetViewPort();
+            Profiler.ExitContext("GetViewPort");
 
             var useObjectHandles = NameOverHeadManager.IsShowing;
             if (useObjectHandles != _useObjectHandles)
@@ -734,33 +746,44 @@ namespace ClassicUO.Game.Scenes
             (var minChunkX, var minChunkY) = (minX >> 3, minY >> 3);
             (var maxChunkX, var maxChunkY) = (maxX >> 3, maxY >> 3);
 
-            for (var chunkX = minChunkX; chunkX <= maxChunkX; chunkX++)
+            Profiler.EnterContext("MapChunkLoop");
+            int totalChunksX = maxChunkX - minChunkX + 1;
+            int totalChunksY = maxChunkY - minChunkY + 1;
+
+            for (int chunkXIdx = 0; chunkXIdx < totalChunksX; chunkXIdx++)
             {
-                for (var chunkY = minChunkY; chunkY <= maxChunkY; chunkY++)
+                int chunkX = minChunkX + chunkXIdx;
+                for (int chunkYIdx = 0; chunkYIdx < totalChunksY; chunkYIdx++)
                 {
+                    int chunkY = minChunkY + chunkYIdx;
+
                     var chunk = map.GetChunk2(chunkX, chunkY, true);
-                    if (chunk == null || chunk.IsDestroyed)
+                    if (chunk?.IsDestroyed != false)
                         continue;
 
-                    for (var x = 0; x < 8; x++)
+                    // Access tiles directly instead of calling GetHeadObject 64 times
+                    var tiles = chunk.Tiles;
+                    for (int tileIdx = 0; tileIdx < 64; tileIdx++) // 8x8 = 64
                     {
-                        for (var y = 0; y < 8; y++)
-                        {
-                            var firstObj = chunk.GetHeadObject(x, y);
-                            if (firstObj == null || firstObj.IsDestroyed)
-                                continue;
+                        int x = tileIdx & 7;        // tileIdx % 8
+                        int y = tileIdx >> 3;       // tileIdx / 8
 
-                            AddTileToRenderList(
-                                firstObj,
-                                use_handles,
-                                150,
-                                maxCotZ,
-                                ref playerPos
-                            );
+                        // Inline GetHeadObject logic for better performance
+                        var firstObj = tiles[x, y];
+                        while (firstObj?.TPrevious != null)
+                        {
+                            firstObj = firstObj.TPrevious;
                         }
+
+                        if (firstObj?.IsDestroyed != false)
+                            continue;
+
+                        AddTileToRenderList(firstObj, use_handles, 150, maxCotZ, ref playerPos);
                     }
                 }
             }
+
+            Profiler.ExitContext("MapChunkLoop");
 
 
             //for (var x = minX; x <= maxX; x++)
@@ -1078,11 +1101,15 @@ namespace ClassicUO.Game.Scenes
 
             if (_use_render_target)
             {
+                Profiler.EnterContext("DrawWorldRenderTarget");
                 can_draw_lights = DrawWorldRenderTarget(batcher, gd, camera_viewport);
+                Profiler.ExitContext("DrawWorldRenderTarget");
             }
             else
             {
+                Profiler.EnterContext("DrawWorldDirect");
                 can_draw_lights = DrawWorldDirect(batcher, gd, camera_viewport);
+                Profiler.ExitContext("DrawWorldDirect");
             }
 
             // draw lights
@@ -1231,7 +1258,9 @@ namespace ClassicUO.Game.Scenes
         private void DrawWorld(UltimaBatcher2D batcher, ref Matrix matrix, bool use_render_target)
         {
             SelectedObject.Object = null;
+            Profiler.EnterContext("FillObjectList");
             FillGameObjectList();
+            Profiler.ExitContext("FillObjectList");
 
             if (use_render_target)
             {
@@ -1245,45 +1274,40 @@ namespace ClassicUO.Game.Scenes
             batcher.SetBrightlight(ProfileManager.CurrentProfile.TerrainShadowsLevel * 0.1f);
             batcher.SetStencil(DepthStencilState.Default);
 
+            Profiler.EnterContext("DrawObjects");
             RenderedObjectsCount = 0;
+            Profiler.EnterContext("Statics");
             RenderedObjectsCount += DrawRenderList(
                 batcher,
                 _renderListStatics
             );
+            Profiler.ExitContext("Statics");
+            Profiler.EnterContext("Animations");
             RenderedObjectsCount += DrawRenderList(
                 batcher,
                 _renderListAnimations
             );
+            Profiler.ExitContext("Animations");
+            Profiler.EnterContext("Effects");
             RenderedObjectsCount += DrawRenderList(
                 batcher,
                 _renderListEffects
             );
+            Profiler.ExitContext("Effects");
 
             if (_renderListTransparentObjects.Count > 0)
             {
+                Profiler.EnterContext("Transparency");
                 batcher.SetStencil(DepthStencilState.DepthRead);
                 RenderedObjectsCount += DrawRenderList(
                     batcher,
                     _renderListTransparentObjects
                 );
+                Profiler.ExitContext("Transparency");
             }
+            Profiler.ExitContext("DrawObjects");
 
             batcher.SetStencil(null);
-
-            //var worldPoint = Camera.MouseToWorldPosition() + _offset;
-            //worldPoint.X += 22;
-            //worldPoint.Y += 22;
-
-            //var isoX = (int)(0.5f * (worldPoint.X / 22f + worldPoint.Y / 22f));
-            //var isoY = (int)(0.5f * (-worldPoint.X / 22f + worldPoint.Y / 22f));
-
-            //GameObject selectedObject = World.Map.GetTile(isoX, isoY, false);
-
-            //if (selectedObject != null)
-            //{
-            //    selectedObject.Hue = 0x44;
-            //}
-
 
             if (
                 _multi != null
@@ -1291,12 +1315,14 @@ namespace ClassicUO.Game.Scenes
                 && _world.TargetManager.TargetingState == CursorTarget.MultiPlacement
             )
             {
+                Profiler.EnterContext("DrawMulti");
                 _multi.Draw(
                     batcher,
                     _multi.RealScreenPosition.X,
                     _multi.RealScreenPosition.Y,
                     _multi.CalculateDepthZ()
                 );
+                Profiler.ExitContext("DrawMulti");
             }
 
             batcher.SetSampler(null);
@@ -1331,14 +1357,18 @@ namespace ClassicUO.Game.Scenes
             {
                 if (obj.Z <= _maxGroundZ)
                 {
+                    Profiler.EnterContext("Calculate depth");
                     float depth = obj.CalculateDepthZ();
+                    Profiler.ExitContext("Calculate depth");
 
+                    Profiler.EnterContext("Draw");
                     if (
                         obj.Draw(batcher, obj.RealScreenPosition.X, obj.RealScreenPosition.Y, depth)
                     )
                     {
                         ++done;
                     }
+                    Profiler.ExitContext("Draw");
                 }
             }
 

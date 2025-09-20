@@ -2571,7 +2571,7 @@ public class WorldMapGump : ResizableGump
 
         if (_showCoordinates)
         {
-            string text = $"{World.Player.X}, {World.Player.Y} ({World.Player.Z}) [{_zoomIndex}]";
+            string text = $"{World.Player.X}, {World.Player.Y}, {World.Player.Z} [{_zoomIndex}]";
 
             if (_showSextantCoordinates && Sextant.FormatString(new Point(World.Player.X, World.Player.Y), _map, out var sextantCoords))
                 text += "\n" + sextantCoords;
@@ -3365,6 +3365,15 @@ public class WorldMapGump : ResizableGump
         {
             CanvasToWorld(_lastMousePosition.Value.X, _lastMousePosition.Value.Y, out int wX, out int wY);
             _world.Player.Pathfinder.WalkTo(wX, wY, 0, 1);
+        }
+
+        if (button == MouseButtonType.Left && !Keyboard.Alt && !Keyboard.Ctrl && !Keyboard.Shift)
+        {
+            if (x > 10 && x < 120 && y > 10 && y < 25)
+            {
+                SDL.SDL_SetClipboardText($"{World.Player.X}, {World.Player.Y}, {World.Player.Z}");
+                GameActions.Print("Copied player coords to clipboard.");
+            }
         }
 
         Client.Game.UO.GameCursor.IsDraggingCursorForced = false;

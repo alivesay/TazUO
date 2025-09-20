@@ -3890,7 +3890,11 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             content.BlankLine();
+            content.AddToRight(new CheckboxWithLabel(lang.GetTazUO.HiddenLayersEnabled, 0, profile.HiddenLayersEnabled, (b) => { profile.HiddenLayersEnabled = b; }), true, page);
+
+            content.BlankLine();
             content.AddToRight(new CheckboxWithLabel(lang.GetTazUO.OnlyForYourself, 0, profile.HideLayersForSelf, (b) => { profile.HideLayersForSelf = b; }), true, page);
+
             content.BlankLine();
 
             bool rightSide = false;

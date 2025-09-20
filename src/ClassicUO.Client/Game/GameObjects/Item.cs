@@ -71,6 +71,10 @@ namespace ClassicUO.Game.GameObjects
         private ushort? _displayedGraphic;
         private bool _isMulti;
 
+        /// <summary>
+        /// Use this constructor for internal usage only, otherwise use the static Create method.
+        /// </summary>
+        /// <param name="world"></param>
         public Item(World world) : base(world, 0) { }
 
         public bool IsCoin => Graphic == 0x0EEA || Graphic == 0x0EED || Graphic == 0x0EF0;
@@ -214,10 +218,13 @@ namespace ClassicUO.Game.GameObjects
         public bool UsedLayer;
         public bool WantUpdateMulti = true;
 
+        private bool _isLight;
+
         public static Item Create(World world, uint serial)
         {
             Item i = new Item(world); // _pool.GetOne();
             i.Serial = serial;
+            i._isLight = i.ItemData.IsLight;
 
             return i;
         }

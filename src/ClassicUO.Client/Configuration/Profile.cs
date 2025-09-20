@@ -591,6 +591,7 @@ namespace ClassicUO.Configuration
 
         public bool DisableMouseInteractionOverheadText { get; set; } = false;
 
+        public bool HiddenLayersEnabled { get; set; } = false;
         public List<int> HiddenLayers { get; set; } = new List<int>();
         public bool HideLayersForSelf { get; set; } = true;
 

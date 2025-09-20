@@ -216,7 +216,10 @@ namespace ClassicUO.Utility
                     if (time > currentAverage * SpikeThresholdMultiplier)
                     {
                         string contextName = Context != null ? string.Join(":", Context) : "Unknown";
-                        Log.Warn($"Performance spike detected in '{contextName}': {time:F2}ms (avg: {currentAverage:F2}ms, threshold: {currentAverage * SpikeThresholdMultiplier:F2}ms)");
+                        if(time < 20)
+                            Log.Warn($"Performance spike detected in '{contextName}': {time:F2}ms (avg: {currentAverage:F2}ms, threshold: {currentAverage * SpikeThresholdMultiplier:F2}ms)");
+                        else
+                            Log.Error($"Major spike detected in '{contextName}': {time:F2}ms (avg: {currentAverage:F2}ms, threshold: {currentAverage * SpikeThresholdMultiplier:F2}ms)");
                     }
                 }
 

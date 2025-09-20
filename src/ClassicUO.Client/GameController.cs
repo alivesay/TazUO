@@ -421,8 +421,10 @@ namespace ClassicUO
 
             if (Time.Ticks >= _nextSlowUpdate)
             {
+                Profiler.EnterContext("Slow Update");
                 _nextSlowUpdate = Time.Ticks + 500;
                 UIManager.SlowUpdate();
+                Profiler.ExitContext("Slow Update");
             }
 
             _totalElapsed += gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -518,6 +520,7 @@ namespace ClassicUO
             _uoSpriteBatch.Begin();
             UO.GameCursor?.Draw(_uoSpriteBatch);
             _uoSpriteBatch.End();
+            Profiler.ExitContext("OutOfContext");
 
             Profiler.EnterContext("ImGui");
             ImGuiManager.Update(gameTime);

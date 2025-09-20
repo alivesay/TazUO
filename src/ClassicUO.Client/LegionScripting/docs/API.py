@@ -1482,9 +1482,9 @@ def FindMobile(serial: int) -> PyMobile:
     """
     pass
 
-def GetAllMobiles(graphic: int | None = None, distance: int | None = None) -> list[PyMobile]:
+def GetAllMobiles(graphic: int | None = None, distance: int | None = None, notoriety: list[Notoriety] = None) -> list[PyMobile]:
     """
-     Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
+     Return a list of all mobiles the client is aware of, optionally filtered by graphic, distance, and/or notoriety.
      Example:
      ```py
      # Get all mobiles
@@ -1495,6 +1495,8 @@ def GetAllMobiles(graphic: int | None = None, distance: int | None = None) -> li
      nearby = API.GetAllMobiles(distance=10)
      # Get all humans within 5 tiles
      nearby_humans = API.GetAllMobiles(400, 5)
+     # Get all enemies (murderers and criminals) within 15 tiles
+     enemies = API.GetAllMobiles(distance=15, notoriety=[API.Notoriety.Murderer, API.Notoriety.Criminal])
      ```
     
     """

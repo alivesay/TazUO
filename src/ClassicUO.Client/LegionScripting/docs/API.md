@@ -2180,8 +2180,8 @@ You can now type `-updateapi` in game to download the latest API.py file.
 ---
 
 ### GetAllMobiles
-`(graphic, distance)`
- Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
+`(graphic, distance, notoriety)`
+ Return a list of all mobiles the client is aware of, optionally filtered by graphic, distance, and/or notoriety.
  Example:
  ```py
  # Get all mobiles
@@ -2192,6 +2192,8 @@ You can now type `-updateapi` in game to download the latest API.py file.
  nearby = API.GetAllMobiles(distance=10)
  # Get all humans within 5 tiles
  nearby_humans = API.GetAllMobiles(400, 5)
+ # Get all enemies (murderers and criminals) within 15 tiles
+ enemies = API.GetAllMobiles(distance=15, notoriety=[API.Notoriety.Murderer, API.Notoriety.Criminal])
  ```
 
 
@@ -2201,6 +2203,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | --- | --- | --- | --- |
 | `graphic` | `ushort?` | ✅ Yes | Optional graphic ID to filter by |
 | `distance` | `int?` | ✅ Yes | Optional maximum distance from player |
+| `notoriety` | `IList<Notoriety>` | ✅ Yes | Optional list of notoriety flags to filter by |
 
 **Return Type:** `PyMobile[]`
 

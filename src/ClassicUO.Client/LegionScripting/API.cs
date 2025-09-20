@@ -2560,23 +2560,24 @@ namespace ClassicUO.LegionScripting
         });
 
         /// <summary>
-        /// Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
+        /// Return a list of all mobiles the client is aware of, optionally filtered by graphic, distance, and/or notoriety.
         /// Example:
         /// ```py
         /// # Get all mobiles
         /// mobiles = API.GetAllMobiles()
         /// # Get all mobiles with graphic 400
         /// humans = API.GetAllMobiles(400)
-        /// # Get all mobiles within 10 tiles
-        /// nearby = API.GetAllMobiles(distance=10)
         /// # Get all humans within 5 tiles
         /// nearby_humans = API.GetAllMobiles(400, 5)
+        /// # Get all enemies (murderers and criminals) within 15 tiles
+        /// enemies = API.GetAllMobiles(distance=15, notoriety=[API.Notoriety.Murderer, API.Notoriety.Criminal])
         /// ```
         /// </summary>
         /// <param name="graphic">Optional graphic ID to filter by</param>
         /// <param name="distance">Optional maximum distance from player</param>
+        /// <param name="notoriety">Optional list of notoriety flags to filter by</param>
         /// <returns></returns>
-        public PyMobile[] GetAllMobiles(ushort? graphic = null, int? distance = null) => MainThreadQueue.InvokeOnMainThread(() =>
+        public PyMobile[] GetAllMobiles(ushort? graphic = null, int? distance = null, IList<Notoriety> notoriety = null) => MainThreadQueue.InvokeOnMainThread(() =>
         {
             var mobiles = World.Mobiles.Values.AsEnumerable();
 
@@ -2585,6 +2586,9 @@ namespace ClassicUO.LegionScripting
 
             if (distance.HasValue)
                 mobiles = mobiles.Where(m => m.Distance <= distance.Value);
+
+            if (notoriety != null && notoriety.Count > 0)
+                mobiles = mobiles.Where(m => notoriety.Contains((Notoriety)(byte)m.NotorietyFlag));
 
             return mobiles.Select(m => new PyMobile(m)).ToArray();
         });

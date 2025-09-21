@@ -10,10 +10,11 @@ namespace ClassicUO.Game.UI.ImGuiControls
         private readonly List<TabItem> _tabs = new();
         private int _selectedTabIndex = -1;
         private int _preSelectIndex = -1;
-        private AssistantWindow() : base("Assistant")
+        private AssistantWindow() : base("Legion Assistant")
         {
             WindowFlags = ImGuiWindowFlags.AlwaysAutoResize;
 
+            AddTab("General", DrawGeneral, GeneralWindow.Show, () => GeneralWindow.Instance?.Dispose());
             AddTab("Auto Loot", DrawAutoLoot, AutoLootWindow.Show, () => AutoLootWindow.Instance?.Dispose() );
             AddTab("Organizer", DrawOrganizer, OrganizerWindow.Show, () => OrganizerWindow.Instance?.Dispose() );
             AddTab("Bandage Agent", DrawBandageAgent, BandageAgentWindow.Show, () => BandageAgentWindow.Instance?.Dispose() );
@@ -26,7 +27,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 case AssistantGump.PAGE.None:
                     break;
                 case AssistantGump.PAGE.AutoLoot:
-                    _preSelectIndex = 0;
+                    _preSelectIndex = 1;
                     break;
                 case AssistantGump.PAGE.AutoSell:
                     break;
@@ -47,12 +48,12 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 case AssistantGump.PAGE.DressAgent:
                     break;
                 case AssistantGump.PAGE.BandageAgent:
-                    _preSelectIndex = 2;
+                    _preSelectIndex = 3;
                     break;
                 case AssistantGump.PAGE.FriendsList:
                     break;
                 case AssistantGump.PAGE.Organizer:
-                    _preSelectIndex = 1;
+                    _preSelectIndex = 2;
                     break;
             }
         }
@@ -118,6 +119,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
         }
 
+        private void DrawGeneral() => GeneralWindow.GetInstance()?.DrawContent();
         private void DrawAutoLoot() => AutoLootWindow.GetInstance()?.DrawContent();
         private void DrawOrganizer() => OrganizerWindow.GetInstance()?.DrawContent();
         private void DrawBandageAgent() => BandageAgentWindow.GetInstance()?.DrawContent();

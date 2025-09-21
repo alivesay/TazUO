@@ -14,8 +14,9 @@ using SDL3;
 
 namespace ClassicUO.Network
 {
-    sealed class AsyncSocketWrapper : IDisposable
+    sealed class AsyncSocketWrapper(AsyncNetClient client) : IDisposable
     {
+        private AsyncNetClient _client = client;
         private TcpClient _socket;
         private NetworkStream _stream;
         private CancellationTokenSource _cancellationTokenSource;
@@ -25,7 +26,6 @@ namespace ClassicUO.Network
 
         public event EventHandler OnConnected, OnDisconnected;
         public event EventHandler<SocketError> OnError;
-        public event EventHandler<byte[]> OnDataReceived;
 
         public async Task<bool> ConnectAsync(string ip, int port, CancellationToken cancellationToken = default, int timeoutS = 2)
         {
@@ -101,7 +101,7 @@ namespace ClassicUO.Network
 
         private async Task ReceiveLoopAsync(CancellationToken cancellationToken)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(4096);
+            byte[] buffer = ArrayPool<byte>.Shared.Rent(4096);
 
             try
             {
@@ -124,7 +124,8 @@ namespace ClassicUO.Network
                     {
                         var data = new byte[bytesRead];
                         Array.Copy(buffer, data, bytesRead);
-                        OnDataReceived?.Invoke(this, data);
+                        _client.OnDataReceived(data);
+                        //OnDataReceived?.Invoke(this, data);
                     }
 
                     await Task.Yield(); // Task.Delay(1, cancellationToken);
@@ -211,7 +212,7 @@ namespace ClassicUO.Network
             Statistics = new NetStatistics(this);
             _sendStream = new CircularBuffer();
 
-            _socket = new AsyncSocketWrapper();
+            _socket = new AsyncSocketWrapper(this);
 
             _socket.OnConnected += (o, e) =>
             {
@@ -221,7 +222,7 @@ namespace ClassicUO.Network
 
             _socket.OnDisconnected += (o, e) => Disconnected?.Invoke(this, SocketError.Success);
             _socket.OnError += (o, e) => Disconnected?.Invoke(this, e);
-            _socket.OnDataReceived += OnDataReceived;
+            //_socket.OnDataReceived += OnDataReceived;
         }
 
         public static EncryptionType Load(ClientVersion clientVersion, EncryptionType encryption)
@@ -349,7 +350,7 @@ namespace ClassicUO.Network
                     Statistics.Update();
 
                     // Small delay to prevent excessive CPU usage
-                    await Task.Delay(1, cancellationToken);
+                    await Task.Yield(); //await Task.Delay(1, cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {
@@ -367,7 +368,7 @@ namespace ClassicUO.Network
             }
         }
 
-        private void OnDataReceived(object sender, byte[] data)
+        public void OnDataReceived(byte[] data)
         {
             try
             {
@@ -454,7 +455,7 @@ namespace ClassicUO.Network
                 {
                     if (_sendStream.Length > 0)
                     {
-                        sendingBuffer = new byte[4096];
+                        sendingBuffer = ArrayPool<byte>.Shared.Rent(4096); //= new byte[4096];
 
                         int size = Math.Min(sendingBuffer.Length, _sendStream.Length);
 
@@ -465,6 +466,7 @@ namespace ClassicUO.Network
                 if (bytesToSend > 0 && sendingBuffer != null)
                 {
                     await _socket.SendAsync(sendingBuffer, 0, bytesToSend, cancellationToken);
+                    ArrayPool<byte>.Shared.Return(sendingBuffer);
                 }
             }
             catch (Exception ex)

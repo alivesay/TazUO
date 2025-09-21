@@ -262,10 +262,10 @@ namespace ClassicUO.Game.Map
                     block.Destroy();
                     block = null;
 
-                    if (++count >= Constants.MAX_MAP_OBJECT_REMOVED_BY_GARBAGE_COLLECTOR)
-                    {
-                        break;
-                    }
+                    // if (++count >= Constants.MAX_MAP_OBJECT_REMOVED_BY_GARBAGE_COLLECTOR)
+                    // {
+                    //     break;
+                    // }
                 }
 
                 first = next;

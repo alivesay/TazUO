@@ -128,7 +128,7 @@ namespace ClassicUO.Network
                         //OnDataReceived?.Invoke(this, data);
                     }
 
-                    await Task.Yield(); // Task.Delay(1, cancellationToken);
+                    await Task.Delay(1, cancellationToken);
                 }
             }
             catch (IOException ioEx) when (ioEx.InnerException is SocketException socketEx)
@@ -350,7 +350,7 @@ namespace ClassicUO.Network
                     Statistics.Update();
 
                     // Small delay to prevent excessive CPU usage
-                    await Task.Yield(); //await Task.Delay(1, cancellationToken);
+                    await Task.Delay(1, cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {

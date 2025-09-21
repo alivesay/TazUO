@@ -229,9 +229,12 @@ namespace ClassicUO.Game.UI.Gumps
 
         public void SetFocus()
         {
-            TextBoxControl.IsEditable = true;
-            TextBoxControl.SetKeyboardFocus();
+            UIManager.KeyboardFocusControl = null;
             TextBoxControl.IsEditable = _isActive;
+
+            if(_isActive)
+                TextBoxControl.SetKeyboardFocus();
+
             _trans.IsVisible = _isActive;
             _trans.Alpha = ProfileManager.CurrentProfile != null && ProfileManager.CurrentProfile.HideChatGradient ? 0.0f : 0.5f;
         }

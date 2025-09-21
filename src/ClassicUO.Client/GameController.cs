@@ -72,6 +72,9 @@ namespace ClassicUO
             TargetElapsedTime = TimeSpan.FromMilliseconds(1000.0 / 250.0);
             PluginHost = pluginHost;
             bufferRect = new Rectangle(0, 0, GraphicManager.PreferredBackBufferWidth, GraphicManager.PreferredBackBufferHeight);
+
+            SDL.SDL_SetHint(SDL_HINT_ENABLE_SCREEN_KEYBOARD, "0");
+            SDL.SDL_StartTextInput(Window.Handle);
         }
 
         public Scene Scene { get; private set; }

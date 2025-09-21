@@ -275,6 +275,11 @@ namespace ClassicUO.Game.Managers
                 Client.Game.SetRefreshRate(Settings.GlobalSettings.FPS);
                 GameActions.Print($"FPS Limit updated to: {Settings.GlobalSettings.FPS}", 62);
             });
+
+            Register("dressagent", (s) => DressAgentManager.Instance?.DressAgentCommand(s));
+            Register("organize", (s) => OrganizerAgent.Instance?.OrganizerCommand(s));
+            Register("organizer", (s) => OrganizerAgent.Instance?.OrganizerCommand(s));
+            Register("organizerlist", (s) => OrganizerAgent.Instance?.ListOrganizers());
         }
 
 

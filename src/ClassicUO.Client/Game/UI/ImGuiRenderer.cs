@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ClassicUO.Game.UI;
 using ClassicUO.Game.UI.Gumps;
+using SDL3;
 
 namespace ImGuiNET.SampleProgram.XNA
 {
@@ -40,6 +41,7 @@ namespace ImGuiNET.SampleProgram.XNA
         private int _scrollWheelValue;
         private readonly float WHEEL_DELTA = 120;
         private Keys[] _allKeys = Enum.GetValues<Keys>();
+        private bool _textInputActive = false;
 
         public ImGuiRenderer(Game game)
         {
@@ -187,8 +189,6 @@ namespace ImGuiNET.SampleProgram.XNA
         /// </summary>
         protected virtual void UpdateInput()
         {
-            if (!_game.IsActive) return;
-
             var io = ImGui.GetIO();
 
             var mouse = Mouse.GetState();

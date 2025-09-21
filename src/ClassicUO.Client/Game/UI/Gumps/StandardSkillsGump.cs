@@ -35,7 +35,7 @@ namespace ClassicUO.Game.UI.Gumps
         private readonly List<SkillsGroupControl> _skillsControl = new List<SkillsGroupControl>();
         private readonly Label _skillsLabelSum;
         private readonly NiceButton _resetGroups;
-        
+
         private static int last_x = 100, last_y = 100;
 
         public StandardSkillsGump(World world) : base(world, 0, 0)
@@ -488,8 +488,8 @@ namespace ClassicUO.Game.UI.Gumps
                             _gumpPic.IsVisible = true;
                             _textbox.IsEditable = false;
                             _textbox.AllowSelection = false;
-                            UIManager.KeyboardFocusControl = this;
-                            UIManager.SystemChat.SetFocus();
+                            //UIManager.KeyboardFocusControl = null;
+                            //UIManager.SystemChat.SetFocus();
 
                             break;
 
@@ -497,18 +497,17 @@ namespace ClassicUO.Game.UI.Gumps
                             _gumpPic.IsVisible = true;
                             _textbox.IsEditable = false;
                             _textbox.AllowSelection = false;
-                            UIManager.KeyboardFocusControl = this;
+                            //UIManager.KeyboardFocusControl = null;
 
                             //UIManager.SystemChat.SetFocus();
                             break;
 
                         case 2:
+                            UIManager.KeyboardFocusControl = null;
                             _gumpPic.IsVisible = false;
                             _textbox.IsEditable = true;
                             _textbox.AllowSelection = true;
-                            UIManager.KeyboardFocusControl = _textbox;
                             _textbox.SetKeyboardFocus();
-
                             break;
                     }
                 };

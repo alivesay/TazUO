@@ -639,6 +639,7 @@ namespace ClassicUO.Game.GameObjects
                 return;
             }
 
+            Profiler.EnterContext("Get Anim Frames");
             var frames = Client.Game.UO.Animations.GetAnimationFrames(
                 id,
                 animGroup,
@@ -648,6 +649,7 @@ namespace ClassicUO.Game.GameObjects
                 isEquip,
                 false
             );
+            Profiler.ExitContext("Get Anim Frames");
 
             if (hueFromFile == 0)
             {
@@ -817,9 +819,7 @@ namespace ClassicUO.Game.GameObjects
 
                 if (entity != null && entity.ItemData.IsLight)
                 {
-                    Client.Game
-                        .GetScene<GameScene>()
-                        .AddLight(owner, entity, mirror ? x + spriteInfo.UV.Width : x, y);
+                    GameScene.Instance?.AddLight(owner, entity, mirror ? x + spriteInfo.UV.Width : x, y);
                 }
             }
         }

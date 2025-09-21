@@ -267,6 +267,14 @@ namespace ClassicUO.Game.Managers
             Register("artbrowser", (s) => { UIManager.Add(new ArtBrowserGump(_world)); });
 
             Register("animbrowser", (s) => { UIManager.Add(new AnimBrowser(_world)); });
+
+            Register("syncfps", (_) =>
+            {
+                Settings.GlobalSettings.FPS = GameController.SupportedRefreshRate;
+                Settings.GlobalSettings.Save();
+                Client.Game.SetRefreshRate(Settings.GlobalSettings.FPS);
+                GameActions.Print($"FPS Limit updated to: {Settings.GlobalSettings.FPS}", 62);
+            });
         }
 
 

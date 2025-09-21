@@ -80,6 +80,7 @@ namespace ClassicUO
         public IPluginHost PluginHost { get; private set; }
         public GraphicsDeviceManager GraphicManager { get; }
         public readonly uint[] FrameDelay = new uint[2];
+        public static int SupportedRefreshRate = 0;
 
         private readonly List<(uint, Action)> _queuedActions = new();
 
@@ -98,10 +99,24 @@ namespace ClassicUO
             GraphicManager.ApplyChanges();
 
             SetRefreshRate(Settings.GlobalSettings.FPS);
+            SupportedRefreshRate = Settings.GlobalSettings.FPS;
+
             _uoSpriteBatch = new UltimaBatcher2D(GraphicsDevice);
 
             _filter = HandleSdlEvent;
             SDL_SetEventFilter(_filter, IntPtr.Zero);
+
+            var displayId = SDL.SDL_GetDisplayForWindow(Window.Handle);
+            var displayMode = SDL.SDL_GetCurrentDisplayMode(displayId);
+            if (displayMode != IntPtr.Zero)
+            {
+                // Marshal the pointer to the display mode structure
+                var mode = Marshal.PtrToStructure<SDL.SDL_DisplayMode>(displayMode);
+
+                float refreshRate = mode.refresh_rate;
+                if (refreshRate > 0)
+                    SupportedRefreshRate = (int)refreshRate;
+            }
 
             base.Initialize();
         }

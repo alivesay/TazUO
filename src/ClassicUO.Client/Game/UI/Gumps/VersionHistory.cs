@@ -10,6 +10,33 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private static string[] updateTexts =
         {
+            "/c[white][4.8.0]/cd\n" +
+            """
+            # Misc
+            - Vastly improved grid container performance
+            - Better profiler info for testing and debugging
+            - Remove need for cuoapi.dll(Mostly affects mac arm users)
+            - Grid containers for corpses will now only show the items in there instead of the full grid
+            - Added Top menu -> More -> Tools -> Retrieve gumps to find lost gumps(Outside your screen)
+            - Added Lichtblitz color picker to color picker gumps
+            - Single click coords on world map to copy to clipboard
+            - Performance improvements for tiles, land, mobiles
+            - Added new low fps reminder and `-syncfps` command to sync your fps limit to your monitor
+
+            # Legion Py
+            - Fix for buffexists method to make sure a valid string was put in and null checks
+            - Add API.SetWarMode()
+            - Add optional notoriety list to GetAllMobiles()
+            - Add API.GlobalMsg() to send global chat messages
+
+            # Bug fixes
+            - Check if cuoapi is found/loaded, if not don't try to load plugins and disable pluginhost
+            - Check if sdl event is null before processing
+            - Fix buff icon text
+            - Fixed a rare infobar crash
+            """+
+            "\n",
+
             "/c[white][4.7.0]/cd\n" +
             """
             - Upgraded to latest FNA and SDL(Major changes on backend)
@@ -318,10 +345,6 @@ namespace ClassicUO.Game.UI.Gumps
             "- Added advanced nameplate options\n" +
             "- Moved TTF Font settings to their own category\n" +
             "- Journal tabs are now fully customizable",
-            "/c[white][3.10.1]/cd\n" +
-            "- Bug fix for floating damage numbers\n" +
-            "- Bug fix for health line color\n" +
-            "- Fix skill progress bar positioning\n",
 
             "\n\n/c[white]For further history please visit our discord."
         };

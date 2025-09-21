@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Timers;
 using ClassicUO.Game.UI.Gumps;
 using ClassicUO.Input;
 using ClassicUO.Network;
@@ -132,6 +133,16 @@ namespace ClassicUO.Game.Managers
 
         private void RegisterCommands()
         {
+            if (World.Instance == null)
+            {
+                Timer timer = new(TimeSpan.FromSeconds(2));
+                timer.Elapsed += (sender, args) =>
+                {
+                    RegisterCommands();
+                };
+                return;
+            }
+
             if (World.Instance.CommandManager.Commands.ContainsKey("dressagent")) return;
 
             World.Instance.CommandManager.Register("dressagent", args =>

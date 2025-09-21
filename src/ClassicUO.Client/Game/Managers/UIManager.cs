@@ -487,7 +487,7 @@ namespace ClassicUO.Game.Managers
 
             if (_keyboardFocusControl == null)
             {
-                if (SystemChat != null && !SystemChat.IsDisposed)
+                if (SystemChat is { IsDisposed: false })
                 {
                     _keyboardFocusControl = SystemChat.TextBoxControl;
                     _keyboardFocusControl.OnFocusEnter();

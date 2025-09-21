@@ -33,6 +33,12 @@ namespace ClassicUO.Game.UI.ImGuiControls
             WindowFlags = ImGuiWindowFlags.AlwaysAutoResize;
             _profile = ProfileManager.CurrentProfile;
 
+            if (_profile == null)
+            {
+                Dispose();
+                return;
+            }
+
             _enableAutoSell = _profile.SellAgentEnabled;
             _maxItems = _profile.SellAgentMaxItems;
             _maxUniques = _profile.SellAgentMaxUniques;
@@ -136,7 +142,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
 
                         if (!string.IsNullOrEmpty(_newMaxAmountInput) && ushort.TryParse(_newMaxAmountInput, out ushort maxAmount))
                         {
-                            newConfig.MaxAmount = maxAmount;
+                            newConfig.MaxAmount = maxAmount == 0 ? ushort.MaxValue : maxAmount;
                         }
 
                         if (!string.IsNullOrEmpty(_newRestockInput) && ushort.TryParse(_newRestockInput, out ushort restock))

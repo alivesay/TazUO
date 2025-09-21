@@ -226,19 +226,6 @@ namespace ImGuiNET.SampleProgram.XNA
 
             io.DisplaySize = new System.Numerics.Vector2(_graphicsDevice.PresentationParameters.BackBufferWidth, _graphicsDevice.PresentationParameters.BackBufferHeight);
             io.DisplayFramebufferScale = new System.Numerics.Vector2(1f, 1f);
-
-            // Handle SDL text input state based on ImGui's needs
-            bool wantTextInput = io.WantTextInput;
-            if (wantTextInput && !_textInputActive)
-            {
-                SDL.SDL_StartTextInput(_game.Window.Handle);
-                _textInputActive = true;
-            }
-            else if (!wantTextInput && _textInputActive)
-            {
-                SDL.SDL_StopTextInput(_game.Window.Handle);
-                _textInputActive = false;
-            }
         }
 
         private bool TryMapKeys(Keys key, out ImGuiKey imguikey)

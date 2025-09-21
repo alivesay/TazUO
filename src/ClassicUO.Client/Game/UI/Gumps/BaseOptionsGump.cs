@@ -1184,21 +1184,12 @@ public class BaseOptionsGump : Gump
             {
                 base.OnFocusEnter();
                 CaretIndex = Text?.Length ?? 0;
-
-                if (!SDL.SDL_TextInputActive(Client.Game.Window.Handle))
-                    SDL.SDL_StartTextInput(Client.Game.Window.Handle);
-
-                SDL.SDL_Rect textRect = new() { x = ScreenCoordinateX, y = ScreenCoordinateY, w = Width, h = Height };
-                SDL.SDL_SetTextInputArea(Client.Game.Window.Handle, ref textRect, 0);
             }
 
             internal override void OnFocusLost()
             {
                 if (Stb != null)
                     Stb.SelectStart = Stb.SelectEnd = 0;
-
-                if (SDL.SDL_TextInputActive(Client.Game.Window.Handle))
-                    SDL.SDL_StopTextInput(Client.Game.Window.Handle);
 
                 base.OnFocusLost();
             }

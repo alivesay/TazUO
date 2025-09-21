@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
+using System.Timers;
 using ClassicUO.Configuration;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.UI.Gumps;
@@ -35,66 +36,25 @@ namespace ClassicUO.Game.Managers
 
             if (JsonHelper.Load<List<OrganizerConfig>>(newPath, OrganizerAgentContext.Default.ListOrganizerConfig, out var configs))
                 Instance.OrganizerConfigs = configs;
-
-            // Register organizer commands if they don't already exist
-            RegisterCommands();
         }
 
-        private static void RegisterCommands()
+        public void OrganizerCommand(string[] args)
         {
-            // Check if commands already exist before registering
-            if (!World.Instance.CommandManager.Commands.ContainsKey("organize"))
+            if (args.Length == 1)
             {
-                World.Instance.CommandManager.Register("organize", (s) =>
-                {
-                    if (s.Length == 1)
-                    {
-                        // Run all organizers
-                        Instance?.RunOrganizer();
-                    }
-                    else if (int.TryParse(s[1], out int index))
-                    {
-                        // Run organizer by index
-                        Instance?.RunOrganizer(index);
-                    }
-                    else
-                    {
-                        // Run organizer by name - join all args after command
-                        string name = string.Join(" ", s.Skip(1));
-                        Instance?.RunOrganizer(name);
-                    }
-                });
+                // Run all organizers
+                Instance?.RunOrganizer();
             }
-
-            if (!World.Instance.CommandManager.Commands.ContainsKey("organizer"))
+            else if (int.TryParse(args[1], out int index))
             {
-                World.Instance.CommandManager.Register("organizer", (s) =>
-                {
-                    if (s.Length == 1)
-                    {
-                        // Run all organizers
-                        Instance?.RunOrganizer();
-                    }
-                    else if (int.TryParse(s[1], out int index))
-                    {
-                        // Run organizer by index
-                        Instance?.RunOrganizer(index);
-                    }
-                    else
-                    {
-                        // Run organizer by name - join all args after command
-                        string name = string.Join(" ", s.Skip(1));
-                        Instance?.RunOrganizer(name);
-                    }
-                });
+                // Run organizer by index
+                Instance?.RunOrganizer(index);
             }
-
-            if (!World.Instance.CommandManager.Commands.ContainsKey("organizerlist"))
+            else
             {
-                World.Instance.CommandManager.Register("organizerlist", (s) =>
-                {
-                    Instance?.ListOrganizers();
-                });
+                // Run organizer by name - join all args after command
+                string name = string.Join(" ", args.Skip(1));
+                Instance?.RunOrganizer(name);
             }
         }
 

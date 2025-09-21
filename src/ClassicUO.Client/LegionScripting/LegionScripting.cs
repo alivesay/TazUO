@@ -50,7 +50,7 @@ namespace ClassicUO.LegionScripting
         public static void Init(World world)
         {
             World = world;
-            Task.Factory.StartNew(() => Python.CreateEngine());
+            Task.Factory.StartNew(Python.CreateEngine); //This is to preload engine stuff, helps with faster script startup later
             ScriptPath = Path.GetFullPath(Path.Combine(CUOEnviroment.ExecutablePath, "LegionScripts"));
 
             if (!_loaded)
@@ -520,14 +520,17 @@ namespace ClassicUO.LegionScripting
                 }
                 else if (script.ScriptType == ScriptType.Python)
                 {
-                    if (script.PythonThread != null)
+                    if (script.PythonThread is { IsAlive: true })
                     {
                         PyThreads.Remove(script.PythonThread.ManagedThreadId);
+                        script.pythonEngine.Runtime.Shutdown();
                         script.PythonThread.Interrupt();
                     }
-
-                    script.PythonScriptStopped();
-                    script.PythonThread = null;
+                    else
+                    {
+                        script.PythonScriptStopped();
+                        script.PythonThread = null;
+                    }
                 }
 
                 ScriptStoppedEvent?.Invoke(null, new ScriptInfoEvent(script));

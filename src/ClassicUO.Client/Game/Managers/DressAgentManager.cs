@@ -60,7 +60,6 @@ namespace ClassicUO.Game.Managers
 
             LoadOtherCharacterConfigs();
 
-            RegisterCommands();
             IsLoaded = true;
         }
 
@@ -131,53 +130,38 @@ namespace ClassicUO.Game.Managers
             }
         }
 
-        private void RegisterCommands()
+        public void DressAgentCommand(string[] args)
         {
-            if (World.Instance == null)
+            if (args.Length < 3)
             {
-                Timer timer = new(TimeSpan.FromSeconds(2));
-                timer.Elapsed += (sender, args) =>
-                {
-                    RegisterCommands();
-                };
+                GameActions.Print(World.Instance, "Usage: -dressagent <dress|undress> \"<config name>\"");
                 return;
             }
 
-            if (World.Instance.CommandManager.Commands.ContainsKey("dressagent")) return;
+            string action = args[1].ToLower();
+            string configName = string.Join(" ", args.Skip(2)).Trim('"');
 
-            World.Instance.CommandManager.Register("dressagent", args =>
+            var config = CurrentPlayerConfigs.FirstOrDefault(c => c.Name.Equals(configName, StringComparison.OrdinalIgnoreCase));
+            if (config == null)
             {
-                if (args.Length < 3)
-                {
+                GameActions.Print(World.Instance, $"Dress config '{configName}' not found");
+                return;
+            }
+
+            switch (action)
+            {
+                case "dress":
+                    DressFromConfig(config);
+                    GameActions.Print(World.Instance, $"Dressing from config: {configName}");
+                    break;
+                case "undress":
+                    UndressFromConfig(config);
+                    GameActions.Print(World.Instance, $"Undressing from config: {configName}");
+                    break;
+                default:
                     GameActions.Print(World.Instance, "Usage: -dressagent <dress|undress> \"<config name>\"");
-                    return;
-                }
-
-                string action = args[1].ToLower();
-                string configName = string.Join(" ", args.Skip(2)).Trim('"');
-
-                var config = CurrentPlayerConfigs.FirstOrDefault(c => c.Name.Equals(configName, StringComparison.OrdinalIgnoreCase));
-                if (config == null)
-                {
-                    GameActions.Print(World.Instance, $"Dress config '{configName}' not found");
-                    return;
-                }
-
-                switch (action)
-                {
-                    case "dress":
-                        DressFromConfig(config);
-                        GameActions.Print(World.Instance, $"Dressing from config: {configName}");
-                        break;
-                    case "undress":
-                        UndressFromConfig(config);
-                        GameActions.Print(World.Instance, $"Undressing from config: {configName}");
-                        break;
-                    default:
-                        GameActions.Print(World.Instance, "Usage: -dressagent <dress|undress> \"<config name>\"");
-                        break;
-                }
-            });
+                    break;
+            }
         }
 
         public void Save()

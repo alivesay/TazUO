@@ -101,8 +101,11 @@ namespace ClassicUO.Game.UI.Controls
             }
         }
 
-        public ushort SelectedHue => SelectedIndex < 0 || SelectedIndex >= _hues.Length ? (ushort)0 : _hues[SelectedIndex];
-
+        public ushort SelectedHue
+        {
+            get => SelectedIndex < 0 || SelectedIndex >= _hues.Length ? (ushort)0 : _hues[SelectedIndex];
+            set => SelectHue(value);
+        }
 
 
         public override void Update()
@@ -222,6 +225,27 @@ namespace ClassicUO.Game.UI.Controls
                     startColor += 5;
                 }
             }
+        }
+
+        private void SelectHue(ushort desiredHue)
+        {
+            // revert setting the Graduation later if it does not contain the desired color
+            int previousGraduation = Graduation;
+
+            // When calculating the color from the graduation, it's incremented twice by one in CreateTexture()
+            // To revert this we could subtract two but to avoid negative values, adding 3 does the same thing because of the modulo
+            Graduation = (desiredHue + 3) % 5;
+
+            for (int i = 0; i < Hues.Length; i++)
+            {
+                if (Hues[i] == desiredHue)
+                {
+                    SelectedIndex = i;
+                    return;
+                }
+            }
+
+            Graduation = previousGraduation;
         }
     }
 }

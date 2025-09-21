@@ -36,6 +36,8 @@ namespace ClassicUO.Game.GameObjects
         public bool IsVegetation;
         public int Index;
 
+        private bool _isLight;
+
 
         public static Static Create(World world, ushort graphic, ushort hue, int index)
         {
@@ -61,6 +63,8 @@ namespace ClassicUO.Game.GameObjects
             {
                 s._canBeTransparent = 0;
             }
+
+            s._isLight = s.ItemData.IsLight;
 
             return s;
         }

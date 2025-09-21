@@ -57,7 +57,15 @@ namespace ClassicUO.Game
 
         public Point RangeSize;
 
-        public PlayerMobile Player { get; private set; }
+        public PlayerMobile Player
+        {
+            get;
+            private set
+            {
+                field = value;
+                UIManager.InGame = Map != null && field != null;
+            }
+        }
 
         public HouseCustomizationManager CustomHouseManager;
 
@@ -108,7 +116,15 @@ namespace ClassicUO.Game
 
         public Dictionary<uint, Mobile> Mobiles { get; } = new Dictionary<uint, Mobile>();
 
-        public Map.Map Map { get; private set; }
+        public Map.Map Map
+        {
+            get;
+            private set
+            {
+                field = value;
+                UIManager.InGame = Player != null && field != null;
+            }
+        }
 
         public byte ClientViewRange { get; set; } = Constants.MAX_VIEW_RANGE;
 
@@ -866,6 +882,8 @@ namespace ClassicUO.Game
             ActiveSpellIcons.Clear();
 
             SkillsRequested = false;
+
+            Instance = null;
         }
 
         private void InternalMapChangeClear(bool noplayer)

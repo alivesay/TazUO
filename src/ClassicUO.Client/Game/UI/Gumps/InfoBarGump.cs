@@ -127,7 +127,7 @@ namespace ClassicUO.Game.UI.Gumps
     public class InfoBarControl : Control
     {
         private readonly InfoBarGump _gump;
-        private readonly TextBox _data;
+        private TextBox _data;
         private readonly TextBox _label;
         private readonly ResizableStaticPic _pic;
         private ushort _warningLinesHue;
@@ -165,6 +165,13 @@ namespace ClassicUO.Game.UI.Gumps
         public ushort Hue { get; }
         protected long _refreshTime = (long)Time.Ticks - 1;
 
+        private void BuildDataLabel()
+        {
+            _data?.Dispose();
+            _data = TextBox.GetOne(string.Empty, ProfileManager.CurrentProfile.InfoBarFont, ProfileManager.CurrentProfile.InfoBarFontSize, 0x0481, TextBox.RTLOptions.Default());
+            _data.X = _label.IsVisible ? _label.Width + 3 : _pic.Width;
+        }
+
         public override void Update()
         {
             if (IsDisposed)
@@ -176,10 +183,13 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 _refreshTime = (long)Time.Ticks + 250;
 
+                if(_data == null || _data.IsDisposed)
+                    BuildDataLabel();
+
                 string newData = GetVarData(Var) ?? string.Empty;
                 if (!newData.Equals(_data.Text))
                 {
-                    _data.Text = newData;
+                    _data.SetText(newData);
                     _data.WantUpdateSize = true;
                     WantUpdateSize = true;
                 }

@@ -277,6 +277,13 @@ def Attack(serial: int) -> None:
     """
     pass
 
+def SetWarMode(enabled: bool) -> None:
+    """
+     Sets the player's war mode state (peace/war toggle).
+    
+    """
+    pass
+
 def BandageSelf() -> bool:
     """
      Attempt to bandage yourself. Older clients this will not work, you will need to find a bandage, use it, and target yourself.
@@ -608,6 +615,13 @@ def EmoteMsg(message: str) -> None:
      ```py
      API.EmoteMsg("laughing")
      ```
+    
+    """
+    pass
+
+def GlobalMsg(message: str) -> None:
+    """
+     Send a chat message via the global chat msg system ( ,message here ).
     
     """
     pass
@@ -1475,19 +1489,19 @@ def FindMobile(serial: int) -> PyMobile:
     """
     pass
 
-def GetAllMobiles(graphic: int | None = None, distance: int | None = None) -> list[PyMobile]:
+def GetAllMobiles(graphic: int | None = None, distance: int | None = None, notoriety: list[Notoriety] = None) -> list[PyMobile]:
     """
-     Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
+     Return a list of all mobiles the client is aware of, optionally filtered by graphic, distance, and/or notoriety.
      Example:
      ```py
      # Get all mobiles
      mobiles = API.GetAllMobiles()
      # Get all mobiles with graphic 400
      humans = API.GetAllMobiles(400)
-     # Get all mobiles within 10 tiles
-     nearby = API.GetAllMobiles(distance=10)
      # Get all humans within 5 tiles
      nearby_humans = API.GetAllMobiles(400, 5)
+     # Get all enemies (murderers and criminals) within 15 tiles
+     enemies = API.GetAllMobiles(distance=15, notoriety=[API.Notoriety.Murderer, API.Notoriety.Criminal])
      ```
     
     """

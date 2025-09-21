@@ -77,6 +77,15 @@ namespace ClassicUO.Game.UI.Controls
             if (_pool.Count > 0)
             {
                 TextBox tb = _pool.Dequeue();
+
+                while (!tb.IsDisposed && tb.Parent != null) //In case a text entry was added to the pool but is still in use somewhere
+                {
+                    if(_pool.Count > 0)
+                        tb = _pool.Dequeue();
+                    else
+                        return new TextBox(text, font, size, hue, options);
+                }
+
                 tb.SetDisposed(false);
                 tb._font = font;
                 tb._size = size;

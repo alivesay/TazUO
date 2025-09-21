@@ -186,6 +186,14 @@ namespace ClassicUO.Game.UI.Gumps
                     }
                 );
 
+                a.MouseUp += (s, e) =>
+                {
+                    if (e.Button == MouseButtonType.Left && World.TargetManager.IsTargeting)
+                    {
+                        World.TargetManager.Target(item);
+                    }
+                };
+
                 _dataBox.Add(a);
             }
         }

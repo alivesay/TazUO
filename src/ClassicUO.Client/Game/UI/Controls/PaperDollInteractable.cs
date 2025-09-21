@@ -139,7 +139,7 @@ namespace ClassicUO.Game.UI.Controls
                 return;
             }
 
-            Mobile mobile = _paperDollGump.World.Mobiles.Get(LocalSerial);
+            Mobile mobile = World.Instance.Mobiles.Get(LocalSerial);
 
             if (mobile == null || mobile.IsDestroyed)
             {
@@ -303,8 +303,8 @@ namespace ClassicUO.Game.UI.Controls
                             AcceptMouseInput = true,
                             IsPartialHue = equipItem.ItemData.IsPartialHue,
                             CanLift =
-                                _paperDollGump.World.InGame
-                                && !_paperDollGump.World.Player.IsDead
+                                World.Instance.InGame
+                                && !World.Instance.Player.IsDead
                                 && layer != Layer.Beard
                                 && layer != Layer.Hair
                                 && ((_paperDollGump != null && _paperDollGump.CanLift) || (_paperDollGump != null && LocalSerial == _paperDollGump.World.Player)),

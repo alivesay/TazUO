@@ -38,6 +38,8 @@ namespace ClassicUO.Game.Managers
 
         public static bool IsModalOpen { get; private set; }
 
+        public static bool InGame;
+
         public static bool IsMouseOverWorld
         {
             get
@@ -436,7 +438,7 @@ namespace ClassicUO.Game.Managers
         public static void Draw(UltimaBatcher2D batcher)
         {
             SortControlsByInfo();
-            if (World != null && World.InGame && ProfileManager.CurrentProfile.GlobalScaling)
+            if (InGame && ProfileManager.CurrentProfile.GlobalScaling)
                 batcher.Begin(null, Matrix.CreateScale(ProfileManager.CurrentProfile.GlobalScale));
             else
                 batcher.Begin();

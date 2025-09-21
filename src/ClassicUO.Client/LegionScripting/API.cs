@@ -301,6 +301,13 @@ namespace ClassicUO.LegionScripting
         /// <param name="serial"></param>
         public void Attack(uint serial) => MainThreadQueue.InvokeOnMainThread(() => GameActions.Attack(World, serial));
 
+
+        /// <summary>
+        /// Sets the player's war mode state (peace/war toggle).
+        /// </summary>
+        /// <param name="enabled">True to enable war mode, false to disable war mode</param>
+        public void SetWarMode(bool enabled) => MainThreadQueue.InvokeOnMainThread(() => GameActions.RequestWarMode(World.Player, enabled));
+
         /// <summary>
         /// Attempt to bandage yourself. Older clients this will not work, you will need to find a bandage, use it, and target yourself.
         /// Example:
@@ -665,8 +672,13 @@ namespace ClassicUO.LegionScripting
         public bool BuffExists(string buffName) => MainThreadQueue.InvokeOnMainThread
         (() =>
             {
+                if (string.IsNullOrEmpty(buffName))
+                    return false;
+
                 foreach (BuffIcon buff in World.Player.BuffIcons.Values)
                 {
+                    if (buff == null) continue;
+
                     if (buff.Title.Contains(buffName))
                         return true;
                 }
@@ -708,7 +720,11 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="hue">Color of the message</param>
-        public void SysMsg(string message, ushort hue = 946) => MainThreadQueue.InvokeOnMainThread(() => GameActions.Print(World, message, hue));
+        public void SysMsg(string message, ushort hue = 946)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => GameActions.Print(World, message, hue));
+        }
 
         /// <summary>
         /// Say a message outloud.
@@ -718,7 +734,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message">The message to say</param>
-        public void Msg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.SpeechHue); });
+        public void Msg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.SpeechHue); });
+        }
 
         /// <summary>
         /// Show a message above a mobile or item, this is only visible to you.
@@ -753,7 +773,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message">The message</param>
-        public void PartyMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.SayParty(message); });
+        public void PartyMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.SayParty(message); });
+        }
 
         /// <summary>
         /// Send your guild a message.
@@ -763,7 +787,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void GuildMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.GuildMessageHue, MessageType.Guild); });
+        public void GuildMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.GuildMessageHue, MessageType.Guild); });
+        }
 
         /// <summary>
         /// Send a message to your alliance.
@@ -773,7 +801,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void AllyMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.AllyMessageHue, MessageType.Alliance); });
+        public void AllyMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.AllyMessageHue, MessageType.Alliance); });
+        }
 
         /// <summary>
         /// Whisper a message.
@@ -783,7 +815,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void WhisperMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.WhisperHue, MessageType.Whisper); });
+        public void WhisperMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.WhisperHue, MessageType.Whisper); });
+        }
 
         /// <summary>
         /// Yell a message.
@@ -793,7 +829,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void YellMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.YellHue, MessageType.Yell); });
+        public void YellMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.YellHue, MessageType.Yell); });
+        }
 
         /// <summary>
         /// Emote a message.
@@ -803,7 +843,21 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void EmoteMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.EmoteHue, MessageType.Emote); });
+        public void EmoteMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.EmoteHue, MessageType.Emote); });
+        }
+
+        /// <summary>
+        /// Send a chat message via the global chat msg system ( ,message here ).
+        /// </summary>
+        /// <param name="message"></param>
+        public void GlobalMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { AsyncNetClient.Socket.Send_ChatMessageCommand(message); });
+        }
 
         /// <summary>
         /// Send a response to a server prompt(Like renaming a rune for example).
@@ -2548,23 +2602,24 @@ namespace ClassicUO.LegionScripting
         });
 
         /// <summary>
-        /// Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
+        /// Return a list of all mobiles the client is aware of, optionally filtered by graphic, distance, and/or notoriety.
         /// Example:
         /// ```py
         /// # Get all mobiles
         /// mobiles = API.GetAllMobiles()
         /// # Get all mobiles with graphic 400
         /// humans = API.GetAllMobiles(400)
-        /// # Get all mobiles within 10 tiles
-        /// nearby = API.GetAllMobiles(distance=10)
         /// # Get all humans within 5 tiles
         /// nearby_humans = API.GetAllMobiles(400, 5)
+        /// # Get all enemies (murderers and criminals) within 15 tiles
+        /// enemies = API.GetAllMobiles(distance=15, notoriety=[API.Notoriety.Murderer, API.Notoriety.Criminal])
         /// ```
         /// </summary>
         /// <param name="graphic">Optional graphic ID to filter by</param>
         /// <param name="distance">Optional maximum distance from player</param>
+        /// <param name="notoriety">Optional list of notoriety flags to filter by</param>
         /// <returns></returns>
-        public PyMobile[] GetAllMobiles(ushort? graphic = null, int? distance = null) => MainThreadQueue.InvokeOnMainThread(() =>
+        public PyMobile[] GetAllMobiles(ushort? graphic = null, int? distance = null, IList<Notoriety> notoriety = null) => MainThreadQueue.InvokeOnMainThread(() =>
         {
             var mobiles = World.Mobiles.Values.AsEnumerable();
 
@@ -2573,6 +2628,9 @@ namespace ClassicUO.LegionScripting
 
             if (distance.HasValue)
                 mobiles = mobiles.Where(m => m.Distance <= distance.Value);
+
+            if (notoriety != null && notoriety.Count > 0)
+                mobiles = mobiles.Where(m => notoriety.Contains((Notoriety)(byte)m.NotorietyFlag));
 
             return mobiles.Select(m => new PyMobile(m)).ToArray();
         });

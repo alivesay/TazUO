@@ -28,7 +28,7 @@ namespace ClassicUO.Game.GameObjects
             }
 
             if (
-                ItemData.IsLight
+                _isLight
                 || DisplayedGraphic >= 0x3E02 && DisplayedGraphic <= 0x3E0B
                 || DisplayedGraphic >= 0x3914 && DisplayedGraphic <= 0x3929
             )
@@ -69,7 +69,7 @@ namespace ClassicUO.Game.GameObjects
                     {
                         Client.Game.UO.FileManager.TileData.StaticData[Graphic].SetImpassable(false);
                     }
-                        
+
                 }
             }
 

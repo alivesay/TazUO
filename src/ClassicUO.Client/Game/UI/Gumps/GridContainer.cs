@@ -841,24 +841,23 @@ namespace ClassicUO.Game.UI.Gumps
 
         public class GridItem : Control
         {
-            //private readonly HitBox hit;
-            private bool mousePressedWhenEntered;
-            private readonly Item container;
+            private bool _mousePressedWhenEntered;
+            private readonly Item _container;
             private Item _item;
-            private readonly GridContainer gridContainer;
-            public bool ItemGridLocked { get; set; }
-            private readonly int slot;
-            private GridContainerPreview preview;
-            private Label count;
-            private AlphaBlendControl background;
-            private CustomToolTip toolTipThis, toolTipitem1, toolTipitem2;
-            private readonly List<SimpleTimedTextGump> timedTexts = new();
-            private World world;
+            private readonly GridContainer _gridContainer;
+            private readonly int _slot;
+            private GridContainerPreview _preview;
+            private Label _count;
+            private readonly AlphaBlendControl background;
+            private CustomToolTip _toolTipThis, _toolTipitem1, _toolTipitem2;
+            private readonly List<SimpleTimedTextGump> _timedTexts = new();
+            private readonly World _world;
             private static readonly HashSet<uint> _toggledThisAltDrag = new HashSet<uint>();
             private static bool _altDragActive;
+            private bool _selectHighlight;
 
+            public bool ItemGridLocked { get; set; }
             public bool Highlight { get; set; }
-            public bool SelectHighlight { get; set; }
             public Item SlotItem
             {
                 get => _item;
@@ -873,23 +872,17 @@ namespace ClassicUO.Game.UI.Gumps
 
             public GridItem(World world, uint serial, int size, Item container, GridContainer gridContainer, int count)
             {
-                this.world = world;
-                slot = count;
-                this.container = container;
-                this.gridContainer = gridContainer;
+                _world = world;
+                _slot = count;
+                _container = container;
+                _gridContainer = gridContainer;
                 LocalSerial = serial;
                 _item = world.Items.Get(serial);
                 CanMove = false;
                 AcceptMouseInput = true;
                 WantUpdateSize = false;
 
-                if (_item != null)
-                {
-                    ref readonly var text = ref Client.Game.UO.Arts.GetArt((uint)_item.DisplayedGraphic);
-                    texture = text.Texture;
-                    bounds = text.UV;
-                    rect = Client.Game.UO.Arts.GetRealArtBounds((uint)_item.DisplayedGraphic);
-                }
+                StaticGridContainerSettingUpdated();
 
                 background = new AlphaBlendControl(0.25f)
                 {
@@ -906,20 +899,20 @@ namespace ClassicUO.Game.UI.Gumps
 
             public void AddText(string text, ushort hue)
             {
-                var timedText = new SimpleTimedTextGump(world, text, (uint)hue, TimeSpan.FromSeconds(2), 200)
+                SimpleTimedTextGump timedText = new SimpleTimedTextGump(_world, text, (uint)hue, TimeSpan.FromSeconds(2), 200)
                 {
                     X = ScreenCoordinateX,
                     Y = ScreenCoordinateY
                 };
 
                 // Remove disposed timed texts
-                timedTexts.RemoveAll(tt => tt == null || tt.IsDisposed);
+                _timedTexts.RemoveAll(tt => tt == null || tt.IsDisposed);
 
                 // Adjust the Y position of existing timed texts
-                foreach (var tt in timedTexts)
+                foreach (var tt in _timedTexts)
                     tt.Y -= timedText.Height + 5;
 
-                timedTexts.Add(timedText);
+                _timedTexts.Add(timedText);
                 UIManager.Add(timedText);
             }
 
@@ -943,62 +936,74 @@ namespace ClassicUO.Game.UI.Gumps
                     LocalSerial = 0;
                     ClearTooltip();
                     Highlight = false;
-                    count?.Dispose();
-                    count = null;
+                    _count?.Dispose();
+                    _count = null;
                     ItemGridLocked = false;
                     CanMove = true;
+                    _hasItem = false;
+                    _shouldDraw = !_gridContainer.isCorpse;
                     return;
                 }
 
+                _hasItem = true;
                 CanMove = false;
                 _item = item;
                 ref readonly var text = ref Client.Game.UO.Arts.GetArt((uint)_item.DisplayedGraphic);
-                texture = text.Texture;
-                bounds = text.UV;
-                rect = Client.Game.UO.Arts.GetRealArtBounds(_item.DisplayedGraphic);
+                _texture = text.Texture;
+                _bounds = text.UV;
+                _rect = Client.Game.UO.Arts.GetRealArtBounds(_item.DisplayedGraphic);
+                _shouldDraw = _texture != null;
 
                 LocalSerial = item.Serial;
                 int itemAmt = _item.ItemData.IsStackable ? _item.Amount : 1;
 
                 if (itemAmt > 1)
                 {
-                    count?.Dispose();
-                    count = new Label(itemAmt.ToString(), true, 0x0481, align: TEXT_ALIGN_TYPE.TS_LEFT)
+                    _count?.Dispose();
+                    _count = new Label(itemAmt.ToString(), true, 0x0481, align: TEXT_ALIGN_TYPE.TS_LEFT)
                     {
                         X = 1
                     };
-                    Y = Height - count.Height;
+                    Y = Height - _count.Height;
                 }
 
                 SetTooltip(_item);
+            }
+
+            /// <summary>
+            /// Called when various cached settings like border hue and alpha are updated.
+            /// </summary>
+            public static void StaticGridContainerSettingUpdated()
+            {
+                _borderHueVec = new Vector3(ProfileManager.CurrentProfile.GridBorderHue, 1, (float)ProfileManager.CurrentProfile.GridBorderAlpha / 100);
             }
 
             protected override bool OnMouseDoubleClick(int x, int y, MouseButtonType e)
             {
                 base.OnMouseDoubleClick(x, y, e);
 
-                if (e != MouseButtonType.Left || world.TargetManager.IsTargeting || _item == null)
+                if (e != MouseButtonType.Left || _world.TargetManager.IsTargeting || _item == null)
                     return false;
 
                 if (!Keyboard.Ctrl &&
                     !Keyboard.Alt &&
-                    ProfileManager.CurrentProfile.DoubleClickToLootInsideContainers &&
-                    gridContainer.isCorpse &&
+                    _profile.DoubleClickToLootInsideContainers &&
+                    _gridContainer.isCorpse &&
                     !_item.IsDestroyed &&
                     !_item.ItemData.IsContainer &&
-                    container != world.Player.FindItemByLayer(Layer.Backpack) &&
+                    _container != _world.Player.FindItemByLayer(Layer.Backpack) &&
                     !_item.IsLocked &&
                     _item.IsLootable)
                 {
-                    GameActions.GrabItem(world, _item, _item.Amount);
+                    GameActions.GrabItem(_world, _item, _item.Amount);
                 }
                 else if (Keyboard.Alt && _item != null)
                 {
                     if (MultiItemMoveGump.TrySelect(_item))
-                        SelectHighlight = true;
+                        _selectHighlight = true;
                     var graphic = _item.Graphic;
                     var hue = _item.Hue;
-                    foreach (var gridItem in gridContainer.gridSlotManager.GridSlots.Values)
+                    foreach (var gridItem in _gridContainer.gridSlotManager.GridSlots.Values)
                     {
                         var item = gridItem?._item;
                         if (item is null ||
@@ -1010,14 +1015,14 @@ namespace ClassicUO.Game.UI.Gumps
                         }
 
                         if (MultiItemMoveGump.TrySelect(item))
-                            gridItem.SelectHighlight = true;
+                            gridItem._selectHighlight = true;
                     }
 
-                    MultiItemMoveGump.ShowNextTo(gridContainer);
+                    MultiItemMoveGump.ShowNextTo(_gridContainer);
                 }
                 else
                 {
-                    GameActions.DoubleClick(world, LocalSerial);
+                    GameActions.DoubleClick(_world, LocalSerial);
                 }
 
                 return true;
@@ -1035,42 +1040,42 @@ namespace ClassicUO.Game.UI.Gumps
                         {
                             GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, 0xFFFF, 0xFFFF, 0, _item.Serial);
                             Mouse.CancelDoubleClick = true;
-                            mousePressedWhenEntered = false; //Fix for not needing to move mouse out of grid box to re-drag item
+                            _mousePressedWhenEntered = false; //Fix for not needing to move mouse out of grid box to re-drag item
                         }
                         else if (_item != null && _item.ItemData.IsStackable && _item.Graphic == Client.Game.UO.GameCursor.ItemHold.Graphic)
                         {
                             GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, _item.X, _item.Y, 0, _item.Serial);
                             Mouse.CancelDoubleClick = true;
-                            mousePressedWhenEntered = false; //Fix for not needing to move mouse out of grid box to re-drag item
+                            _mousePressedWhenEntered = false; //Fix for not needing to move mouse out of grid box to re-drag item
                         }
                         else
                         {
-                            Rectangle containerBounds = world.ContainerManager.Get(container.Graphic).Bounds;
-                            gridContainer.gridSlotManager.AddLockedItemSlot(Client.Game.UO.GameCursor.ItemHold.Serial, slot);
-                            var pos = GetBoxPosition(slot, Client.Game.UO.GameCursor.ItemHold.Graphic, containerBounds.Width, containerBounds.Height);
-                            GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, pos.X, pos.Y, 0, container.Serial);
+                            Rectangle containerBounds = _world.ContainerManager.Get(_container.Graphic).Bounds;
+                            _gridContainer.gridSlotManager.AddLockedItemSlot(Client.Game.UO.GameCursor.ItemHold.Serial, _slot);
+                            var pos = GetBoxPosition(_slot, Client.Game.UO.GameCursor.ItemHold.Graphic, containerBounds.Width, containerBounds.Height);
+                            GameActions.DropItem(Client.Game.UO.GameCursor.ItemHold.Serial, pos.X, pos.Y, 0, _container.Serial);
                             Mouse.CancelDoubleClick = true;
-                            mousePressedWhenEntered = false; //Fix for not needing to move mouse out of grid box to re-drag item
+                            _mousePressedWhenEntered = false; //Fix for not needing to move mouse out of grid box to re-drag item
                         }
                     }
-                    else if (world.TargetManager.IsTargeting)
+                    else if (_world.TargetManager.IsTargeting)
                     {
                         if (_item != null)
                         {
-                            world.TargetManager.Target(_item);
-                            if (world.TargetManager.TargetingState == CursorTarget.SetTargetClientSide)
+                            _world.TargetManager.Target(_item);
+                            if (_world.TargetManager.TargetingState == CursorTarget.SetTargetClientSide)
                             {
-                                UIManager.Add(new InspectorGump(world, _item));
+                                UIManager.Add(new InspectorGump(_world, _item));
                             }
                         }
-                        else if (!ProfileManager.CurrentProfile.DisableTargetingGridContainers)
-                            world.TargetManager.Target(container);
+                        else if (!_profile.DisableTargetingGridContainers)
+                            _world.TargetManager.Target(_container);
                         Mouse.CancelDoubleClick = true;
                     }
                     else if (Keyboard.Ctrl)
                     {
                         if (_item != null)
-                            gridContainer.gridSlotManager.SetLockedSlot(slot, !ItemGridLocked, gridContainer.gridContainerEntry.GetSlot(_item.Serial));
+                            _gridContainer.gridSlotManager.SetLockedSlot(_slot, !ItemGridLocked, _gridContainer.gridContainerEntry.GetSlot(_item.Serial));
                         Mouse.CancelDoubleClick = true;
                     }
                     else if (Keyboard.Alt && _item != null)
@@ -1078,40 +1083,40 @@ namespace ClassicUO.Game.UI.Gumps
                         // If no drag occurred, toggle on click to prevent missed quick taps.
                         if (!_altDragActive)
                         {
-                            SelectHighlight = MultiItemMoveGump.ToggleItem(_item);
+                            _selectHighlight = MultiItemMoveGump.ToggleItem(_item);
                         }
                         else
                         {
-                            SelectHighlight = MultiItemMoveGump.IsSelected(_item.Serial);
+                            _selectHighlight = MultiItemMoveGump.IsSelected(_item.Serial);
                         }
 
-                        if (SelectHighlight)
-                            MultiItemMoveGump.ShowNextTo(gridContainer);
+                        if (_selectHighlight)
+                            MultiItemMoveGump.ShowNextTo(_gridContainer);
 
                         Mouse.CancelDoubleClick = true;
                     }
-                    else if (Keyboard.Shift && _item != null && ProfileManager.CurrentProfile.EnableAutoLoot && !ProfileManager.CurrentProfile.HoldShiftForContext && !ProfileManager.CurrentProfile.HoldShiftToSplitStack)
+                    else if (Keyboard.Shift && _item != null && _profile.EnableAutoLoot && !_profile.HoldShiftForContext && !_profile.HoldShiftToSplitStack)
                     {
                         AutoLootManager.Instance.AddAutoLootEntry(_item.Graphic, _item.Hue, _item.Name);
-                        GameActions.Print(world, $"Added this item to auto loot.");
+                        GameActions.Print(_world, $"Added this item to auto loot.");
                     }
                     else if (_item != null)
                     {
                         Point offset = Mouse.LDragOffset;
                         if (Math.Abs(offset.X) < Constants.MIN_PICKUP_DRAG_DISTANCE_PIXELS && Math.Abs(offset.Y) < Constants.MIN_PICKUP_DRAG_DISTANCE_PIXELS)
                         {
-                            if ((gridContainer.isCorpse && ProfileManager.CurrentProfile.CorpseSingleClickLoot) || gridContainer.quickLootThisContainer)
+                            if ((_gridContainer.isCorpse && _profile.CorpseSingleClickLoot) || _gridContainer.quickLootThisContainer)
                             {
                                 Client.Game.GetScene<GameScene>()?.MoveItemQueue.EnqueueQuick(_item);
                                 Mouse.CancelDoubleClick = true;
                             }
                             else
                             {
-                                if (world.ClientFeatures.TooltipsEnabled)
-                                    world.DelayedObjectClickManager.Set(_item.Serial, gridContainer.X, gridContainer.Y - 80, Time.Ticks + Mouse.MOUSE_DELAY_DOUBLE_CLICK);
+                                if (_world.ClientFeatures.TooltipsEnabled)
+                                    _world.DelayedObjectClickManager.Set(_item.Serial, _gridContainer.X, _gridContainer.Y - 80, Time.Ticks + Mouse.MOUSE_DELAY_DOUBLE_CLICK);
                                 else
                                 {
-                                    GameActions.SingleClick(world, _item.Serial);
+                                    GameActions.SingleClick(_world, _item.Serial);
                                 }
                             }
                         }
@@ -1121,8 +1126,8 @@ namespace ClassicUO.Game.UI.Gumps
 
             private (int X, int Y) GetBoxPosition(int boxIndex, uint itemGraphic, int width, int height)
             {
-                if (gridContainer.StackNonStackableItems)
-                    foreach (var gridSlot in gridContainer.gridSlotManager.GridSlots.Values)
+                if (_gridContainer.StackNonStackableItems)
+                    foreach (var gridSlot in _gridContainer.gridSlotManager.GridSlots.Values)
                     {
                         if (gridSlot._item != null && gridSlot._item.Graphic == itemGraphic)
                         {
@@ -1130,7 +1135,7 @@ namespace ClassicUO.Game.UI.Gumps
                         }
                     }
 
-                int gridSize = (int)Math.Ceiling(Math.Sqrt(gridContainer.gridSlotManager.GridSlots.Count));
+                int gridSize = (int)Math.Ceiling(Math.Sqrt(_gridContainer.gridSlotManager.GridSlots.Count));
 
                 int row = boxIndex / gridSize;
                 int col = boxIndex % gridSize;
@@ -1148,7 +1153,7 @@ namespace ClassicUO.Game.UI.Gumps
             {
                 base.OnMouseExit(x, y);
 
-                if (Mouse.LButtonPressed && !mousePressedWhenEntered)
+                if (Mouse.LButtonPressed && !_mousePressedWhenEntered)
                 {
                     Point offset = Mouse.LDragOffset;
                     if (Math.Abs(offset.X) >= Constants.MIN_PICKUP_DRAG_DISTANCE_PIXELS || Math.Abs(offset.Y) >= Constants.MIN_PICKUP_DRAG_DISTANCE_PIXELS)
@@ -1156,7 +1161,7 @@ namespace ClassicUO.Game.UI.Gumps
                         if (_item != null)
                         {
                             if (!Keyboard.Alt)
-                                GameActions.PickUp(world, _item, x, y);
+                                GameActions.PickUp(_world, _item, x, y);
                         }
                     }
                 }
@@ -1167,23 +1172,23 @@ namespace ClassicUO.Game.UI.Gumps
                     g.Dispose();
                 }
 
-                mousePressedWhenEntered = false;
+                _mousePressedWhenEntered = false;
             }
 
             protected override void OnMouseEnter(int x, int y)
             {
                 base.OnMouseEnter(x, y);
 
-                SelectedObject.Object = world.Get(LocalSerial);
-                mousePressedWhenEntered = Mouse.LButtonPressed;
+                SelectedObject.Object = _world.Get(LocalSerial);
+                _mousePressedWhenEntered = Mouse.LButtonPressed;
 
                 if (_item != null)
                 {
                     if (_item.ItemData.IsContainer && _item.Items != null &&
-                        ProfileManager.CurrentProfile.GridEnableContPreview && !spellbooks.Contains(_item.Graphic))
+                        _profile.GridEnableContPreview && !spellbooks.Contains(_item.Graphic))
                     {
-                        preview = new GridContainerPreview(world, _item, Mouse.Position.X, Mouse.Position.Y);
-                        UIManager.Add(preview);
+                        _preview = new GridContainerPreview(_world, _item, Mouse.Position.X, Mouse.Position.Y);
+                        UIManager.Add(_preview);
                     }
 
                     if (!HasTooltip)
@@ -1191,22 +1196,29 @@ namespace ClassicUO.Game.UI.Gumps
                 }
             }
 
-            private Texture2D texture;
-            private Rectangle rect;
-            private Rectangle bounds;
+            private Texture2D _texture;
+            private Rectangle _rect = Rectangle.Empty;
+            private Rectangle _bounds;
+            private readonly Profile _profile = ProfileManager.CurrentProfile;
+            private readonly Texture2D _whiteTexture = SolidColorTextureCache.GetTexture(Color.White);
+            private bool _hasItem;
+            private static readonly Vector3 _highLightHue = ShaderHueTranslator.GetHueVector(0x34, false, 1);
+            private static Vector3 _borderHueVec;
+            private bool _shouldDraw;
 
             public override bool Draw(UltimaBatcher2D batcher, int x, int y)
             {
-                bool itemNull = _item == null;
-                if (!itemNull && Keyboard.Ctrl && _item.ItemData.Layer > 0 && MouseIsOver && (toolTipThis == null || toolTipThis.IsDisposed) && (toolTipitem1 == null || toolTipitem1.IsDisposed) && (toolTipitem2 == null || toolTipitem2.IsDisposed))
+                if (!_shouldDraw || IsDisposed) return false;
+
+                if (_hasItem && Keyboard.Ctrl && _item.ItemData.Layer > 0 && MouseIsOver && (_toolTipThis == null || _toolTipThis.IsDisposed) && (_toolTipitem1 == null || _toolTipitem1.IsDisposed) && (_toolTipitem2 == null || _toolTipitem2.IsDisposed))
                 {
-                    Item compItem = world.Player.FindItemByLayer((Layer)_item.ItemData.Layer);
+                    Item compItem = _world.Player.FindItemByLayer((Layer)_item.ItemData.Layer);
                     Item compItem2 = null;
 
                     // For weapons, also check the opposite layer for comparison
                     if ((Layer)_item.ItemData.Layer == Layer.OneHanded)
                     {
-                        compItem2 = world.Player.FindItemByLayer(Layer.TwoHanded);
+                        compItem2 = _world.Player.FindItemByLayer(Layer.TwoHanded);
                         // If no one-handed item equipped, use two-handed as primary comparison
                         if (compItem == null && compItem2 != null)
                         {
@@ -1216,7 +1228,7 @@ namespace ClassicUO.Game.UI.Gumps
                     }
                     else if ((Layer)_item.ItemData.Layer == Layer.TwoHanded)
                     {
-                        compItem2 = world.Player.FindItemByLayer(Layer.OneHanded);
+                        compItem2 = _world.Player.FindItemByLayer(Layer.OneHanded);
                         // If no two-handed item equipped, use one-handed as primary comparison
                         if (compItem == null && compItem2 != null)
                         {
@@ -1229,51 +1241,52 @@ namespace ClassicUO.Game.UI.Gumps
                     {
                         ClearTooltip();
                         List<CustomToolTip> toolTipList = new List<CustomToolTip>();
-                        toolTipThis = new CustomToolTip(world, _item, Mouse.Position.X + 5, Mouse.Position.Y + 5, this, compareTo: compItem);
-                        toolTipList.Add(toolTipThis);
-                        toolTipitem1 = new CustomToolTip(world, compItem, toolTipThis.X + toolTipThis.Width + 10, toolTipThis.Y, this, "<basefont color=\"orange\">Equipped Item<br>");
-                        toolTipList.Add(toolTipitem1);
+                        _toolTipThis = new CustomToolTip(_world, _item, Mouse.Position.X + 5, Mouse.Position.Y + 5, this, compareTo: compItem);
+                        toolTipList.Add(_toolTipThis);
+                        _toolTipitem1 = new CustomToolTip(_world, compItem, _toolTipThis.X + _toolTipThis.Width + 10, _toolTipThis.Y, this, "<basefont color=\"orange\">Equipped Item<br>");
+                        toolTipList.Add(_toolTipitem1);
 
                         if (CUOEnviroment.Debug)
                         {
-                            ItemPropertiesData i1 = new ItemPropertiesData(world, _item);
-                            ItemPropertiesData i2 = new ItemPropertiesData(world, compItem);
+                            ItemPropertiesData i1 = new ItemPropertiesData(_world, _item);
+                            ItemPropertiesData i2 = new ItemPropertiesData(_world, compItem);
 
                             if (i1.GenerateComparisonTooltip(i2, out string compileToolTip))
-                                GameActions.Print(world,compileToolTip);
+                                GameActions.Print(_world,compileToolTip);
                         }
 
                         // Add second weapon comparison if both hands have weapons
                         if (compItem2 != null)
                         {
-                            toolTipitem2 = new CustomToolTip(world, compItem2, toolTipitem1.X + toolTipitem1.Width + 10, toolTipitem1.Y, this, "<basefont color=\"orange\">Equipped Item<br>");
-                            toolTipList.Add(toolTipitem2);
+                            _toolTipitem2 = new CustomToolTip(_world, compItem2, _toolTipitem1.X + _toolTipitem1.Width + 10, _toolTipitem1.Y, this, "<basefont color=\"orange\">Equipped Item<br>");
+                            toolTipList.Add(_toolTipitem2);
                         }
 
-                        MultipleToolTipGump multipleToolTipGump = new MultipleToolTipGump(world, Mouse.Position.X + 10, Mouse.Position.Y + 10, toolTipList.ToArray(), this);
+                        MultipleToolTipGump multipleToolTipGump = new MultipleToolTipGump(_world, Mouse.Position.X + 10, Mouse.Position.Y + 10, toolTipList.ToArray(), this);
                         UIManager.Add(multipleToolTipGump);
                     }
                 }
 
-                if (SelectHighlight && !itemNull)
+                if (_selectHighlight && _hasItem)
                     if (!MultiItemMoveGump.IsSelected(_item.Serial))
-                        SelectHighlight = false;
+                        _selectHighlight = false;
 
                 base.Draw(batcher, x, y);
 
-                Vector3 hueVector = ShaderHueTranslator.GetHueVector(ProfileManager.CurrentProfile.GridBorderHue, false, (float)ProfileManager.CurrentProfile.GridBorderAlpha / 100);
+                Vector3 hueVector = _borderHueVec;
 
-                if (ItemGridLocked)
-                    hueVector = ShaderHueTranslator.GetHueVector(0x2, false, (float)ProfileManager.CurrentProfile.GridBorderAlpha / 100);
-
-                if (Highlight || SelectHighlight)
+                if(_hasItem)
                 {
-                    hueVector = ShaderHueTranslator.GetHueVector(0x34, false, 1);
+                    if (ItemGridLocked)
+                        hueVector = ShaderHueTranslator.GetHueVector(0x2, false, (float)_profile.GridBorderAlpha / 100);
+
+                    if (Highlight || _selectHighlight)
+                        hueVector = _highLightHue;
                 }
 
                 batcher.DrawRectangle
                 (
-                    SolidColorTextureCache.GetTexture(Color.White),
+                    _whiteTexture,
                     x,
                     y,
                     Width,
@@ -1281,11 +1294,13 @@ namespace ClassicUO.Game.UI.Gumps
                     hueVector
                 );
 
-                if (!itemNull && _item.MatchesHighlightData)
+                if (!_hasItem) return true;
+
+                if (_item.MatchesHighlightData)
                 {
                     int bx = x + 6;
                     int by = y + 6;
-                    int bsize = ProfileManager.CurrentProfile.GridHighlightSize;
+                    int bsize = _profile.GridHighlightSize;
 
 
                     Texture2D borderTexture = SolidColorTextureCache.GetTexture(_item.HighlightColor);
@@ -1316,13 +1331,13 @@ namespace ClassicUO.Game.UI.Gumps
                         );
                 }
 
-                if (MouseIsOver && _item != null)
+                if (MouseIsOver)
                 {
                     hueVector.Z = 0.3f;
 
                     batcher.Draw
                     (
-                        SolidColorTextureCache.GetTexture(Color.White),
+                        _whiteTexture,
                         new Rectangle
                         (
                             x + 1,
@@ -1334,72 +1349,74 @@ namespace ClassicUO.Game.UI.Gumps
                     );
                 }
 
-                if (_item != null && texture != null & rect != null)
+                if (_texture == null) return true;
+
+                hueVector = ShaderHueTranslator.GetHueVector(_item.Hue, _item.ItemData.IsPartialHue, 1f);
+
+                Point originalSize = new(Width, Height);
+                Point point = new();
+                float scale = (_profile.GridContainersScale / 100f);
+                bool scaleItems = _profile.GridContainerScaleItems;
+
+                if (_rect.Width < Width)
                 {
-                    hueVector = ShaderHueTranslator.GetHueVector(_item.Hue, _item.ItemData.IsPartialHue, 1f);
+                    if (scaleItems)
+                        originalSize.X = (ushort)(_rect.Width * scale);
+                    else
+                        originalSize.X = _rect.Width;
 
-                    Point originalSize = new Point(Width, Height);
-                    Point point = new Point();
-                    var scale = (ProfileManager.CurrentProfile.GridContainersScale / 100f);
-
-                    if (rect.Width < Width)
-                    {
-                        if (ProfileManager.CurrentProfile.GridContainerScaleItems)
-                            originalSize.X = (ushort)(rect.Width * scale);
-                        else
-                            originalSize.X = rect.Width;
-
-                        point.X = (Width >> 1) - (originalSize.X >> 1);
-                    }
-                    else if (rect.Width > Width)
-                    {
-                        if (ProfileManager.CurrentProfile.GridContainerScaleItems)
-                            originalSize.X = (ushort)(Width * scale);
-                        else
-                            originalSize.X = Width;
-                        point.X = (Width >> 1) - (originalSize.X >> 1);
-                    }
-
-                    if (rect.Height < Height)
-                    {
-                        if (ProfileManager.CurrentProfile.GridContainerScaleItems)
-                            originalSize.Y = (ushort)(rect.Height * scale);
-                        else
-                            originalSize.Y = rect.Height;
-
-                        point.Y = (Height >> 1) - (originalSize.Y >> 1);
-                    }
-                    else if (rect.Height > Height)
-                    {
-                        if (ProfileManager.CurrentProfile.GridContainerScaleItems)
-                            originalSize.Y = (ushort)(Height * scale);
-                        else
-                            originalSize.Y = Height;
-
-                        point.Y = (Height >> 1) - (originalSize.Y >> 1);
-                    }
-
-                    batcher.Draw
-                    (
-                        texture,
-                        new Rectangle
-                        (
-                            x + point.X,
-                            y + point.Y,
-                            originalSize.X,
-                            originalSize.Y
-                        ),
-                        new Rectangle
-                        (
-                            bounds.X + rect.X,
-                            bounds.Y + rect.Y,
-                            rect.Width,
-                            rect.Height
-                        ),
-                        hueVector
-                    );
-                    count?.Draw(batcher, x + count.X, y + count.Y);
+                    point.X = (Width >> 1) - (originalSize.X >> 1);
                 }
+                else if (_rect.Width > Width)
+                {
+                    if (scaleItems)
+                        originalSize.X = (ushort)(Width * scale);
+                    else
+                        originalSize.X = Width;
+                    point.X = (Width >> 1) - (originalSize.X >> 1);
+                }
+
+                if (_rect.Height < Height)
+                {
+                    if (scaleItems)
+                        originalSize.Y = (ushort)(_rect.Height * scale);
+                    else
+                        originalSize.Y = _rect.Height;
+
+                    point.Y = (Height >> 1) - (originalSize.Y >> 1);
+                }
+                else if (_rect.Height > Height)
+                {
+                    if (scaleItems)
+                        originalSize.Y = (ushort)(Height * scale);
+                    else
+                        originalSize.Y = Height;
+
+                    point.Y = (Height >> 1) - (originalSize.Y >> 1);
+                }
+
+                batcher.Draw
+                (
+                    _texture,
+                    new Rectangle
+                    (
+                        x + point.X,
+                        y + point.Y,
+                        originalSize.X,
+                        originalSize.Y
+                    ),
+                    new Rectangle
+                    (
+                        _bounds.X + _rect.X,
+                        _bounds.Y + _rect.Y,
+                        _rect.Width,
+                        _rect.Height
+                    ),
+                    hueVector
+                );
+
+                _count?.Draw(batcher, x + _count.X, y + _count.Y);
+
                 return true;
             }
 
@@ -1409,7 +1426,7 @@ namespace ClassicUO.Game.UI.Gumps
 
                 bool comboActive = Keyboard.Alt && Mouse.LButtonPressed
                    && !Client.Game.UO.GameCursor.ItemHold.Enabled
-                   && !world.TargetManager.IsTargeting;
+                   && !_world.TargetManager.IsTargeting;
 
                 if (comboActive)
                 {
@@ -1423,10 +1440,10 @@ namespace ClassicUO.Game.UI.Gumps
                     // Toggle immediately for the item currently under the cursor
                     if (_item != null && MouseIsOver && _toggledThisAltDrag.Add(_item.Serial))
                     {
-                        SelectHighlight = MultiItemMoveGump.ToggleItem(_item);
+                        _selectHighlight = MultiItemMoveGump.ToggleItem(_item);
 
-                        if (SelectHighlight)
-                            MultiItemMoveGump.ShowNextTo(gridContainer);
+                        if (_selectHighlight)
+                            MultiItemMoveGump.ShowNextTo(_gridContainer);
                     }
                 }
                 else if (_altDragActive)

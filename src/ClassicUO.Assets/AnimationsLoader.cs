@@ -1178,12 +1178,12 @@ namespace ClassicUO.Assets
         {
             //ConvertBodyIfNeeded(ref animID);
 
-            if (animFlags.HasFlag(AnimationFlags.CalculateOffsetByLowGroup))
+            if ((animFlags & AnimationFlags.CalculateOffsetByLowGroup) != 0)
             {
                 animType = AnimationGroupsType.Animal;
             }
 
-            if (animFlags.HasFlag(AnimationFlags.CalculateOffsetLowGroupExtended))
+            if ((animFlags & AnimationFlags.CalculateOffsetLowGroupExtended) != 0)
             {
                 animType = AnimationGroupsType.Monster;
             }
@@ -1215,14 +1215,8 @@ namespace ClassicUO.Assets
                         {
                             return 8;
                         }
-                        {
-                            if (!isRunning)
-                            {
-                                return 8;
-                            }
 
-                            goto case AnimationGroupsType.Monster;
-                        }
+                        goto case AnimationGroupsType.Monster;
                     }
 
                 case AnimationGroupsType.Monster:
@@ -1285,14 +1279,15 @@ namespace ClassicUO.Assets
             }
 
             file.Seek(index.Position, SeekOrigin.Begin);
-            var buf = new byte[index.Size];
+            var buf = ArrayPool<byte>.Shared.Rent((int)index.Size); //new byte[index.Size];
             file.Read(buf);
 
             var reader = new StackDataReader(buf);
 
+            byte[] dbuf = null;
             if (index.CompressionType >= CompressionType.Zlib)
             {
-                var dbuf = new byte[(int)index.UncompressedSize];
+                dbuf = ArrayPool<byte>.Shared.Rent((int)index.UncompressedSize); //new byte[(int)index.UncompressedSize];
                 var result = ZLib.Decompress(buf, dbuf);
                 if (result != ZLib.ZLibError.Ok)
                 {
@@ -1303,7 +1298,7 @@ namespace ClassicUO.Assets
 
                 if (index.CompressionType == CompressionType.ZlibBwt)
                 {
-                    dbuf = ClassicUO.Utility.BwtDecompress.Decompress(dbuf);
+                    dbuf = BwtDecompress.Decompress(dbuf);
                 }
 
                 reader = new StackDataReader(dbuf);
@@ -1337,7 +1332,7 @@ namespace ClassicUO.Assets
                     frame.PixelOffset = pixeloffset;
                 }
 
-                var list = new List<UOPFrameData>();
+                var list = new List<UOPFrameData>(fc);
                 var lastFrameId = 1;
                 for (var i = 0; i < fc; ++i)
                 {
@@ -1430,6 +1425,9 @@ namespace ClassicUO.Assets
             finally
             {
                 ArrayPool<UOPFrameData>.Shared.Return(sharedBuffer);
+                ArrayPool<byte>.Shared.Return(buf);
+                if(dbuf != null)
+                    ArrayPool<byte>.Shared.Return(dbuf);
             }
         }
 

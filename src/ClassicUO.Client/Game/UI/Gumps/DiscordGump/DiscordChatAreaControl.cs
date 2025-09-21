@@ -70,13 +70,13 @@ public class DiscordChatAreaControl : Control
         {
             if (_selectedChannel == 0) return;
 
-            TargetHelper.TargetObject(World.Instance, (e) =>
+            World.Instance.TargetManager.SetTargeting((e) =>
             {
-                if (e == null) return;
+                if (e == null || !(e is Entity entity)) return;
 
-                if (SerialHelper.IsItem(e.Serial))
+                if (SerialHelper.IsItem(entity.Serial))
                 {
-                    Item item = World.Instance.Items.Get(e.Serial);
+                    Item item = World.Instance.Items.Get(entity.Serial);
                     DiscordManager.Instance.SendChannelItem(_selectedChannel, item, isDM);
                 }
             });

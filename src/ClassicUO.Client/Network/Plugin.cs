@@ -17,6 +17,7 @@ using CUO_API;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDL3;
+using ArtInfo = CUO_API.ArtInfo;
 
 namespace ClassicUO.Network
 {
@@ -461,7 +462,7 @@ namespace ClassicUO.Network
             return buffer != null;
         }
 
-        private static void GetStaticImage(ushort g, ref CUO_API.ArtInfo info)
+        private static void GetStaticImage(ushort g, ref ArtInfo info)
         {
             //Client.Game.UO.FileManager.Arts.TryGetEntryInfo(g, out long address, out long size, out long compressedsize);
             //info.Address = address;
@@ -583,6 +584,8 @@ namespace ClassicUO.Network
 
         internal static void OnClosing()
         {
+            if (!Enabled) return;
+
             Client.Game.PluginHost?.Closing();
 
             for (int i = 0; i < Plugins.Count; i++)
@@ -598,6 +601,8 @@ namespace ClassicUO.Network
 
         internal static void OnFocusGained()
         {
+            if (!Enabled) return;
+
             Client.Game.PluginHost?.FocusGained();
 
             foreach (Plugin t in Plugins)
@@ -611,6 +616,8 @@ namespace ClassicUO.Network
 
         internal static void OnFocusLost()
         {
+            if (!Enabled) return;
+
             Client.Game.PluginHost?.FocusLost();
 
             foreach (Plugin t in Plugins)
@@ -686,6 +693,8 @@ namespace ClassicUO.Network
 
         internal static void ProcessMouse(int button, int wheel)
         {
+            if (!Enabled) return;
+
             Client.Game.PluginHost?.Mouse(button, wheel);
 
             foreach (Plugin plugin in Plugins)
@@ -696,6 +705,8 @@ namespace ClassicUO.Network
 
         internal static void ProcessDrawCmdList(GraphicsDevice device)
         {
+            if (!Enabled) return;
+
             IntPtr cmdList = IntPtr.Zero;
             var len = 0;
             Client.Game.PluginHost?.GetCommandList(out cmdList, out len);
@@ -721,6 +732,8 @@ namespace ClassicUO.Network
 
         internal static int ProcessWndProc(SDL.SDL_Event* e)
         {
+            if (!Enabled) return 0;
+
             var result = Client.Game.PluginHost?.SdlEvent(e) ?? 0;
 
             foreach (Plugin plugin in Plugins)
@@ -736,6 +749,8 @@ namespace ClassicUO.Network
 
         internal static void UpdatePlayerPosition(int x, int y, int z)
         {
+            if (!Enabled) return;
+
             Client.Game.PluginHost?.UpdatePlayerPosition(x, y, z);
 
             foreach (Plugin plugin in Plugins)
@@ -764,6 +779,8 @@ namespace ClassicUO.Network
 
         internal static bool OnPluginRecv(ref byte[] data, ref int length)
         {
+            if (!Enabled) return true;
+
             lock (PacketHandlers.Handler)
             {
                 PacketHandlers.Handler.Append(data.AsSpan(0, length), true);
@@ -774,6 +791,8 @@ namespace ClassicUO.Network
 
         internal static bool OnPluginSend(ref byte[] data, ref int length)
         {
+            if (!Enabled) return true;
+
             if (AsyncNetClient.Socket.IsConnected)
             {
                 AsyncNetClient.Socket.Send(data.AsSpan(0, length), true);
@@ -784,6 +803,8 @@ namespace ClassicUO.Network
 
         internal static bool OnPluginRecv_new(IntPtr buffer, ref int length)
         {
+            if (!Enabled) return true;
+
             if (buffer != IntPtr.Zero && length > 0)
             {
                 lock (PacketHandlers.Handler)
@@ -797,6 +818,8 @@ namespace ClassicUO.Network
 
         internal static bool OnPluginSend_new(IntPtr buffer, ref int length)
         {
+            if (!Enabled) return true;
+
             if (buffer != IntPtr.Zero && length > 0)
             {
                 AsyncNetClient.Socket.Send(new Span<byte>((void*)buffer, length), true);

@@ -138,12 +138,15 @@ namespace ClassicUO.Game.UI.ImGuiControls
             ImGui.SameLine();
             if (ImGui.Button("Target Item to Add"))
             {
-                TargetHelper.TargetObject(Client.Game.UO.World, (targetedItem) =>
+                World.Instance.TargetManager.SetTargeting((targetedItem) =>
                 {
-                    if (targetedItem != null)
+                    if (targetedItem != null && targetedItem is Entity targetedEntity)
                     {
-                        AutoLootManager.Instance.AddAutoLootEntry(targetedItem.Graphic, targetedItem.Hue, targetedItem.Name);
-                        lootEntries = AutoLootManager.Instance.AutoLootList;
+                        if(SerialHelper.IsItem(targetedEntity))
+                        {
+                            AutoLootManager.Instance.AddAutoLootEntry(targetedEntity.Graphic, targetedEntity.Hue, targetedEntity.Name);
+                            lootEntries = AutoLootManager.Instance.AutoLootList;
+                        }
                     }
                 });
             }

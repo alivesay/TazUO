@@ -13,10 +13,6 @@ using ClassicUO.Utility;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using Microsoft.Xna.Framework;
-using System.IO;
-using System.Collections.Generic;
 
 namespace ClassicUO.Game.Managers
 {
@@ -35,11 +31,12 @@ namespace ClassicUO.Game.Managers
         MoveItemContainer,
         Internal,
         SetFavoriteMoveBag,
+        CallbackTarget
     }
 
     public class CursorType
     {
-        public static readonly uint Target = 6983686;
+        public const uint Target = 6983686;
     }
 
     public enum TargetType
@@ -154,6 +151,7 @@ namespace ClassicUO.Game.Managers
         private uint _targetCursorId, _lastAttack;
         private readonly World _world;
         private readonly byte[] _lastDataBuffer = new byte[19];
+        private Action<object> _targetCallback;
 
         public TargetManager(World world) { _world = world; }
 
@@ -226,10 +224,17 @@ namespace ClassicUO.Game.Managers
         {
             ClearTargetingWithoutTargetCancelPacket();
 
+            _targetCallback = null;
             TargetingState = 0;
             _targetCursorId = 0;
             MultiTargetInfo = null;
             TargetingType = 0;
+        }
+
+        public void SetTargeting(Action<object> callback, uint cursorId = CursorType.Target, TargetType cursorType = TargetType.Neutral)
+        {
+            _targetCallback = callback;
+            SetTargeting(CursorTarget.CallbackTarget, cursorId, cursorType);
         }
 
         public void SetTargeting(CursorTarget targeting, uint cursorID, TargetType cursorType)
@@ -280,6 +285,11 @@ namespace ClassicUO.Game.Managers
 
                     UIManager.GetGump<HouseCustomizationGump>()?.Update();
                 }
+            }
+
+            if (TargetingState == CursorTarget.CallbackTarget)
+            {
+                _targetCallback?.Invoke(null);
             }
 
             if (IsTargeting || TargetingType == TargetType.Cancel)
@@ -527,6 +537,11 @@ namespace ClassicUO.Game.Managers
                         }
                         ClearTargetingWithoutTargetCancelPacket();
                         return;
+                    case CursorTarget.CallbackTarget:
+                        _targetCallback?.Invoke(entity);
+
+                        ClearTargetingWithoutTargetCancelPacket();
+                        return;
                 }
             }
             else
@@ -559,6 +574,25 @@ namespace ClassicUO.Game.Managers
 
             // Record action for script recording
             ClassicUO.LegionScripting.ScriptRecorder.Instance.RecordTargetLocation(x, y, z, graphic);
+
+            switch (TargetingState)
+            {
+                case CursorTarget.CallbackTarget:
+                    GameObject candidate = _world.Map.GetTile(x, y);
+
+                    while (candidate != null)
+                    {
+                        if (candidate.Graphic == graphic && candidate.Z == z)
+                        {
+                            _targetCallback?.Invoke(candidate);
+                            break;
+                        }
+                        candidate = candidate.TNext;
+                    }
+
+                    ClearTargetingWithoutTargetCancelPacket();
+                    return;
+            }
 
             if (graphic == 0)
             {
@@ -663,85 +697,4 @@ namespace ClassicUO.Game.Managers
         }
     }
 
-    internal static class TargetHelper
-    {
-        private static CancellationTokenSource _executingSource = new CancellationTokenSource();
-
-        /// <summary>
-        /// Request the player to target a gump
-        /// </summary>
-        /// <param name="onTarget"></param>
-        public static async void TargetGump(World world, Action<Gump> onTarget)
-        {
-            var serial = await TargetAsync(world);
-            if (serial == 0) return;
-
-            var g = UIManager.GetGump(serial);
-            if (g == null)
-            {
-                GameActions.Print(world, $"Failed to find the targeted gump (0x{serial:X}).");
-                return;
-            }
-
-            onTarget(g);
-        }
-
-        /// <summary>
-        /// Request the player target an item or mobile
-        /// </summary>
-        /// <param name="onTargeted"></param>
-        /// <returns></returns>
-        public static async Task TargetObject(World world, Action<Entity> onTargeted)
-        {
-            var serial = await TargetAsync(world);
-            if (serial == 0) return;
-
-            var untyped = world.Get(serial);
-            if (untyped == null)
-            {
-                GameActions.Print(world, $"Failed to find the targeted entity (0x{serial:X}).");
-                return;
-            }
-
-            onTargeted(untyped);
-        }
-
-        public static async Task<uint> TargetAsync(World world)
-        {
-            if (world.TargetManager.IsTargeting) world.TargetManager.CancelTarget();
-
-            if (CUOEnviroment.Debug)
-            {
-                GameActions.Print(world, $"Waiting for Target.");
-            }
-
-            // Abort any previous running task
-            var newSource = new CancellationTokenSource();
-            Interlocked.Exchange(ref _executingSource, newSource).Cancel();
-
-            // Set target
-            world.TargetManager.SetTargeting(CursorTarget.Internal, CursorType.Target, TargetType.Neutral);
-
-            // Wait for target
-            while (!newSource.IsCancellationRequested && world.TargetManager.IsTargeting)
-            {
-                try
-                {
-                    await Task.Delay(250, newSource.Token);
-                }
-                catch
-                {
-                    // ignored
-                }
-            }
-
-            if (newSource.IsCancellationRequested)
-            {
-                GameActions.Print(world, $"Target request was cancelled.");
-                return 0;
-            }
-
-            return world.TargetManager.LastTargetInfo.Serial;
-        }
-    }
 }

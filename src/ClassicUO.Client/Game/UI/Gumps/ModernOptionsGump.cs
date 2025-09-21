@@ -2641,11 +2641,19 @@ namespace ClassicUO.Game.UI.Gumps
             content.AddToRight
             (
                 new SliderWithLabel
-                    (lang.GetTazUO.GridItemBorderOpacity, 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.GridBorderAlpha, (i) => { profile.GridBorderAlpha = (byte)i; }), true, page
+                    (lang.GetTazUO.GridItemBorderOpacity, 0, ThemeSettings.SLIDER_WIDTH, 0, 100, profile.GridBorderAlpha, (i) =>
+                    {
+                        profile.GridBorderAlpha = (byte)i;
+                        GridContainer.GridItem.StaticGridContainerSettingUpdated();
+                    }), true, page
             );
 
             content.Indent();
-            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.BorderColor, profile.GridBorderHue, (h) => { profile.GridBorderHue = h; }), true, page);
+            content.AddToRight(new ModernColorPickerWithLabel(World, lang.GetTazUO.BorderColor, profile.GridBorderHue, (h) =>
+            {
+                profile.GridBorderHue = h;
+                GridContainer.GridItem.StaticGridContainerSettingUpdated();
+            }), true, page);
             content.RemoveIndent();
 
             content.BlankLine();
@@ -3882,7 +3890,11 @@ namespace ClassicUO.Game.UI.Gumps
             );
 
             content.BlankLine();
+            content.AddToRight(new CheckboxWithLabel(lang.GetTazUO.HiddenLayersEnabled, 0, profile.HiddenLayersEnabled, (b) => { profile.HiddenLayersEnabled = b; }), true, page);
+
+            content.BlankLine();
             content.AddToRight(new CheckboxWithLabel(lang.GetTazUO.OnlyForYourself, 0, profile.HideLayersForSelf, (b) => { profile.HideLayersForSelf = b; }), true, page);
+
             content.BlankLine();
 
             bool rightSide = false;

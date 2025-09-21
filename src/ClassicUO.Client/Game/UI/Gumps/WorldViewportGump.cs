@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using System.Timers;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.Scenes;
@@ -100,6 +101,18 @@ namespace ClassicUO.Game.UI.Gumps
                 ProfileManager.CurrentProfile.LastVersionHistoryShown = CUOEnviroment.Version.ToString();
 
                 LegionScripting.LegionScripting.DownloadAPIPy();
+            }
+
+            if (Settings.GlobalSettings.FPS < GameController.SupportedRefreshRate)
+            {
+                Timer fps = new Timer(TimeSpan.FromSeconds(5));
+                fps.Elapsed += (sender, args) =>
+                {
+                    if (World.Instance != null)
+                        GameActions.Print($"Your monitor supports {GameController.SupportedRefreshRate} fps, but you currently have your fps limited to {Settings.GlobalSettings.FPS}. To update this type -syncfps", 32);
+                    fps?.Stop();
+                };
+                fps.Start();
             }
         }
 

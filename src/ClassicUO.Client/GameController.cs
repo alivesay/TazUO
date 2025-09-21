@@ -21,6 +21,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -79,6 +80,7 @@ namespace ClassicUO
         public IPluginHost PluginHost { get; private set; }
         public GraphicsDeviceManager GraphicManager { get; }
         public readonly uint[] FrameDelay = new uint[2];
+        public static int SupportedRefreshRate = 0;
 
         private readonly List<(uint, Action)> _queuedActions = new();
 
@@ -97,10 +99,24 @@ namespace ClassicUO
             GraphicManager.ApplyChanges();
 
             SetRefreshRate(Settings.GlobalSettings.FPS);
+            SupportedRefreshRate = Settings.GlobalSettings.FPS;
+
             _uoSpriteBatch = new UltimaBatcher2D(GraphicsDevice);
 
             _filter = HandleSdlEvent;
             SDL_SetEventFilter(_filter, IntPtr.Zero);
+
+            var displayId = SDL.SDL_GetDisplayForWindow(Window.Handle);
+            var displayMode = SDL.SDL_GetCurrentDisplayMode(displayId);
+            if (displayMode != IntPtr.Zero)
+            {
+                // Marshal the pointer to the display mode structure
+                var mode = Marshal.PtrToStructure<SDL.SDL_DisplayMode>(displayMode);
+
+                float refreshRate = mode.refresh_rate;
+                if (refreshRate > 0)
+                    SupportedRefreshRate = (int)refreshRate;
+            }
 
             base.Initialize();
         }
@@ -150,16 +166,7 @@ namespace ClassicUO
             // TODO: temporary fix to avoid crash when laoding plugins
             Settings.GlobalSettings.Encryption = (byte)AsyncNetClient.Load(UO.FileManager.Version, (EncryptionType)Settings.GlobalSettings.Encryption);
 
-            Log.Trace("Loading plugins...");
-            PluginHost?.Initialize();
-
-            foreach (string p in Settings.GlobalSettings.Plugins)
-            {
-                Plugin.Create(p);
-                _pluginsInitialized = true; //Moved here, if no plugins loaded, no need to run plugin code later
-            }
-
-            Log.Trace("Done!");
+            LoadPlugins();
 
             UIManager.World = UO.World;
 
@@ -170,9 +177,23 @@ namespace ClassicUO
             DiscordManager.Instance.FromSavedToken();
         }
 
+        private void LoadPlugins()
+        {
+            Log.Trace("Loading plugins...");
+            PluginHost?.Initialize();
+
+            foreach (string p in Settings.GlobalSettings.Plugins)
+            {
+                Plugin.Create(p);
+                _pluginsInitialized = true; //Moved here, if no plugins loaded, no need to run plugin code later
+            }
+
+            Log.Trace("Done!");
+        }
+
         protected override void UnloadContent()
         {
-            DiscordManager.Instance.BeginDisconnect();
+            DiscordManager.Instance?.BeginDisconnect();
             SDL_GetWindowBordersSize(Window.Handle, out int top, out int left, out _, out _);
 
             Settings.GlobalSettings.WindowPosition = new Point(
@@ -183,11 +204,11 @@ namespace ClassicUO
             Audio?.StopMusic();
             Settings.GlobalSettings.Save();
 
-            if(_pluginsInitialized)
+            if (_pluginsInitialized)
                 Plugin.OnClosing();
 
             UO.Unload();
-            DiscordManager.Instance.FinalizeDisconnect();
+            DiscordManager.Instance?.FinalizeDisconnect();
             base.UnloadContent();
         }
 
@@ -409,12 +430,16 @@ namespace ClassicUO
             LegionScripting.LegionScripting.OnUpdate();
             Profiler.ExitContext("LScript");
 
+            Profiler.EnterContext("MTQ");
             MainThreadQueue.ProcessQueue();
+            Profiler.ExitContext("MTQ");
 
             if (Time.Ticks >= _nextSlowUpdate)
             {
+                Profiler.EnterContext("Slow Update");
                 _nextSlowUpdate = Time.Ticks + 500;
                 UIManager.SlowUpdate();
+                Profiler.ExitContext("Slow Update");
             }
 
             _totalElapsed += gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -455,20 +480,7 @@ namespace ClassicUO
             UO.GameCursor?.Update();
             Audio?.Update();
 
-            DiscordManager.Instance.Update();
-
-
-            for (var i = _queuedActions.Count - 1; i >= 0; i--)
-            {
-                (var time, var fn) = _queuedActions[i];
-
-                if (Time.Ticks > time)
-                {
-                    fn();
-                    _queuedActions.RemoveAt(i);
-                    break;
-                }
-            }
+            DiscordManager.Instance?.Update();
 
             base.Update(gameTime);
         }
@@ -510,8 +522,11 @@ namespace ClassicUO
             _uoSpriteBatch.Begin();
             UO.GameCursor?.Draw(_uoSpriteBatch);
             _uoSpriteBatch.End();
+            Profiler.ExitContext("OutOfContext");
 
+            Profiler.EnterContext("ImGui");
             ImGuiManager.Update(gameTime);
+            Profiler.ExitContext("ImGui");
 
             base.Draw(gameTime);
 
@@ -549,6 +564,12 @@ namespace ClassicUO
 
         private bool HandleSdlEvent(IntPtr userdata, SDL_Event* sdlEvent)
         {
+            if (sdlEvent == null)
+            {
+                Log.Error("SDL Event was null, this is an unexpected error.");
+                return false;
+            }
+
             switch ((SDL_EventType)sdlEvent->type)
             {
                 case SDL_EventType.SDL_EVENT_AUDIO_DEVICE_ADDED:
@@ -568,12 +589,12 @@ namespace ClassicUO
                     break;
 
                 case SDL_EventType.SDL_EVENT_WINDOW_FOCUS_GAINED:
-                    if(_pluginsInitialized)
+                    if (_pluginsInitialized)
                         Plugin.OnFocusGained();
                     break;
 
                 case SDL_EventType.SDL_EVENT_WINDOW_FOCUS_LOST:
-                    if(_pluginsInitialized)
+                    if (_pluginsInitialized)
                         Plugin.OnFocusLost();
                     break;
 
@@ -705,7 +726,7 @@ namespace ClassicUO
                     Mouse.Update();
                     bool isScrolledUp = sdlEvent->wheel.y > 0;
 
-                    if(_pluginsInitialized)
+                    if (_pluginsInitialized)
                         Plugin.ProcessMouse(0, (int)sdlEvent->wheel.y);
 
                     if (!Scene.OnMouseWheel(isScrolledUp))
@@ -932,7 +953,7 @@ namespace ClassicUO
                     break;
 
                 case SDL_EventType.SDL_EVENT_GAMEPAD_AXIS_MOTION: //Work around because sdl doesn't see trigger buttons as buttons, they are axis probably for pressure support
-                    //GameActions.Print(typeof(SDL_GamepadButton).GetEnumName((SDL_GamepadButton)sdlEvent->gbutton.button));
+                                                                  //GameActions.Print(typeof(SDL_GamepadButton).GetEnumName((SDL_GamepadButton)sdlEvent->gbutton.button));
                     if (!IsActive)
                     {
                         break;

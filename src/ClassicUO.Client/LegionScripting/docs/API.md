@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `9/17/25`.*
+*This was generated on `9/20/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -240,6 +240,21 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `serial` | `uint` | ❌ No |  |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### SetWarMode
+`(enabled)`
+ Sets the player's war mode state (peace/war toggle).
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `enabled` | `bool` | ❌ No | True to enable war mode, false to disable war mode |
 
 **Return Type:** `void` *(Does not return anything)*
 
@@ -769,6 +784,21 @@ You can now type `-updateapi` in game to download the latest API.py file.
  ```py
  API.EmoteMsg("laughing")
  ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `message` | `string` | ❌ No |  |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### GlobalMsg
+`(message)`
+ Send a chat message via the global chat msg system ( ,message here ).
 
 
 **Parameters:**
@@ -2165,18 +2195,18 @@ You can now type `-updateapi` in game to download the latest API.py file.
 ---
 
 ### GetAllMobiles
-`(graphic, distance)`
- Return a list of all mobiles the client is aware of, optionally filtered by graphic and/or distance.
+`(graphic, distance, notoriety)`
+ Return a list of all mobiles the client is aware of, optionally filtered by graphic, distance, and/or notoriety.
  Example:
  ```py
  # Get all mobiles
  mobiles = API.GetAllMobiles()
  # Get all mobiles with graphic 400
  humans = API.GetAllMobiles(400)
- # Get all mobiles within 10 tiles
- nearby = API.GetAllMobiles(distance=10)
  # Get all humans within 5 tiles
  nearby_humans = API.GetAllMobiles(400, 5)
+ # Get all enemies (murderers and criminals) within 15 tiles
+ enemies = API.GetAllMobiles(distance=15, notoriety=[API.Notoriety.Murderer, API.Notoriety.Criminal])
  ```
 
 
@@ -2186,6 +2216,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | --- | --- | --- | --- |
 | `graphic` | `ushort?` | ✅ Yes | Optional graphic ID to filter by |
 | `distance` | `int?` | ✅ Yes | Optional maximum distance from player |
+| `notoriety` | `IList<Notoriety>` | ✅ Yes | Optional list of notoriety flags to filter by |
 
 **Return Type:** `PyMobile[]`
 

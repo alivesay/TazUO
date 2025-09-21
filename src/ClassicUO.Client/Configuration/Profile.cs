@@ -591,6 +591,7 @@ namespace ClassicUO.Configuration
 
         public bool DisableMouseInteractionOverheadText { get; set; } = false;
 
+        public bool HiddenLayersEnabled { get; set; } = false;
         public List<int> HiddenLayers { get; set; } = new List<int>();
         public bool HideLayersForSelf { get; set; } = true;
 
@@ -629,7 +630,6 @@ namespace ClassicUO.Configuration
         public bool SpellBar_ShowHotkeys { get; set; } = true;
         public byte ForcedHouseTransparency { get;  set; } = 40;
         public ushort ForcedTransparencyHouseTileHue { get; set; } = 0;
-
         public bool ForceHouseTransparency { get; set; }
         public ulong HideHudGumpFlags { get; set; }
         public bool DisableGrayEnemies { get; set; }

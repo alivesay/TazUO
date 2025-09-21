@@ -30,6 +30,7 @@ namespace ClassicUO.Game.GameObjects
         public TextContainer TextContainer { get; private set; }
 
         private AverageOverTime _averageOverTime;
+        protected Profile _profile = ProfileManager.CurrentProfile;
 
         public bool HasLineOfSightFrom(GameObject observer = null)
         {

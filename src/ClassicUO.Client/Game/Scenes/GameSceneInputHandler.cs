@@ -652,6 +652,7 @@ namespace ClassicUO.Game.Scenes
                     case CursorTarget.Position:
                     case CursorTarget.Object:
                     case CursorTarget.MultiPlacement when _world.CustomHouseManager == null:
+                    case CursorTarget.CallbackTarget:
 
                         {
                             BaseGameObject obj = lastObj;

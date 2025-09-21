@@ -1,4 +1,5 @@
 using ClassicUO.Game.Managers;
+using ClassicUO.Game.GameObjects;
 using ImGuiNET;
 using System;
 using System.Linq;
@@ -48,8 +49,6 @@ namespace ClassicUO.Game.UI.ImGuiControls
         {
             ImGui.Text("Organizers");
 
-            // Add new organizer
-            ImGui.SameLine();
             ImGui.Separator();
             if (ImGui.Button("Add Organizer"))
             {
@@ -169,15 +168,15 @@ namespace ClassicUO.Game.UI.ImGuiControls
             if (ImGui.Button("Set Source Container"))
             {
                 GameActions.Print("Select [SOURCE] Container", 82);
-                TargetHelper.TargetObject(World.Instance, (source) =>
+                World.Instance.TargetManager.SetTargeting((source) =>
                 {
-                    if (source == null || !SerialHelper.IsItem(source))
+                    if (source == null || !(source is Entity sourceEntity) || !SerialHelper.IsItem(sourceEntity))
                     {
                         GameActions.Print("Only items can be selected!");
                         return;
                     }
-                    _selectedConfig.SourceContSerial = source.Serial;
-                    GameActions.Print($"Source container set to {source.Serial:X}", 63);
+                    _selectedConfig.SourceContSerial = sourceEntity.Serial;
+                    GameActions.Print($"Source container set to {sourceEntity.Serial:X}", 63);
                 });
             }
 
@@ -185,15 +184,15 @@ namespace ClassicUO.Game.UI.ImGuiControls
             if (ImGui.Button("Set Destination Container"))
             {
                 GameActions.Print("Select [DESTINATION] Container", 82);
-                TargetHelper.TargetObject(World.Instance, (destination) =>
+                World.Instance.TargetManager.SetTargeting((destination) =>
                 {
-                    if (destination == null || !SerialHelper.IsItem(destination))
+                    if (destination == null || !(destination is Entity destEntity) || !SerialHelper.IsItem(destEntity))
                     {
                         GameActions.Print("Only items can be selected!");
                         return;
                     }
-                    _selectedConfig.DestContSerial = destination.Serial;
-                    GameActions.Print($"Destination container set to {destination.Serial:X}", 63);
+                    _selectedConfig.DestContSerial = destEntity.Serial;
+                    GameActions.Print($"Destination container set to {destEntity.Serial:X}", 63);
                 });
             }
 
@@ -226,19 +225,19 @@ namespace ClassicUO.Game.UI.ImGuiControls
             // Add item buttons
             if (ImGui.Button("Target Item to Add"))
             {
-                TargetHelper.TargetObject(World.Instance, (obj) =>
+                World.Instance.TargetManager.SetTargeting((obj) =>
                 {
-                    if (!SerialHelper.IsItem(obj))
+                    if (obj == null || !(obj is Entity objEntity) || !SerialHelper.IsItem(objEntity))
                     {
                         GameActions.Print("Only items can be added!");
                         return;
                     }
 
                     var newItemConfig = _selectedConfig.NewItemConfig();
-                    newItemConfig.Graphic = obj.Graphic;
-                    newItemConfig.Hue = obj.Hue;
+                    newItemConfig.Graphic = objEntity.Graphic;
+                    newItemConfig.Hue = objEntity.Hue;
 
-                    GameActions.Print($"Added item: Graphic {obj.Graphic:X}, Hue {obj.Hue:X}");
+                    GameActions.Print($"Added item: Graphic {objEntity.Graphic:X}, Hue {objEntity.Hue:X}");
                 });
             }
 

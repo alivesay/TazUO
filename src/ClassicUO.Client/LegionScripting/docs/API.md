@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `9/19/25`.*
+*This was generated on `9/20/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -784,6 +784,21 @@ You can now type `-updateapi` in game to download the latest API.py file.
  ```py
  API.EmoteMsg("laughing")
  ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `message` | `string` | ❌ No |  |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### GlobalMsg
+`(message)`
+ Send a chat message via the global chat msg system ( ,message here ).
 
 
 **Parameters:**

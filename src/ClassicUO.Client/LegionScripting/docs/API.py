@@ -619,6 +619,13 @@ def EmoteMsg(message: str) -> None:
     """
     pass
 
+def GlobalMsg(message: str) -> None:
+    """
+     Send a chat message via the global chat msg system ( ,message here ).
+    
+    """
+    pass
+
 def PromptResponse(message: str) -> None:
     """
      Send a response to a server prompt(Like renaming a rune for example).

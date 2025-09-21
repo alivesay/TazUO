@@ -720,7 +720,11 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="hue">Color of the message</param>
-        public void SysMsg(string message, ushort hue = 946) => MainThreadQueue.InvokeOnMainThread(() => GameActions.Print(World, message, hue));
+        public void SysMsg(string message, ushort hue = 946)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => GameActions.Print(World, message, hue));
+        }
 
         /// <summary>
         /// Say a message outloud.
@@ -730,7 +734,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message">The message to say</param>
-        public void Msg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.SpeechHue); });
+        public void Msg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.SpeechHue); });
+        }
 
         /// <summary>
         /// Show a message above a mobile or item, this is only visible to you.
@@ -765,7 +773,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message">The message</param>
-        public void PartyMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.SayParty(message); });
+        public void PartyMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.SayParty(message); });
+        }
 
         /// <summary>
         /// Send your guild a message.
@@ -775,7 +787,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void GuildMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.GuildMessageHue, MessageType.Guild); });
+        public void GuildMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.GuildMessageHue, MessageType.Guild); });
+        }
 
         /// <summary>
         /// Send a message to your alliance.
@@ -785,7 +801,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void AllyMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.AllyMessageHue, MessageType.Alliance); });
+        public void AllyMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.AllyMessageHue, MessageType.Alliance); });
+        }
 
         /// <summary>
         /// Whisper a message.
@@ -795,7 +815,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void WhisperMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.WhisperHue, MessageType.Whisper); });
+        public void WhisperMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.WhisperHue, MessageType.Whisper); });
+        }
 
         /// <summary>
         /// Yell a message.
@@ -805,7 +829,11 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void YellMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.YellHue, MessageType.Yell); });
+        public void YellMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.YellHue, MessageType.Yell); });
+        }
 
         /// <summary>
         /// Emote a message.
@@ -815,7 +843,21 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         /// <param name="message"></param>
-        public void EmoteMsg(string message) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.EmoteHue, MessageType.Emote); });
+        public void EmoteMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { GameActions.Say(message, ProfileManager.CurrentProfile.EmoteHue, MessageType.Emote); });
+        }
+
+        /// <summary>
+        /// Send a chat message via the global chat msg system ( ,message here ).
+        /// </summary>
+        /// <param name="message"></param>
+        public void GlobalMsg(string message)
+        {
+            if(!string.IsNullOrEmpty(message))
+                MainThreadQueue.InvokeOnMainThread(() => { AsyncNetClient.Socket.Send_ChatMessageCommand(message); });
+        }
 
         /// <summary>
         /// Send a response to a server prompt(Like renaming a rune for example).

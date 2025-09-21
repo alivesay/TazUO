@@ -189,17 +189,6 @@ namespace ImGuiNET.SampleProgram.XNA
         /// </summary>
         protected virtual void UpdateInput()
         {
-            if (!_game.IsActive)
-            {
-                // Stop text input when game is not active
-                if (_textInputActive)
-                {
-                    SDL.SDL_StopTextInput(_game.Window.Handle);
-                    _textInputActive = false;
-                }
-                return;
-            }
-
             var io = ImGui.GetIO();
 
             var mouse = Mouse.GetState();

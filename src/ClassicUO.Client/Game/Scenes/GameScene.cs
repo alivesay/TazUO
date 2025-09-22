@@ -890,9 +890,9 @@ namespace ClassicUO.Game.Scenes
 
             if (
                 (currentProfile.CorpseOpenOptions == 1 || currentProfile.CorpseOpenOptions == 3)
-                    && World.Instance.TargetManager.IsTargeting
+                    && _world.TargetManager.IsTargeting
                 || (currentProfile.CorpseOpenOptions == 2 || currentProfile.CorpseOpenOptions == 3)
-                    && World.Instance.Player.IsHidden
+                    && _world.Player.IsHidden
             )
             {
                 _useItemQueue.ClearCorpses();

@@ -882,8 +882,6 @@ namespace ClassicUO.Game
             ActiveSpellIcons.Clear();
 
             SkillsRequested = false;
-
-            Instance = null;
         }
 
         private void InternalMapChangeClear(bool noplayer)

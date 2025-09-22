@@ -1705,7 +1705,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             private static string GetItemName(Item item)
             {
-                if (World.Instance.OPL.TryGetNameAndData(item.Serial, out string name, out string data))
+                if (World.Instance != null && World.Instance.OPL.TryGetNameAndData(item.Serial, out string name, out string data))
                 {
                     return !string.IsNullOrEmpty(name) ? name : item.ItemData.Name;
                 }

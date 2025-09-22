@@ -700,9 +700,7 @@ namespace ClassicUO.Game.Scenes
                 FoliageIndex = 1;
             }
 
-            Profiler.EnterContext("GetViewPort");
             GetViewPort();
-            Profiler.ExitContext("GetViewPort");
 
             var useObjectHandles = NameOverHeadManager.IsShowing;
             if (useObjectHandles != _useObjectHandles)

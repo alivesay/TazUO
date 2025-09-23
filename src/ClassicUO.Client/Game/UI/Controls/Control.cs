@@ -693,8 +693,6 @@ namespace ClassicUO.Game.UI.Controls
 
         public void HitTest(Point position, ref Control res)
         {
-            if (res == null) return;
-
             HitTest(position.X, position.Y, ref res);
         }
 

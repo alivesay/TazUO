@@ -2013,7 +2013,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `seconds` | `double` | ❌ No |  |
+| `seconds` | `double` | ❌ No | 0-30 seconds. |
 
 **Return Type:** `void` *(Does not return anything)*
 
@@ -2379,7 +2379,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
  Add a mobile to the friends list by serial number.
  Example:
  ```py
- mobile = API.GetMobile(0x12345)
+ mobile = API.FindMobile(0x12345)
  if mobile:
      API.AddFriend(mobile.Serial)
  ```

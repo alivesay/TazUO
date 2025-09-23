@@ -2385,13 +2385,15 @@ namespace ClassicUO.LegionScripting
         /// API.Pause(5)
         /// ```
         /// </summary>
-        /// <param name="seconds"></param>
+        /// <param name="seconds">0-30 seconds.</param>
         public void Pause(double seconds)
         {
-            if (seconds > 2000)
-                seconds = 2000;
+            seconds = Math.Clamp(seconds, 0, 30);
 
             Thread.Sleep((int)(seconds * 1000));
+
+            if (StopRequested)
+                throw new ThreadInterruptedException();
         }
 
         /// <summary>

@@ -177,6 +177,15 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         public static PyProfile PyProfile = new();
 
+        /// <summary>
+        /// Check if the script has been requested to stop.
+        /// ```py
+        /// while not API.StopRequested:
+        ///   DoSomeStuff()
+        /// ```
+        /// </summary>
+        public volatile bool StopRequested;
+
         #endregion
 
         #region Enum

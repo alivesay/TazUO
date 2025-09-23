@@ -461,7 +461,10 @@ namespace ClassicUO.LegionScripting
                     {
                         script.ReadFromFile();
                         script.PythonThread = new Thread(() => ExecutePythonScript(script));
-                        PyThreads.Add(script.PythonThread.ManagedThreadId, script);
+
+                        if(!PyThreads.TryAdd(script.PythonThread.ManagedThreadId, script))
+                            PyThreads[script.PythonThread.ManagedThreadId] = script;
+
                         script.PythonThread.Start();
                     }
                 }
@@ -522,12 +525,13 @@ namespace ClassicUO.LegionScripting
                 {
                     if (script.PythonThread is { IsAlive: true })
                     {
-                        PyThreads.Remove(script.PythonThread.ManagedThreadId);
+                        script.scopedAPI.StopRequested = true;
                         script.pythonEngine.Runtime.Shutdown();
                         script.PythonThread.Interrupt();
                     }
                     else
                     {
+                        PyThreads.Remove(script.PythonThread.ManagedThreadId);
                         script.PythonScriptStopped();
                         script.PythonThread = null;
                     }

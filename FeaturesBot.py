@@ -78,7 +78,7 @@ Top Menu -> More -> Tools -> Quick spell cast
 ```ini
 [ Python Scripting ]
 ```
-> TazUO added built-in pthon scripting to the client. \n
+> TazUO added built-in python scripting to the client. \n
 See more -> <https://tazuo.org/wiki/legion-scripting>
 """,
 
@@ -239,7 +239,7 @@ See more -> <https://tazuo.org/wiki/tazuoaccount-selector>
 ```ini
 [ Alternate paperdoll ]
 ```
-> TUO has a more mordern alternative to the original paperdoll gump.\n
+> TUO has a more modern alternative to the original paperdoll gump.\n
 See more -> <https://tazuo.org/wiki/tazuoalternate-paperdoll>
 """,
 
@@ -383,7 +383,7 @@ See more -> <https://tazuo.org/wiki/tazuoinfo-bar>
 ```ini
 [ Item tooltip comparisons ]
 ```
-> TUO added the ability to compare an item in a container to the item you have equiped in that slot by pressing `Ctrl` while hovering over the item.\n
+> TUO added the ability to compare an item in a container to the item you have equipped in that slot by pressing `Ctrl` while hovering over the item.\n
 See more -> <https://tazuo.org/wiki/tazuoitem-comparison>
 """,
 

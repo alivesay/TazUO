@@ -243,6 +243,7 @@ namespace ClassicUO.Configuration
             #region GameWindow
             public string FPSCap { get; set; } = "FPS Cap";
             public string BackgroundFPS { get; set; } = "Reduce FPS when game is not in focus";
+            public string EnableVSync { get; set; } = "Enable VSync";
             public string FullsizeViewport { get; set; } = "Always use fullsize game world viewport";
             public string FullScreen { get; set; } = "Fullscreen window";
             public string LockViewport { get; set; } = "Lock game world viewport position/size";

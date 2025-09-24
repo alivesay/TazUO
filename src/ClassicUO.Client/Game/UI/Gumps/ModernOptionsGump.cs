@@ -805,6 +805,18 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.AddToRight
             (
+                new CheckboxWithLabel(lang.GetVideo.EnableVSync, isChecked: profile.EnableVSync, valueChanged: (b) =>
+                {
+                    profile.EnableVSync = b;
+                    Client.Game?.SetVSync(b);
+                }), true,
+                page
+            );
+
+            content.BlankLine();
+
+            content.AddToRight
+            (
                 new CheckboxWithLabel
                 (
                     lang.GetVideo.FullsizeViewport, isChecked: profile.GameWindowFullSize, valueChanged: (b) =>

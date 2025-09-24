@@ -280,6 +280,8 @@ namespace ClassicUO.Configuration
 
         public bool ReduceFPSWhenInactive { get; set; } = true;
 
+        public bool EnableVSync { get; set; }
+
         public bool OverrideAllFonts { get; set; }
         public bool OverrideAllFontsIsUnicode { get; set; } = true;
 

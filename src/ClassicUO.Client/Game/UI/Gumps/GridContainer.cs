@@ -975,7 +975,7 @@ namespace ClassicUO.Game.UI.Gumps
             /// </summary>
             public static void StaticGridContainerSettingUpdated()
             {
-                _borderHueVec = new Vector3(ProfileManager.CurrentProfile.GridBorderHue, 1, (float)ProfileManager.CurrentProfile.GridBorderAlpha / 100);
+                _borderHueVec = ShaderHueTranslator.GetHueVector(ProfileManager.CurrentProfile.GridBorderHue, false, (float)ProfileManager.CurrentProfile.GridBorderAlpha / 100);
             }
 
             protected override bool OnMouseDoubleClick(int x, int y, MouseButtonType e)

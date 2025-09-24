@@ -253,7 +253,7 @@ namespace ClassicUO.Game.UI.Gumps
                 new ComboBoxWithLabel
                 (World,
                     lang.GetGeneral.HPShowWhen, 0, ThemeSettings.COMBO_BOX_WIDTH,
-                    new string[] { lang.GetGeneral.HPShowWhen_Always, lang.GetGeneral.HPShowWhen_Less100, lang.GetGeneral.HPShowWhen_Smart }, profile.MobileHPShowWhen,
+                    new string[] { lang.GetGeneral.HPShowWhen_Always, lang.GetGeneral.HPShowWhen_Less100, lang.GetGeneral.HPShowWhen_Smart, "Target Only" }, profile.MobileHPShowWhen,
                     (s, n) => { profile.MobileHPShowWhen = s; }
                 ), true, page
             );

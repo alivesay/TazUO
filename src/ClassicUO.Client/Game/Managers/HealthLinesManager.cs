@@ -79,6 +79,49 @@ namespace ClassicUO.Game.Managers
             var animations = Client.Game.UO.Animations;
             var isEnabled = IsEnabled;
 
+            if (showWhen == 3)
+            {
+                Mobile target = null;
+                var tm = _world.TargetManager;
+                uint[] possibleSerials = {
+                    tm.LastTargetInfo?.Serial ?? 0,
+                    tm.LastAttack,
+                    tm.SelectedTarget,
+                    tm.NewTargetSystemSerial
+                };
+
+                foreach (uint serial in possibleSerials)
+                {
+                    if (serial != 0 && _world.Mobiles.TryGetValue(serial, out Mobile mob) && !mob.IsDestroyed)
+                    {
+                        target = mob;
+                        break;
+                    }
+                }
+
+                if (target != null)
+                {
+                    int current = target.Hits;
+                    int max = target.HitsMax;
+                    if (max > 0)
+                    {
+                        Point p = target.RealScreenPosition;
+                        p.X += (int)target.Offset.X + 22 + 5;
+                        p.Y += (int)(target.Offset.Y - target.Offset.Z) + 22 + 5;
+                        var offsetY = 0;
+                        p.X -= 5;
+                        p = Client.Game.Scene.Camera.WorldToScreen(p);
+                        p.X -= BAR_WIDTH_HALF;
+                        p.Y -= BAR_HEIGHT_HALF;
+                        if (p.X >= 0 && p.X <= camera.Bounds.Width - BAR_WIDTH && p.Y >= 0 && p.Y <= camera.Bounds.Height - BAR_HEIGHT)
+                        {
+                            DrawHealthLine(batcher, target, p.X, p.Y, offsetY, false, false);
+                        }
+                    }
+                }
+                return;
+            }
+
             foreach (Mobile mobile in _world.Mobiles.Values)
             {
                 if (mobile.IsDestroyed)

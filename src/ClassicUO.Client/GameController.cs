@@ -256,6 +256,7 @@ namespace ClassicUO
         public void SetVSync(bool value)
         {
             GraphicManager.SynchronizeWithVerticalRetrace = value;
+            GraphicManager.ApplyChanges();
         }
 
         public void SetRefreshRate(int rate)

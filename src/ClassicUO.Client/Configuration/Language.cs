@@ -143,6 +143,7 @@ namespace ClassicUO.Configuration
             public string HPShowWhen_Always { get; set; } = "Always";
             public string HPShowWhen_Less100 { get; set; } = "Less than 100%";
             public string HPShowWhen_Smart { get; set; } = "Smart";
+            public string HPShowWhen_TargetOnly { get; set; } = "Target Only";
             public string HighlightPoisoned { get; set; } = "Highlight poisoned mobiles";
             public string PoisonHighlightColor { get; set; } = "Highlight color";
             public string HighlightPara { get; set; } = "Highlight paralyzed mobiles";

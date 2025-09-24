@@ -531,7 +531,8 @@ namespace ClassicUO.LegionScripting
                     }
                     else
                     {
-                        PyThreads.Remove(script.PythonThread.ManagedThreadId);
+                        if (script.PythonThread != null)
+                            PyThreads.Remove(script.PythonThread.ManagedThreadId);
                         script.PythonScriptStopped();
                         script.PythonThread = null;
                     }

@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `9/23/25`.*
+*This was generated on `9/25/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -591,6 +591,25 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `spellName` | `string` | ❌ No | This can be a partial match. Fireba will cast Fireball. |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### Dress
+`(name)`
+ Dress from a saved dress configuration.
+ Example:
+ ```py
+ API.Dress("PvP Gear")
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | ❌ No | The name of the dress configuration |
 
 **Return Type:** `void` *(Does not return anything)*
 

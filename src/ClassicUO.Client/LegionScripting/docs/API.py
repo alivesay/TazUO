@@ -494,6 +494,17 @@ def CastSpell(spellName: str) -> None:
     """
     pass
 
+def Dress(name: str) -> None:
+    """
+     Dress from a saved dress configuration.
+     Example:
+     ```py
+     API.Dress("PvP Gear")
+     ```
+    
+    """
+    pass
+
 def BuffExists(buffName: str) -> bool:
     """
      Check if a buff is active.

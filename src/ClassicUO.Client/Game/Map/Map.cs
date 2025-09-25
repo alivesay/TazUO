@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Assets;
 
@@ -14,6 +15,7 @@ namespace ClassicUO.Game.Map
         private static readonly bool[] _blockAccessList = new bool[0x1000];
         private readonly LinkedList<int> _usedIndices = new LinkedList<int>();
         private readonly World _world;
+        private readonly object _chunkLock = new object();
 
 
         public Map(World world, int index)
@@ -98,6 +100,81 @@ namespace ClassicUO.Game.Map
             return chunk;
         }
 
+        public Chunk PreloadChunk(int x, int y)
+        {
+            if (x < 0 || y < 0)
+                return null;
+
+            int cellX = x >> 3;
+            int cellY = y >> 3;
+
+            return PreloadChunk2(cellX, cellY);
+        }
+
+        public Chunk PreloadChunk2(int chunkx, int chunky)
+        {
+            int block = GetBlock(chunkx, chunky);
+
+            if (block >= BlocksCount || block >= _terrainChunks.Length)
+            {
+                return null;
+            }
+
+            ref Chunk chunk = ref _terrainChunks[block];
+
+            if (chunk is { IsDestroyed: false })
+            {
+                chunk.LastAccessTime = Time.Ticks;
+                return chunk;
+            }
+
+            _ = AsyncGetChunk(chunkx, chunky, block);
+
+            return null;
+        }
+
+        private Task<Chunk> AsyncGetChunk(int chunkX, int chunkY, int block)
+        {
+            var task = Task.Run(() =>
+            {
+                lock (_chunkLock)
+                {
+                    ref Chunk chunk = ref _terrainChunks[block];
+
+                    if (chunk == null)
+                    {
+                        LinkedListNode<int> node = _usedIndices.AddLast(block);
+                        chunk = Chunk.Create(_world, chunkX, chunkY);
+                        chunk.Load(Index);
+                        chunk.Node = node;
+                        chunk.LastAccessTime = Time.Ticks;
+                    }
+                    else if (chunk.IsDestroyed)
+                    {
+                        // make sure node is clear
+                        if (chunk.Node != null && (chunk.Node.Previous != null || chunk.Node.Next != null))
+                        {
+                            chunk.Node.List?.Remove(chunk.Node);
+                        }
+
+                        LinkedListNode<int> node = _usedIndices.AddLast(block);
+                        chunk.X = chunkX;
+                        chunk.Y = chunkY;
+                        chunk.Load(Index);
+                        chunk.Node = node;
+                        chunk.LastAccessTime = Time.Ticks;
+                    }
+                    else
+                    {
+                        chunk.LastAccessTime = Time.Ticks;
+                    }
+
+                    return chunk;
+                }
+            });
+
+            return task;
+        }
 
         public GameObject GetTile(int x, int y, bool load = true)
         {

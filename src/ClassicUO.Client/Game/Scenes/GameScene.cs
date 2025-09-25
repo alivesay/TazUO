@@ -755,7 +755,7 @@ namespace ClassicUO.Game.Scenes
                 {
                     int chunkY = minChunkY + chunkYIdx;
 
-                    var chunk = map.GetChunk2(chunkX, chunkY, true);
+                    var chunk = map.PreloadChunk2(chunkX, chunkY); //GetChunk2(chunkX, chunkY, true);
                     if (chunk?.IsDestroyed != false)
                         continue;
 
@@ -1151,7 +1151,7 @@ namespace ClassicUO.Game.Scenes
 
             gd.Viewport = r_viewport;
 
-            if (can_draw_lights)
+            if (can_draw_lights || _use_render_target)
             {
                 gd.Clear(ClearOptions.Stencil, Color.Transparent, 0f, 0);
             }

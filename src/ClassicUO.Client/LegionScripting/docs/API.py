@@ -175,6 +175,7 @@ LastTargetGraphic: int = None
 Found: int = None
 PyProfile: PyProfile = None
 StopRequested: bool = None
+CancellationToken = None
 
 class ScanType:
     Hostile = 0

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
 using ClassicUO.Game;
@@ -185,6 +186,8 @@ namespace ClassicUO.LegionScripting
         /// ```
         /// </summary>
         public volatile bool StopRequested;
+
+        public CancellationTokenSource CancellationToken = new();
 
         #endregion
 
@@ -2412,7 +2415,7 @@ namespace ClassicUO.LegionScripting
         {
             seconds = Math.Clamp(seconds, 0, 30);
 
-            Thread.Sleep((int)(seconds * 1000));
+            Task.Delay(TimeSpan.FromSeconds(seconds), cancellationToken: CancellationToken.Token).Wait(cancellationToken:CancellationToken.Token);
 
             if (StopRequested)
                 throw new ThreadInterruptedException();

@@ -485,17 +485,14 @@ namespace ClassicUO.LegionScripting
                 ScriptSource source = script.pythonEngine.CreateScriptSourceFromString(script.FileContentsJoined, script.FullPath, SourceCodeKind.File);
                 source?.Execute(script.pythonScope);
             }
-            catch (ThreadInterruptedException)
-            {
-            }
-            catch (ThreadAbortException)
-            {
-            }
+            catch (ThreadInterruptedException) { }
+            catch (ThreadAbortException) { }
+            catch (OperationCanceledException) { }
             catch (Exception e)
             {
                 ExceptionOperations eo = script.pythonEngine.GetService<ExceptionOperations>();
                 string error = e.Message;
-                if(eo != null)
+                if (eo != null)
                     error = eo.FormatException(e);
 
                 GameActions.Print(World, "Python Script Error:");
@@ -526,6 +523,7 @@ namespace ClassicUO.LegionScripting
                     if (script.PythonThread is { IsAlive: true })
                     {
                         script.scopedAPI.StopRequested = true;
+                        script.scopedAPI.CancellationToken.Cancel();
                         script.pythonEngine.Runtime.Shutdown();
                         script.PythonThread.Interrupt();
                     }

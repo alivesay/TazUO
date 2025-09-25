@@ -1090,7 +1090,6 @@ namespace ClassicUO.Game.Scenes
 
             Viewport r_viewport = gd.Viewport;
             Viewport camera_viewport = Camera.GetViewport();
-            Matrix matrix = Camera.ViewTransformMatrix;
 
             bool can_draw_lights = false;
             Vector3 hue = new Vector3(0, 0, 1);
@@ -1147,10 +1146,15 @@ namespace ClassicUO.Game.Scenes
 
             DrawOverheads(batcher);
             DrawSelection(batcher);
+
             batcher.End();
 
             gd.Viewport = r_viewport;
 
+            if (can_draw_lights)
+            {
+                gd.Clear(ClearOptions.Stencil, Color.Transparent, 0f, 0);
+            }
             return base.Draw(batcher);
         }
 
@@ -1163,12 +1167,12 @@ namespace ClassicUO.Game.Scenes
             {
                 Camera.Zoom = 1f; // oScale + profile.GlobalScale;
                 float scale = profile.GlobalScale;
-                matrix = Matrix.CreateScale(profile.GlobalScale);
+                matrix = Matrix.CreateScale(scale);
                 camera_viewport.Bounds = new Rectangle(
-                    (int)(camera_viewport.Bounds.X * profile.GlobalScale),
-                    (int)(camera_viewport.Bounds.Y * profile.GlobalScale),
-                    (int)(camera_viewport.Bounds.Width * profile.GlobalScale),
-                    (int)(camera_viewport.Bounds.Height * profile.GlobalScale)
+                    (int)(camera_viewport.Bounds.X * scale),
+                    (int)(camera_viewport.Bounds.Y * scale),
+                    (int)(camera_viewport.Bounds.Width * scale),
+                    (int)(camera_viewport.Bounds.Height * scale)
                 );
             }
 
@@ -1375,14 +1379,9 @@ namespace ClassicUO.Game.Scenes
 
         private bool PrepareLightsRendering(UltimaBatcher2D batcher, ref Matrix matrix)
         {
-            if (
-                !UseLights && !UseAltLights
-                || _world.Player.IsDead && ProfileManager.CurrentProfile.EnableBlackWhiteEffect
-                || _light_render_target == null
-            )
-            {
-                return false;
-            }
+            if (!UseLights && !UseAltLights) return false;
+            if (_world.Player.IsDead && ProfileManager.CurrentProfile.EnableBlackWhiteEffect) return false;
+            if (_light_render_target == null) return false;
 
             batcher.GraphicsDevice.SetRenderTarget(_light_render_target);
             batcher.GraphicsDevice.Clear(ClearOptions.Target, Color.Black, 0f, 0);
@@ -1446,7 +1445,6 @@ namespace ClassicUO.Game.Scenes
             batcher.End();
 
             batcher.GraphicsDevice.SetRenderTarget(null);
-
             return true;
         }
 

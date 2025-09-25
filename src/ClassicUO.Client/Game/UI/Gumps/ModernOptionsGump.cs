@@ -3437,6 +3437,18 @@ namespace ClassicUO.Game.UI.Gumps
             );
             c.SetTooltip("After disabling, you need to restart the client to revert to no borders.");
 
+            content.BlankLine();
+
+            content.AddToRight
+            (
+                c = new CheckboxWithLabel(lang.GetTazUO.EnableASyncMapLoading, isChecked: profile.EnableASyncMapLoading, valueChanged: (e) =>
+                {
+                    profile.EnableASyncMapLoading = e;
+                    GameScene.Instance?.ASyncMapLoading = e;
+                }),
+                true, page
+            );
+
             #region HideHouses
             content.BlankLine();
 

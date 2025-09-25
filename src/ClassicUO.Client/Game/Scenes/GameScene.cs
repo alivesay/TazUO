@@ -20,6 +20,7 @@ using SDL3;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using ClassicUO.Game.Map;
 using ClassicUO.Game.UI.Gumps.GridHighLight;
 using ClassicUO.LegionScripting;
 
@@ -672,6 +673,8 @@ namespace ClassicUO.Game.Scenes
             }
         }
 
+        public bool ASyncMapLoading = ProfileManager.CurrentProfile.EnableASyncMapLoading;
+
         private void FillGameObjectList()
         {
             _renderListStatics.Clear();
@@ -755,7 +758,8 @@ namespace ClassicUO.Game.Scenes
                 {
                     int chunkY = minChunkY + chunkYIdx;
 
-                    var chunk = map.PreloadChunk2(chunkX, chunkY); //GetChunk2(chunkX, chunkY, true);
+                    Chunk chunk = ASyncMapLoading ? map.PreloadChunk2(chunkX, chunkY) : map.GetChunk2(chunkX, chunkY, true);
+
                     if (chunk?.IsDestroyed != false)
                         continue;
 

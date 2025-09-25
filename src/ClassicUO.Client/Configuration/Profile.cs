@@ -639,6 +639,7 @@ namespace ClassicUO.Configuration
         public ushort PostProcessingType { get; set; }
         public bool DisableHotkeys { get; set; }
         public bool DisableDismountInWarMode { get; set; }
+        public bool EnableASyncMapLoading { get; set; }
 
         private long lastSave;
         internal void Save(World world, string path, bool saveGumps = true)

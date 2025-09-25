@@ -548,7 +548,7 @@ namespace ClassicUO.Game.UI.Gumps
 
             List<Item> sortedContents = ProfileManager.CurrentProfile is null || ProfileManager.CurrentProfile.GridContainerSearchMode == 0
                 ? gridSlotManager.SearchResults(searchBox.Text)
-                : GridSlotManager.GetItemsInContainer(World, container, sortMode);
+                : GridSlotManager.GetItemsInContainer(World, container, sortMode, overrideSort);
 
             gridSlotManager.RebuildContainer(sortedContents, searchBox.Text, overrideSort);
             InvalidateContents = false;
@@ -1668,10 +1668,10 @@ namespace ClassicUO.Game.UI.Gumps
 
             public void UpdateItems()
             {
-                containerContents = GetItemsInContainer(world, container, gridContainer.SortMode);
+                containerContents = GetItemsInContainer(world, container, gridContainer.SortMode, gridContainer.AutoSortContainer);
             }
 
-            public static List<Item> GetItemsInContainer(World World, Item _container, GridSortMode sortMode = GridSortMode.GraphicAndHue)
+            public static List<Item> GetItemsInContainer(World World, Item _container, GridSortMode sortMode = GridSortMode.GraphicAndHue, bool shouldSort = true)
             {
                 List<Item> contents = new List<Item>();
                 for (LinkedObject i = _container.Items; i != null; i = i.Next)
@@ -1693,14 +1693,19 @@ namespace ClassicUO.Game.UI.Gumps
                     contents.Add(item);
                 }
 
-                if (sortMode == GridSortMode.Name) // Sort by name
+                if (shouldSort)
                 {
-                    return contents.OrderBy(item => GetItemName(item)).ThenBy((x) => x.Graphic).ThenBy((x) => x.Hue).ToList();
+                    if (sortMode == GridSortMode.Name) // Sort by name
+                    {
+                        return contents.OrderBy(item => GetItemName(item)).ThenBy((x) => x.Graphic).ThenBy((x) => x.Hue).ToList();
+                    }
+                    else // Default: Sort by graphic + hue
+                    {
+                        return contents.OrderBy((x) => x.Graphic).ThenBy((x) => x.Hue).ToList();
+                    }
                 }
-                else // Default: Sort by graphic + hue
-                {
-                    return contents.OrderBy((x) => x.Graphic).ThenBy((x) => x.Hue).ToList();
-                }
+
+                return contents;
             }
 
             private static string GetItemName(Item item)

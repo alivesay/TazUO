@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.Managers
 {
@@ -22,7 +23,17 @@ namespace ClassicUO.Game.Managers
 
     public class AutoLootManager
     {
-        public static AutoLootManager Instance { get; private set; } = new ();
+        public static AutoLootManager Instance
+        {
+            get
+            {
+                if (field == null)
+                    field = new();
+                return field;
+            }
+            private set => field = value;
+        }
+
         public bool IsLoaded { get { return loaded; } }
         public List<AutoLootConfigEntry> AutoLootList { get => autoLootItems; set => autoLootItems = value; }
         public bool IsLooting => lootItems.Count > 0;
@@ -32,7 +43,7 @@ namespace ClassicUO.Game.Managers
         private static Queue<uint> lootItems = new ();
         private List<AutoLootConfigEntry> autoLootItems = new ();
         private bool loaded = false;
-        private readonly string savePath = Path.Combine(ProfileManager.ProfilePath, "AutoLoot.json");
+        private readonly string savePath;
         private long nextLootTime = Time.Ticks;
         private long nextClearRecents = Time.Ticks + 5000;
         private ProgressBarGump progressBarGump;
@@ -44,6 +55,7 @@ namespace ClassicUO.Game.Managers
         private AutoLootManager()
         {
             World = Client.Game.UO.World;
+            savePath = Path.Combine(ProfileManager.ProfilePath, "AutoLoot.json");
         }
 
 
@@ -219,6 +231,7 @@ namespace ClassicUO.Game.Managers
             EventSink.OnOpenContainer -= OnOpenContainer;
             EventSink.OnPositionChanged -= OnPositionChanged;
             Save();
+            Instance = null;
         }
 
         private void OnPositionChanged(object sender, PositionChangedArgs e)
@@ -345,19 +358,27 @@ namespace ClassicUO.Game.Managers
                 if (!File.Exists(savePath))
                 {
                     autoLootItems = new List<AutoLootConfigEntry>();
+                    Log.Error("Auto loot save path not found, creating new..");
                     loaded = true;
                 }
                 else
                 {
+                    Log.Info($"Loading: {savePath}");
                     try
                     {
-                        string data = File.ReadAllText(savePath);
-                        autoLootItems = JsonSerializer.Deserialize(data, AutoLootJsonContext.Default.ListAutoLootConfigEntry);
+                        JsonHelper.Load(savePath, AutoLootJsonContext.Default.ListAutoLootConfigEntry, out autoLootItems);
+
+                        if (autoLootItems == null)
+                        {
+                            Log.Error("There was an error loading your auto loot config file, defaulted to no configs.");
+                            autoLootItems = new();
+                        }
+
                         loaded = true;
                     }
                     catch
                     {
-                        GameActions.Print(World, "There was an error loading your auto loot config file, please check it with a json validator.", 32);
+                        Log.Error("There was an error loading your auto loot config file, please check it with a json validator.");
                         loaded = false;
                     }
 
@@ -371,9 +392,7 @@ namespace ClassicUO.Game.Managers
             {
                 try
                 {
-                    string fileData = JsonSerializer.Serialize(autoLootItems, AutoLootJsonContext.Default.ListAutoLootConfigEntry);
-
-                    File.WriteAllText(savePath, fileData);
+                    JsonHelper.SaveAndBackup(autoLootItems, savePath, AutoLootJsonContext.Default.ListAutoLootConfigEntry);
                 }
                 catch (Exception e) { Console.WriteLine(e.ToString()); }
             }

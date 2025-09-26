@@ -276,13 +276,13 @@ namespace ClassicUO.Game.UI.ImGuiControls
             ImGui.Separator();
 
             // Items table
-            if (ImGui.BeginTable("ItemsTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, 300)))
+            if (ImGui.BeginTable("ItemsTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, ImGuiTheme.Dimensions.STANDARD_TABLE_SCROLL_HEIGHT)))
             {
-                ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, 70);
-                ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, 70);
-                ImGui.TableSetupColumn("Amount", ImGuiTableColumnFlags.WidthFixed, 70);
-                ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthFixed, 70);
-                ImGui.TableSetupColumn("Del", ImGuiTableColumnFlags.WidthFixed, 70);
+                ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, 55);
+                ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                ImGui.TableSetupColumn("Amount", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                ImGui.TableSetupColumn("Del", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
                 ImGui.TableHeadersRow();
 
                 for (int i = _selectedConfig.ItemConfigs.Count - 1; i >= 0; i--)

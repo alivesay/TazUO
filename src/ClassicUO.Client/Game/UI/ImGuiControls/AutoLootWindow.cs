@@ -2,12 +2,11 @@ using ImGuiNET;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.GameObjects;
-using ClassicUO.Input;
 using ClassicUO.Game.UI.Gumps;
+using ClassicUO.Utility;
 using System;
 using System.IO;
 using System.Numerics;
-using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -170,7 +169,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
 
                 if (ImGui.Button("Add##AddEntry"))
                 {
-                    if (TryParseGraphic(newGraphicInput, out int graphic))
+                    if (StringHelper.TryParseGraphic(newGraphicInput, out int graphic))
                     {
                         ushort hue = ushort.MaxValue;
                         if (!string.IsNullOrEmpty(newHueInput) && newHueInput != "-1")
@@ -209,13 +208,13 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
             else
             // Table headers
-            if (ImGui.BeginTable("AutoLootTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, 200)))
+            if (ImGui.BeginTable("AutoLootTable", 5, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, ImGuiTheme.Dimensions.STANDARD_TABLE_SCROLL_HEIGHT)))
             {
                 ImGui.TableSetupColumn(string.Empty, ImGuiTableColumnFlags.WidthFixed, 52);
-                ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, 80);
-                ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, 80);
+                ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
                 ImGui.TableSetupColumn("Regex", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 80);
+                ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
                 ImGui.TableHeadersRow();
 
                 for (int i = lootEntries.Count - 1; i >= 0; i--)
@@ -237,7 +236,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                     if (ImGui.InputText($"##Graphic{i}", ref graphicStr, 10))
                     {
                         entryGraphicInputs[entry.UID] = graphicStr;
-                        if (TryParseGraphic(graphicStr, out int newGraphic))
+                        if (StringHelper.TryParseGraphic(graphicStr, out int newGraphic))
                         {
                             entry.Graphic = newGraphic;
                         }
@@ -343,20 +342,6 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
         }
 
-        private bool TryParseGraphic(string text, out int graphic)
-        {
-            graphic = 0;
-            if (string.IsNullOrEmpty(text)) return false;
-
-            if (text.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-            {
-                return int.TryParse(text.Substring(2), NumberStyles.AllowHexSpecifier, null, out graphic);
-            }
-            else
-            {
-                return int.TryParse(text, out graphic);
-            }
-        }
 
     }
 }

@@ -1,11 +1,10 @@
 using ImGuiNET;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.GameObjects;
+using ClassicUO.Utility;
 
 namespace ClassicUO.Game.UI.ImGuiControls
 {
@@ -74,8 +73,8 @@ namespace ClassicUO.Game.UI.ImGuiControls
 
                 if (ImGui.Button("Add##AddEntry"))
                 {
-                    if (TryParseGraphic(newOriginalGraphicInput, out int originalGraphic) &&
-                        TryParseGraphic(newReplacementGraphicInput, out int replacementGraphic))
+                    if (StringHelper.TryParseGraphic(newOriginalGraphicInput, out int originalGraphic) &&
+                        StringHelper.TryParseGraphic(newReplacementGraphicInput, out int replacementGraphic))
                     {
                         ushort newHue = ushort.MaxValue;
                         if (!string.IsNullOrEmpty(newHueInput) && newHueInput != "-1")
@@ -121,12 +120,12 @@ namespace ClassicUO.Game.UI.ImGuiControls
             else
             {
                 // Table headers
-                if (ImGui.BeginTable("GraphicReplacementTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, 200)))
+                if (ImGui.BeginTable("GraphicReplacementTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, ImGuiTheme.Dimensions.STANDARD_TABLE_SCROLL_HEIGHT)))
                 {
-                    ImGui.TableSetupColumn("Original Graphic", ImGuiTableColumnFlags.WidthFixed, 80);
-                    ImGui.TableSetupColumn("Replacement Graphic", ImGuiTableColumnFlags.WidthFixed, 80);
-                    ImGui.TableSetupColumn("New Hue", ImGuiTableColumnFlags.WidthFixed, 80);
-                    ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 80);
+                    ImGui.TableSetupColumn("Original Graphic", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                    ImGui.TableSetupColumn("Replacement Graphic", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                    ImGui.TableSetupColumn("New Hue", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                    ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
                     ImGui.TableHeadersRow();
 
                     var filterList = filters.Values.ToList();
@@ -145,7 +144,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                         if (ImGui.InputText($"##Original{i}", ref originalStr, 10))
                         {
                             entryOriginalInputs[filter.OriginalGraphic] = originalStr;
-                            if (TryParseGraphic(originalStr, out int newOriginal))
+                            if (StringHelper.TryParseGraphic(originalStr, out int newOriginal))
                             {
                                 filter.OriginalGraphic = (ushort)newOriginal;
                                 GraphicsReplacement.ResetLists();
@@ -162,7 +161,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                         if (ImGui.InputText($"##Replacement{i}", ref replacementStr, 10))
                         {
                             entryReplacementInputs[filter.OriginalGraphic] = replacementStr;
-                            if (TryParseGraphic(replacementStr, out int newReplacement))
+                            if (StringHelper.TryParseGraphic(replacementStr, out int newReplacement))
                             {
                                 filter.ReplacementGraphic = (ushort)newReplacement;
                             }
@@ -204,19 +203,5 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
         }
 
-        private bool TryParseGraphic(string text, out int graphic)
-        {
-            graphic = 0;
-            if (string.IsNullOrEmpty(text)) return false;
-
-            if (text.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-            {
-                return int.TryParse(text.Substring(2), NumberStyles.AllowHexSpecifier, null, out graphic);
-            }
-            else
-            {
-                return int.TryParse(text, out graphic);
-            }
-        }
     }
 }

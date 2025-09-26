@@ -2,9 +2,8 @@ using ImGuiNET;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.GameObjects;
-using System;
+using ClassicUO.Utility;
 using System.Numerics;
-using System.Globalization;
 using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.ImGuiControls
@@ -125,7 +124,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
 
                 if (ImGui.Button("Add##AddEntry"))
                 {
-                    if (TryParseGraphic(_newGraphicInput, out int graphic))
+                    if (StringHelper.TryParseGraphic(_newGraphicInput, out int graphic))
                     {
                         var newConfig = BuySellAgent.Instance.NewBuyConfig();
                         newConfig.Graphic = (ushort)graphic;
@@ -178,13 +177,13 @@ namespace ClassicUO.Game.UI.ImGuiControls
             else
             {
                 // Table headers
-                if (ImGui.BeginTable("AutoBuyTable", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, 200)))
+                if (ImGui.BeginTable("AutoBuyTable", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, ImGuiTheme.Dimensions.STANDARD_TABLE_SCROLL_HEIGHT)))
                 {
                     ImGui.TableSetupColumn(string.Empty, ImGuiTableColumnFlags.WidthFixed, 52);
-                    ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, 80);
-                    ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, 80);
-                    ImGui.TableSetupColumn("Max Amount", ImGuiTableColumnFlags.WidthFixed, 80);
-                    ImGui.TableSetupColumn("Restock Up To", ImGuiTableColumnFlags.WidthFixed, 80);
+                    ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                    ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                    ImGui.TableSetupColumn("Max Amount", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                    ImGui.TableSetupColumn("Restock Up To", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
                     ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthFixed, 60);
                     ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 50);
                     ImGui.TableHeadersRow();
@@ -208,7 +207,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                         if (ImGui.InputText($"##Graphic{i}", ref graphicStr, 10))
                         {
                             _entryGraphicInputs[entry] = graphicStr;
-                            if (TryParseGraphic(graphicStr, out int newGraphic))
+                            if (StringHelper.TryParseGraphic(graphicStr, out int newGraphic))
                             {
                                 entry.Graphic = (ushort)newGraphic;
                             }
@@ -293,19 +292,5 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
         }
 
-        private bool TryParseGraphic(string text, out int graphic)
-        {
-            graphic = 0;
-            if (string.IsNullOrEmpty(text)) return false;
-
-            if (text.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-            {
-                return int.TryParse(text.Substring(2), NumberStyles.AllowHexSpecifier, null, out graphic);
-            }
-            else
-            {
-                return int.TryParse(text, out graphic);
-            }
-        }
     }
 }

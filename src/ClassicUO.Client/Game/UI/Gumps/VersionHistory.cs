@@ -10,6 +10,51 @@ namespace ClassicUO.Game.UI.Gumps
     {
         private static string[] updateTexts =
         {
+            """
+            /c[white][4.10.0]/cd
+            # Misc
+            - Add clear journal button
+            - Add VSync toggle
+            - Async map loading for better performance
+            - Add auto buy to new assistant window
+            - Add Async map loading toggle
+            - Default profiles to no reduced fps while inactive
+            - Default profiles to use vsync
+            - Add graphic to autoloot assistant window
+            - Moved graphic replacement settings to new assistant window
+
+            # Legion Py
+            - Fixed Legion Py script stopping bug
+            - Added API.StopRequested to check if your script should stop
+            - Added several friends methods
+            - Limit API.Pause to 0-30 seconds
+            - Check for stop requests after API.Pause internally
+            - Added API.Dress()
+            - API.Pause now uses a cancellation token to end early when hitting stop on a script mid pause
+
+            # Bug fixes
+            - Fixed crash when world is somehow null
+            - Fixed a rare crash on control hit test
+            - Fix for grid container borders not properly hued
+            - Fix for lag in high traffic areas
+            - Fix for viewport not showing border
+            - Fix for grid containers sorting when they shouldn't be
+            - Fix background color on comparison tooltips
+            """,
+
+            """
+            /c[white][4.9.0]/cd
+            ## Misc
+            - Moved auto sell to new assistant window
+
+            ## Legion Py
+            - Changed how script stopping works slightly, it should indicate now if the script did not stop at least.
+
+            ## Bugs
+            - Fixed a couple crashes when re-logging quickly
+            - Fixed a high cpu usage bug
+            """,
+
             "/c[white][4.8.0]/cd\n" +
             """
             # Misc
@@ -334,17 +379,6 @@ namespace ClassicUO.Game.UI.Gumps
             "- Added Exclude self to advanced nameplate options\n" +
             "- Bug fix for spell indicator loading\n" +
             "- Added override profile for same server characters only\n",
-            "/c[white][3.11.0]/cd\n" +
-            "- Modern shop gump fix\n" +
-            "- Pull in latest changes from CUO\n" +
-            "- Update client-side version checking\n" +
-            "- Infobar bug fixes\n" +
-            "- Other small bug fixes\n" +
-            "- Modern paperdoll being anchored will be remembered now\n" +
-            "- Added an option for Cooldown bars to use the position of the last moved bar\n" +
-            "- Added advanced nameplate options\n" +
-            "- Moved TTF Font settings to their own category\n" +
-            "- Journal tabs are now fully customizable",
 
             "\n\n/c[white]For further history please visit our discord."
         };

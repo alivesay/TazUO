@@ -15,7 +15,9 @@ namespace ClassicUO.Game.Map
         private static readonly bool[] _blockAccessList = new bool[0x1000];
         private readonly LinkedList<int> _usedIndices = new LinkedList<int>();
         private readonly World _world;
-        private readonly object _chunkLock = new object();
+        private static readonly object _chunkLock = new object();
+        private static readonly object _pendingLock = new object();
+        private static HashSet<int> _pendingBlocks = new();
 
 
         public Map(World world, int index)
@@ -128,6 +130,12 @@ namespace ClassicUO.Game.Map
                 return chunk;
             }
 
+            lock (_pendingLock)
+            {
+                if (!_pendingBlocks.Add(block))
+                    return null;
+            }
+
             _ = AsyncGetChunk(chunkx, chunky, block);
 
             return null;
@@ -167,6 +175,11 @@ namespace ClassicUO.Game.Map
                     else
                     {
                         chunk.LastAccessTime = Time.Ticks;
+                    }
+
+                    lock (_pendingLock)
+                    {
+                        _pendingBlocks.Remove(block);
                     }
 
                     return chunk;

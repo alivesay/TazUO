@@ -40,12 +40,14 @@ namespace ClassicUO.Game.Managers
 
         public void OrganizerCommand(string[] args)
         {
-            if (args.Length == 1)
+            if (args is not { Length: > 1 })
             {
                 // Run all organizers
                 Instance?.RunOrganizer();
+                return;
             }
-            else if (int.TryParse(args[1], out int index))
+
+            if (int.TryParse(args[1], out int index))
             {
                 // Run organizer by index
                 Instance?.RunOrganizer(index);
@@ -66,18 +68,7 @@ namespace ClassicUO.Game.Managers
         public static void Unload()
         {
             Instance?.Save();
-
-            // Unregister commands
-            UnregisterCommands();
-
             Instance = null;
-        }
-
-        private static void UnregisterCommands()
-        {
-            World.Instance.CommandManager.UnRegister("organize");
-            World.Instance.CommandManager.UnRegister("organizer");
-            World.Instance.CommandManager.UnRegister("organizerlist");
         }
 
         public OrganizerConfig NewOrganizerConfig()

@@ -3444,7 +3444,8 @@ namespace ClassicUO.Game.UI.Gumps
                 c = new CheckboxWithLabel(lang.GetTazUO.EnableASyncMapLoading, isChecked: profile.EnableASyncMapLoading, valueChanged: (e) =>
                 {
                     profile.EnableASyncMapLoading = e;
-                    GameScene.Instance?.ASyncMapLoading = e;
+                    if(GameScene.Instance != null)
+                        GameScene.Instance.ASyncMapLoading = e;
                 }),
                 true, page
             );

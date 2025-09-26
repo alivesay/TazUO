@@ -665,6 +665,8 @@ namespace ClassicUO.Game.Scenes
             ref Vector2 playerScreePos
         )
         {
+            Profile profile = ProfileManager.CurrentProfile;
+
             for (; obj != null; obj = obj.TNext)
             {
                 if (UpdateDrawPosition || obj.IsPositionChanged)
@@ -741,7 +743,7 @@ namespace ClassicUO.Game.Scenes
                             }
 
                             //we avoid to hide impassable foliage or bushes, if present...
-                            if (itemData.IsFoliage && ProfileManager.CurrentProfile.TreeToStumps)
+                            if (itemData.IsFoliage && profile.TreeToStumps)
                             {
                                 continue;
                             }
@@ -749,7 +751,7 @@ namespace ClassicUO.Game.Scenes
                             if (
                                 !itemData.IsMultiMovable
                                 && staticc.IsVegetation
-                                && ProfileManager.CurrentProfile.HideVegetation
+                                && profile.HideVegetation
                             )
                             {
                                 continue;
@@ -776,8 +778,8 @@ namespace ClassicUO.Game.Scenes
 
                             // hacky way to render shadows without z-fight
                             if (
-                                ProfileManager.CurrentProfile.ShadowsEnabled
-                                && ProfileManager.CurrentProfile.ShadowsStatics
+                                profile.ShadowsEnabled
+                                && profile.ShadowsStatics
                                 && (
                                     StaticFilters.IsTree(obj.Graphic, out _)
                                     || itemData.IsFoliage
@@ -830,12 +832,12 @@ namespace ClassicUO.Game.Scenes
 
                             if (!itemData.IsMultiMovable)
                             {
-                                if (itemData.IsFoliage && ProfileManager.CurrentProfile.TreeToStumps)
+                                if (itemData.IsFoliage && profile.TreeToStumps)
                                 {
                                     continue;
                                 }
 
-                                if (multi.IsVegetation && ProfileManager.CurrentProfile.HideVegetation)
+                                if (multi.IsVegetation && profile.HideVegetation)
                                 {
                                     continue;
                                 }
@@ -862,8 +864,8 @@ namespace ClassicUO.Game.Scenes
 
                             // hacky way to render shadows without z-fight
                             if (
-                                ProfileManager.CurrentProfile.ShadowsEnabled
-                                && ProfileManager.CurrentProfile.ShadowsStatics
+                                profile.ShadowsEnabled
+                                && profile.ShadowsStatics
                                 && (
                                     StaticFilters.IsTree(obj.Graphic, out _)
                                     || itemData.IsFoliage
@@ -977,7 +979,7 @@ namespace ClassicUO.Game.Scenes
                             if (
                                 !itemData.IsMultiMovable
                                 && itemData.IsFoliage
-                                && ProfileManager.CurrentProfile.TreeToStumps
+                                && profile.TreeToStumps
                             )
                             {
                                 continue;

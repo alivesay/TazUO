@@ -48,5 +48,11 @@ namespace ClassicUO.Game.UI
             public static readonly Vector4 ScrollbarGrabActive = new Vector4(0.450f, 0.550f, 0.600f, 1.00f); // #738C99FF
 
         }
+
+        public static class Dimensions
+        {
+            public const float STANDARD_INPUT_WIDTH = 80f;
+            public const float STANDARD_TABLE_SCROLL_HEIGHT = 200f;
+        }
     }
 }

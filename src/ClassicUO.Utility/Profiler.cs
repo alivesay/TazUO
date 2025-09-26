@@ -11,7 +11,7 @@ namespace ClassicUO.Utility
     {
         public const int ProfileTimeCount = 60;
         public const double SpikeThresholdMultiplier = 3.0;
-        public const double MinimumTimeForSpikeDetection = 1.0;
+        public const double MinimumTimeForSpikeDetection = 2.0;
         private static readonly List<ContextAndTick> m_Context;
         private static readonly List<Tuple<string[], double>> m_ThisFrameData;
         private static readonly List<ProfileData> m_AllFrameData;

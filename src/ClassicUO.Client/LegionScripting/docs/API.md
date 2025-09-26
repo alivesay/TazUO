@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `9/20/25`.*
+*This was generated on `9/25/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -93,6 +93,21 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
  Access useful player settings.
 
+
+### `StopRequested`
+
+**Type:** `bool`
+
+ Check if the script has been requested to stop.
+ ```py
+ while not API.StopRequested:
+   DoSomeStuff()
+ ```
+
+
+### `CancellationToken`
+
+**Type:** `CancellationTokenSource`
 
 
 ## Enums
@@ -580,6 +595,25 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
 | `spellName` | `string` | ❌ No | This can be a partial match. Fireba will cast Fireball. |
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+
+### Dress
+`(name)`
+ Dress from a saved dress configuration.
+ Example:
+ ```py
+ API.Dress("PvP Gear")
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | ❌ No | The name of the dress configuration |
 
 **Return Type:** `void` *(Does not return anything)*
 
@@ -2002,7 +2036,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 | Name | Type | Optional | Description |
 | --- | --- | --- | --- |
-| `seconds` | `double` | ❌ No |  |
+| `seconds` | `double` | ❌ No | 0-30 seconds. |
 
 **Return Type:** `void` *(Does not return anything)*
 
@@ -2340,6 +2374,81 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | `y2` | `int` | ❌ No | Ending Y coordinate |
 
 **Return Type:** `List<PyMulti>`
+
+---
+
+### IsFriend
+`(serial)`
+ Check if a mobile is in the friends list.
+ Example:
+ ```py
+ if API.IsFriend(player.Serial):
+     API.SysMsg("This player is your friend!")
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `serial` | `uint` | ❌ No | Serial number of the mobile to check |
+
+**Return Type:** `bool`
+
+---
+
+### AddFriend
+`(serial)`
+ Add a mobile to the friends list by serial number.
+ Example:
+ ```py
+ mobile = API.FindMobile(0x12345)
+ if mobile:
+     API.AddFriend(mobile.Serial)
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `serial` | `uint` | ❌ No | Serial number of the mobile to add |
+
+**Return Type:** `bool`
+
+---
+
+### RemoveFriend
+`(serial)`
+ Remove a mobile from the friends list by serial number.
+ Example:
+ ```py
+ API.RemoveFriend(0x12345)
+ ```
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `serial` | `uint` | ❌ No | Serial number of the mobile to remove |
+
+**Return Type:** `bool`
+
+---
+
+### GetAllFriends
+
+ Get all friends as an array of serials.
+ Example:
+ ```py
+ friends = API.GetAllFriends()
+ for friend in friends:
+     API.FindMobile(friend)
+ ```
+
+
+**Return Type:** `PythonList`
 
 ---
 

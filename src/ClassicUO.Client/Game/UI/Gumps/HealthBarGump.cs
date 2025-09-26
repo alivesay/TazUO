@@ -44,7 +44,7 @@ namespace ClassicUO.Game.UI.Gumps
             _isDead = entity is Mobile mm && mm.IsDead;
 
             BuildGump();
-                        HasBeenBuilt = true;
+            HasBeenBuilt = true;
         }
 
         public virtual void SetNewMobile(uint serial)

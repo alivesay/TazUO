@@ -128,20 +128,20 @@ namespace ClassicUO
 
         private void ProcessNetworkPackets()
         {
-            if (AsyncNetClient.Socket.TryDequeuePacket(out byte[] message))
-            {
-                var c = PacketHandlers.Handler.ParsePackets(Client.Game.UO.World, message);
-                AsyncNetClient.Socket.Statistics.TotalPacketsReceived += (uint)c;
-            }
-            //Trying just one packet pet update()
-            //
-            // int packetsProcessed = 0;
-            // while (packetsProcessed < MAX_PACKETS_PER_FRAME && AsyncNetClient.Socket.TryDequeuePacket(out byte[] message))
+            // if (AsyncNetClient.Socket.TryDequeuePacket(out byte[] message))
             // {
             //     var c = PacketHandlers.Handler.ParsePackets(Client.Game.UO.World, message);
             //     AsyncNetClient.Socket.Statistics.TotalPacketsReceived += (uint)c;
-            //     packetsProcessed++;
             // }
+            //Trying just one packet pet update()
+            //
+            int packetsProcessed = 0;
+            while (packetsProcessed < MAX_PACKETS_PER_FRAME && AsyncNetClient.Socket.TryDequeuePacket(out byte[] message))
+            {
+                int c = PacketHandlers.Handler.ParsePackets(Client.Game.UO.World, message);
+                AsyncNetClient.Socket.Statistics.TotalPacketsReceived += (uint)c;
+                packetsProcessed++;
+            }
         }
 
         protected override void LoadContent()
@@ -256,6 +256,7 @@ namespace ClassicUO
         public void SetVSync(bool value)
         {
             GraphicManager.SynchronizeWithVerticalRetrace = value;
+            GraphicManager.ApplyChanges();
         }
 
         public void SetRefreshRate(int rate)

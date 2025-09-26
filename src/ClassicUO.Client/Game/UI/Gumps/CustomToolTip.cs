@@ -121,18 +121,25 @@ namespace ClassicUO.Game.UI.Gumps
             return text;
         }
 
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            text?.Dispose();
+        }
+
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)
         {
             base.Draw(batcher, x, y);
+
             if (IsDisposed)
                 return false;
-            if (hoverReference != null && !hoverReference.MouseIsOver)
+
+            if (hoverReference is { MouseIsOver: false })
             {
                 Dispose();
                 return false;
             }
-            //if (text == null) //Waiting for opl data to load the text tooltip
-            //    return true;
 
             float alpha = 0.7f;
 
@@ -148,7 +155,7 @@ namespace ClassicUO.Game.UI.Gumps
             Vector3 hue_vec = ShaderHueTranslator.GetHueVector(1, false, alpha);
 
             if (ProfileManager.CurrentProfile != null)
-                hue_vec.X = ProfileManager.CurrentProfile.ToolTipBGHue - 1;
+                hue_vec.X = ProfileManager.CurrentProfile.ToolTipBGHue;
 
             batcher.Draw
             (

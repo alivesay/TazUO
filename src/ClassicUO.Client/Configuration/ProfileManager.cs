@@ -52,6 +52,8 @@ namespace ClassicUO.Configuration
             }
 
             ValidateFields(CurrentProfile);
+
+            Client.Game?.SetVSync(CurrentProfile.EnableVSync);
         }
 
         public static void SetProfileAsDefault(Profile profile)

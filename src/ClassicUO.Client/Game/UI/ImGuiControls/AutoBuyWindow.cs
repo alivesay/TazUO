@@ -8,10 +8,10 @@ using System.Collections.Generic;
 
 namespace ClassicUO.Game.UI.ImGuiControls
 {
-    public class AutoSellWindow : SingletonImGuiWindow<AutoSellWindow>
+    public class AutoBuyWindow : SingletonImGuiWindow<AutoBuyWindow>
     {
         private Profile _profile;
-        private bool _enableAutoSell;
+        private bool _enableAutoBuy;
         private int _maxItems;
         private int _maxUniques;
 
@@ -20,14 +20,14 @@ namespace ClassicUO.Game.UI.ImGuiControls
         private string _newMaxAmountInput = "";
         private string _newRestockInput = "";
 
-        private List<BuySellItemConfig> _sellEntries;
+        private List<BuySellItemConfig> _buyEntries;
         private bool _showAddEntry = false;
         private Dictionary<BuySellItemConfig, string> _entryGraphicInputs = new Dictionary<BuySellItemConfig, string>();
         private Dictionary<BuySellItemConfig, string> _entryHueInputs = new Dictionary<BuySellItemConfig, string>();
         private Dictionary<BuySellItemConfig, string> _entryMaxAmountInputs = new Dictionary<BuySellItemConfig, string>();
         private Dictionary<BuySellItemConfig, string> _entryRestockInputs = new Dictionary<BuySellItemConfig, string>();
 
-        private AutoSellWindow() : base("Auto Sell")
+        private AutoBuyWindow() : base("Auto Buy")
         {
             WindowFlags = ImGuiWindowFlags.AlwaysAutoResize;
             _profile = ProfileManager.CurrentProfile;
@@ -38,11 +38,11 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 return;
             }
 
-            _enableAutoSell = _profile.SellAgentEnabled;
-            _maxItems = _profile.SellAgentMaxItems;
-            _maxUniques = _profile.SellAgentMaxUniques;
+            _enableAutoBuy = _profile.BuyAgentEnabled;
+            _maxItems = _profile.BuyAgentMaxItems;
+            _maxUniques = _profile.BuyAgentMaxUniques;
 
-            _sellEntries = BuySellAgent.Instance?.SellConfigs ?? new List<BuySellItemConfig>();
+            _buyEntries = BuySellAgent.Instance?.BuyConfigs ?? new List<BuySellItemConfig>();
         }
 
         public override void DrawContent()
@@ -54,24 +54,24 @@ namespace ClassicUO.Game.UI.ImGuiControls
             }
 
             // Main settings
-            if (ImGui.Checkbox("Enable auto sell", ref _enableAutoSell))
+            if (ImGui.Checkbox("Enable auto buy", ref _enableAutoBuy))
             {
-                _profile.SellAgentEnabled = _enableAutoSell;
+                _profile.BuyAgentEnabled = _enableAutoBuy;
             }
 
             if (ImGui.SliderInt("Max total items (0 = unlimited)", ref _maxItems, 0, 100))
             {
-                _profile.SellAgentMaxItems = _maxItems;
+                _profile.BuyAgentMaxItems = _maxItems;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Maximum total items to sell in a single transaction. Set to 0 for unlimited.");
+                ImGui.SetTooltip("Maximum total items to buy in a single transaction. Set to 0 for unlimited.");
 
             if (ImGui.SliderInt("Max unique items", ref _maxUniques, 0, 100))
             {
-                _profile.SellAgentMaxUniques = _maxUniques;
+                _profile.BuyAgentMaxUniques = _maxUniques;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Maximum number of different items to sell in a single transaction.");
+                ImGui.SetTooltip("Maximum number of different items to buy in a single transaction.");
 
             ImGui.Separator();
 
@@ -90,10 +90,10 @@ namespace ClassicUO.Game.UI.ImGuiControls
                     {
                         if (SerialHelper.IsItem(targetedEntity))
                         {
-                            var newConfig = BuySellAgent.Instance.NewSellConfig();
+                            var newConfig = BuySellAgent.Instance.NewBuyConfig();
                             newConfig.Graphic = targetedEntity.Graphic;
                             newConfig.Hue = targetedEntity.Hue;
-                            _sellEntries = BuySellAgent.Instance.SellConfigs;
+                            _buyEntries = BuySellAgent.Instance.BuyConfigs;
                         }
                     }
                 });
@@ -116,17 +116,17 @@ namespace ClassicUO.Game.UI.ImGuiControls
                 ImGui.SameLine();
                 ImGui.InputText("##NewMaxAmount", ref _newMaxAmountInput, 10);
 
-                ImGui.Text("Min on Hand:");
+                ImGui.Text("Restock Up To:");
                 ImGui.SameLine();
                 ImGui.InputText("##NewRestock", ref _newRestockInput, 10);
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Minimum amount to keep on hand (0 = disabled)");
+                    ImGui.SetTooltip("Amount to restock up to when buying (0 = disabled)");
 
                 if (ImGui.Button("Add##AddEntry"))
                 {
                     if (StringHelper.TryParseGraphic(_newGraphicInput, out int graphic))
                     {
-                        var newConfig = BuySellAgent.Instance.NewSellConfig();
+                        var newConfig = BuySellAgent.Instance.NewBuyConfig();
                         newConfig.Graphic = (ushort)graphic;
 
                         if (!string.IsNullOrEmpty(_newHueInput) && _newHueInput != "-1")
@@ -154,7 +154,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                         _newMaxAmountInput = "";
                         _newRestockInput = "";
                         _showAddEntry = false;
-                        _sellEntries = BuySellAgent.Instance.SellConfigs;
+                        _buyEntries = BuySellAgent.Instance.BuyConfigs;
                     }
                 }
                 ImGui.SameLine();
@@ -170,27 +170,27 @@ namespace ClassicUO.Game.UI.ImGuiControls
 
             ImGui.Separator();
 
-            if (_sellEntries.Count == 0)
+            if (_buyEntries.Count == 0)
             {
                 ImGui.Text("No entries configured");
             }
             else
             {
                 // Table headers
-                if (ImGui.BeginTable("AutoSellTable", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, ImGuiTheme.Dimensions.STANDARD_TABLE_SCROLL_HEIGHT)))
+                if (ImGui.BeginTable("AutoBuyTable", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY, new Vector2(0, ImGuiTheme.Dimensions.STANDARD_TABLE_SCROLL_HEIGHT)))
                 {
                     ImGui.TableSetupColumn(string.Empty, ImGuiTableColumnFlags.WidthFixed, 52);
                     ImGui.TableSetupColumn("Graphic", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
                     ImGui.TableSetupColumn("Hue", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
                     ImGui.TableSetupColumn("Max Amount", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
-                    ImGui.TableSetupColumn("Min on Hand", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
+                    ImGui.TableSetupColumn("Restock Up To", ImGuiTableColumnFlags.WidthFixed, ImGuiTheme.Dimensions.STANDARD_INPUT_WIDTH);
                     ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthFixed, 60);
                     ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 50);
                     ImGui.TableHeadersRow();
 
-                    for (int i = _sellEntries.Count - 1; i >= 0; i--)
+                    for (int i = _buyEntries.Count - 1; i >= 0; i--)
                     {
-                        var entry = _sellEntries[i];
+                        var entry = _buyEntries[i];
                         ImGui.TableNextRow();
 
                         ImGui.TableNextColumn();
@@ -249,7 +249,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                             }
                         }
 
-                        // Restock/Min on Hand
+                        // Restock Up To
                         ImGui.TableNextColumn();
                         if (!_entryRestockInputs.ContainsKey(entry))
                         {
@@ -283,7 +283,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
                             _entryHueInputs.Remove(entry);
                             _entryMaxAmountInputs.Remove(entry);
                             _entryRestockInputs.Remove(entry);
-                            _sellEntries = BuySellAgent.Instance.SellConfigs;
+                            _buyEntries = BuySellAgent.Instance.BuyConfigs;
                         }
                     }
 

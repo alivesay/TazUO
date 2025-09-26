@@ -3006,12 +3006,9 @@ sealed class PacketHandlers
         {
             mob.NotorietyFlag = notoriety;
 
-                UIManager.GetGump<PaperDollGump>(serial)?.RequestUpdateContents();
-                UIManager.GetGump<ModernPaperdoll>(serial)?.RequestUpdateContents();
-
-                if(mob.Serial == world.Player.Serial)
-                    GameActions.RequestEquippedOPL(world);
-            }
+            UIManager.GetGump<PaperDollGump>(serial)?.RequestUpdateContents();
+            UIManager.GetGump<ModernPaperdoll>(serial)?.RequestUpdateContents();
+        }
 
         if (p[0] != 0x78)
         {
@@ -3077,9 +3074,9 @@ sealed class PacketHandlers
                 }
             }
 
-                UIManager.GetGump<PaperDollGump>(serial)?.RequestUpdateContents();
-                UIManager.GetGump<ModernPaperdoll>(serial)?.RequestUpdateContents();
-                GameActions.RequestEquippedOPL(world);
+            UIManager.GetGump<PaperDollGump>(serial)?.RequestUpdateContents();
+            UIManager.GetGump<ModernPaperdoll>(serial)?.RequestUpdateContents();
+            GameActions.RequestEquippedOPL(world);
 
             world.Player.UpdateAbilities();
         }

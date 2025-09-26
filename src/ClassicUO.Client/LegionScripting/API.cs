@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using ClassicUO.Assets;
 using ClassicUO.Configuration;
 using ClassicUO.Game;
@@ -176,6 +177,17 @@ namespace ClassicUO.LegionScripting
         /// Access useful player settings.
         /// </summary>
         public static PyProfile PyProfile = new();
+
+        /// <summary>
+        /// Check if the script has been requested to stop.
+        /// ```py
+        /// while not API.StopRequested:
+        ///   DoSomeStuff()
+        /// ```
+        /// </summary>
+        public volatile bool StopRequested;
+
+        public CancellationTokenSource CancellationToken = new();
 
         #endregion
 
@@ -658,6 +670,28 @@ namespace ClassicUO.LegionScripting
         /// </summary>
         /// <param name="spellName">This can be a partial match. Fireba will cast Fireball.</param>
         public void CastSpell(string spellName) => MainThreadQueue.InvokeOnMainThread(() => { GameActions.CastSpellByName(spellName); });
+
+        /// <summary>
+        /// Dress from a saved dress configuration.
+        /// Example:
+        /// ```py
+        /// API.Dress("PvP Gear")
+        /// ```
+        /// </summary>
+        /// <param name="name">The name of the dress configuration</param>
+        public void Dress(string name) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
+            if (string.IsNullOrEmpty(name))
+                return;
+
+            DressConfig config = DressAgentManager.Instance.CurrentPlayerConfigs
+                .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            if (config != null)
+            {
+                DressAgentManager.Instance.DressFromConfig(config);
+            }
+        });
 
         /// <summary>
         /// Check if a buff is active.
@@ -2376,13 +2410,15 @@ namespace ClassicUO.LegionScripting
         /// API.Pause(5)
         /// ```
         /// </summary>
-        /// <param name="seconds"></param>
+        /// <param name="seconds">0-30 seconds.</param>
         public void Pause(double seconds)
         {
-            if (seconds > 2000)
-                seconds = 2000;
+            seconds = Math.Clamp(seconds, 0, 30);
 
-            Thread.Sleep((int)(seconds * 1000));
+            Task.Delay(TimeSpan.FromSeconds(seconds), cancellationToken: CancellationToken.Token).Wait(cancellationToken:CancellationToken.Token);
+
+            if (StopRequested)
+                throw new ThreadInterruptedException();
         }
 
         /// <summary>
@@ -2825,6 +2861,62 @@ namespace ClassicUO.LegionScripting
 
             return multis;
         });
+
+        #region Friends List
+
+        /// <summary>
+        /// Check if a mobile is in the friends list.
+        /// Example:
+        /// ```py
+        /// if API.IsFriend(player.Serial):
+        ///     API.SysMsg("This player is your friend!")
+        /// ```
+        /// </summary>
+        /// <param name="serial">Serial number of the mobile to check</param>
+        /// <returns>True if the mobile is in the friends list, false otherwise</returns>
+        public bool IsFriend(uint serial) => MainThreadQueue.InvokeOnMainThread(() => FriendsListManager.Instance.IsFriend(serial));
+
+        /// <summary>
+        /// Add a mobile to the friends list by serial number.
+        /// Example:
+        /// ```py
+        /// mobile = API.FindMobile(0x12345)
+        /// if mobile:
+        ///     API.AddFriend(mobile.Serial)
+        /// ```
+        /// </summary>
+        /// <param name="serial">Serial number of the mobile to add</param>
+        /// <returns>True if the friend was added successfully, false if already exists or invalid</returns>
+        public bool AddFriend(uint serial) => MainThreadQueue.InvokeOnMainThread(() =>
+        {
+            var mobile = World.Mobiles.Get(serial);
+            return mobile != null && FriendsListManager.Instance.AddFriend(mobile);
+        });
+
+        /// <summary>
+        /// Remove a mobile from the friends list by serial number.
+        /// Example:
+        /// ```py
+        /// API.RemoveFriend(0x12345)
+        /// ```
+        /// </summary>
+        /// <param name="serial">Serial number of the mobile to remove</param>
+        /// <returns>True if the friend was removed successfully, false if not found</returns>
+        public bool RemoveFriend(uint serial) => MainThreadQueue.InvokeOnMainThread(() => FriendsListManager.Instance.RemoveFriend(serial));
+
+        /// <summary>
+        /// Get all friends as an array of serials.
+        /// Example:
+        /// ```py
+        /// friends = API.GetAllFriends()
+        /// for friend in friends:
+        ///     API.FindMobile(friend)
+        /// ```
+        /// </summary>
+        /// <returns>Array of serials representing all friends</returns>
+        public PythonList GetAllFriends() => MainThreadQueue.InvokeOnMainThread(() => FriendsListManager.Instance.GetAllFriends());
+
+        #endregion
 
         #region Gumps
 

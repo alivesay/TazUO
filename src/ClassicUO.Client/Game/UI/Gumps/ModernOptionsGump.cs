@@ -805,6 +805,18 @@ namespace ClassicUO.Game.UI.Gumps
 
             content.AddToRight
             (
+                new CheckboxWithLabel(lang.GetVideo.EnableVSync, isChecked: profile.EnableVSync, valueChanged: (b) =>
+                {
+                    profile.EnableVSync = b;
+                    Client.Game?.SetVSync(b);
+                }), true,
+                page
+            );
+
+            content.BlankLine();
+
+            content.AddToRight
+            (
                 new CheckboxWithLabel
                 (
                     lang.GetVideo.FullsizeViewport, isChecked: profile.GameWindowFullSize, valueChanged: (b) =>
@@ -3424,6 +3436,19 @@ namespace ClassicUO.Game.UI.Gumps
                 true, page
             );
             c.SetTooltip("After disabling, you need to restart the client to revert to no borders.");
+
+            content.BlankLine();
+
+            content.AddToRight
+            (
+                c = new CheckboxWithLabel(lang.GetTazUO.EnableASyncMapLoading, isChecked: profile.EnableASyncMapLoading, valueChanged: (e) =>
+                {
+                    profile.EnableASyncMapLoading = e;
+                    if(GameScene.Instance != null)
+                        GameScene.Instance.ASyncMapLoading = e;
+                }),
+                true, page
+            );
 
             #region HideHouses
             content.BlankLine();

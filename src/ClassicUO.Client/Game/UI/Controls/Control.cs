@@ -680,6 +680,8 @@ namespace ClassicUO.Game.UI.Controls
                     {
                         Control c = Children[i];
 
+                        if(c == null) continue;
+
                         if (c.Page == 0 || c.Page == ActivePage)
                         {
                             c.HitTest(x, y, ref res);

@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `9/25/25`.*
+*This was generated on `9/27/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -2844,6 +2844,23 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | `hue` | `ushort` | ✅ Yes |  |
 
 **Return Type:** `GumpPic`
+
+---
+
+### CreateDropDown
+`(width, items, selectedIndex)`
+ Creates a dropdown control (combobox) with the specified width and items.
+
+
+**Parameters:**
+
+| Name | Type | Optional | Description |
+| --- | --- | --- | --- |
+| `width` | `int` | ❌ No | The width of the dropdown control |
+| `items` | `string[]` | ❌ No | Array of strings to display as dropdown options |
+| `selectedIndex` | `int` | ✅ Yes | The initially selected item index (default: 0) |
+
+**Return Type:** `PyControlDropDown`
 
 ---
 

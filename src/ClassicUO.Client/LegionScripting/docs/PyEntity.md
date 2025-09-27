@@ -60,3 +60,13 @@ description:  Represents a Python-accessible entity in the game world, such as a
 
 ---
 
+### Destroy
+
+ This will remove the item from the client, it will reappear if you leave the area and come back.
+ This object will also no longer be available and may cause issues if you try to interact with it further.
+
+
+**Return Type:** `void` *(Does not return anything)*
+
+---
+

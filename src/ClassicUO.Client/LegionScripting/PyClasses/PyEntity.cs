@@ -46,6 +46,8 @@ public class PyEntity : PyGameObject
     /// <returns>The <see cref="Serial"/> value of the entity.</returns>
     public static implicit operator uint(PyEntity entity)
     {
+        if (entity == null) return 0;
+
         return entity.Serial;
     }
 
@@ -60,6 +62,16 @@ public class PyEntity : PyGameObject
         var e = GetEntity();
         if(e != null)
             e.Hue = Hue = hue;
+    }
+
+    /// <summary>
+    /// This will remove the item from the client, it will reappear if you leave the area and come back.
+    /// This object will also no longer be available and may cause issues if you try to interact with it further.
+    /// </summary>
+    public void Destroy()
+    {
+        GetEntity()?.Destroy();
+        entity = null;
     }
 
     protected Entity entity;

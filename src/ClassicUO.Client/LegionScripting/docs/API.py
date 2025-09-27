@@ -5,60 +5,166 @@ class Buff:
     Type = None
     Title: str = None
 
+class PyBaseControl:
+
+    def Add(self, childControl: PyControl) -> None:
+        """
+         Adds a child control to this control. Works with gumps too (gump.Add(control)).
+         Used in python API
+        
+        """
+        pass
+
+    def GetX(self) -> int:
+        """
+         Returns the control's X position.
+         Used in python API
+        
+        """
+        pass
+
+    def GetY(self) -> int:
+        """
+         Returns the control's Y position.
+         Used in python API
+        
+        """
+        pass
+
+    def SetX(self, x: int) -> None:
+        """
+         Sets the control's X position.
+         Used in python API
+        
+        """
+        pass
+
+    def SetY(self, y: int) -> None:
+        """
+         Sets the control's Y position.
+         Used in python API
+        
+        """
+        pass
+
+    def SetPos(self, x: int, y: int) -> None:
+        """
+         Sets the control's X and Y positions.
+         Used in python API
+        
+        """
+        pass
+
+    def SetWidth(self, width: int) -> None:
+        """
+         Sets the control's width.
+         Used in python API
+        
+        """
+        pass
+
+    def SetHeight(self, height: int) -> None:
+        """
+         Sets the control's height.
+         Used in python API
+        
+        """
+        pass
+
+    def SetRect(self, x: int, y: int, width: int, height: int) -> None:
+        """
+         Sets the control's position and size in one operation.
+         Used in python API
+        
+        """
+        pass
+
+    def CenterXInViewPort(self) -> None:
+        """
+         Centers a GUMP horizontally in the viewport. Only works on Gump instances.
+         Used in python API
+        
+        """
+        pass
+
+    def CenterYInViewPort(self) -> None:
+        """
+         Centers a GUMP vertically in the viewport. Only works on Gump instances.
+         Used in python API
+        
+        """
+        pass
+
+    def Dispose(self) -> None:
+        """
+         Close/Destroy the control
+        
+        """
+        pass
+
 class PyControl:
 
-    def SetRect(x: int, y: int, w: int, h: int) -> "PyControl":
+    def SetRect(self, x: int, y: int, w: int, h: int) -> "PyControl":
         """
          Used in python API
         
         """
         pass
 
-    def SetWidth(width: int) -> "PyControl":
+    def SetWidth(self, width: int) -> "PyControl":
         """
          Used in python API
         
         """
         pass
 
-    def SetHeight(height: int) -> "PyControl":
+    def SetHeight(self, height: int) -> "PyControl":
         """
          Used in python API
         
         """
         pass
 
-    def SetX(x: int) -> "PyControl":
+    def SetX(self, x: int) -> "PyControl":
         """
          Used in python API
         
         """
         pass
 
-    def SetY(y: int) -> "PyControl":
+    def SetY(self, y: int) -> "PyControl":
         """
          Used in python API
         
         """
         pass
 
-    def SetPos(x: int, y: int) -> "PyControl":
+    def SetPos(self, x: int, y: int) -> "PyControl":
         """
          Use int python API
         
         """
         pass
 
-    def GetX() -> int:
+    def GetX(self) -> int:
         """
          Used in python API
         
         """
         pass
 
-    def GetY() -> int:
+    def GetY(self) -> int:
         """
          Used in python API
+        
+        """
+        pass
+
+class PyControlDropDown:
+
+    def GetSelectedIndex(self) -> int:
+        """
+         Get the selected index of the dropdown. The first entry is 0.
         
         """
         pass
@@ -69,7 +175,7 @@ class PyEntity:
     __class__: str = None
     Serial: int = None
 
-    def ToString() -> str:
+    def ToString(self) -> str:
         """
          Returns a readable string representation of the entity.
          Used when printing or converting the object to a string in Python scripts.
@@ -77,7 +183,15 @@ class PyEntity:
         """
         pass
 
-    def SetHue(hue: int) -> None:
+    def SetHue(self, hue: int) -> None:
+        pass
+
+    def Destroy(self) -> None:
+        """
+         This will remove the item from the client, it will reappear if you leave the area and come back.
+         This object will also no longer be available and may cause issues if you try to interact with it further.
+        
+        """
         pass
 
 class PyGameObject:
@@ -89,7 +203,7 @@ class PyGameObject:
     Graphic: int = None
     Hue: int = None
 
-    def HasLineOfSightFrom(observer: PyGameObject = None) -> bool:
+    def HasLineOfSightFrom(self, observer: PyGameObject = None) -> bool:
         """
          Determines if there is line of sight from the specified observer to this object.
          If no observer is specified, it defaults to the player.
@@ -97,7 +211,7 @@ class PyGameObject:
         """
         pass
 
-    def ToString() -> str:
+    def ToString(self) -> str:
         """
          Returns a readable string representation of the game object.
          Used when printing or converting the object to a string in Python scripts.
@@ -105,7 +219,7 @@ class PyGameObject:
         """
         pass
 
-    def __repr__() -> str:
+    def __repr__(self) -> str:
         """
          Returns a detailed string representation of the object.
          This string is used by Python’s built-in <c>repr()</c> function.
@@ -1881,6 +1995,13 @@ def CreateGumpPic(graphic: int, x: int = 0, y: int = 0, hue: int = 0) -> PyContr
      ```py
      gumpPic = API.CreateGumpPic(0xafb)
      gump.Add(gumpPic)
+    
+    """
+    pass
+
+def CreateDropDown(width: int, items: list[str], selectedIndex: int = 0) -> PyControlDropDown:
+    """
+     Creates a dropdown control (combobox) with the specified width and items.
     
     """
     pass

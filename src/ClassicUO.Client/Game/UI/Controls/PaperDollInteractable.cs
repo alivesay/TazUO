@@ -521,7 +521,7 @@ namespace ClassicUO.Game.UI.Controls
                 CanMove = false;
                 _layer = layer;
 
-                if (SerialHelper.IsValid(serial) && _gump.World.InGame)
+                if (SerialHelper.IsValid(serial) && _gump?.World?.InGame == true)
                 {
                     SetTooltip(serial);
                 }
@@ -537,7 +537,7 @@ namespace ClassicUO.Game.UI.Controls
                 }
 
                 // this check is necessary to avoid crashes during character creation
-                if (_gump.World.InGame)
+                if (_gump?.World?.InGame == true)
                 {
                     GameActions.DoubleClick(_gump.World, LocalSerial);
                 }
@@ -547,7 +547,7 @@ namespace ClassicUO.Game.UI.Controls
 
             protected override void OnMouseUp(int x, int y, MouseButtonType button)
             {
-                SelectedObject.Object = _gump.World.Get(LocalSerial);
+                SelectedObject.Object = _gump?.World?.Get(LocalSerial);
                 base.OnMouseUp(x, y, button);
             }
 
@@ -555,7 +555,7 @@ namespace ClassicUO.Game.UI.Controls
             {
                 base.Update();
 
-                if (_gump.World.InGame)
+                if (_gump?.World?.InGame == true)
                 {
                     if (
                         CanLift
@@ -580,14 +580,14 @@ namespace ClassicUO.Game.UI.Controls
                     }
                     else if (MouseIsOver)
                     {
-                        SelectedObject.Object = _gump.World.Get(LocalSerial);
+                        SelectedObject.Object = _gump?.World?.Get(LocalSerial);
                     }
                 }
             }
 
             protected override void OnMouseOver(int x, int y)
             {
-                SelectedObject.Object = _gump.World.Get(LocalSerial);
+                SelectedObject.Object = _gump?.World?.Get(LocalSerial);
             }
         }
     }

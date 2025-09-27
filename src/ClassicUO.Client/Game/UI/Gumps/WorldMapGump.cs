@@ -3413,7 +3413,7 @@ public class WorldMapGump : ResizableGump
             _lastScroll.Y = _center.Y;
         }
 
-        if (button == MouseButtonType.Right && Keyboard.Ctrl)
+        if (button == MouseButtonType.Right && Keyboard.Ctrl && _lastMousePosition.HasValue)
         {
             CanvasToWorld(_lastMousePosition.Value.X, _lastMousePosition.Value.Y, out int wX, out int wY);
             _world.Player.Pathfinder.WalkTo(wX, wY, 0, 1);

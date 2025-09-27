@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ClassicUO.Game.Scenes;
 using System.Collections.Generic;
+using ClassicUO.Utility.Logging;
 
 namespace ClassicUO.Game.UI.Gumps
 {
@@ -73,7 +74,7 @@ namespace ClassicUO.Game.UI.Gumps
                 return;
             }
 
-            _text = TextBox.GetOne(string.Empty, ProfileManager.CurrentProfile.NamePlateFont, ProfileManager.CurrentProfile.NamePlateFontSize, entity is Mobile m ? Notoriety.GetHue(m.NotorietyFlag) : (ushort)0x0481, TextBox.RTLOptions.DefaultCenterStroked());
+            EnsureTextBox(entity);
 
             SetTooltip(entity);
 
@@ -81,16 +82,31 @@ namespace ClassicUO.Game.UI.Gumps
             SetName();
         }
 
+        private void EnsureTextBox(Entity entity)
+        {
+            _text = TextBox.GetOne(string.Empty, ProfileManager.CurrentProfile.NamePlateFont, ProfileManager.CurrentProfile.NamePlateFontSize, entity is Mobile m ? Notoriety.GetHue(m.NotorietyFlag) : (ushort)0x0481, TextBox.RTLOptions.DefaultCenterStroked());
+
+        }
+
         public bool SetName()
         {
+            if (World == null) return false;
+
             Entity entity = World.Get(LocalSerial);
 
             if (entity == null)
-            {
                 return false;
-            }
 
-            _text ??= TextBox.GetOne(string.Empty, ProfileManager.CurrentProfile.NamePlateFont, ProfileManager.CurrentProfile.NamePlateFontSize, entity is Mobile m ? Notoriety.GetHue(m.NotorietyFlag) : (ushort)0x0481, TextBox.RTLOptions.DefaultCenterStroked());
+            if (_text == null)
+            {
+                EnsureTextBox(entity);
+
+                if (_text == null)
+                {
+                    Log.Error("Failed to create textbox in NameOverheadGump.SetName");
+                    return false;
+                }
+            }
 
             if (entity is Item item)
             {

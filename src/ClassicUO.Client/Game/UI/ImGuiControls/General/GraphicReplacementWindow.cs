@@ -26,10 +26,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
         public override void DrawContent()
         {
             ImGui.Text("Info:");
-            ImGui.SameLine();
-            ImGui.TextDisabled("(?)");
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("This can be used to replace graphics of mobiles with other graphics (For example if dragons are too big, replace them with wyverns).");
+            ImGuiComponents.Tooltip("This can be used to replace graphics of mobiles with other graphics (For example if dragons are too big, replace them with wyverns).");
 
             ImGui.Separator();
 

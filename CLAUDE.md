@@ -5,7 +5,7 @@
 **TazUO** is a feature-rich fork of ClassicUO, an open-source implementation of the Ultima Online Classic Client. Originally forked to add quality-of-life features requested by users, TazUO has evolved into an independent project that selectively incorporates updates from the original ClassicUO while focusing on enhanced gameplay features.
 
 - **Repository**: https://github.com/PlayTazUO/TazUO
-- **Language**: C# targeting .NET Framework 4.7.2
+- **Language**: C# targeting .NET 9
 - **Platform**: Windows with support for Mac and Linux via Mono
 - **License**: Based on ClassicUO's open-source license
 

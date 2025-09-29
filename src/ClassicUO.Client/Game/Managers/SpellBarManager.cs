@@ -69,6 +69,26 @@ public class SpellBarManager
         if (!enabled || !spellBarSettings.Enabled || ProfileManager.CurrentProfile.DisableHotkeys)
             return;
 
+        // Remove NUM lock from modifier checks
+        mod &= ~SDL.SDL_Keymod.SDL_KMOD_NUM;
+
+        // Normalize left/right modifiers to generic modifiers
+        if ((mod & (SDL.SDL_Keymod.SDL_KMOD_LCTRL | SDL.SDL_Keymod.SDL_KMOD_RCTRL)) != 0)
+        {
+            mod &= ~(SDL.SDL_Keymod.SDL_KMOD_LCTRL | SDL.SDL_Keymod.SDL_KMOD_RCTRL);
+            mod |= SDL.SDL_Keymod.SDL_KMOD_CTRL;
+        }
+        if ((mod & (SDL.SDL_Keymod.SDL_KMOD_LSHIFT | SDL.SDL_Keymod.SDL_KMOD_RSHIFT)) != 0)
+        {
+            mod &= ~(SDL.SDL_Keymod.SDL_KMOD_LSHIFT | SDL.SDL_Keymod.SDL_KMOD_RSHIFT);
+            mod |= SDL.SDL_Keymod.SDL_KMOD_SHIFT;
+        }
+        if ((mod & (SDL.SDL_Keymod.SDL_KMOD_LALT | SDL.SDL_Keymod.SDL_KMOD_RALT)) != 0)
+        {
+            mod &= ~(SDL.SDL_Keymod.SDL_KMOD_LALT | SDL.SDL_Keymod.SDL_KMOD_RALT);
+            mod |= SDL.SDL_Keymod.SDL_KMOD_ALT;
+        }
+
         for (int i = 0; i < 10; i++)
         {
             if (i >= spellBarSettings.HotKeys.Length)

@@ -739,7 +739,7 @@ namespace ClassicUO.Game.Managers
 
         public void AddOrUpdateItem(Item item, World world)
         {
-            if (item == null || world?.Player == null)
+            if (!_initialized || item == null || world?.Player == null || ProfileManager.CurrentProfile?.ItemDatabaseEnabled == false)
                 return;
 
             var itemInfo = new ItemInfo
@@ -776,14 +776,12 @@ namespace ClassicUO.Game.Managers
 
             _pendingItems.Enqueue(itemInfo);
 
-            if (_pendingItemsTimer == null)
-            {
-                _pendingItemsTimer = new Timer(3000);
-                _pendingItemsTimer.Elapsed += PendingItemsTimerOnElapsed;
-                _pendingItemsTimer.Start();
-            }
+            if (_pendingItemsTimer != null)
+                return;
 
-            //_ = AddOrUpdateItemAsync(itemInfo);
+            _pendingItemsTimer = new Timer(3000);
+            _pendingItemsTimer.Elapsed += PendingItemsTimerOnElapsed;
+            _pendingItemsTimer.Start();
         }
 
         private void PendingItemsTimerOnElapsed(object sender, ElapsedEventArgs e)

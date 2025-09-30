@@ -12,12 +12,17 @@ namespace ClassicUO.Game.Managers
         /// </summary>
         public static event EventHandler<EventArgs> OnPlayerCreated;
         public static void InvokeOnPlayerCreated() => OnPlayerCreated?.Invoke(null, EventArgs.Empty);
-        
+
         /// <summary>
         /// Invoked when an item is added to the client, sender is the Item
         /// </summary>
         internal static event EventHandler<EventArgs> OnItemCreated;
-        internal static void InvokeOnItemCreated(Item sender) => OnItemCreated?.Invoke(sender, EventArgs.Empty);
+        internal static event EventHandler<uint> PyOnItemCreated;
+        internal static void InvokeOnItemCreated(Item sender)
+        {
+            OnItemCreated?.Invoke(sender, EventArgs.Empty);
+            PyOnItemCreated?.Invoke(sender, sender.Serial);
+        }
 
         /// <summary>
         /// Invoked when an item is already in the client but has been updated, sender is the Item
@@ -77,13 +82,23 @@ namespace ClassicUO.Game.Managers
         /// Invoked when a buff is "added" to a player
         /// </summary>
         internal static event EventHandler<BuffEventArgs> OnBuffAdded;
-        internal static void InvokeOnBuffAdded(object sender, BuffEventArgs e) => OnBuffAdded?.Invoke(sender, e);
+        internal static event EventHandler<LegionScripting.PyClasses.Buff> PyOnBuffAdded;
+        internal static void InvokeOnBuffAdded(object sender, BuffEventArgs e)
+        {
+            OnBuffAdded?.Invoke(sender, e);
+            PyOnBuffAdded?.Invoke(sender, new LegionScripting.PyClasses.Buff(e.Buff));
+        }
 
         /// <summary>
         /// Invoked when a buff is "removed" to a player (Called before removal)
         /// </summary>
         internal static event EventHandler<BuffEventArgs> OnBuffRemoved;
-        internal static void InvokeOnBuffRemoved(object sender, BuffEventArgs e) => OnBuffRemoved?.Invoke(sender, e);
+        internal static event EventHandler<LegionScripting.PyClasses.Buff> PyOnBuffRemoved;
+        internal static void InvokeOnBuffRemoved(object sender, BuffEventArgs e)
+        {
+            OnBuffRemoved?.Invoke(sender, e);
+            PyOnBuffRemoved?.Invoke(sender, new LegionScripting.PyClasses.Buff(e.Buff));
+        }
 
         /// <summary>
         /// Invoked when the players position is changed
@@ -92,7 +107,7 @@ namespace ClassicUO.Game.Managers
         internal static void InvokeOnPositionChanged(object sender, PositionChangedArgs e) => OnPositionChanged?.Invoke(sender, e);
 
         /// <summary>
-        /// Invoked when any entity in game receives damage, not neccesarily the player.
+        /// Invoked when any entity in game receives damage, not necessarily the player.
         /// </summary>
         internal static event EventHandler<int> OnEntityDamage;
         internal static void InvokeOnEntityDamage(object sender, int e) => OnEntityDamage?.Invoke(sender, e);
@@ -123,22 +138,10 @@ namespace ClassicUO.Game.Managers
         internal static void InvokeOnSetWeather(object sender, WeatherEventArgs e) => OnSetWeather?.Invoke(sender, e);
 
         /// <summary>
-        /// Invoked when a stat of the player is changed(min or max). Currently only Hits is set up.
+        /// Invoked when the players hits changed.
         /// </summary>
-        internal static event EventHandler<PlayerStatChangedArgs> OnPlayerStatChange;
-        internal static void InvokeOnPlayerStatChange(object sender, PlayerStatChangedArgs e) => OnPlayerStatChange?.Invoke(sender, e);
-
-        /// <summary>
-        /// This  occurs *before* any TazUO tooltip processing occurs allowing you to modify it before processing happens
-        /// </summary>
-        internal static PreProcessTooltipDelegate PreProcessTooltip;
-        internal delegate void PreProcessTooltipDelegate(ref ItemPropertiesData e);
-
-        /// <summary>
-        /// This event occurs *after* TazUO tooltip processing, this is the final string before being rendered into a tooltip window
-        /// </summary>
-        internal static PostProcessTooltipDelegate PostProcessTooltip;
-        internal delegate void PostProcessTooltipDelegate(ref string e);
+        internal static event EventHandler<int> OnPlayerHitsChanged;
+        internal static void InvokeOnPlayerStatChange(object sender, int newValue) => OnPlayerHitsChanged?.Invoke(sender, newValue);
 
         /// <summary>
         /// Called when the visual spell manager detects a spell being cast.
@@ -193,29 +196,5 @@ namespace ClassicUO.Game.Managers
         public WeatherType Type { get; }
         public byte Count { get; }
         public byte Temp { get; }
-    }
-
-    public class PlayerStatChangedArgs : EventArgs
-    {
-        public PlayerStatChangedArgs(PlayerStat stat, int oldValue, int newValue)
-        {
-            Stat = stat;
-            OldValue = oldValue;
-            NewValue = newValue;
-        }
-
-        public PlayerStat Stat { get; }
-        public int OldValue { get; }
-        public int NewValue { get; }
-
-        public enum PlayerStat
-        {
-            Hits,
-            HitsMax,
-            Mana,
-            ManaMax,
-            Stamina,
-            StaminaMax
-        }
     }
 }

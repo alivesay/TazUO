@@ -47,6 +47,7 @@
     <ProjectReference Include="..\ClassicUO.Renderer\ClassicUO.Renderer.csproj" />
     <ProjectReference Include="..\ClassicUO.Utility\ClassicUO.Utility.csproj" />
     <ProjectReference Include="..\ClassicUO.CUOAPI\ClassicUO.CUOAPI.csproj" />
+    <ProjectReference Include="..\..\tools\EventGenerator\EventGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>

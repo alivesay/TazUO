@@ -94,6 +94,10 @@ You can now type `-updateapi` in game to download the latest API.py file.
  Access useful player settings.
 
 
+### `Events`
+
+**Type:** `Events`
+
 ### `StopRequested`
 
 **Type:** `bool`

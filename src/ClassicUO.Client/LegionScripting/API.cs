@@ -38,6 +38,7 @@ namespace ClassicUO.LegionScripting
         public API(ScriptEngine engine)
         {
             this.engine = engine;
+            Events = new Events(engine, this);
         }
 
         internal ScriptEngine engine;
@@ -61,6 +62,24 @@ namespace ClassicUO.LegionScripting
                     GameActions.Print(World, "Python Scripting Error: Too many callbacks registered!");
                 }
             }
+        }
+
+        internal void ScheduleCallback(object callback, params object[] args)
+        {
+            if (callback == null || !engine.Operations.IsCallable(callback))
+                return;
+
+            ScheduleCallback(() =>
+            {
+                try
+                {
+                    engine.Operations.Invoke(callback, args);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Script callback error: {ex}");
+                }
+            });
         }
 
         /// <summary>
@@ -177,6 +196,8 @@ namespace ClassicUO.LegionScripting
         /// Access useful player settings.
         /// </summary>
         public static PyProfile PyProfile = new();
+
+        public Events Events;
 
         /// <summary>
         /// Check if the script has been requested to stop.

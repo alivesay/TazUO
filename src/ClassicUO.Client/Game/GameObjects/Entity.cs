@@ -34,19 +34,18 @@ namespace ClassicUO.Game.GameObjects
         public bool ExecuteAnimation = true;
         internal long LastAnimationChangeTime;
         public Flags Flags;
-        public ushort Hits { get => hits; set 
+        public ushort Hits { get => hits; set
             {
-                if(this is PlayerMobile)
+                if(Serial == World.Player)
                 {
-                    var arg = new PlayerStatChangedArgs(PlayerStatChangedArgs.PlayerStat.Hits, hits, value);
                     hits = value;
-                    EventSink.InvokeOnPlayerStatChange(this, arg);
+                    EventSink.InvokeOnPlayerStatChange(this, value);
                 }
                 else
                 {
                     hits = value;
                 }
-            } 
+            }
         }
         public ushort HitsMax;
         public byte HitsPercentage;

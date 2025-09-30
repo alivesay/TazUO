@@ -5,6 +5,66 @@ class Buff:
     Type = None
     Title: str = None
 
+class Events:
+
+    def OnPlayerHitsChanged(self, callback: Any) -> None:
+        """
+         Subscribe to player hits changed event. Callback receives the new hits value as an integer.
+         Example:
+         ```py
+         def on_hits_changed(new_hits):
+           API.SysMsg(f"Player hits changed to: {new_hits}")
+         API.Events.OnPlayerHitsChanged(on_hits_changed)
+         while not API.StopRequested:
+           API.ProcessCallbacks()
+           API.Pause(0.25)
+         ```
+        
+        """
+        pass
+
+    def OnBuffAdded(self, callback: Any) -> None:
+        """
+         Called when a buff is added to your char. Callback receives a Buff object.
+        
+        """
+        pass
+
+    def OnBuffRemoved(self, callback: Any) -> None:
+        """
+         Called when a buff is removed from your char. Callback receives a Buff object.
+        
+        """
+        pass
+
+    def OnPlayerDeath(self, callback: Any) -> None:
+        """
+         Called when the player dies. Callback receives your characters serial.
+        
+        """
+        pass
+
+    def OnOpenContainer(self, callback: Any) -> None:
+        """
+         Called when a container is opened. Callback receives the container serial.
+        
+        """
+        pass
+
+    def OnPlayerMoved(self, callback: Any) -> None:
+        """
+         Called when the player moves. Callback receives a PositionChangedArgs object with .NewLocation available in the object.
+        
+        """
+        pass
+
+    def OnItemCreated(self, callback: Any) -> None:
+        """
+         Called when a new item is created. Callback receives the item serial.
+        
+        """
+        pass
+
 class PyBaseControl:
 
     def Add(self, childControl: PyControl) -> None:
@@ -342,6 +402,7 @@ LastTargetPos = None
 LastTargetGraphic: int = None
 Found: int = None
 PyProfile: PyProfile = None
+Events = None
 StopRequested: bool = None
 CancellationToken = None
 

@@ -236,7 +236,7 @@ namespace ClassicUO.Game.Managers
             ClearAllPendingHeals();
             EventSink.OnBuffAdded -= OnBuffAdded;
             EventSink.OnBuffRemoved -= OnBuffRemoved;
-            Instance = null;
+            Instance = new();
         }
     }
 }

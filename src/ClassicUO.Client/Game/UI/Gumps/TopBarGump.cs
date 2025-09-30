@@ -147,7 +147,7 @@ namespace ClassicUO.Game.UI.Gumps
                 Y = 1,
                 FontCenter = true
             }, 1);
-            assistant.MouseUp += (s, e) => { UIManager.Add(new AssistantGump(world)); };
+            assistant.MouseUp += (s, e) => { AssistantWindow.Show(); };
             startX += largeWidth + 1;
 
             RighClickableButton lscript;

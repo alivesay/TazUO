@@ -97,7 +97,7 @@ namespace ClassicUO.Game.UI.Gumps
             if (entity == null)
                 return false;
 
-            if (_text == null)
+            if (_text == null || _text.IsDisposed)
             {
                 EnsureTextBox(entity);
 
@@ -156,6 +156,9 @@ namespace ClassicUO.Game.UI.Gumps
 
             if (!string.IsNullOrEmpty(entity.Name))
             {
+                if (_text == null)
+                    return false;
+
                 _text.Text = entity.Name;
 
                 Width = _background.Width = Math.Max(60, _text.Width) + 4;

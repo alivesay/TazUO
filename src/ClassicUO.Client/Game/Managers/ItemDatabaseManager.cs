@@ -784,12 +784,18 @@ namespace ClassicUO.Game.Managers
 
             _pendingItems.Enqueue(itemInfo);
 
-            if (_pendingItemsTimer != null)
-                return;
+            lock (_dbLock)
+            {
+                if (_pendingItemsTimer != null)
+                    return;
 
-            _pendingItemsTimer = new Timer(3000);
-            _pendingItemsTimer.Elapsed += PendingItemsTimerOnElapsed;
-            _pendingItemsTimer.Start();
+                _pendingItemsTimer = new Timer(3000);
+                if (_pendingItemsTimer != null)
+                {
+                    _pendingItemsTimer.Elapsed += PendingItemsTimerOnElapsed;
+                    _pendingItemsTimer.Start();
+                }
+            }
         }
 
         private void PendingItemsTimerOnElapsed(object sender, ElapsedEventArgs e)
@@ -807,7 +813,11 @@ namespace ClassicUO.Game.Managers
                     items.Add(itemInfo);
                 }
 
-                _pendingItemsTimer = null;
+                lock (_dbLock)
+                {
+                    _pendingItemsTimer?.Dispose();
+                    _pendingItemsTimer = null;
+                }
 
                 _ = AddOrUpdateItemsAsync(items);
             });

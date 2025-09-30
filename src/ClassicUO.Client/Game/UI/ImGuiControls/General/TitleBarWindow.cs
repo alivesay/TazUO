@@ -9,7 +9,6 @@ namespace ClassicUO.Game.UI.ImGuiControls
     {
         private Profile profile;
         private bool enableTitleBarStats;
-        private int updateInterval;
         private TitleBarStatsMode statsMode;
 
         private TitleBarWindow() : base("Title Bar Settings")
@@ -20,7 +19,6 @@ namespace ClassicUO.Game.UI.ImGuiControls
             if (profile != null)
             {
                 enableTitleBarStats = profile.EnableTitleBarStats;
-                updateInterval = profile.TitleBarUpdateInterval;
                 statsMode = profile.TitleBarStatsMode;
             }
         }
@@ -60,17 +58,6 @@ namespace ClassicUO.Game.UI.ImGuiControls
                     Client.Game.SetWindowTitle(string.IsNullOrEmpty(World.Instance.Player?.Name) ? string.Empty : World.Instance.Player.Name);
                 }
             }
-            ImGui.Spacing();
-
-            // Update interval slider
-            ImGui.Text("Update interval (ms):");
-            ImGui.SetNextItemWidth(300);
-            if (ImGui.SliderInt("##UpdateInterval", ref updateInterval, 500, 5000))
-            {
-                profile.TitleBarUpdateInterval = updateInterval;
-                TitleBarStatsManager.ForceUpdate();
-            }
-            ImGuiComponents.Tooltip("How often to update the title bar (500ms - 5000ms)");
             ImGui.Spacing();
 
             // Display mode section

@@ -250,7 +250,6 @@ namespace ClassicUO.Configuration
         // title bar stats
         public bool EnableTitleBarStats { get; set; } = false;
         public TitleBarStatsMode TitleBarStatsMode { get; set; } = TitleBarStatsMode.Text;
-        public int TitleBarUpdateInterval { get; set; } = 1000;
         public int CounterBarRows { get; set; } = 1;
         public int CounterBarColumns { get; set; } = 5;
 

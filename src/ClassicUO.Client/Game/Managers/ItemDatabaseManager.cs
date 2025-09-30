@@ -742,6 +742,14 @@ namespace ClassicUO.Game.Managers
             if (!_initialized || item == null || world?.Player == null || ProfileManager.CurrentProfile?.ItemDatabaseEnabled == false)
                 return;
 
+            // Check if ItemData is accessible (TileData might not be loaded yet)
+            Layer layer = Layer.Invalid;
+            try
+            {
+                layer = (Layer)item.ItemData.Layer;
+            }
+            catch { }
+
             var itemInfo = new ItemInfo
             {
                 Serial = item.Serial,
@@ -750,7 +758,7 @@ namespace ClassicUO.Game.Managers
                 Name = item.Name ?? string.Empty,
                 Properties = string.Empty, // Will be filled by tooltip if available
                 Container = item.Container,
-                Layer = (Layer)item.ItemData.Layer,
+                Layer = layer,
                 UpdatedTime = DateTime.Now,
                 Character = world.Player.Serial,
                 CharacterName = world.Player.Name ?? string.Empty,

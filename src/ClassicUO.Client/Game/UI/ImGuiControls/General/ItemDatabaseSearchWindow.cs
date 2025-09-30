@@ -22,6 +22,7 @@ namespace ClassicUO.Game.UI.ImGuiControls
         private bool _inContainersOnly = false;
         private int _maxResults = 100;
         private bool _searchCurrentCharacterOnly = true;
+        private bool _enabled;
 
         // Results
         private List<ItemInfo> _searchResults = new List<ItemInfo>();
@@ -46,15 +47,21 @@ namespace ClassicUO.Game.UI.ImGuiControls
         private ItemDatabaseSearchWindow() : base("Item Database Search")
         {
             WindowFlags = ImGuiWindowFlags.AlwaysAutoResize;
+            _enabled = ProfileManager.CurrentProfile.ItemDatabaseEnabled;
         }
 
         public override void DrawContent()
         {
             var currentProfile = ProfileManager.CurrentProfile;
-            if (currentProfile == null || !currentProfile.ItemDatabaseEnabled)
+
+            if (ImGui.Checkbox("Enable item database", ref _enabled))
+            {
+                currentProfile.ItemDatabaseEnabled = _enabled;
+            }
+
+            if (!_enabled)
             {
                 ImGui.TextColored(new Vector4(1, 0.5f, 0.5f, 1), "Item Database is disabled.");
-                ImGui.Text("Enable it in Profile settings to use this feature.");
                 return;
             }
 

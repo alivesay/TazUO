@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using ClassicUO.Configuration;
 using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
@@ -19,6 +21,8 @@ namespace ClassicUO.Game.Managers
         private readonly object _dbLock = new object();
         private string _databasePath;
         private bool _initialized;
+        private ConcurrentQueue<ItemInfo> _pendingItems = new();
+        private Timer _pendingItemsTimer;
 
         public static ItemDatabaseManager Instance
         {
@@ -770,7 +774,37 @@ namespace ClassicUO.Game.Managers
                 }
             }
 
-            _ = AddOrUpdateItemAsync(itemInfo);
+            _pendingItems.Enqueue(itemInfo);
+
+            if (_pendingItemsTimer == null)
+            {
+                _pendingItemsTimer = new Timer(3000);
+                _pendingItemsTimer.Elapsed += PendingItemsTimerOnElapsed;
+                _pendingItemsTimer.Start();
+            }
+
+            //_ = AddOrUpdateItemAsync(itemInfo);
+        }
+
+        private void PendingItemsTimerOnElapsed(object sender, ElapsedEventArgs e)
+        {
+            _ = BulkPending();
+        }
+
+        private async Task BulkPending()
+        {
+            await Task.Run(() =>
+            {
+                List<ItemInfo> items = new List<ItemInfo>();
+                while (_pendingItems.TryDequeue(out ItemInfo itemInfo))
+                {
+                    items.Add(itemInfo);
+                }
+
+                _pendingItemsTimer = null;
+
+                _ = AddOrUpdateItemsAsync(items);
+            });
         }
     }
 }

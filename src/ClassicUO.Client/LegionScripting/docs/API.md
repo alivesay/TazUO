@@ -21,7 +21,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 [Additional notes](../notes/)  
 
-*This was generated on `9/29/25`.*
+*This was generated on `9/30/25`.*
 
 ## Properties
 ### `JournalEntries`
@@ -441,7 +441,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 ---
 
-### QueMoveItem
+### QueueMoveItem
 `(serial, destination, amt, x, y)`
  Move an item to another container.
  Use x, and y if you don't want items stacking in the desination container.
@@ -457,7 +457,7 @@ You can now type `-updateapi` in game to download the latest API.py file.
      for item in items:
          data = API.ItemNameAndProps(item)
          if data and "An Exotic Fish" in data:
-             API.QueMoveItem(item, barrel)
+             API.QueueMoveItem(item, barrel)
  ```
 
 
@@ -510,14 +510,14 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 ---
 
-### QueMoveItemOffset
+### QueueMoveItemOffset
 `(serial, amt, x, y, z, OSI)`
  Move an item to the ground near you.
  Example:
  ```py
  items = API.ItemsInContainer(API.Backpack)
  for item in items:
-   API.QueMoveItemOffset(item, 0, 1, 0, 0)
+   API.QueueMoveItemOffset(item, 0, 1, 0, 0)
  ```
 
 
@@ -620,6 +620,21 @@ You can now type `-updateapi` in game to download the latest API.py file.
 | `name` | `string` | ❌ No | The name of the dress configuration |
 
 **Return Type:** `void` *(Does not return anything)*
+
+---
+
+### GetAvailableDressOutfits
+
+ Get all available dress configurations.
+ Example:
+ ```py
+ outfits = API.GetAvailableDressOutfits()
+ if outfits:
+   Dress(outfits[0])
+ ```
+
+
+**Return Type:** `PythonList`
 
 ---
 
@@ -3081,12 +3096,12 @@ You can now type `-updateapi` in game to download the latest API.py file.
 
 ---
 
-### IsProcessingMoveQue
+### IsProcessingMoveQueue
 
  Check if the move item queue is being processed. You can use this to prevent actions if the queue is being processed.
  Example:
  ```py
- if API.IsProcessingMoveQue():
+ if API.IsProcessingMoveQueue():
    API.Pause(0.5)
  ```
 

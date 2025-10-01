@@ -627,7 +627,7 @@ def ClearMoveQueue() -> None:
     """
     pass
 
-def QueMoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: int = 0xFFFF) -> None:
+def QueueMoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: int = 0xFFFF) -> None:
     """
      Move an item to another container.
      Use x, and y if you don't want items stacking in the desination container.
@@ -643,7 +643,7 @@ def QueMoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y:
          for item in items:
              data = API.ItemNameAndProps(item)
              if data and "An Exotic Fish" in data:
-                 API.QueMoveItem(item, barrel)
+                 API.QueueMoveItem(item, barrel)
      ```
     
     """
@@ -672,14 +672,14 @@ def MoveItem(serial: int, destination: int, amt: int = 0, x: int = 0xFFFF, y: in
     """
     pass
 
-def QueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0, OSI: bool = False) -> None:
+def QueueMoveItemOffset(serial: int, amt: int = 0, x: int = 0, y: int = 0, z: int = 0, OSI: bool = False) -> None:
     """
      Move an item to the ground near you.
      Example:
      ```py
      items = API.ItemsInContainer(API.Backpack)
      for item in items:
-       API.QueMoveItemOffset(item, 0, 1, 0, 0)
+       API.QueueMoveItemOffset(item, 0, 1, 0, 0)
      ```
     
     """
@@ -730,6 +730,19 @@ def Dress(name: str) -> None:
      Example:
      ```py
      API.Dress("PvP Gear")
+     ```
+    
+    """
+    pass
+
+def GetAvailableDressOutfits() -> Any:
+    """
+     Get all available dress configurations.
+     Example:
+     ```py
+     outfits = API.GetAvailableDressOutfits()
+     if outfits:
+       Dress(outfits[0])
      ```
     
     """
@@ -2239,12 +2252,12 @@ def RemoveMapMarker(name: str) -> None:
     """
     pass
 
-def IsProcessingMoveQue() -> bool:
+def IsProcessingMoveQueue() -> bool:
     """
      Check if the move item queue is being processed. You can use this to prevent actions if the queue is being processed.
      Example:
      ```py
-     if API.IsProcessingMoveQue():
+     if API.IsProcessingMoveQueue():
        API.Pause(0.5)
      ```
     

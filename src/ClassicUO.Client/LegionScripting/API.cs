@@ -524,7 +524,7 @@ namespace ClassicUO.LegionScripting
         ///     for item in items:
         ///         data = API.ItemNameAndProps(item)
         ///         if data and "An Exotic Fish" in data:
-        ///             API.QueMoveItem(item, barrel)
+        ///             API.QueueMoveItem(item, barrel)
         /// ```
         /// </summary>
         /// <param name="serial"></param>
@@ -532,7 +532,7 @@ namespace ClassicUO.LegionScripting
         /// <param name="amt">Amount to move</param>
         /// <param name="x">X coordinate inside a container</param>
         /// <param name="y">Y coordinate inside a container</param>
-        public void QueMoveItem(uint serial, uint destination, ushort amt = 0, int x = 0xFFFF, int y = 0xFFFF) => MainThreadQueue.InvokeOnMainThread
+        public void QueueMoveItem(uint serial, uint destination, ushort amt = 0, int x = 0xFFFF, int y = 0xFFFF) => MainThreadQueue.InvokeOnMainThread
         (() =>
             {
                 Client.Game.GetScene<GameScene>()?.MoveItemQueue.Enqueue(serial, destination, amt, x, y);
@@ -577,7 +577,7 @@ namespace ClassicUO.LegionScripting
         /// ```py
         /// items = API.ItemsInContainer(API.Backpack)
         /// for item in items:
-        ///   API.QueMoveItemOffset(item, 0, 1, 0, 0)
+        ///   API.QueueMoveItemOffset(item, 0, 1, 0, 0)
         /// ```
         /// </summary>
         /// <param name="serial"></param>
@@ -586,7 +586,7 @@ namespace ClassicUO.LegionScripting
         /// <param name="y">Offset from your location</param>
         /// <param name="z">Offset from your location. Leave blank in most cases</param>
         /// <param name="OSI">True if you are playing OSI</param>
-        public void QueMoveItemOffset(uint serial, ushort amt = 0, int x = 0, int y = 0, int z = 0, bool OSI = false) => MainThreadQueue.InvokeOnMainThread
+        public void QueueMoveItemOffset(uint serial, ushort amt = 0, int x = 0, int y = 0, int z = 0, bool OSI = false) => MainThreadQueue.InvokeOnMainThread
         (() =>
             {
                 World.Map.GetMapZ(World.Player.X + x, World.Player.Y + y, out sbyte gz, out sbyte gz2);
@@ -713,6 +713,27 @@ namespace ClassicUO.LegionScripting
                 DressAgentManager.Instance.DressFromConfig(config);
             }
         });
+
+        /// <summary>
+        /// Get all available dress configurations.
+        /// Example:
+        /// ```py
+        /// outfits = API.GetAvailableDressOutfits()
+        /// if outfits:
+        ///   Dress(outfits[0])
+        /// ```
+        /// </summary>
+        /// <returns>Returns a list of outfit names for use with Dress(outfitname)</returns>
+        public PythonList GetAvailableDressOutfits() => MainThreadQueue.InvokeOnMainThread(() =>
+            {
+                PythonList list = new();
+                foreach (var config in DressAgentManager.Instance.CurrentPlayerConfigs)
+                {
+                    list.Add(config.Name);
+                }
+
+                return list;
+            });
 
         /// <summary>
         /// Check if a buff is active.
@@ -3624,12 +3645,12 @@ namespace ClassicUO.LegionScripting
         /// Check if the move item queue is being processed. You can use this to prevent actions if the queue is being processed.
         /// Example:
         /// ```py
-        /// if API.IsProcessingMoveQue():
+        /// if API.IsProcessingMoveQueue():
         ///   API.Pause(0.5)
         /// ```
         /// </summary>
         /// <returns></returns>
-        public bool IsProcessingMoveQue() => MainThreadQueue.InvokeOnMainThread(() => !MoveItemQueue.Instance.IsEmpty);
+        public bool IsProcessingMoveQueue() => MainThreadQueue.InvokeOnMainThread(() => !MoveItemQueue.Instance.IsEmpty);
 
         /// <summary>
         /// Check if the use item queue is being processed. You can use this to prevent actions if the queue is being processed.

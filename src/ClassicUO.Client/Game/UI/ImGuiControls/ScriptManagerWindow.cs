@@ -583,7 +583,7 @@ while True:
 
             // Draw play/stop button
             ImGui.SameLine();
-            string buttonText = isPlaying ? "■" : "▶︎";
+            string buttonText = isPlaying ? "Stop" : "Play";
             Vector4 buttonColor = isPlaying
                 ? ImGuiTheme.Colors.Success
                 : ImGuiTheme.Colors.Primary;
@@ -604,7 +604,7 @@ while True:
 
             // Add menu button at the end
             ImGui.SameLine();
-            if (ImGui.Button("⚙︎", new Vector2(20, 0)))
+            if (ImGui.Button("*", new Vector2(20, 0)))
             {
                 _showContextMenu = true;
                 _contextMenuScript = script;

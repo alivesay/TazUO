@@ -19,14 +19,11 @@ namespace ClassicUO.Game.UI.Controls
         internal static int _StepsDone = 1;
         internal static int _StepChanger = 1;
 
-        private bool _acceptKeyboardInput, _acceptMouseInput;
-        private int _activePage;
+        private bool _acceptKeyboardInput;
         private Rectangle _bounds;
-        private bool _handlesKeyboardFocus;
         private Point _offset;
         private Control _parent;
         private float alpha = 1.0f;
-        private List<Control> _reusableDisposedList = new();
 
         protected Control(Control parent = null)
         {
@@ -121,8 +118,8 @@ namespace ClassicUO.Game.UI.Controls
 
         public virtual bool AcceptMouseInput
         {
-            get => IsEnabled && !IsDisposed && _acceptMouseInput && IsVisible;
-            set => _acceptMouseInput = value;
+            get => IsEnabled && !IsDisposed && field && IsVisible;
+            set;
         }
 
         public ref int X => ref _bounds.X;
@@ -196,7 +193,7 @@ namespace ClassicUO.Game.UI.Controls
                     return false;
                 }
 
-                if (_handlesKeyboardFocus)
+                if (field)
                 {
                     return true;
                 }
@@ -216,15 +213,15 @@ namespace ClassicUO.Game.UI.Controls
 
                 return false;
             }
-            set => _handlesKeyboardFocus = value;
+            set;
         }
 
         public int ActivePage
         {
-            get => _activePage;
+            get;
             set
             {
-                _activePage = value;
+                field = value;
 
                 OnPageChanged();
             }
@@ -348,10 +345,9 @@ namespace ClassicUO.Game.UI.Controls
             for (int i = 0; i < Children.Count; i++)
             {
                 if (Children.Count <= i)
-                {
                     break;
-                }
-                Control c = Children.ElementAt(i);
+
+                Control c = Children[i];
 
                 if (c != null && (c.Page == 0 || c.Page == ActivePage))
                 {
@@ -372,136 +368,81 @@ namespace ClassicUO.Game.UI.Controls
         /// </summary>
         public virtual void Update()
         {
-            if (IsDisposed)
-            {
+            if (IsDisposed || Children.Count == 0)
                 return;
+
+            int w = 0, h = 0, count = Children.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                if (i >= Children.Count)
+                    break;
+
+                Control c = Children[i];
+
+                if (c == null || c.IsDisposed)
+                    continue;
+
+                c.Update();
+
+                if (WantUpdateSize)
+                {
+                    if ((c.Page == 0 || c.Page == ActivePage) && c.IsVisible)
+                    {
+                        if (w < c.Bounds.Right)
+                        {
+                            w = c.Bounds.Right;
+                        }
+
+                        if (h < c.Bounds.Bottom)
+                        {
+                            h = c.Bounds.Bottom;
+                        }
+                    }
+                }
             }
 
-            if (Children.Count != 0)
+            if (WantUpdateSize && IsVisible)
             {
-                bool hasDisposals = false;
-                int w = 0, h = 0;
-
-                for (int i = 0; i < Children.Count; i++)
+                if (w != Width)
                 {
-                    if (i < 0 || i >= Children.Count)
-                    {
-                        continue;
-                    }
-
-                    Control c = Children.ElementAt(i);
-
-                    if (c == null)
-                    {
-                        continue;
-                    }
-
-                    if (c.IsDisposed)
-                    {
-                        _reusableDisposedList.Add(c);
-                        hasDisposals = true;
-                        continue;
-                    }
-
-                    c.Update();
-
-                    if (WantUpdateSize)
-                    {
-                        if ((c.Page == 0 || c.Page == ActivePage) && c.IsVisible)
-                        {
-                            if (w < c.Bounds.Right)
-                            {
-                                w = c.Bounds.Right;
-                            }
-
-                            if (h < c.Bounds.Bottom)
-                            {
-                                h = c.Bounds.Bottom;
-                            }
-                        }
-                    }
+                    Width = w;
                 }
 
-                if (hasDisposals)
+                if (h != Height)
                 {
-                    foreach (Control c in _reusableDisposedList)
-                    {
-                        if (Children.Contains(c))
-                        {
-                            OnChildRemoved();
-                            Children.Remove(c);
-                        }
-                    }
-
-                    _reusableDisposedList.Clear();
+                    Height = h;
                 }
 
-                if (WantUpdateSize && IsVisible)
-                {
-                    if (w != Width)
-                    {
-                        Width = w;
-                    }
-
-                    if (h != Height)
-                    {
-                        Height = h;
-                    }
-
-                    WantUpdateSize = false;
-                }
+                WantUpdateSize = false;
             }
         }
 
         /// <summary>
-        /// Intended for updates that don't need to occur as frequently as Update() does.
-        /// SlowUpdate is called twice per second.
+        /// Intended for any ui changes that only need to occur just before drawing to the screen.
         /// </summary>
-        public virtual void SlowUpdate()
+        public virtual void PreDraw()
         {
-            if (IsDisposed)
+            if (IsDisposed) return;
+
+            if (Children.Count == 0) return;
+
+            int count = Children.Count;
+
+            for (int i = 0; i < count; i++)
             {
-                return;
+                if (i >= Children.Count)
+                    continue;
+
+                Control c = Children[i];
+
+                if (c == null || c.IsDisposed)
+                    continue;
+
+                c.PreDraw();
             }
 
-            if (Children.Count != 0)
-            {
-                List<Control> removalList = new List<Control>(); ;
-
-                for (int i = 0; i < Children.Count; i++)
-                {
-                    if (i < 0 || i >= Children.Count)
-                    {
-                        continue;
-                    }
-
-                    Control c = Children.ElementAt(i);
-
-                    if (c == null)
-                    {
-                        continue;
-                    }
-
-                    if (c.IsDisposed)
-                    {
-                        removalList.Add(c);
-                        continue;
-                    }
-
-                    c.SlowUpdate();
-
-                }
-
-                if (removalList.Count > 0)
-                {
-                    foreach (Control c in removalList)
-                    {
-                        OnChildRemoved();
-                        Children.Remove(c);
-                    }
-                }
-
-            }
+            CleanUpDisposedChildren();
         }
 
         /// <summary>
@@ -584,6 +525,18 @@ namespace ClassicUO.Game.UI.Controls
             if (ServerSerial != 0)
             {
                 WantUpdateSize = true;
+            }
+        }
+
+        private void CleanUpDisposedChildren()
+        {
+            for (int i = Children.Count - 1; i >= 0; i--)
+            {
+                if (Children[i]?.IsDisposed == true)
+                {
+                    OnChildRemoved();
+                    Children.RemoveAt(i);
+                }
             }
         }
 

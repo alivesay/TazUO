@@ -68,12 +68,11 @@ namespace ClassicUO.Game.UI.Controls
         public int ScrollMinValue => _scrollBar.MinValue;
         public int ScrollMaxValue => _scrollBar.MaxValue;
 
-
         public Rectangle ScissorRectangle;
 
-        public override void SlowUpdate()
+        public override void PreDraw()
         {
-            base.SlowUpdate();
+            base.PreDraw();
             CalculateScrollBarMaxValue();
 
             if (ScrollbarBehaviour == ScrollbarBehaviour.ShowAlways)

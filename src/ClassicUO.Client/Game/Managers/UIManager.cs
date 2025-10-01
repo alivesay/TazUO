@@ -412,7 +412,7 @@ namespace ClassicUO.Game.Managers
             HandleMouseInput();
         }
 
-        public static void SlowUpdate()
+        public static void PreDraw()
         {
             SortControlsByInfo();
 
@@ -422,9 +422,9 @@ namespace ClassicUO.Game.Managers
             {
                 LinkedListNode<Gump> next = first.Next;
 
-                Control g = first.Value;
+                Gump g = first.Value;
 
-                g.SlowUpdate();
+                g.PreDraw();
 
                 if (g.IsDisposed)
                 {

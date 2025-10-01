@@ -140,7 +140,7 @@ namespace ClassicUO.Game.UI.Controls
             _textBox.SetText(val.ToString());
         }
 
-        public override void Update()
+        public override void PreDraw()
         {
             if (IsDisposed)
             {
@@ -157,7 +157,7 @@ namespace ClassicUO.Game.UI.Controls
                 }
             }
 
-            base.Update();
+            base.PreDraw();
         }
     }
 }

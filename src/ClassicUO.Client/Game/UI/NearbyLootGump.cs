@@ -337,7 +337,6 @@ namespace ClassicUO.Game.UI
                     _alphaBg.Height = Height;
                     _resizeDrag.Y = Height - 10;
                     _scrollArea.UpdateScrollbarPosition();//Update scrollbar position for new dimensions
-                    _scrollArea.SlowUpdate();//Recalculate scrollbar
                 }
             }
 

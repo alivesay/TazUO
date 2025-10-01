@@ -62,10 +62,9 @@ public class AnimationDisplay : Control
         return 0;
     }
 
-
-    public override void Update()
+    public override void PreDraw()
     {
-        base.Update();
+        base.PreDraw();
 
         if (_nextFrame <= Time.Ticks)
         {

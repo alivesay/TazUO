@@ -108,7 +108,7 @@ namespace ClassicUO.Game.UI.Controls
         }
 
 
-        public override void Update()
+        public override void PreDraw()
         {
             if (IsDisposed)
             {
@@ -131,7 +131,7 @@ namespace ClassicUO.Game.UI.Controls
                 }
             }
 
-            base.Update();
+            base.PreDraw();
         }
 
         public override bool Draw(UltimaBatcher2D batcher, int x, int y)

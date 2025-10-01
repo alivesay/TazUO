@@ -143,9 +143,10 @@ namespace ClassicUO.LegionScripting
             writer.WriteAttributeString("rw", Width.ToString());
             writer.WriteAttributeString("rh", Height.ToString());
         }
-        public override void SlowUpdate()
+
+        public override void PreDraw()
         {
-            base.SlowUpdate();
+            base.PreDraw();
             if (RefreshContent)
             {
                 RefreshContent = false;
@@ -533,7 +534,7 @@ while True:
                         Macro mac = new (script.FileName);
                         mac.Items = new MacroObjectString(MacroType.ClientCommand, MacroSubType.MSC_NONE, "togglelscript " + script.FileName);
                         mm.PushToBack(mac);
-                        
+
                         MacroButtonGump bg = new(World, mac, Mouse.Position.X, Mouse.Position.Y);
                         UIManager.Add(bg);
                     }

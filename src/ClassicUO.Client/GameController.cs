@@ -39,7 +39,7 @@ namespace ClassicUO
 
         private bool _ignoreNextTextInput;
         private readonly float[] _intervalFixedUpdate = new float[2];
-        private double _totalElapsed, _currentFpsTime, _nextSlowUpdate;
+        private double _totalElapsed, _currentFpsTime;
         private uint _totalFrames;
         private UltimaBatcher2D _uoSpriteBatch;
         private bool _suppressedDraw;
@@ -438,14 +438,6 @@ namespace ClassicUO
             MainThreadQueue.ProcessQueue();
             Profiler.ExitContext("MTQ");
 
-            if (Time.Ticks >= _nextSlowUpdate)
-            {
-                Profiler.EnterContext("Slow Update");
-                _nextSlowUpdate = Time.Ticks + 500;
-                UIManager.SlowUpdate();
-                Profiler.ExitContext("Slow Update");
-            }
-
             _totalElapsed += gameTime.ElapsedGameTime.TotalMilliseconds;
             _currentFpsTime += gameTime.ElapsedGameTime.TotalMilliseconds;
 
@@ -498,6 +490,9 @@ namespace ClassicUO
         protected override void Draw(GameTime gameTime)
         {
             Profiler.EndFrame();
+
+            UIManager.PreDraw();
+
             Profiler.BeginFrame();
             Profiler.ExitContext("OutOfContext");
             Profiler.EnterContext("Draw-Tiles");

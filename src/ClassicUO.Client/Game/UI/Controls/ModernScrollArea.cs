@@ -87,9 +87,9 @@ namespace ClassicUO.Game.UI.Controls
             set => _scrollBar.ArrowColor = value;
         }
 
-        public override void SlowUpdate()
+        public override void PreDraw()
         {
-            base.SlowUpdate();
+            base.PreDraw();
             CalculateScrollBarMaxValue();
 
             if (ScrollbarBehaviour == ScrollbarBehaviour.ShowAlways)

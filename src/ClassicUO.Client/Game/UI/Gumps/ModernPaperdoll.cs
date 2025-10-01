@@ -24,7 +24,7 @@ namespace ClassicUO.Game.UI.Gumps
         private const int WIDTH = 250, HEIGHT = 380;
         private const int CELL_SPACING = 2, TOP_SPACING = 40;
         private Texture2D MordernPaperdollGump;
-        
+
         private void InitializeTexture()
         {
             if (MordernPaperdollGump == null)
@@ -259,17 +259,15 @@ namespace ClassicUO.Game.UI.Gumps
             }
         }
 
-        public override void Update()
+        protected override void OnMove(int x, int y)
         {
-            base.Update();
-
             if (X != lastX || Y != lastY)
-            {
-                lastX = X;
-                lastY = Y;
-                if (ProfileManager.CurrentProfile != null)
-                    ProfileManager.CurrentProfile.ModernPaperdollPosition = new Point(X, Y);
-            }
+          {
+              lastX = X;
+              lastY = Y;
+              if (ProfileManager.CurrentProfile != null)
+                  ProfileManager.CurrentProfile.ModernPaperdollPosition = new Point(X, Y);
+          }
         }
 
         public override void Dispose()

@@ -617,9 +617,9 @@ namespace ClassicUO.Game.UI.Gumps
             base.Dispose();
         }
 
-        public override void Update()
+        public override void PreDraw()
         {
-            base.Update();
+            base.PreDraw();
 
             if (IsDisposed)
                 return;
@@ -1421,9 +1421,9 @@ namespace ClassicUO.Game.UI.Gumps
                 return true;
             }
 
-            public override void Update()
+            public override void PreDraw()
             {
-                base.Update();
+                base.PreDraw();
 
                 bool comboActive = Keyboard.Alt && Mouse.LButtonPressed
                    && !Client.Game.UO.GameCursor.ItemHold.Enabled

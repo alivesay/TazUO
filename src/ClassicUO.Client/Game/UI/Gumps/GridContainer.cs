@@ -287,6 +287,7 @@ namespace ClassicUO.Game.UI.Gumps
                     if (Keyboard.Alt)
                     {
                         autoSortContainer ^= true;
+                        gridContainerEntry.AutoSort = autoSortContainer;
                         sortContents.SetTooltip(sortButtonTooltip);
                     }
                     else
@@ -1553,7 +1554,6 @@ namespace ClassicUO.Game.UI.Gumps
                         if (slot.Value.SlotItem != null)
                             continue;
                         slot.Value.SetGridItem(i);
-                        AddLockedItemSlot(i, slot.Key);
                         break;
                     }
                 }

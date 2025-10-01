@@ -742,6 +742,9 @@ namespace ClassicUO.Game.Managers
             if (!_initialized || item == null || world?.Player == null || ProfileManager.CurrentProfile?.ItemDatabaseEnabled == false)
                 return;
 
+            if (item.ItemData.IsDoor || item.ItemData.IsLight || item.ItemData.IsInternal || item.ItemData.IsRoof || item.ItemData.IsWall)
+                return;
+
             // Check if ItemData is accessible (TileData might not be loaded yet)
             Layer layer = Layer.Invalid;
             try
@@ -773,8 +776,7 @@ namespace ClassicUO.Game.Managers
             {
                 if (!string.IsNullOrEmpty(oplName))
                 {
-                    if (string.IsNullOrEmpty(itemInfo.Name))
-                        itemInfo.Name = oplName;
+                    itemInfo.Name = oplName;
                 }
                 if (!string.IsNullOrEmpty(oplData))
                 {

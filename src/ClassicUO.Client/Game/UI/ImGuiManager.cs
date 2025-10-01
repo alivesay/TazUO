@@ -17,33 +17,53 @@ namespace ClassicUO.Game.UI
         private static bool _isInitialized;
         private static bool _hasWindows;
         private static readonly List<ImGuiWindow> _windows = new List<ImGuiWindow>();
+        private static readonly object _windowsLock = new object();
         private static Microsoft.Xna.Framework.Game _game;
 
         public static bool IsInitialized => _isInitialized;
         public static ImGuiRenderer Renderer => _imGuiRenderer;
+        public static ImGuiWindow[] Windows
+        {
+            get
+            {
+                lock (_windowsLock)
+                {
+                    return _windows.ToArray();
+                }
+            }
+        }
 
         public static void AddWindow(ImGuiWindow window)
         {
             if (window == null) return;
-            if (!_windows.Contains(window))
-                _windows.Add(window);
-            _hasWindows = _windows.Count > 0;
+            lock (_windowsLock)
+            {
+                if (!_windows.Contains(window))
+                    _windows.Add(window);
+                _hasWindows = _windows.Count > 0;
+            }
         }
 
         public static void RemoveWindow(ImGuiWindow window)
         {
             if (window == null) return;
-            _windows.Remove(window);
-            _hasWindows = _windows.Count > 0;
+            lock (_windowsLock)
+            {
+                _windows.Remove(window);
+                _hasWindows = _windows.Count > 0;
+            }
         }
 
         public static void RemoveAllWindows()
         {
-            foreach (var window in _windows)
+            lock (_windowsLock)
             {
-                window?.Dispose();
+                foreach (var window in _windows)
+                {
+                    window?.Dispose();
+                }
+                _windows.Clear();
             }
-            _windows.Clear();
         }
 
         private static void SetTazUOTheme()
@@ -177,25 +197,28 @@ namespace ClassicUO.Game.UI
         private static void DrawImGui()
         {
             // Draw managed windows
-            for (int i = _windows.Count - 1; i >= 0; i--)
+            lock (_windowsLock)
             {
-                var window = _windows[i];
-                if (window != null)
+                for (int i = _windows.Count - 1; i >= 0; i--)
                 {
-                    if (window.IsOpen)
+                    var window = _windows[i];
+                    if (window != null)
                     {
-                        window.Update();
-                        window.Draw();
+                        if (window.IsOpen)
+                        {
+                            window.Update();
+                            window.Draw();
+                        }
+                        else
+                        {
+                            window.Dispose();
+                            _windows.RemoveAt(i);
+                        }
                     }
                     else
                     {
-                        window.Dispose();
                         _windows.RemoveAt(i);
                     }
-                }
-                else
-                {
-                    _windows.RemoveAt(i);
                 }
             }
         }

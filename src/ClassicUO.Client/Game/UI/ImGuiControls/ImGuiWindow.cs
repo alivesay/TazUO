@@ -2,6 +2,7 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Xml;
 using ClassicUO.Renderer;
 
 namespace ClassicUO.Game.UI.ImGuiControls
@@ -42,11 +43,15 @@ namespace ClassicUO.Game.UI.ImGuiControls
             if (!_isVisible || !_isOpen)
                 return;
 
+            bool rightclickClose = false;
+
             try
             {
                 if (ImGui.Begin(Title, ref _isOpen, _windowFlags))
                 {
                     DrawContent();
+
+                    rightclickClose = ImGui.IsMouseClicked(ImGuiMouseButton.Right) && ImGui.IsWindowHovered() && ImGui.IsWindowFocused();
                 }
             }
             catch (Exception ex)
@@ -57,6 +62,9 @@ namespace ClassicUO.Game.UI.ImGuiControls
             {
                 ImGui.End();
             }
+
+            if(rightclickClose)
+                Dispose();
         }
 
         public abstract void DrawContent();
@@ -69,6 +77,13 @@ namespace ClassicUO.Game.UI.ImGuiControls
         {
         }
 
+        public virtual void Save(XmlTextWriter xml)
+        {
+            xml.WriteAttributeString("type", GetType().FullName);
+        }
+
+        public virtual void Load(XmlElement xml) { }
+
         public virtual void Dispose()
         {
             OnWindowClosed();
@@ -78,6 +93,8 @@ namespace ClassicUO.Game.UI.ImGuiControls
                     ImGuiManager.Renderer.UnbindTexture(item.Value.Pointer);
 
             _texturePointerCache.Clear();
+
+            _isOpen = false;
         }
 
         protected void SetTooltip(string tooltip)

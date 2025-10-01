@@ -146,7 +146,7 @@ namespace ClassicUO.Game.Scenes
             _currentFilter = null;
             _postFx = null;
         }
-        private long _nextProfileSave;
+        private long _nextProfileSave = Time.Ticks + 1000*60*60;
 
         public MoveItemQueue MoveItemQueue => _moveItemQueue;
         public bool UpdateDrawPosition { get; set; }
@@ -386,7 +386,6 @@ namespace ClassicUO.Game.Scenes
 
             Instance = null;
 
-            Game.UI.ImGuiManager.Dispose();
             GridContainerSaveData.Instance.Save();
             GridContainerSaveData.Reset();
             JournalFilterManager.Instance.Save();
@@ -433,6 +432,7 @@ namespace ClassicUO.Game.Scenes
             UIManager.GetGump<WorldMapGump>()?.SaveSettings();
 
             ProfileManager.CurrentProfile?.Save(_world, ProfileManager.ProfilePath);
+            ImGuiManager.Dispose();
             TileMarkerManager.Instance.Save();
             SpellVisualRangeManager.Instance.Save();
             SpellVisualRangeManager.Instance.OnSceneUnload();

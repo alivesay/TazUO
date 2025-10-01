@@ -379,7 +379,7 @@ namespace ClassicUO.Game.UI.Controls
         {
             if (_dirty || WantUpdateSize)
             {
-                var text = _rtl.Text ?? string.Empty;
+                var text = _rtl?.Text ?? string.Empty;
 
                 if (WantUpdateSize && Options != null)
                     Options.Width = null;

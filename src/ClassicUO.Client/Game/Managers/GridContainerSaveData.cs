@@ -346,6 +346,34 @@ public class GridContainerEntry
         AutoSort = container.AutoSortContainer;
         VisuallyStackNonStackables = container.StackNonStackableItems;
         SortMode = (int)container.SortMode;
+
+        // Sync all item positions from GridSlotManager to Slots
+        // First, remove any entries for items no longer in ItemPositions (they were removed/moved)
+        var itemPositions = container.SlotManager?.ItemPositions;
+        if (itemPositions != null)
+        {
+            // Get list of serials currently in ItemPositions
+            var currentSerials = new HashSet<uint>(itemPositions.Values);
+
+            // Remove stale entries from Slots
+            var staleSerials = Slots.Keys.Where(serial => !currentSerials.Contains(serial)).ToList();
+            foreach (var serial in staleSerials)
+            {
+                Slots.Remove(serial);
+            }
+
+            // Now sync current positions
+            foreach (var kvp in itemPositions)
+            {
+                int slotIndex = kvp.Key;
+                uint itemSerial = kvp.Value;
+
+                // Ensure this item has a slot entry with the correct position
+                var entry = GetSlot(itemSerial);
+                entry.Slot = slotIndex;
+            }
+        }
+
         return this;
     }
 }
